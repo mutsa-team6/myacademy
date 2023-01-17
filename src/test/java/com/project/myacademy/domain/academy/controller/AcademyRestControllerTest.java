@@ -1,9 +1,7 @@
 package com.project.myacademy.domain.academy.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.myacademy.domain.academy.dto.AcademyDto;
-import com.project.myacademy.domain.academy.dto.CreateAcademyRequest;
-import com.project.myacademy.domain.academy.dto.UpdateAcademyReqeust;
+import com.project.myacademy.domain.academy.dto.*;
 import com.project.myacademy.domain.academy.service.AcademyService;
 import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.global.configuration.SecurityConfig;
@@ -133,4 +131,25 @@ class AcademyRestControllerTest {
         verify(academyService).deleteAcademy(anyLong(), anyString());
     }
 
+    @Test
+    @DisplayName("학원 로그인 : 성공")
+    void login() throws Exception {
+        final String token = JwtTokenUtil.createToken("admin", secretKey, 3600L);
+        final LoginAcademyRequest request = new LoginAcademyRequest("businessRegistrationNumber", "password");
+        final LoginAcademyResponse response = new LoginAcademyResponse(1L, token);
+
+        when(academyService.loginAcademy(any(LoginAcademyRequest.class))).thenReturn(response);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/academies/login")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
+                .andExpect(jsonPath("$.result.academyId").value(1L))
+                .andExpect(jsonPath("$.result.jwt").exists());
+
+        verify(academyService).loginAcademy(any(LoginAcademyRequest.class));
+    }
 }
