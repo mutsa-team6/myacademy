@@ -2,12 +2,14 @@ package com.project.myacademy.domain.student;
 
 import com.project.myacademy.domain.student.dto.CreateStudentRequest;
 import com.project.myacademy.domain.student.dto.CreateStudentResponse;
+import com.project.myacademy.domain.student.dto.FindAllStudentResponse;
 import com.project.myacademy.domain.student.dto.FindStudentResponse;
 import com.project.myacademy.global.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Controller;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -22,7 +24,7 @@ public class StudentRestController {
      * 학생 등록
      */
     @PostMapping("/students")
-    public Response<CreateStudentResponse> create( CreateStudentRequest request) {
+    public Response<CreateStudentResponse> create(CreateStudentRequest request) {
         //String userName = authentication.getName();
         CreateStudentResponse response = studentService.createStudent(request);
         return Response.success(response);
@@ -33,7 +35,17 @@ public class StudentRestController {
      */
     @GetMapping("/students/{studentsId}")
     public Response<FindStudentResponse> find(@PathVariable Long studentsId) {
-        FindStudentResponse findStudentResponse = studentService.findStudent(studentsId);
-        return Response.success(findStudentResponse);
+        FindStudentResponse response = studentService.findStudent(studentsId);
+        return Response.success(response);
+    }
+
+    /**
+     * 학생 정보 전체 조회
+     */
+    @GetMapping("/students")
+    public Response<Page<FindAllStudentResponse>> findAll() {
+        PageRequest pageable = PageRequest.of(0, 20, Sort.by("id").descending());
+        Page<FindAllStudentResponse> responses = studentService.findAllStudent(pageable);
+        return Response.success(responses);
     }
 }

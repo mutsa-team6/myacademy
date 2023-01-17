@@ -1,15 +1,17 @@
 package com.project.myacademy.domain.student;
 
-import com.project.myacademy.domain.employee.EmployeeRepository;
 import com.project.myacademy.domain.parent.Parent;
 import com.project.myacademy.domain.parent.ParentRepository;
 import com.project.myacademy.domain.student.dto.CreateStudentRequest;
 import com.project.myacademy.domain.student.dto.CreateStudentResponse;
+import com.project.myacademy.domain.student.dto.FindAllStudentResponse;
 import com.project.myacademy.domain.student.dto.FindStudentResponse;
 import com.project.myacademy.global.exception.AppException;
 import com.project.myacademy.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -54,5 +56,15 @@ public class StudentService {
                 .orElseThrow(() -> new AppException(ErrorCode.STUDENT_NOT_FOUND));
 
         return FindStudentResponse.of(student);
+    }
+
+    /**
+     * 학생 정보 전체 조회
+     */
+    public Page<FindAllStudentResponse> findAllStudent(PageRequest pageable) {
+
+        //토큰에 들어있는 userName이 EmployeeRepository에 있는지 확인
+
+        return studentRepository.findAll(pageable).map(student -> FindAllStudentResponse.of(student));
     }
 }
