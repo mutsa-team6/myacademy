@@ -2,10 +2,7 @@ package com.project.myacademy.domain.student;
 
 import com.project.myacademy.domain.parent.Parent;
 import com.project.myacademy.domain.parent.ParentRepository;
-import com.project.myacademy.domain.student.dto.CreateStudentRequest;
-import com.project.myacademy.domain.student.dto.CreateStudentResponse;
-import com.project.myacademy.domain.student.dto.FindAllStudentResponse;
-import com.project.myacademy.domain.student.dto.FindStudentResponse;
+import com.project.myacademy.domain.student.dto.*;
 import com.project.myacademy.global.exception.AppException;
 import com.project.myacademy.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +22,7 @@ public class StudentService {
     /**
      * 학생 등록
      */
+    @Transactional
     public CreateStudentResponse createStudent(CreateStudentRequest request) {
 
         //토큰에 들어있는 userName이 Employ에 있는지 확인
@@ -66,5 +65,20 @@ public class StudentService {
         //토큰에 들어있는 userName이 EmployeeRepository에 있는지 확인
 
         return studentRepository.findAll(pageable).map(student -> FindAllStudentResponse.of(student));
+    }
+
+    /**
+     * 학생 정보 수정
+     */
+    @Transactional
+    public ModifyStudentResponse modifyStudent(long studentsId, ModifyStudentRequest request) {
+        Student student = studentRepository.findById(studentsId)
+                .orElseThrow(() -> new AppException(ErrorCode.STUDENT_NOT_FOUND));
+
+        student.modifyStudent(request);
+
+        //부모정보도 여기서 수정이 가능해야 할까?
+
+        return ModifyStudentResponse.of(student);
     }
 }

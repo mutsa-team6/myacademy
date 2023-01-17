@@ -1,9 +1,6 @@
 package com.project.myacademy.domain.student;
 
-import com.project.myacademy.domain.student.dto.CreateStudentRequest;
-import com.project.myacademy.domain.student.dto.CreateStudentResponse;
-import com.project.myacademy.domain.student.dto.FindAllStudentResponse;
-import com.project.myacademy.domain.student.dto.FindStudentResponse;
+import com.project.myacademy.domain.student.dto.*;
 import com.project.myacademy.global.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,5 +44,14 @@ public class StudentRestController {
         PageRequest pageable = PageRequest.of(0, 20, Sort.by("id").descending());
         Page<FindAllStudentResponse> responses = studentService.findAllStudent(pageable);
         return Response.success(responses);
+    }
+
+    /**
+     * 학생 정보 수정
+     */
+    @PutMapping("/students/{studentsId}")
+    public Response<ModifyStudentResponse> modify(@PathVariable Long studentsId, ModifyStudentRequest request) {
+        ModifyStudentResponse response = studentService.modifyStudent(studentsId, request);
+        return Response.success(response);
     }
 }
