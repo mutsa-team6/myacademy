@@ -5,6 +5,7 @@ import com.project.myacademy.domain.parent.Parent;
 import com.project.myacademy.domain.parent.ParentRepository;
 import com.project.myacademy.domain.student.dto.CreateStudentRequest;
 import com.project.myacademy.domain.student.dto.CreateStudentResponse;
+import com.project.myacademy.domain.student.dto.FindStudentResponse;
 import com.project.myacademy.global.exception.AppException;
 import com.project.myacademy.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,7 @@ public class StudentService {
 
         //토큰에 들어있는 userName이 Employ에 있는지 확인
 
-        //중복된 학생인지 체크
+        //중복체크
         studentRepository.findByPhoneNum(request.getPhoneNum())
                 .ifPresent(user -> {
                     throw new AppException(ErrorCode.DUPLICATED_STUDENT);
@@ -40,5 +41,18 @@ public class StudentService {
         Student savedStudent = studentRepository.save(Student.toStudent(request, parent));
 
         return CreateStudentResponse.of(savedStudent);
+    }
+
+    /**
+     * 학생 정보 단건 조회
+     */
+    public FindStudentResponse findStudent(Long studentsId) {
+
+        //토큰에 들어있는 userName이 EmployeeRepository에 있는지 확인
+
+        Student student = studentRepository.findById(studentsId)
+                .orElseThrow(() -> new AppException(ErrorCode.STUDENT_NOT_FOUND));
+
+        return FindStudentResponse.of(student);
     }
 }

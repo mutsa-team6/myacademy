@@ -2,15 +2,13 @@ package com.project.myacademy.domain.student;
 
 import com.project.myacademy.domain.student.dto.CreateStudentRequest;
 import com.project.myacademy.domain.student.dto.CreateStudentResponse;
+import com.project.myacademy.domain.student.dto.FindStudentResponse;
 import com.project.myacademy.global.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,10 +23,17 @@ public class StudentRestController {
      */
     @PostMapping("/students")
     public Response<CreateStudentResponse> create( CreateStudentRequest request) {
-        log.info("Student phoneNum : " + request.getPhoneNum());
-
         //String userName = authentication.getName();
         CreateStudentResponse response = studentService.createStudent(request);
         return Response.success(response);
+    }
+
+    /**
+     * 학생 정보 단건 조회
+     */
+    @GetMapping("/students/{studentsId}")
+    public Response<FindStudentResponse> find(@PathVariable Long studentsId) {
+        FindStudentResponse findStudentResponse = studentService.findStudent(studentsId);
+        return Response.success(findStudentResponse);
     }
 }
