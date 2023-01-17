@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/academies")
 @RequiredArgsConstructor
 @Slf4j
-public class AcademyController {
+public class AcademyRestController {
 
     private final AcademyService academyService;
 
