@@ -16,6 +16,10 @@ public class IndexController {
         return "join";
     }
 
+    @GetMapping("/login")
+    public String login(){
+        return "login";
+    }
 
 
 }
