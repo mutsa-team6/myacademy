@@ -7,8 +7,10 @@ import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.domain.employee.EmployeeRepository;
 import com.project.myacademy.global.exception.AppException;
 import com.project.myacademy.global.exception.ErrorCode;
+import com.project.myacademy.global.util.JwtTokenUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +24,10 @@ public class AcademyService {
     private final AcademyRepository academyRepository;
     private final EmployeeRepository employeeRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    @Value("${jwt.token.secret}")
+    private String secretKey;
+    private long expiredTimeMs = 1000 * 60 * 60;
 
     /**
      * 학원 등록
@@ -131,4 +137,35 @@ public class AcademyService {
         return academyId;
     }
 
+    /**
+     * 학원 로그인
+     *
+     * @param request
+     * @return LoginAcademyResponse
+     */
+    @Transactional
+    public LoginAcademyResponse loginAcademy(LoginAcademyRequest request) {
+
+        // 요청의 등록번호 추출
+        String businessRegistrationNumber = request.getBusinessRegistrationNumber();
+        log.info("요청에서 등록번호를 추출했습니다.");
+
+        // 등록번호로 학원정보 조회
+        log.info("등록번호로 저장소에서 학원정보를 조회합니다.");
+        Academy academy = academyRepository.findByBusinessRegistrationNumber(businessRegistrationNumber)
+                .orElseThrow(() -> {
+                    throw new AppException(ErrorCode.ACADEMY_NOT_FOUND, ErrorCode.ACADEMY_NOT_FOUND.getMessage());
+                });
+        log.info("학원정보를 저장소에서 조회했습니다.");
+
+        // 권한 확인
+        log.info("조회된 학원정보와 요청의 비밀번호로 권한을 확인합니다.");
+        if (!bCryptPasswordEncoder.matches(request.getPassword(), academy.getPassword())) {
+            throw new AppException(ErrorCode.INVALID_PASSWORD, ErrorCode.INVALID_PASSWORD.getMessage());
+        }
+        log.info("조회된 학원정보와 요청의 비밀번호가 일치합니다.");
+        log.info("학원 토큰이 발급됩니다.");
+
+        return new LoginAcademyResponse(academy.getId(), JwtTokenUtil.createToken(request.getBusinessRegistrationNumber(), secretKey, expiredTimeMs));
+    }
 }

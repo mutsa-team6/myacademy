@@ -73,4 +73,20 @@ public class AcademyController {
                 "학원 삭제가 정상적으로 완료되었습니다.")));
     }
 
+    /**
+     * 학원 로그인
+     *
+     * @param request
+     * @return ResponseEntity
+     */
+    @PostMapping("/login")
+    public ResponseEntity login(@RequestBody LoginAcademyRequest request) {
+
+        LoginAcademyResponse response = academyService.loginAcademy(request);
+        log.info("학원 로그인 정상적으로 완료되었습니다.");
+        log.info("학원 번호 : " + response.getAcademyId());
+        log.info("학원 토큰이 발급되었습니다.");
+
+        return ResponseEntity.ok(Response.success(response));
+    }
 }
