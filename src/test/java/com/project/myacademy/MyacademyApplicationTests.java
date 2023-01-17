@@ -82,9 +82,8 @@ class MyacademyApplicationTests {
 
 		Teacher teacher = Teacher.builder()
 				.name("Teacher name")
-				.address("Teacher address")
-				.email("Teacher email")
-				.phoneNum("Teacher phone number")
+				.subject("Teacher subject")
+				.employee(employee)
 				.build();
 
 		Lecture lecture = Lecture.builder()
