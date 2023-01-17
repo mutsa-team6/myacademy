@@ -115,4 +115,22 @@ class AcademyRestControllerTest {
         verify(academyService).updateAcademy(anyLong(), any(UpdateAcademyReqeust.class), anyString());
     }
 
+    @Test
+    @DisplayName("학원 정보 삭제 : 성공")
+    void delete() throws Exception {
+        final String token = JwtTokenUtil.createToken("admin", secretKey, 3600L);
+
+        when(academyService.deleteAcademy(anyLong(), anyString())).thenReturn(1L);
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/academies/1")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
+                .andExpect(jsonPath("$.result.id").value(1L))
+                .andExpect(jsonPath("$.result.message").value("학원 삭제가 정상적으로 완료되었습니다."));
+
+        verify(academyService).deleteAcademy(anyLong(), anyString());
+    }
+
 }
