@@ -4,6 +4,8 @@ import com.project.myacademy.domain.student.Student;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Builder
 public class FindStudentResponse {
@@ -21,6 +23,10 @@ public class FindStudentResponse {
     private String email;
     //부모 핸드폰번호
     private String parentPhoneNum;
+    //학생 정보 등록 일시
+    private LocalDateTime createAt;
+    //학생 정보 마지막 수정 일시
+    private LocalDateTime lastModifiedAt;
 
     public static FindStudentResponse of(Student student) {
         return FindStudentResponse.builder()
@@ -31,6 +37,8 @@ public class FindStudentResponse {
                 .phoneNum(student.getPhoneNum())
                 .email(student.getEmail())
                 //.parentPhoneNum(student.getParent().getPhoneNum()) NPE 제거해야함
+                .createAt(student.getCreatedAt())
+                .lastModifiedAt(student.getLastModifiedAt())
                 .build();
     }
 }
