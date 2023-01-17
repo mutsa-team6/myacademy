@@ -27,6 +27,8 @@ public class Student extends BaseEntity {
 
     private String school;
 
+    private String birth;
+
     @Column(name = "phone_number")
     private String phoneNum;
 
