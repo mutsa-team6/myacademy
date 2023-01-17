@@ -1,6 +1,9 @@
 package com.project.myacademy.domain.teacher;
 
 import com.project.myacademy.domain.BaseEntity;
+import com.project.myacademy.domain.employee.Employee;
+import com.project.myacademy.domain.teacher.dto.CreateTeacherRequest;
+import com.project.myacademy.domain.teacher.dto.UpdateTeacherRequest;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
@@ -21,15 +24,23 @@ public class Teacher extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "teacher_id")
     private Long id;
-
     private String name;
+    private String subject;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "employee_id")
+    private Employee employee;
 
-    @Column(name = "phone_number")
-    private String phoneNum;
+    public static Teacher addTeacherToLecture(CreateTeacherRequest request, Employee employee) {
+        return Teacher.builder()
+                .name(request.getName())
+                .subject(request.getSubject())
+                .employee(employee)
+                .build();
+    }
 
-    private String email;
-
-    private String address;
-
+    public void updateTeacherInLecture(UpdateTeacherRequest request) {
+        this.name = request.getName();
+        this.subject = request.getSubject();
+    }
 }
