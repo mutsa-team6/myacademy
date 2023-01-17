@@ -55,4 +55,22 @@ public class AcademyController {
                 "학원 수정이 정상적으로 완료되었습니다.")));
     }
 
+    /**
+     * 학원 삭제
+     *
+     * @param academyId
+     * @param authentication
+     * @return ResponseEntity
+     */
+    @DeleteMapping("/{academyId}")
+    public ResponseEntity delete(@PathVariable Long academyId, Authentication authentication) {
+        log.info("Academy id : " + academyId);
+
+        Long deletedAcademyId = academyService.deleteAcademy(academyId, authentication.getName());
+
+        return ResponseEntity.ok(Response.success(new DeleteAcademyResponse(
+                deletedAcademyId,
+                "학원 삭제가 정상적으로 완료되었습니다.")));
+    }
+
 }

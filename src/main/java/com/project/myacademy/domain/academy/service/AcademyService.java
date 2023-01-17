@@ -95,4 +95,40 @@ public class AcademyService {
         return updatedAcademy.toAcademyDto();
     }
 
+    /**
+     * 학원 삭제
+     *
+     * @param academyId
+     * @return Long
+     */
+    @Transactional
+    public Long deleteAcademy(Long academyId, String name) {
+
+        // 인증 확인
+        log.info("인증정보로 저장소에서 계정정보를 확인합니다.");
+        Employee employee = employeeRepository.findByName(name)
+                .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND, ErrorCode.ACCOUNT_NOT_FOUND.getMessage()));
+        log.info("계정정보가 확인되었습니다.");
+
+        // academyId로 학원정보  확인
+        log.info("academyId로 저장소에서 학원정보를 조회합니다.");
+        Academy academy = academyRepository.findById(academyId)
+                .orElseThrow(() -> new AppException(ErrorCode.ACADEMY_NOT_FOUND, ErrorCode.ACADEMY_NOT_FOUND.getMessage()));
+        log.info("저장소에서 학원정보가 조회되었습니다.");
+
+        // 권한 확인
+        log.info("학원정보의 소유자와 인증정보로 권한을 확인합니다.");
+        if(!academy.getOwner().equals(name) && !employee.getEmployeeRole().equals("ADMIN")) {
+            throw new AppException(ErrorCode.INVALID_PERMISSION, ErrorCode.INVALID_PERMISSION.getMessage());
+        }
+        log.info("권한이 확인되었습니다.");
+
+        // 학원 정보 수정
+        log.info("학원정보를 삭제하겠습니다.");
+        academyRepository.delete(academy);
+        log.info("학원정보를 삭제하였습니다.");
+
+        return academyId;
+    }
+
 }
