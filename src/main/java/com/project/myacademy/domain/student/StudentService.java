@@ -71,7 +71,7 @@ public class StudentService {
      * 학생 정보 수정
      */
     @Transactional
-    public ModifyStudentResponse modifyStudent(long studentsId, ModifyStudentRequest request) {
+    public UpdateStudentResponse updateStudent(long studentsId, UpdateStudentRequest request) {
         Student student = studentRepository.findById(studentsId)
                 .orElseThrow(() -> new AppException(ErrorCode.STUDENT_NOT_FOUND));
 
@@ -79,6 +79,6 @@ public class StudentService {
 
         //부모정보도 여기서 수정이 가능해야 할까?
 
-        return ModifyStudentResponse.of(student);
+        return UpdateStudentResponse.of(student);
     }
 }

@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class ModifyStudentRequest {
+public class UpdateStudentRequest {
     //학생 이름
     private String name;
     //학생 학교

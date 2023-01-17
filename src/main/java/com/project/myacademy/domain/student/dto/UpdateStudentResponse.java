@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Getter
 @Builder
-public class ModifyStudentResponse {
+public class UpdateStudentResponse {
     //학생 id
     private Long id;
     //학생 이름
@@ -27,8 +27,8 @@ public class ModifyStudentResponse {
     //학생 정보 마지막 수정 일시
     private LocalDateTime lastModifiedAt;
 
-    public static ModifyStudentResponse of(Student student) {
-        return ModifyStudentResponse.builder()
+    public static UpdateStudentResponse of(Student student) {
+        return UpdateStudentResponse.builder()
                 .id(student.getId())
                 .name(student.getName())
                 .address(student.getAddress())

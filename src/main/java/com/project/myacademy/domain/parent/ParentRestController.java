@@ -6,6 +6,7 @@ import com.project.myacademy.domain.parent.dto.FindParentResponse;
 import com.project.myacademy.global.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,18 +21,18 @@ public class ParentRestController {
      * 부모 등록
      */
     @PostMapping("/parents")
-    public Response<CreateParentResponse> create(CreateParentRequest request) {
+    public ResponseEntity<Response<CreateParentResponse>> create(CreateParentRequest request) {
         //String userName = authentication.getName();
         CreateParentResponse response = parentService.createParent(request);
-        return Response.success(response);
+        return ResponseEntity.ok().body(Response.success(response));
     }
 
     /**
      * 부모 정보 단건 조회
      */
     @GetMapping("/parents/{parentId}")
-    public Response<FindParentResponse> find(@PathVariable Long parentId) {
+    public ResponseEntity<Response<FindParentResponse>> find(@PathVariable Long parentId) {
         FindParentResponse response = parentService.findParent(parentId);
-        return Response.success(response);
+        return ResponseEntity.ok().body(Response.success(response));
     }
 }
