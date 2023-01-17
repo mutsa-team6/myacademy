@@ -5,6 +5,7 @@ import com.project.myacademy.domain.academy.entity.Academy;
 import com.project.myacademy.domain.academy.repository.AcademyRepository;
 import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.domain.employee.EmployeeRepository;
+import com.project.myacademy.domain.employee.EmployeeRole;
 import com.project.myacademy.global.exception.AppException;
 import com.project.myacademy.global.exception.ErrorCode;
 import com.project.myacademy.global.util.JwtTokenUtil;
@@ -83,7 +84,7 @@ public class AcademyService {
 
         // 권한 확인
         log.info("학원정보의 소유자와 인증정보로 권한을 확인합니다.");
-        if(!academy.getOwner().equals(name) && !employee.getEmployeeRole().equals("ADMIN")) {
+        if(!academy.getOwner().equals(name) && !employee.getEmployeeRole().equals(EmployeeRole.ROLE_ADMIN)) {
             throw new AppException(ErrorCode.INVALID_PERMISSION, ErrorCode.INVALID_PERMISSION.getMessage());
         }
         log.info("권한이 확인되었습니다.");
@@ -124,7 +125,7 @@ public class AcademyService {
 
         // 권한 확인
         log.info("학원정보의 소유자와 인증정보로 권한을 확인합니다.");
-        if(!academy.getOwner().equals(name) && !employee.getEmployeeRole().equals("ADMIN")) {
+        if(!academy.getOwner().equals(name) && !employee.getEmployeeRole().equals(EmployeeRole.ROLE_ADMIN)) {
             throw new AppException(ErrorCode.INVALID_PERMISSION, ErrorCode.INVALID_PERMISSION.getMessage());
         }
         log.info("권한이 확인되었습니다.");
