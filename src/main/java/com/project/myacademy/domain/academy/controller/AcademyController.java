@@ -6,6 +6,7 @@ import com.project.myacademy.global.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -32,4 +33,26 @@ public class AcademyController {
                 savedAcademyDto.getOwner(),
                 "학원 등록이 정상적으로 완료되었습니다.")));
     }
+
+    /**
+     * 학원 정보 수정
+     *
+     * @param academyId
+     * @param reqeust
+     * @param authentication
+     * @return ResponseEntity
+     */
+    @PutMapping("/{academyId}")
+    public ResponseEntity update(@PathVariable Long academyId, @RequestBody UpdateAcademyReqeust reqeust, Authentication authentication) {
+        log.info("Academy id : " + academyId);
+
+        AcademyDto updatedAcademyDto = academyService.updateAcademy(academyId, reqeust, authentication.getName());
+
+        return ResponseEntity.ok(Response.success(new UpdateAcademyResponse(
+                updatedAcademyDto.getId(),
+                updatedAcademyDto.getName(),
+                updatedAcademyDto.getOwner(),
+                "학원 수정이 정상적으로 완료되었습니다.")));
+    }
+
 }
