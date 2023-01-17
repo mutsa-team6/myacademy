@@ -2,6 +2,7 @@ package com.project.myacademy.domain.parent;
 
 import com.project.myacademy.domain.parent.dto.CreateParentRequest;
 import com.project.myacademy.domain.parent.dto.CreateParentResponse;
+import com.project.myacademy.domain.parent.dto.FindParentResponse;
 import com.project.myacademy.global.exception.AppException;
 import com.project.myacademy.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -28,5 +29,16 @@ public class ParentService {
         Parent savedParent = parentRepository.save(Parent.toParent(request));
 
         return CreateParentResponse.of(savedParent);
+    }
+
+    /**
+     * 부모 정보 단건 조회
+     */
+    public FindParentResponse findParent(long parentId) {
+
+        Parent parent = parentRepository.findById(parentId)
+                .orElseThrow(() ->new AppException(ErrorCode.PARENT_NOT_FOUND));
+
+        return FindParentResponse.of(parent);
     }
 }
