@@ -2,6 +2,7 @@ package com.project.myacademy.domain.student;
 
 import com.project.myacademy.domain.BaseEntity;
 import com.project.myacademy.domain.parent.Parent;
+import com.project.myacademy.domain.student.dto.CreateStudentRequest;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
@@ -40,4 +41,16 @@ public class Student extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     private Parent parent;
+
+    public static Student toStudent(CreateStudentRequest request, Parent parent) {
+        return Student.builder()
+                .name(request.getName())
+                .school(request.getSchool())
+                .birth(request.getBirth())
+                .phoneNum(request.getPhoneNum())
+                .email(request.getEmail())
+                .address(request.getAddress())
+                .parent(parent)
+                .build();
+    }
 }
