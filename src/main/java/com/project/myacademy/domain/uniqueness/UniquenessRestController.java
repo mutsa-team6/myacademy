@@ -38,6 +38,12 @@ public class UniquenessRestController {
         return ResponseEntity.ok().body(Response.success(responses));
     }
 
+    /**
+     *
+     * @param studentId 특이사항의 대상이 되는 학생 Id
+     * @param uniquenessId 수정하려고하는 특이사항 Id
+     * @param request 수정내용이 담긴 dto
+     */
     @PutMapping("students/{studentId}/uniqueness/{uniquenessId}")
     public ResponseEntity<Response<UpdateUniquenessResponse>> update(@PathVariable Long studentId, @PathVariable Long uniquenessId, UpdateUniquenessRequest request) {
      UpdateUniquenessResponse response = uniquenessService.updateUniqueness(studentId, uniquenessId, request);

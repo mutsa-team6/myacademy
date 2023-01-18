@@ -47,6 +47,13 @@ public class UniquenessService {
         return uniquenessRepository.findAllByStudent(student, pageable).map(uniqueness -> ReadAllUniquenessResponse.of(uniqueness));
     }
 
+    /**
+     *
+     * @param studentId 특이사항의 대상이 되는 학생 Id
+     * @param uniquenessId 수정하려고하는 특이사항 Id
+     * @param request 수정내용이 담긴 dto
+     */
+    @Transactional
     public UpdateUniquenessResponse updateUniqueness(Long studentId, Long uniquenessId, UpdateUniquenessRequest request) {
 
         studentRepository.findById(studentId)
