@@ -81,8 +81,9 @@ public class StudentService {
     }
 
     /**
-     * 부모 정보 삭제
+     * 학생 정보 삭제
      */
+    @Transactional
     public DeleteStudentResponse deleteStudent(Long studentId) {
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new AppException(ErrorCode.STUDENT_NOT_FOUND));
