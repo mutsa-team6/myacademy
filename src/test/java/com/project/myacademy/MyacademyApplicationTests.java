@@ -2,9 +2,9 @@ package com.project.myacademy;
 
 import com.project.myacademy.domain.academy.entity.Academy;
 import com.project.myacademy.domain.academy.repository.AcademyRepository;
-import com.project.myacademy.domain.employee.Employee;
-import com.project.myacademy.domain.employee.EmployeeRepository;
-import com.project.myacademy.domain.employee.EmployeeRole;
+import com.project.myacademy.domain.employee.entity.Employee;
+import com.project.myacademy.domain.employee.repository.EmployeeRepository;
+import com.project.myacademy.domain.employee.entity.EmployeeRole;
 import com.project.myacademy.domain.lecture.Lecture;
 import com.project.myacademy.domain.lecture.LectureRepository;
 import com.project.myacademy.domain.parent.Parent;
