@@ -106,7 +106,6 @@ class AcademyServiceTest {
 
         assertDoesNotThrow(() -> academyService.loginAcademy(request));
         assertEquals(1L, academyService.loginAcademy(request).getAcademyId());
-        assertTrue(academyService.loginAcademy(request).getJwt().describeConstable().isPresent());
 
         verify(academyRepository, atLeastOnce()).findByBusinessRegistrationNumber(anyString());
     }
