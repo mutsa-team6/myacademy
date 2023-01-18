@@ -77,8 +77,18 @@ public class StudentService {
 
         student.updateStudent(request);
 
-        //부모정보도 여기서 수정이 가능해야 할까?
-
         return UpdateStudentResponse.of(student);
+    }
+
+    /**
+     * 부모 정보 삭제
+     */
+    public DeleteStudentResponse deleteStudent(Long studentId) {
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new AppException(ErrorCode.STUDENT_NOT_FOUND));
+
+        studentRepository.delete(student);
+
+        return DeleteStudentResponse.of(student);
     }
 }

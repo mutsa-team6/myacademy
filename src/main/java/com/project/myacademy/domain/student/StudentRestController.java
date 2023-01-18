@@ -55,4 +55,13 @@ public class StudentRestController {
         UpdateStudentResponse response = studentService.updateStudent(studentId, request);
         return ResponseEntity.ok().body(Response.success(response));
     }
+
+    /**
+     * 학생 정보 삭제
+     */
+    @DeleteMapping("/students/{studentId}")
+    public ResponseEntity<Response<DeleteStudentResponse>> delete(@PathVariable Long studentId) {
+        DeleteStudentResponse response = studentService.deleteStudent(studentId);
+        return ResponseEntity.ok().body(Response.success(response));
+    }
 }
