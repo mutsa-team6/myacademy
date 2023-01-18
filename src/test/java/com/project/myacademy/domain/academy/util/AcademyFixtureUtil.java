@@ -3,9 +3,7 @@ package com.project.myacademy.domain.academy.util;
 import com.project.myacademy.domain.academy.entity.Academy;
 
 public enum AcademyFixtureUtil {
-    ACADEMY_ADMIN(1L, "name", "address", "phoneNum", "admin", "businessRegistrationNumber", "password"),
-    ACADEMY_USER1(1L, "name", "address", "phoneNum", "user1", "businessRegistrationNumber", "password"),
-    ACADEMY_USER2(1L, "name", "address", "phoneNum", "user2", "businessRegistrationNumber", "password");
+    ACADEMY_ADMIN(1L, "name", "address", "phoneNum", "admin", "businessRegistrationNumber", "password");
 
     private Long id;
     private String name;
