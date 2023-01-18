@@ -1,6 +1,6 @@
 package com.project.myacademy.domain.lecture;
 
-import com.project.myacademy.domain.academy.AcademyRepository;
+import com.project.myacademy.domain.academy.repository.AcademyRepository;
 import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.domain.employee.EmployeeRepository;
 import com.project.myacademy.domain.lecture.dto.*;
