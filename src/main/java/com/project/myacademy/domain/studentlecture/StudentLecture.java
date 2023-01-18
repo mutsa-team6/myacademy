@@ -3,6 +3,7 @@ package com.project.myacademy.domain.studentlecture;
 import com.project.myacademy.domain.BaseEntity;
 import com.project.myacademy.domain.lecture.Lecture;
 import com.project.myacademy.domain.student.Student;
+import com.project.myacademy.domain.studentlecture.dto.CreateStudentLectureRequest;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
@@ -33,5 +34,13 @@ public class StudentLecture extends BaseEntity {
     private Student student;
 
     private String memo;
+
+    public static StudentLecture addClass(Student student, Lecture lecture, CreateStudentLectureRequest request) {
+        return StudentLecture.builder()
+                .student(student)
+                .lecture(lecture)
+                .memo(request.getMemo())
+                .build();
+    }
 
 }
