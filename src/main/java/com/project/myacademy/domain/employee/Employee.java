@@ -1,4 +1,4 @@
-package com.project.myacademy.domain.employee.entity;
+package com.project.myacademy.domain.employee;
 
 import com.project.myacademy.domain.academy.entity.Academy;
 import com.project.myacademy.domain.BaseEntity;

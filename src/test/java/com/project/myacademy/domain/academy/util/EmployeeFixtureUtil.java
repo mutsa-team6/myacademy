@@ -1,7 +1,7 @@
 package com.project.myacademy.domain.academy.util;
 
-import com.project.myacademy.domain.employee.entity.Employee;
-import com.project.myacademy.domain.employee.entity.EmployeeRole;
+import com.project.myacademy.domain.employee.Employee;
+import com.project.myacademy.domain.employee.EmployeeRole;
 
 public enum EmployeeFixtureUtil {
     ROLE_ADMIN(0L, "admin", "password", EmployeeRole.ROLE_ADMIN),

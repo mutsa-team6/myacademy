@@ -1,6 +1,6 @@
 package com.project.myacademy.domain.academy.util;
 
-import com.project.myacademy.domain.employee.entity.Employee;
+import com.project.myacademy.domain.employee.Employee;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 
