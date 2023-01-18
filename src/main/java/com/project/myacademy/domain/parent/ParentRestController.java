@@ -42,4 +42,13 @@ public class ParentRestController {
         UpdateParentResponse response = parentService.updateParent(parentId, request);
         return ResponseEntity.ok().body(Response.success(response));
     }
+
+    /**
+     * 부모 정보 삭제
+     */
+    @DeleteMapping("/parents/{parentId}")
+    public ResponseEntity<Response<DeleteParentResponse>> delete(@PathVariable Long parentId) {
+        DeleteParentResponse response = parentService.deleteParent(parentId);
+        return ResponseEntity.ok().body(Response.success(response));
+    }
 }

@@ -22,7 +22,9 @@ public class ParentService {
     public CreateParentResponse createParent(CreateParentRequest request) {
         //중복체크
         parentRepository.findByPhoneNum(request.getPhoneNum())
-                .ifPresent(user -> {throw new AppException(ErrorCode.DUPLICATED_PARENT);});
+                .ifPresent(user -> {
+                    throw new AppException(ErrorCode.DUPLICATED_PARENT);
+                });
 
         Parent savedParent = parentRepository.save(Parent.toParent(request));
 
@@ -35,7 +37,7 @@ public class ParentService {
     public FindParentResponse findParent(long parentId) {
 
         Parent parent = parentRepository.findById(parentId)
-                .orElseThrow(() ->new AppException(ErrorCode.PARENT_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.PARENT_NOT_FOUND));
 
         return FindParentResponse.of(parent);
     }
@@ -52,5 +54,19 @@ public class ParentService {
         parent.updateParent(request);
 
         return UpdateParentResponse.of(parent);
+    }
+
+    /**
+     * 부모 정보 삭제
+     */
+    @Transactional
+    public DeleteParentResponse deleteParent(Long parentId) {
+
+        Parent parent = parentRepository.findById(parentId)
+                .orElseThrow(() -> new AppException(ErrorCode.PARENT_NOT_FOUND));
+
+        parentRepository.delete(parent);
+
+        return DeleteParentResponse.of(parent);
     }
 }
