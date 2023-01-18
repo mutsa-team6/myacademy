@@ -1,6 +1,6 @@
 package com.project.myacademy.domain.academy.util;
 
-import com.project.myacademy.domain.academy.entity.Academy;
+import com.project.myacademy.domain.academy.Academy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 public enum AcademyFixtureUtil {

@@ -1,8 +1,9 @@
 package com.project.myacademy.domain.academy.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.myacademy.domain.academy.AcademyRestController;
 import com.project.myacademy.domain.academy.dto.*;
-import com.project.myacademy.domain.academy.service.AcademyService;
+import com.project.myacademy.domain.academy.AcademyService;
 import com.project.myacademy.global.configuration.SecurityConfig;
 import com.project.myacademy.global.util.JwtTokenUtil;
 import org.junit.jupiter.api.DisplayName;

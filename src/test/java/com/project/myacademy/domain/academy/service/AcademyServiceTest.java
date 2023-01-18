@@ -1,17 +1,17 @@
 package com.project.myacademy.domain.academy.service;
 
+import com.project.myacademy.domain.academy.AcademyService;
 import com.project.myacademy.domain.academy.dto.LoginAcademyRequest;
 import com.project.myacademy.domain.academy.dto.UpdateAcademyReqeust;
 import com.project.myacademy.domain.academy.util.AcademyFixtureUtil;
 import com.project.myacademy.domain.academy.dto.CreateAcademyRequest;
-import com.project.myacademy.domain.academy.entity.Academy;
-import com.project.myacademy.domain.academy.repository.AcademyRepository;
+import com.project.myacademy.domain.academy.Academy;
+import com.project.myacademy.domain.academy.AcademyRepository;
 import com.project.myacademy.domain.academy.util.EmployeeFixtureUtil;
 import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.domain.employee.EmployeeRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 
