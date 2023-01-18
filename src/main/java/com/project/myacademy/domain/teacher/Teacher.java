@@ -2,6 +2,7 @@ package com.project.myacademy.domain.teacher;
 
 import com.project.myacademy.domain.BaseEntity;
 import com.project.myacademy.domain.employee.Employee;
+import com.project.myacademy.domain.lecture.Lecture;
 import com.project.myacademy.domain.teacher.dto.CreateTeacherRequest;
 import com.project.myacademy.domain.teacher.dto.UpdateTeacherRequest;
 import lombok.*;
@@ -9,6 +10,7 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -30,6 +32,9 @@ public class Teacher extends BaseEntity {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "employee_id")
     private Employee employee;
+
+    @OneToMany(mappedBy = "teacher")
+    private List<Lecture> lectures;
 
     public static Teacher addTeacherToLecture(CreateTeacherRequest request, Employee employee) {
         return Teacher.builder()
