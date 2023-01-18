@@ -1,8 +1,8 @@
-package com.project.myacademy.domain.academy.service;
+package com.project.myacademy.domain.academy;
 
 import com.project.myacademy.domain.academy.dto.*;
-import com.project.myacademy.domain.academy.entity.Academy;
-import com.project.myacademy.domain.academy.repository.AcademyRepository;
+import com.project.myacademy.domain.academy.Academy;
+import com.project.myacademy.domain.academy.AcademyRepository;
 import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.domain.employee.EmployeeRepository;
 import com.project.myacademy.domain.employee.EmployeeRole;

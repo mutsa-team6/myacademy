@@ -1,7 +1,7 @@
 package com.project.myacademy;
 
-import com.project.myacademy.domain.academy.entity.Academy;
-import com.project.myacademy.domain.academy.repository.AcademyRepository;
+import com.project.myacademy.domain.academy.Academy;
+import com.project.myacademy.domain.academy.AcademyRepository;
 import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.domain.employee.EmployeeRepository;
 import com.project.myacademy.domain.employee.EmployeeRole;
@@ -28,10 +28,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-
-import static java.lang.System.currentTimeMillis;
+import java.time.LocalDate;
 
 @SpringBootTest
 class MyacademyApplicationTests {
@@ -94,8 +91,8 @@ class MyacademyApplicationTests {
 				.price(300000)
 				.maximumCapacity(30)
 				.minimumCapacity(5)
-				.startDate(LocalDateTime.now())
-				.finishDate(new Timestamp(currentTimeMillis() + 100).toLocalDateTime())
+				.startDate(LocalDate.now())
+				.finishDate(LocalDate.now().plusDays(10))
 				.build();
 
 		Parent parent =Parent.builder()

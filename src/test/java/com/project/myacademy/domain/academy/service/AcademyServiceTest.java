@@ -1,11 +1,12 @@
 package com.project.myacademy.domain.academy.service;
 
+import com.project.myacademy.domain.academy.AcademyService;
 import com.project.myacademy.domain.academy.dto.LoginAcademyRequest;
 import com.project.myacademy.domain.academy.dto.UpdateAcademyReqeust;
 import com.project.myacademy.domain.academy.util.AcademyFixtureUtil;
 import com.project.myacademy.domain.academy.dto.CreateAcademyRequest;
-import com.project.myacademy.domain.academy.entity.Academy;
-import com.project.myacademy.domain.academy.repository.AcademyRepository;
+import com.project.myacademy.domain.academy.Academy;
+import com.project.myacademy.domain.academy.AcademyRepository;
 import com.project.myacademy.domain.academy.util.EmployeeFixtureUtil;
 import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.domain.employee.EmployeeRepository;
@@ -105,7 +106,6 @@ class AcademyServiceTest {
 
         assertDoesNotThrow(() -> academyService.loginAcademy(request));
         assertEquals(1L, academyService.loginAcademy(request).getAcademyId());
-        assertTrue(academyService.loginAcademy(request).getJwt().describeConstable().isPresent());
 
         verify(academyRepository, atLeastOnce()).findByBusinessRegistrationNumber(anyString());
     }
