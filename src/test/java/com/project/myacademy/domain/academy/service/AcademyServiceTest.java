@@ -74,4 +74,20 @@ class AcademyServiceTest {
         verify(academyRepository, atLeastOnce()).findById(anyLong());
         verify(academyRepository, atLeastOnce()).save(any(Academy.class));
     }
+
+    @Test
+    @DisplayName("학원 정보 삭제 : 성공")
+    void deleteAcademy() {
+        final Employee employee = EmployeeFixtureUtil.ROLE_ADMIN.init();
+        final Academy academy = AcademyFixtureUtil.ACADEMY_ADMIN.init();
+
+        when(employeeRepository.findByName(anyString())).thenReturn(Optional.of(employee));
+        when(academyRepository.findById(anyLong())).thenReturn(Optional.of(academy));
+
+        assertDoesNotThrow(() -> academyService.deleteAcademy(1L, "admin"));
+        assertEquals(1L, academyService.deleteAcademy(1L, "admin"));
+
+        verify(employeeRepository, atLeastOnce()).findByName(anyString());
+        verify(academyRepository, atLeastOnce()).findById(anyLong());
+    }
 }
