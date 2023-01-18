@@ -1,6 +1,6 @@
-package com.project.myacademy.domain.academy.repository;
+package com.project.myacademy.domain.academy;
 
-import com.project.myacademy.domain.academy.entity.Academy;
+import com.project.myacademy.domain.academy.Academy;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

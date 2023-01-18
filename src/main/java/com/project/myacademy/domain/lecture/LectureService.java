@@ -1,7 +1,6 @@
 package com.project.myacademy.domain.lecture;
 
-import com.project.myacademy.domain.academy.repository.AcademyRepository;
-import com.project.myacademy.domain.employee.Employee;
+import com.project.myacademy.domain.academy.AcademyRepository;
 import com.project.myacademy.domain.employee.EmployeeRepository;
 import com.project.myacademy.domain.lecture.dto.*;
 import com.project.myacademy.domain.teacher.Teacher;
@@ -14,8 +13,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import static com.project.myacademy.domain.employee.EmployeeRole.ROLE_USER;
 
 @Service
 @RequiredArgsConstructor
