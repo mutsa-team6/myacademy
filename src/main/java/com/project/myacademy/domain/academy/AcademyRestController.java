@@ -1,7 +1,6 @@
-package com.project.myacademy.domain.academy.controller;
+package com.project.myacademy.domain.academy;
 
 import com.project.myacademy.domain.academy.dto.*;
-import com.project.myacademy.domain.academy.service.AcademyService;
 import com.project.myacademy.global.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
