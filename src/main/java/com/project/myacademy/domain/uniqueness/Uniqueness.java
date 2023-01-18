@@ -3,6 +3,7 @@ package com.project.myacademy.domain.uniqueness;
 import com.project.myacademy.domain.BaseEntity;
 import com.project.myacademy.domain.student.Student;
 import com.project.myacademy.domain.uniqueness.dto.CreateUniquenessRequest;
+import com.project.myacademy.domain.uniqueness.dto.UpdateUniquenessRequest;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
@@ -29,6 +30,10 @@ public class Uniqueness extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "student_id")
     private Student student;
+
+    public void updateUniqueness(UpdateUniquenessRequest request) {
+        this.body = request.getBody();
+    }
 
     public static Uniqueness toUniqueness(CreateUniquenessRequest request, Student student) {
         return Uniqueness.builder()

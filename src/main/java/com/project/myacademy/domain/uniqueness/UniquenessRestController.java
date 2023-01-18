@@ -1,8 +1,6 @@
 package com.project.myacademy.domain.uniqueness;
 
-import com.project.myacademy.domain.uniqueness.dto.CreateUniquenessRequest;
-import com.project.myacademy.domain.uniqueness.dto.CreateUniquenessResponse;
-import com.project.myacademy.domain.uniqueness.dto.ReadAllUniquenessResponse;
+import com.project.myacademy.domain.uniqueness.dto.*;
 import com.project.myacademy.global.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,5 +36,11 @@ public class UniquenessRestController {
         PageRequest pageable = PageRequest.of(0, 20, Sort.by("id").descending());
         Page<ReadAllUniquenessResponse> responses = uniquenessService.readAllUniqueness(studentId, pageable);
         return ResponseEntity.ok().body(Response.success(responses));
+    }
+
+    @PutMapping("students/{studentId}/uniqueness/{uniquenessId}")
+    public ResponseEntity<Response<UpdateUniquenessResponse>> update(@PathVariable Long studentId, @PathVariable Long uniquenessId, UpdateUniquenessRequest request) {
+     UpdateUniquenessResponse response = uniquenessService.updateUniqueness(studentId, uniquenessId, request);
+     return ResponseEntity.ok().body(Response.success(response));
     }
 }

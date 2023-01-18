@@ -2,9 +2,7 @@ package com.project.myacademy.domain.uniqueness;
 
 import com.project.myacademy.domain.student.Student;
 import com.project.myacademy.domain.student.StudentRepository;
-import com.project.myacademy.domain.uniqueness.dto.CreateUniquenessRequest;
-import com.project.myacademy.domain.uniqueness.dto.CreateUniquenessResponse;
-import com.project.myacademy.domain.uniqueness.dto.ReadAllUniquenessResponse;
+import com.project.myacademy.domain.uniqueness.dto.*;
 import com.project.myacademy.global.exception.AppException;
 import com.project.myacademy.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -47,5 +45,18 @@ public class UniquenessService {
                 .orElseThrow(() -> new AppException(ErrorCode.STUDENT_NOT_FOUND));
 
         return uniquenessRepository.findAllByStudent(student, pageable).map(uniqueness -> ReadAllUniquenessResponse.of(uniqueness));
+    }
+
+    public UpdateUniquenessResponse updateUniqueness(Long studentId, Long uniquenessId, UpdateUniquenessRequest request) {
+
+        studentRepository.findById(studentId)
+                .orElseThrow(() -> new AppException(ErrorCode.STUDENT_NOT_FOUND));
+
+        Uniqueness uniqueness = uniquenessRepository.findById(uniquenessId)
+                .orElseThrow(() -> new AppException(ErrorCode.UNIQUENESS_NOT_FOUND));
+
+        uniqueness.updateUniqueness(request);
+
+        return UpdateUniquenessResponse.of(uniqueness);
     }
 }
