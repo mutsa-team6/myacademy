@@ -2,6 +2,7 @@ package com.project.myacademy.domain.uniqueness;
 
 import com.project.myacademy.domain.BaseEntity;
 import com.project.myacademy.domain.student.Student;
+import com.project.myacademy.domain.uniqueness.dto.CreateUniquenessRequest;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
@@ -28,4 +29,11 @@ public class Uniqueness extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "student_id")
     private Student student;
+
+    public static Uniqueness toUniqueness(CreateUniquenessRequest request, Student student) {
+        return Uniqueness.builder()
+                .body(request.getBody())
+                .student(student)
+                .build();
+    }
 }
