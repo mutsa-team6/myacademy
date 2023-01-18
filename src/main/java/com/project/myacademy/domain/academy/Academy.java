@@ -1,6 +1,8 @@
 package com.project.myacademy.domain.academy;
 
 import com.project.myacademy.domain.BaseEntity;
+import com.project.myacademy.domain.academy.dto.AcademyDto;
+import com.project.myacademy.domain.academy.dto.UpdateAcademyReqeust;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
@@ -31,4 +33,20 @@ public class Academy extends BaseEntity {
 
     private String owner;
 
+    private String businessRegistrationNumber;
+
+    private String password;
+
+    public AcademyDto toAcademyDto() {
+        return new AcademyDto(this.id, this.name, this.owner, "");
+    }
+
+    public void update(UpdateAcademyReqeust reqeust) {
+        this.name = reqeust.getName();
+        this.address = reqeust.getAddress();
+        this.phoneNum = reqeust.getPhoneNum();
+        this.owner = reqeust.getOwner();
+        this.businessRegistrationNumber = reqeust.getBusinessRegistrationNumber();
+        this.password = reqeust.getPassword();
+    }
 }
