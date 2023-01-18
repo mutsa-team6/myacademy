@@ -1,9 +1,12 @@
 package com.project.myacademy.domain.academy.service;
 
+import com.project.myacademy.domain.academy.dto.UpdateAcademyReqeust;
 import com.project.myacademy.domain.academy.util.AcademyFixtureUtil;
 import com.project.myacademy.domain.academy.dto.CreateAcademyRequest;
 import com.project.myacademy.domain.academy.entity.Academy;
 import com.project.myacademy.domain.academy.repository.AcademyRepository;
+import com.project.myacademy.domain.academy.util.EmployeeFixtureUtil;
+import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.domain.employee.EmployeeRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -43,6 +46,32 @@ class AcademyServiceTest {
         assertEquals("admin", academyService.createAcademy(request).getOwner());
 
         verify(academyRepository, atLeastOnce()).findByBusinessRegistrationNumber(request.getBusinessRegistrationNumber());
+        verify(academyRepository, atLeastOnce()).save(any(Academy.class));
+    }
+
+    @Test
+    @DisplayName("학원 정보 수정 : 성공")
+    void updateAcademy() {
+        final Employee employee = EmployeeFixtureUtil.ROLE_ADMIN.init();
+        final UpdateAcademyReqeust request = new UpdateAcademyReqeust(
+                "name",
+                "address",
+                "phoneNum",
+                "admin",
+                "businessRegistrationNumber",
+                "password"
+        );
+        final Academy academy = AcademyFixtureUtil.ACADEMY_ADMIN.init();
+
+        when(employeeRepository.findByName(anyString())).thenReturn(Optional.of(employee));
+        when(academyRepository.findById(anyLong())).thenReturn(Optional.of(academy));
+        when(academyRepository.save(any(Academy.class))).thenReturn(academy);
+
+        assertDoesNotThrow(() -> academyService.updateAcademy(1L, request, "admin"));
+        assertEquals("admin", academyService.updateAcademy(1L, request, "admin").getOwner());
+
+        verify(employeeRepository, atLeastOnce()).findByName(anyString());
+        verify(academyRepository, atLeastOnce()).findById(anyLong());
         verify(academyRepository, atLeastOnce()).save(any(Academy.class));
     }
 }
