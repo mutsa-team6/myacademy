@@ -31,9 +31,9 @@ public class StudentRestController {
     /**
      * 학생 정보 단건 조회
      */
-    @GetMapping("/students/{studentsId}")
-    public ResponseEntity<Response<FindStudentResponse>> find(@PathVariable Long studentsId) {
-        FindStudentResponse response = studentService.findStudent(studentsId);
+    @GetMapping("/students/{studentId}")
+    public ResponseEntity<Response<FindStudentResponse>> find(@PathVariable Long studentId) {
+        FindStudentResponse response = studentService.findStudent(studentId);
         return ResponseEntity.ok().body(Response.success(response));
     }
 
@@ -50,9 +50,9 @@ public class StudentRestController {
     /**
      * 학생 정보 수정
      */
-    @PutMapping("/students/{studentsId}")
-    public ResponseEntity<Response<UpdateStudentResponse>> update(@PathVariable Long studentsId, UpdateStudentRequest request) {
-        UpdateStudentResponse response = studentService.updateStudent(studentsId, request);
+    @PutMapping("/students/{studentId}")
+    public ResponseEntity<Response<UpdateStudentResponse>> update(@PathVariable Long studentId, UpdateStudentRequest request) {
+        UpdateStudentResponse response = studentService.updateStudent(studentId, request);
         return ResponseEntity.ok().body(Response.success(response));
     }
 }
