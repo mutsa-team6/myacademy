@@ -3,6 +3,7 @@ package com.project.myacademy.domain.academy.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.myacademy.domain.academy.dto.*;
 import com.project.myacademy.domain.academy.service.AcademyService;
+import com.project.myacademy.domain.academy.util.EmployeeFixtureUtil;
 import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.global.configuration.SecurityConfig;
 import com.project.myacademy.global.util.JwtTokenUtil;
@@ -18,7 +19,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -39,9 +39,9 @@ class AcademyRestControllerTest {
     @Value("${jwt.token.secret}")
     private String secretKey;
 
-    final Employee admin = EmployeeFixture.ROLE_ADMIN.init();
-    final Employee employee1 = EmployeeFixture.ROLE_USER1.init();
-    final Employee employee2 = EmployeeFixture.ROLE_USER2.init();
+    final Employee admin = EmployeeFixtureUtil.ROLE_ADMIN.init();
+    final Employee employee1 = EmployeeFixtureUtil.ROLE_USER1.init();
+    final Employee employee2 = EmployeeFixtureUtil.ROLE_USER2.init();
 
     @Test
     @DisplayName("학원 생성 : 성공")

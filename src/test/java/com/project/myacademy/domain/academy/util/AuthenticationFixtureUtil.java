@@ -1,19 +1,19 @@
-package com.project.myacademy.domain.academy.controller;
+package com.project.myacademy.domain.academy.util;
 
 import com.project.myacademy.domain.employee.Employee;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 
-import static com.project.myacademy.domain.academy.controller.EmployeeFixture.ROLE_ADMIN;
-import static com.project.myacademy.domain.academy.controller.EmployeeFixture.ROLE_USER1;
+import static com.project.myacademy.domain.academy.util.EmployeeFixtureUtil.ROLE_ADMIN;
+import static com.project.myacademy.domain.academy.util.EmployeeFixtureUtil.ROLE_USER1;
 
-public enum AuthenticationFixture {
+public enum AuthenticationFixtureUtil {
     EMPLOYEE_AUTHENTICATION(ROLE_USER1.init()),
     ADMIN_AUTHENTICATION(ROLE_ADMIN.init());
 
     private final Employee employee;
 
-    AuthenticationFixture(Employee employee) {
+    AuthenticationFixtureUtil(Employee employee) {
         this.employee = employee;
     }
 

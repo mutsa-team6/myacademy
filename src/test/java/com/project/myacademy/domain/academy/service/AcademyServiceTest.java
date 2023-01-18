@@ -1,5 +1,6 @@
 package com.project.myacademy.domain.academy.service;
 
+import com.project.myacademy.domain.academy.util.AcademyFixtureUtil;
 import com.project.myacademy.domain.academy.dto.CreateAcademyRequest;
 import com.project.myacademy.domain.academy.entity.Academy;
 import com.project.myacademy.domain.academy.repository.AcademyRepository;
@@ -32,15 +33,7 @@ class AcademyServiceTest {
                 "businessRegistrationNumber",
                 "password"
         );
-        final Academy academy = new Academy(
-                1L,
-                "name",
-                "address",
-                "phoneNum",
-                "admin",
-                "businessRegistrationNumber",
-                "password"
-        );
+        final Academy academy = AcademyFixtureUtil.ACADEMY_ADMIN.init();
 
         when(academyRepository.findByBusinessRegistrationNumber(request.getBusinessRegistrationNumber())).thenReturn(Optional.empty());
         when(academyRepository.save(any(Academy.class))).thenReturn(academy);
