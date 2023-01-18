@@ -75,7 +75,7 @@ public class StudentService {
         Student student = studentRepository.findById(studentsId)
                 .orElseThrow(() -> new AppException(ErrorCode.STUDENT_NOT_FOUND));
 
-        student.modifyStudent(request);
+        student.updateStudent(request);
 
         //부모정보도 여기서 수정이 가능해야 할까?
 
