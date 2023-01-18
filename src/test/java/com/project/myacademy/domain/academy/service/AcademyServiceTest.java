@@ -1,5 +1,6 @@
 package com.project.myacademy.domain.academy.service;
 
+import com.project.myacademy.domain.academy.dto.LoginAcademyRequest;
 import com.project.myacademy.domain.academy.dto.UpdateAcademyReqeust;
 import com.project.myacademy.domain.academy.util.AcademyFixtureUtil;
 import com.project.myacademy.domain.academy.dto.CreateAcademyRequest;
@@ -10,7 +11,11 @@ import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.domain.employee.EmployeeRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockingDetails;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Optional;
 
@@ -24,6 +29,9 @@ class AcademyServiceTest {
     EmployeeRepository employeeRepository = mock(EmployeeRepository.class);
     BCryptPasswordEncoder bCryptPasswordEncoder = mock(BCryptPasswordEncoder.class);
     AcademyService academyService = new AcademyService(academyRepository, employeeRepository, bCryptPasswordEncoder);
+
+    @Value("${jwt.token.secret}")
+    private String secretKey;
 
     @Test
     @DisplayName("학원 생성 : 성공")
@@ -89,5 +97,26 @@ class AcademyServiceTest {
 
         verify(employeeRepository, atLeastOnce()).findByName(anyString());
         verify(academyRepository, atLeastOnce()).findById(anyLong());
+    }
+
+    @Test
+    @DisplayName("학원 로그인 : 성공")
+    void loginAcademy() {
+        final LoginAcademyRequest request = new LoginAcademyRequest("businessRegistrationNumber", "password");
+        final Academy academy = AcademyFixtureUtil.ACADEMY_ADMIN.init();
+        ReflectionTestUtils.setField(
+                academyService,
+                "secretKey",
+                String.valueOf("mockSecretKey")
+        );
+
+        when(academyRepository.findByBusinessRegistrationNumber(anyString())).thenReturn(Optional.of(academy));
+        when(bCryptPasswordEncoder.matches(anyString(), anyString())).thenReturn(true);
+
+        assertDoesNotThrow(() -> academyService.loginAcademy(request));
+        assertEquals(1L, academyService.loginAcademy(request).getAcademyId());
+        assertTrue(academyService.loginAcademy(request).getJwt().describeConstable().isPresent());
+
+        verify(academyRepository, atLeastOnce()).findByBusinessRegistrationNumber(anyString());
     }
 }

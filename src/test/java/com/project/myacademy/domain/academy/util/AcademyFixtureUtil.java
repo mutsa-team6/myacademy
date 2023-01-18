@@ -1,9 +1,12 @@
 package com.project.myacademy.domain.academy.util;
 
 import com.project.myacademy.domain.academy.entity.Academy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 public enum AcademyFixtureUtil {
     ACADEMY_ADMIN(1L, "name", "address", "phoneNum", "admin", "businessRegistrationNumber", "password");
+
+    BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
 
     private Long id;
     private String name;
@@ -31,7 +34,7 @@ public enum AcademyFixtureUtil {
                 .phoneNum(this.phoneNum)
                 .owner(this.owner)
                 .businessRegistrationNumber(this.businessRegistrationNumber)
-                .password(this.password)
+                .password(bCryptPasswordEncoder.encode(this.password))
                 .build();
     }
 }
