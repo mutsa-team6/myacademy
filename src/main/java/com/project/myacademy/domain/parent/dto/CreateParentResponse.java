@@ -21,13 +21,13 @@ public class CreateParentResponse {
     //부모 주소
     private String address;
 
-    public static CreateParentResponse of(Parent savedParent) {
+    public static CreateParentResponse of(Parent parent) {
         return CreateParentResponse.builder()
-                .id(savedParent.getId())
-                .name(savedParent.getName())
-                .parentRecognizedCode(savedParent.getParentRecognizedCode())
-                .phoneNum(savedParent.getPhoneNum())
-                .address(savedParent.getAddress())
+                .id(parent.getId())
+                .name(parent.getName())
+                .parentRecognizedCode(parent.getParentRecognizedCode())
+                .phoneNum(parent.getPhoneNum())
+                .address(parent.getAddress())
                 .build();
     }
 }
