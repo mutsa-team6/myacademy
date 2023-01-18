@@ -3,8 +3,6 @@ package com.project.myacademy.domain.academy.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.myacademy.domain.academy.dto.*;
 import com.project.myacademy.domain.academy.service.AcademyService;
-import com.project.myacademy.domain.academy.util.EmployeeFixtureUtil;
-import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.global.configuration.SecurityConfig;
 import com.project.myacademy.global.util.JwtTokenUtil;
 import org.junit.jupiter.api.DisplayName;
@@ -38,10 +36,6 @@ class AcademyRestControllerTest {
 
     @Value("${jwt.token.secret}")
     private String secretKey;
-
-    final Employee admin = EmployeeFixtureUtil.ROLE_ADMIN.init();
-    final Employee employee1 = EmployeeFixtureUtil.ROLE_USER1.init();
-    final Employee employee2 = EmployeeFixtureUtil.ROLE_USER2.init();
 
     @Test
     @DisplayName("학원 생성 : 성공")
