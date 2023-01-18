@@ -48,10 +48,9 @@ public class UniquenessService {
     }
 
     /**
-     *
-     * @param studentId 특이사항의 대상이 되는 학생 Id
+     * @param studentId    특이사항의 대상이 되는 학생 Id
      * @param uniquenessId 수정하려고하는 특이사항 Id
-     * @param request 수정내용이 담긴 dto
+     * @param request      수정내용이 담긴 dto
      */
     @Transactional
     public UpdateUniquenessResponse updateUniqueness(Long studentId, Long uniquenessId, UpdateUniquenessRequest request) {
@@ -65,5 +64,23 @@ public class UniquenessService {
         uniqueness.updateUniqueness(request);
 
         return UpdateUniquenessResponse.of(uniqueness);
+    }
+
+    /**
+     * @param studentId    특이사항의 대상이 되는 학생 Id
+     * @param uniquenessId 삭제하려고 하는 특이사항 Id
+     */
+    @Transactional
+    public DeleteUniquenessResponse deleteUniqueness(Long studentId, Long uniquenessId) {
+
+        studentRepository.findById(studentId)
+                .orElseThrow(() -> new AppException(ErrorCode.STUDENT_NOT_FOUND));
+
+        Uniqueness uniqueness = uniquenessRepository.findById(uniquenessId)
+                .orElseThrow(() -> new AppException(ErrorCode.UNIQUENESS_NOT_FOUND));
+
+        uniquenessRepository.delete(uniqueness);
+
+        return DeleteUniquenessResponse.of(uniqueness);
     }
 }

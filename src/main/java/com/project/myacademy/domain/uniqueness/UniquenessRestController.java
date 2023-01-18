@@ -39,14 +39,23 @@ public class UniquenessRestController {
     }
 
     /**
-     *
-     * @param studentId 특이사항의 대상이 되는 학생 Id
+     * @param studentId    특이사항의 대상이 되는 학생 Id
      * @param uniquenessId 수정하려고하는 특이사항 Id
-     * @param request 수정내용이 담긴 dto
+     * @param request      수정내용이 담긴 dto
      */
     @PutMapping("students/{studentId}/uniqueness/{uniquenessId}")
     public ResponseEntity<Response<UpdateUniquenessResponse>> update(@PathVariable Long studentId, @PathVariable Long uniquenessId, UpdateUniquenessRequest request) {
-     UpdateUniquenessResponse response = uniquenessService.updateUniqueness(studentId, uniquenessId, request);
-     return ResponseEntity.ok().body(Response.success(response));
+        UpdateUniquenessResponse response = uniquenessService.updateUniqueness(studentId, uniquenessId, request);
+        return ResponseEntity.ok().body(Response.success(response));
+    }
+
+    /**
+     * @param studentId    특이사항의 대상이 되는 학생 Id
+     * @param uniquenessId 삭제하려고 하는 특이사항 Id
+     */
+    @DeleteMapping("students/{studentId}/uniqueness/{uniquenessId}")
+    public ResponseEntity<Response<DeleteUniquenessResponse>> delete(@PathVariable Long studentId, @PathVariable Long uniquenessId) {
+        DeleteUniquenessResponse response = uniquenessService.deleteUniqueness(studentId, uniquenessId);
+        return ResponseEntity.ok().body(Response.success(response));
     }
 }
