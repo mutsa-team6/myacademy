@@ -1,8 +1,6 @@
 package com.project.myacademy.domain.parent;
 
-import com.project.myacademy.domain.parent.dto.CreateParentRequest;
-import com.project.myacademy.domain.parent.dto.CreateParentResponse;
-import com.project.myacademy.domain.parent.dto.FindParentResponse;
+import com.project.myacademy.domain.parent.dto.*;
 import com.project.myacademy.global.exception.AppException;
 import com.project.myacademy.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -40,5 +38,19 @@ public class ParentService {
                 .orElseThrow(() ->new AppException(ErrorCode.PARENT_NOT_FOUND));
 
         return FindParentResponse.of(parent);
+    }
+
+    /**
+     * 부모 정보 수정
+     */
+    @Transactional
+    public UpdateParentResponse updateParent(Long parentId, UpdateParentRequest request) {
+
+        Parent parent = parentRepository.findById(parentId)
+                .orElseThrow(() -> new AppException(ErrorCode.PARENT_NOT_FOUND));
+
+        parent.updateParent(request);
+
+        return UpdateParentResponse.of(parent);
     }
 }

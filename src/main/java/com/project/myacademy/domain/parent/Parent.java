@@ -2,6 +2,7 @@ package com.project.myacademy.domain.parent;
 
 import com.project.myacademy.domain.BaseEntity;
 import com.project.myacademy.domain.parent.dto.CreateParentRequest;
+import com.project.myacademy.domain.parent.dto.UpdateParentRequest;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
@@ -33,6 +34,13 @@ public class Parent extends BaseEntity {
 
     private String address;
 
+    public void updateParent(UpdateParentRequest request) {
+        this.name = request.getName();
+        this.parentRecognizedCode = request.getParentRecognizedCode();
+        this.phoneNum = request.getPhoneNum();
+        this.address = request.getAddress();
+    }
+
     public static Parent toParent(CreateParentRequest request) {
         return Parent.builder()
                 .name(request.getName())
@@ -41,5 +49,4 @@ public class Parent extends BaseEntity {
                 .address(request.getAddress())
                 .build();
     }
-
 }

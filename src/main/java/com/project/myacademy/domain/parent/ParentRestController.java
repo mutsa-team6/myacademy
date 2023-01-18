@@ -39,6 +39,7 @@ public class ParentRestController {
      */
     @PutMapping("/parents/{parentId}")
     public ResponseEntity<Response<UpdateParentResponse>> update(@PathVariable Long parentId, UpdateParentRequest request) {
-        UpdateParentResponse response = parentService.updateParent(parentId, request)
+        UpdateParentResponse response = parentService.updateParent(parentId, request);
+        return ResponseEntity.ok().body(Response.success(response));
     }
 }
