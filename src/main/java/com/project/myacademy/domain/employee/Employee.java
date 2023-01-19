@@ -11,6 +11,8 @@ import org.hibernate.annotations.Where;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 
+import static com.project.myacademy.domain.employee.EmployeeRole.ROLE_USER;
+
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -64,5 +66,11 @@ public class Employee extends BaseEntity {
         this.phoneNum = request.getPhoneNum();
         this.email = request.getEmail();
         this.password = request.getPassword();
+    }
+
+    // 강좌 개설 권한 확인 메서드
+    public static boolean hasAuthorityToCreateLecture(Employee employee) {
+        if(employee.getEmployeeRole().equals(ROLE_USER)) return true;
+        else return false;
     }
 }

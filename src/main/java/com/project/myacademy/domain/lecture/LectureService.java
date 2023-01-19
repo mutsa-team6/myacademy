@@ -1,6 +1,6 @@
 package com.project.myacademy.domain.lecture;
 
-import com.project.myacademy.domain.academy.AcademyRepository;
+import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.domain.employee.EmployeeRepository;
 import com.project.myacademy.domain.lecture.dto.*;
 import com.project.myacademy.domain.teacher.Teacher;
@@ -14,127 +14,121 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.project.myacademy.domain.employee.EmployeeRole.ROLE_USER;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
 @Slf4j
 public class LectureService {
 
-    /**
-     * 학원 로그인, 직원 로그인 개념은 현재는 주석 처리
-     * 학원은 학원 이름 혹은 사업자번호로, 직원은 권한 혹은 이름으로 모두 Authentication에서 가져올 예정
-     * 등록, 수정, 삭제 작업은 employee 권한이 STAFF, ADMIN(원장)만 가능 -> 해당 코드도 현재는 주석 처리
-     * 추후에 중복 코드 메서드로 분리 예정
-     */
-
-    private final AcademyRepository academyRepository;
     private final EmployeeRepository employeeRepository;
     private final TeacherRepository teacherRepository;
     private final LectureRepository lectureRepository;
 
     /**
-     *
-     * @param academyId
+     * @param account   직원 계정
      * @param pageable
      */
-    public Page<ReadAllLectureResponse> readAllLectures(Long academyId, Pageable pageable) {
-//        // 학원의 존재 유무 확인
-//        Academy academy = academyRepository.findById(academyId)
-//                .orElseThrow(() -> new AppException(ErrorCode.ACADEMY_NOT_FOUND));
+    @Transactional(readOnly = true)
+    public Page<ReadAllLectureResponse> readAllLectures(String account, Pageable pageable) {
+
+        // 유효한 계정인지 확인
+        validateEmployee(account);
 
         Page<Lecture> lectures = lectureRepository.findAll(pageable);
         return lectures.map(ReadAllLectureResponse::of);
     }
 
     /**
-     * @param academyId 강좌 생성을 직원의 학원 id
      * @param teacherId 강좌에 들어갈 강사의 id
      * @param request   요청 DTO
+     * @param account   직원 계정
      */
-    public CreateLectureResponse createLecture(Long academyId, Long teacherId, CreateLectureRequest request) {
+    public CreateLectureResponse createLecture(Long teacherId, CreateLectureRequest request, String account) {
 
-        // Authentication으로 넘어온 학원 정보 확인, 없으면 강좌 생성 불가
-//        academyRepository.findBy학원사업자번호이름(사업자번호)
-//                .orElseThrow(() -> new AppException(ErrorCode.INVALID_PERMISSION));
+        // 직원 계정 존재 유무 확인
+        Employee employee = validateEmployee(account);
 
-        // Authentication으로 넘어온 직원 정보 확인, 없으면 강좌 생성 불가
-//        Employee employee = employeeRepository.findByName(employeeName)
-//                .orElseThrow(() -> new AppException(ErrorCode.INVALID_PERMISSION));
-
-//        // 강좌가 등록되는 학원의 존재 유무 확인
-//        Academy academy = academyRepository.findById(academyId)
-//                .orElseThrow(() -> new AppException(ErrorCode.ACADEMY_NOT_FOUND));
-
-        // 강사의 존재 유무 확인 -> 강사 null 허용이면 에러처리 안하나...?
+        // 강사의 존재 유무 확인
         Teacher teacher = teacherRepository.findById(teacherId)
                 .orElseThrow(() -> new AppException(ErrorCode.TEACHER_NOT_FOUND));
 
-        // 강좌 중복 검사
+        // 직원이 강좌를 개설할 권한이 있는지 확인(강사만 불가능)
+        if(Employee.hasAuthorityToCreateLecture(employee)) {
+            throw new AppException(ErrorCode.INVALID_PERMISSION);
+        }
+
+        // 강좌 중복 확인
         lectureRepository.findByName(request.getLectureName())
                 .ifPresent((lecture -> {
                     throw new AppException(ErrorCode.DUPLICATED_LECTURE);
                 }));
 
-        // 강좌를 개설할 권한이 있는지 확인(강사만 불가능)
-//        if(employee.getEmployeeRole.equals((ROLE_USER))) {
-//            throw new AppException(ErrorCode.INVALID_PERMISSION);
-//        }
-
-        Lecture lecture = Lecture.addLecture(request, teacher);
-        Lecture savedLecture = lectureRepository.save(lecture);
+        Lecture savedLecture = lectureRepository.save(Lecture.addLecture(request, teacher));
         return CreateLectureResponse.of(savedLecture);
     }
 
     /**
-     * @param academyId 강좌 수정 진핼할 직원의 학원 id
+     * @param teacherId 수정될 강좌에서 강사의 id
      * @param lectureId 수정될 강좌 id
      * @param request   요청 DTO
+     * @param account   직원 계정
      */
-    public UpdateLectureResponse updateLecture(Long academyId, Long lectureId, UpdateLectureRequest request) {
-        // Authentication으로 넘어온 학원 정보 확인, 없으면 강좌 생성 불가
-//        academyRepository.findBy학원사업자번호이름(사업자번호)
-//                .orElseThrow(() -> new AppException(ErrorCode.INVALID_PERMISSION));
+    public UpdateLectureResponse updateLecture(Long teacherId, Long lectureId, UpdateLectureRequest request, String account) {
 
-        // Authentication으로 넘어온 직원 정보 확인, 없으면 강좌 생성 불가
-//        Employee employee = employeeRepository.findByName(employeeName)
-//                .orElseThrow(() -> new AppException(ErrorCode.INVALID_PERMISSION));
+        // 직원 계정 존재 유무 확인
+        validateEmployee(account);
 
-//        // 강좌가 등록되는 학원의 존재 유무 확인
-//        Academy academy = academyRepository.findById(academyId)
-//                .orElseThrow(() -> new AppException(ErrorCode.ACADEMY_NOT_FOUND));
+        // 강사의 존재 유무 확인
+        validateTeacher(teacherId);
 
         // 수정할 강좌 존재 유무 확인
-        Lecture lecture = lectureRepository.findById(lectureId)
-                .orElseThrow(() -> new AppException(ErrorCode.LECTURE_NOT_FOUND));
+        Lecture lecture = validateLecture(lectureId);
 
+        // 강좌 정보 수정
         lecture.updateLecture(request);
 
         return UpdateLectureResponse.of(lectureId);
     }
 
     /**
-     * @param academyId 강좌 삭제 진핼할 직원의 학원 id
-     * @param lectureId 삭제제 강좌 id
+     * @param teacherId 수정될 강좌에서 강사의 id
+     * @param lectureId 삭제 강좌 id
+     * @param account   직원 계정
      */
-    public DeleteLectureResponse deleteLecture(Long academyId, Long lectureId) {
-        // Authentication으로 넘어온 학원 정보 확인, 없으면 강좌 생성 불가
-//        academyRepository.findBy학원사업자번호이름(사업자번호)
-//                .orElseThrow(() -> new AppException(ErrorCode.INVALID_PERMISSION));
+    public DeleteLectureResponse deleteLecture(Long teacherId, Long lectureId, String account) {
 
-        // Authentication으로 넘어온 직원 정보 확인, 없으면 강좌 생성 불가
-//        Employee employee = employeeRepository.findByName(employeeName)
-//                .orElseThrow(() -> new AppException(ErrorCode.INVALID_PERMISSION));
+        // 직원 계정 존재 유무 확인
+        validateEmployee(account);
 
-//        // 강좌가 등록되는 학원의 존재 유무 확인
-//        Academy academy = academyRepository.findById(academyId)
-//                .orElseThrow(() -> new AppException(ErrorCode.ACADEMY_NOT_FOUND));
+        // 강사의 존재 유무 확인
+        validateTeacher(teacherId);
 
         // 삭제할 강좌 존재 유무 확인
-        Lecture lecture = lectureRepository.findById(lectureId)
-                .orElseThrow(() -> new AppException(ErrorCode.LECTURE_NOT_FOUND));
+        Lecture lecture = validateLecture(lectureId);
 
+        // 강좌 삭제
         lectureRepository.delete(lecture);
 
         return DeleteLectureResponse.of(lectureId);
+    }
+
+    private Employee validateEmployee(String account) {
+        Employee validatedEmployee = employeeRepository.findByAccount(account)
+                .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
+        return validatedEmployee;
+    }
+
+    private Teacher validateTeacher(Long teacherId) {
+        Teacher validatedTeacher = teacherRepository.findById(teacherId)
+                .orElseThrow(() -> new AppException(ErrorCode.TEACHER_NOT_FOUND));
+        return  validatedTeacher;
+    }
+
+    private Lecture validateLecture(Long lectureId) {
+        Lecture validatedLecture = lectureRepository.findById(lectureId)
+                .orElseThrow(() -> new AppException(ErrorCode.LECTURE_NOT_FOUND));
+        return  validatedLecture;
     }
 }
