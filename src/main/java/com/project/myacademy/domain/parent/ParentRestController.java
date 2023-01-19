@@ -5,6 +5,7 @@ import com.project.myacademy.global.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,9 +20,9 @@ public class ParentRestController {
      * 부모 등록
      */
     @PostMapping("")
-    public ResponseEntity<Response<CreateParentResponse>> create(CreateParentRequest request) {
-        //String userName = authentication.getName();
-        CreateParentResponse response = parentService.createParent(request);
+    public ResponseEntity<Response<CreateParentResponse>> create(CreateParentRequest request, Authentication authentication) {
+        String account = authentication.getName();
+        CreateParentResponse response = parentService.createParent(request, account);
         return ResponseEntity.ok().body(Response.success(response));
     }
 
@@ -29,8 +30,9 @@ public class ParentRestController {
      * 부모 정보 단건 조회
      */
     @GetMapping("/{parentId}")
-    public ResponseEntity<Response<FindParentResponse>> find(@PathVariable Long parentId) {
-        FindParentResponse response = parentService.findParent(parentId);
+    public ResponseEntity<Response<FindParentResponse>> find(@PathVariable Long parentId, Authentication authentication) {
+        String account = authentication.getName();
+        FindParentResponse response = parentService.findParent(parentId, account);
         return ResponseEntity.ok().body(Response.success(response));
     }
 
@@ -38,8 +40,9 @@ public class ParentRestController {
      * 부모 정보 수정
      */
     @PutMapping("{parentId}")
-    public ResponseEntity<Response<UpdateParentResponse>> update(@PathVariable Long parentId, UpdateParentRequest request) {
-        UpdateParentResponse response = parentService.updateParent(parentId, request);
+    public ResponseEntity<Response<UpdateParentResponse>> update(@PathVariable Long parentId, UpdateParentRequest request, Authentication authentication) {
+        String account = authentication.getName();
+        UpdateParentResponse response = parentService.updateParent(parentId, request, account);
         return ResponseEntity.ok().body(Response.success(response));
     }
 
@@ -47,8 +50,9 @@ public class ParentRestController {
      * 부모 정보 삭제
      */
     @DeleteMapping("{parentId}")
-    public ResponseEntity<Response<DeleteParentResponse>> delete(@PathVariable Long parentId) {
-        DeleteParentResponse response = parentService.deleteParent(parentId);
+    public ResponseEntity<Response<DeleteParentResponse>> delete(@PathVariable Long parentId, Authentication authentication) {
+        String account = authentication.getName();
+        DeleteParentResponse response = parentService.deleteParent(parentId, account);
         return ResponseEntity.ok().body(Response.success(response));
     }
 }
