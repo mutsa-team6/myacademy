@@ -32,8 +32,9 @@ public class LectureService {
      */
     @Transactional(readOnly = true)
     public Page<ReadAllLectureResponse> readAllLectures(String account, Pageable pageable) {
+
         // 유효한 계정인지 확인
-//        validateEmployee(account);
+        validateEmployee(account);
 
         Page<Lecture> lectures = lectureRepository.findAll(pageable);
         return lectures.map(ReadAllLectureResponse::of);
@@ -47,16 +48,16 @@ public class LectureService {
     public CreateLectureResponse createLecture(Long teacherId, CreateLectureRequest request, String account) {
 
         // 직원 계정 존재 유무 확인
-//        Employee employee = validateEmployee(account);
+        Employee employee = validateEmployee(account);
 
         // 강사의 존재 유무 확인
         Teacher teacher = teacherRepository.findById(teacherId)
                 .orElseThrow(() -> new AppException(ErrorCode.TEACHER_NOT_FOUND));
 
         // 직원이 강좌를 개설할 권한이 있는지 확인(강사만 불가능)
-//        if(Employee.hasAuthorityToCreateLecture(employee)) {
-//            throw new AppException(ErrorCode.INVALID_PERMISSION);
-//        }
+        if(Employee.hasAuthorityToCreateLecture(employee)) {
+            throw new AppException(ErrorCode.INVALID_PERMISSION);
+        }
 
         // 강좌 중복 확인
         lectureRepository.findByName(request.getLectureName())
@@ -77,10 +78,10 @@ public class LectureService {
     public UpdateLectureResponse updateLecture(Long teacherId, Long lectureId, UpdateLectureRequest request, String account) {
 
         // 직원 계정 존재 유무 확인
-//        Employee employee = validateEmployee(account);
+        validateEmployee(account);
 
         // 강사의 존재 유무 확인
-        Teacher teacher = validateTeacher(teacherId);
+        validateTeacher(teacherId);
 
         // 수정할 강좌 존재 유무 확인
         Lecture lecture = validateLecture(lectureId);
@@ -99,10 +100,10 @@ public class LectureService {
     public DeleteLectureResponse deleteLecture(Long teacherId, Long lectureId, String account) {
 
         // 직원 계정 존재 유무 확인
-//        Employee employee = validateEmployee(account);
+        validateEmployee(account);
 
         // 강사의 존재 유무 확인
-        Teacher teacher = validateTeacher(teacherId);
+        validateTeacher(teacherId);
 
         // 삭제할 강좌 존재 유무 확인
         Lecture lecture = validateLecture(lectureId);
@@ -113,12 +114,11 @@ public class LectureService {
         return DeleteLectureResponse.of(lectureId);
     }
 
-
-//    private Employee validateEmployee(String account) {
-//        Employee validatedEmployee = employeeRepository.findByAccount(account)
-//                .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
-//        return validatedEmployee;
-//    }
+    private Employee validateEmployee(String account) {
+        Employee validatedEmployee = employeeRepository.findByAccount(account)
+                .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
+        return validatedEmployee;
+    }
 
     private Teacher validateTeacher(Long teacherId) {
         Teacher validatedTeacher = teacherRepository.findById(teacherId)
