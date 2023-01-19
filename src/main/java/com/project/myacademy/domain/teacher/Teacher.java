@@ -2,6 +2,7 @@ package com.project.myacademy.domain.teacher;
 
 import com.project.myacademy.domain.BaseEntity;
 import com.project.myacademy.domain.employee.Employee;
+import com.project.myacademy.domain.employee.EmployeeRole;
 import com.project.myacademy.domain.lecture.Lecture;
 import com.project.myacademy.domain.teacher.dto.CreateTeacherRequest;
 import com.project.myacademy.domain.teacher.dto.UpdateTeacherRequest;
@@ -36,7 +37,8 @@ public class Teacher extends BaseEntity {
     @OneToMany(mappedBy = "teacher")
     private List<Lecture> lectures;
 
-    public static Teacher addTeacherToLecture(CreateTeacherRequest request, Employee employee) {
+    // 직원 중 강사 확인해서 강사 테이블에 삽입
+    public static Teacher addTeacher(CreateTeacherRequest request, Employee employee) {
         return Teacher.builder()
                 .name(request.getName())
                 .subject(request.getSubject())
@@ -44,7 +46,14 @@ public class Teacher extends BaseEntity {
                 .build();
     }
 
-    public void updateTeacherInLecture(UpdateTeacherRequest request) {
+    // 강사 권한 확인
+    public static boolean isNotTeacher(Employee employee) {
+        if(!employee.getEmployeeRole().equals(EmployeeRole.ROLE_USER)) return true;
+        else return false;
+    }
+
+    // 강사 수정
+    public void updateTeacher(UpdateTeacherRequest request) {
         this.name = request.getName();
         this.subject = request.getSubject();
     }
