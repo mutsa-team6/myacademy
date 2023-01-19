@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping("api/v1/academies")
+@RequestMapping("api/v1/students")
 public class UniquenessRestController {
 
     private final UniquenessService uniquenessService;
@@ -22,7 +22,7 @@ public class UniquenessRestController {
     /**
      * 학생 특이사항 작성
      */
-    @PostMapping("/students/{studentId}/uniqueness")
+    @PostMapping("/{studentId}/uniqueness")
     public ResponseEntity<Response<CreateUniquenessResponse>> create(@PathVariable Long studentId, CreateUniquenessRequest request, Authentication authentication) {
         String account = authentication.getName();
         CreateUniquenessResponse response = uniquenessService.createUniqueness(studentId, request, account);
@@ -32,7 +32,7 @@ public class UniquenessRestController {
     /**
      * 특정 학생 특이사항 목록 조회
      */
-    @GetMapping("/students/{studentId}/uniqueness")
+    @GetMapping("/{studentId}/uniqueness")
     public ResponseEntity<Response<Page<ReadAllUniquenessResponse>>> readAll(@PathVariable Long studentId, Authentication authentication) {
         String account = authentication.getName();
         PageRequest pageable = PageRequest.of(0, 20, Sort.by("id").descending());
@@ -43,7 +43,7 @@ public class UniquenessRestController {
     /**
      * 특정 특이사항 수정
      */
-    @PutMapping("/students/{studentId}/uniqueness/{uniquenessId}")
+    @PutMapping("/{studentId}/uniqueness/{uniquenessId}")
     public ResponseEntity<Response<UpdateUniquenessResponse>> update(@PathVariable Long studentId, @PathVariable Long uniquenessId, UpdateUniquenessRequest request, Authentication authentication) {
         String account = authentication.getName();
         UpdateUniquenessResponse response = uniquenessService.updateUniqueness(studentId, uniquenessId, request, account);
@@ -53,7 +53,7 @@ public class UniquenessRestController {
     /**
      * 특정 특이사항 수정
      */
-    @DeleteMapping("/students/{studentId}/uniqueness/{uniquenessId}")
+    @DeleteMapping("/{studentId}/uniqueness/{uniquenessId}")
     public ResponseEntity<Response<DeleteUniquenessResponse>> delete(@PathVariable Long studentId, @PathVariable Long uniquenessId, Authentication authentication) {
         String account = authentication.getName();
         DeleteUniquenessResponse response = uniquenessService.deleteUniqueness(studentId, uniquenessId, account);
