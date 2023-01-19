@@ -7,6 +7,8 @@ import com.project.myacademy.global.util.JwtTokenUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,7 +64,6 @@ public class EmployeeService {
      * requestdto에 직원 계정, 이메일, 변경하고싶은 비밀번호
      * 직원 계정으로 db에 있는지 확인 -> 없으면 에러처리
      * 직원계정 + 이메일 2개가 동시에 일치하는 데이터가 있는지? -> 없으면 에러처리
-     *
      */
     @Transactional
     public EmployeeDto changePasswordEmployee(ChangePasswordEmployeeRequest request) {
@@ -103,4 +104,19 @@ public class EmployeeService {
         return employeeRepository.findByAccount(account).get().getEmployeeRole();
     }
 
+    /**
+     * 관리자(ADMIN)는 모든 회원 정보를 조회할 수 있다.
+     * @param requestAccount 조회를 요청한 사용자 계정
+     * @param pageable
+     * @return 모든 회원 목록 반환
+     */
+    public Page<ReadEmployeeResponse> readAllEmployees(String requestAccount, Pageable pageable) {
+
+        // 요청한 회원이 존재하지 않는 경우 에러 처리
+        employeeRepository.findByAccount(requestAccount)
+                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND, ErrorCode.EMPLOYEE_NOT_FOUND.getMessage()));
+
+
+        return employeeRepository.findAll(pageable).map(employee -> new ReadEmployeeResponse(employee));
+    }
 }

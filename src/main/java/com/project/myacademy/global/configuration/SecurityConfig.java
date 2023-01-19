@@ -37,6 +37,7 @@ public class SecurityConfig {
                 .authorizeRequests()
                 .antMatchers("/api/v1/employees/signup", "/api/v1/employees/login", "/api/v1/employees/findaccount", "/swagger-ui/**").permitAll()
                 .antMatchers(HttpMethod.DELETE, "/api/v1/employees/**").hasAnyRole("ADMIN","STAFF")
+                .antMatchers(HttpMethod.GET, "/api/v1/employees").hasAnyRole("ADMIN")
                 .and()
 
                 .exceptionHandling()
