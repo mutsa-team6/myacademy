@@ -18,7 +18,9 @@ public class ParentService {
     private final EmployeeRepository employeeRepository;
 
     /**
-     * 부모 등록
+     *
+     * @param request 부모 정보가 담긴 request
+     * @param account jwt로 받아온 사용자(Employee) 계정
      */
     @Transactional
     public CreateParentResponse createParent(CreateParentRequest request, String account) {
@@ -39,7 +41,9 @@ public class ParentService {
     }
 
     /**
-     * 부모 정보 단건 조회
+     *
+     * @param parentId 찾을 부모 Id
+     * @param account jwt로 받아온 사용자(Employee) 계정
      */
     public FindParentResponse findParent(long parentId, String account) {
 
@@ -55,7 +59,10 @@ public class ParentService {
     }
 
     /**
-     * 부모 정보 수정
+     *
+     * @param parentId 수정할 부모 Id
+     * @param request 수정할 부모 정보를 담은 requestDto
+     * @param account jwt로 받아온 사용자(Employee) 계정
      */
     @Transactional
     public UpdateParentResponse updateParent(Long parentId, UpdateParentRequest request, String account) {
@@ -74,7 +81,9 @@ public class ParentService {
     }
 
     /**
-     * 부모 정보 삭제
+     *
+     * @param parentId 삭제할 부모 Id
+     * @param account jwt로 받아온 사용자(Employee) 계정
      */
     @Transactional
     public DeleteParentResponse deleteParent(Long parentId, String account) {
