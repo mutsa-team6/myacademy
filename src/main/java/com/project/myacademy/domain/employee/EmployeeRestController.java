@@ -48,9 +48,16 @@ public class EmployeeRestController {
                 updatedEmployeeDto.getAccount() + "updated")));
     }
 
+    // 관리자(ADMIN) 혹은 직원(STAFF) 등급은 다른 직원 계정을 삭제할 수 있다.
+
     @DeleteMapping("/{employeeId}")
-    public ResponseEntity delete(@PathVariable Long employeeId) {
-        DeleteEmployeeResponse response = employeeService.deleteEmployee(employeeId);
+    public ResponseEntity delete(Authentication authentication, @PathVariable Long employeeId) {
+
+        String requestAccount = authentication.getName();
+        log.info(" ❌ 삭제를 요청한 사용자 계정 [{}] ", requestAccount);
+
+        DeleteEmployeeResponse response = employeeService.deleteEmployee(requestAccount, employeeId);
+
         return ResponseEntity.ok(Response.success(response));
     }
 

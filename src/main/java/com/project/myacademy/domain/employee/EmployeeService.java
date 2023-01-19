@@ -81,13 +81,37 @@ public class EmployeeService {
         return updatedEmployee.toEmployeeDto();
     }
 
+    /**
+     * ADMIN 혹은 STAFF 계정은 ADMIN을 제외한 다른 계정을 삭제할 수 있다.
+     * 자기 자신을 삭제 요청할 시, 에러 처리 ( 본인 탈퇴 기능은 따로 구현 )
+     * ADMIN 계정을 삭제하려고 할 시, 에러 처리
+     * @param requestAccount 삭제 요청한 직원 계정
+     * @param employeeId 삭제를 할 직원 기본키 id
+     * @return
+     */
     @Transactional
-    public DeleteEmployeeResponse deleteEmployee(Long employeeId) {
+    public DeleteEmployeeResponse deleteEmployee(String requestAccount, Long employeeId) {
+
+        // 삭제하려는 계정이 존재하지 않으면 에러 처리
         Employee foundEmployee = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND, ErrorCode.EMPLOYEE_NOT_FOUND.getMessage()));
 
+        // 삭제하려는 계정이 자기 자신인 경우 에러 처리
+        if (foundEmployee.getAccount().equals(requestAccount)) {
+            throw new AppException(ErrorCode.BAD_DELETE_REQUEST, ErrorCode.BAD_DELETE_REQUEST.getMessage());
+        }
+
+        EmployeeRole foundEmployeeRole = foundEmployee.getEmployeeRole();
+        log.info(" ❌ 삭제가 될 사용자 계정 [{}] || 삭제가 될 사용자 등급 [{}]", foundEmployee.getAccount(), foundEmployeeRole);
+
+        // 삭제하려는 계정이 ADMIN 인 경우 에러처리
+        if (foundEmployeeRole.equals(EmployeeRole.ROLE_ADMIN)) {
+            throw new AppException(ErrorCode.NOT_ALLOWED_CHANGE, ErrorCode.NOT_ALLOWED_CHANGE.getMessage());
+        }
+
         employeeRepository.delete(foundEmployee);
-        return new DeleteEmployeeResponse(employeeId, "Employee deleted : " + employeeId);
+
+        return new DeleteEmployeeResponse(employeeId, foundEmployee.getAccount() + " 계정이 삭제되었습니다. ");
     }
 
 
@@ -106,6 +130,7 @@ public class EmployeeService {
 
     /**
      * 관리자(ADMIN)는 모든 회원 정보를 조회할 수 있다.
+     *
      * @param requestAccount 조회를 요청한 사용자 계정
      * @param pageable
      * @return 모든 회원 목록 반환
@@ -123,8 +148,9 @@ public class EmployeeService {
     /**
      * 관리자(ADMIN) 혹은 직원(STAFF) 등급은 다른 직원의 등급을 USER -> STAFF 혹은 STAFF -> USER 로 변경할 수 있다.
      * 변경하려는 계정이 ADMIN 인 경우는 에러 처리
+     *
      * @param requestAccount 등급 변경을 요청한 직원의 계정
-     * @param employeeId 등급 변경이 될 직원의 기본키(id)
+     * @param employeeId     등급 변경이 될 직원의 기본키(id)
      * @return
      */
     @Transactional
@@ -140,7 +166,7 @@ public class EmployeeService {
 
         // 등급을 변경하려는 직원의 변경하기 전 등급
         EmployeeRole foundEmployeeRole = foundEmployee.getEmployeeRole();
-        log.info("🛠 등급 변경이 변경될 사용자 계정 [{}] || 현재 등급[{}] ", foundEmployee.getAccount(),foundEmployeeRole);
+        log.info("🛠 등급 변경이 변경될 사용자 계정 [{}] || 현재 등급 [{}] ", foundEmployee.getAccount(), foundEmployeeRole);
 
 
         EmployeeRole changedRole = EmployeeRole.ROLE_STAFF;
@@ -149,14 +175,14 @@ public class EmployeeService {
         if (foundEmployeeRole.equals(EmployeeRole.ROLE_USER)) {
             foundEmployee.changeRole(changedRole);
 
-        // STAFF 등급인 회원인 경우 USER로 바꿔준다.
+            // STAFF 등급인 회원인 경우 USER로 바꿔준다.
         } else if (foundEmployeeRole.equals(EmployeeRole.ROLE_STAFF)) {
             changedRole = EmployeeRole.ROLE_USER;
             foundEmployee.changeRole(changedRole);
 
-        // ADMIN 등급인 회원을 변경하려는 경우 권한 없음 에러처리한다.
+            // ADMIN 등급인 회원을 변경하려는 경우 권한 없음 에러처리한다.
         } else {
-            throw new AppException(ErrorCode.INVALID_PERMISSION, ErrorCode.INVALID_PERMISSION.getMessage());
+            throw new AppException(ErrorCode.NOT_ALLOWED_CHANGE, ErrorCode.NOT_ALLOWED_CHANGE.getMessage());
         }
 
         return new ChangeRoleEmployeeResponse(employeeId, foundEmployee.getAccount() + " 계정의 권한을 " + changedRole + "로 변경했습니다");
