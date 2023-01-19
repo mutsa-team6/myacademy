@@ -8,7 +8,6 @@ import lombok.Getter;
 @Getter
 @Builder
 public class CreateEmployeeResponse {
-
     private String name;
     private String account;
     private String message;

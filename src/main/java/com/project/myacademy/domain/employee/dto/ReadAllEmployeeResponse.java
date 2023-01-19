@@ -25,6 +25,5 @@ public class ReadAllEmployeeResponse {
         this.email = foundEmployee.getEmail();
         this.account = foundEmployee.getAccount();
         this.employeeRole = foundEmployee.getEmployeeRole();
-        this.academy = foundEmployee.getAcademy();
     }
 }

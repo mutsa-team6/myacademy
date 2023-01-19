@@ -41,7 +41,7 @@ public class EmployeeRestController {
                 updatedEmployeeDto.getAccount(),
                 updatedEmployeeDto.getAccount()+ "updated")));
     }
-    @DeleteMapping("/employee/{employeeId}")
+    @DeleteMapping("/employees/{employeeId}")
     public ResponseEntity delete(@PathVariable Long employeeId) {
         DeleteEmployeeResponse response = employeeService.deleteEmployee(employeeId);
         return ResponseEntity.ok(Response.success(response));

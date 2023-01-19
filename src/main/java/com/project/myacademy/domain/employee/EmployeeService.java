@@ -35,7 +35,7 @@ public class EmployeeService {
         Employee savedEmployee = employeeRepository.save(request.toEmployee(account, encryptedPassword, DEFAULT_EMPLOYEE_ROLE));
         return savedEmployee.toEmployeeDto();
     }
-    @Transactional
+
     public LoginEmployeeResponse login(LoginEmployeeRequest request) {
         String account = request.getAccount();
         String password = request.getPassword();
@@ -47,7 +47,6 @@ public class EmployeeService {
         return new LoginEmployeeResponse(JwtTokenUtil.createToken(account, secretKey, expiredTimeMs), "login succeeded");
     }
 
-    @Transactional
     public ReadEmployeeResponse readAccount(ReadEmployeeAccountRequest request) {
         String name = request.getName();
         String email = request.getEmail();

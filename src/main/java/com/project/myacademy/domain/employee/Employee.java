@@ -32,7 +32,6 @@ public class Employee extends BaseEntity {
     private String address;
 
     @Column(name = "phone_number")
-    @NotBlank
     private String phoneNum;
 
     @NotBlank
@@ -45,7 +44,6 @@ public class Employee extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private EmployeeRole employeeRole;
 
-    @NotBlank
     private String password;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -19,5 +19,4 @@ public class EmployeeDto {
     private String account;
     private EmployeeRole employeeRole;
     private String password;
-    private Academy academy;
 }
