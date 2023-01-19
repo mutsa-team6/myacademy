@@ -11,14 +11,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/employees")
 @RequiredArgsConstructor
 @Slf4j
 public class EmployeeRestController {
 
     private final EmployeeService employeeService;
 
-    @PostMapping("/employees/signup")
+    @PostMapping("/signup")
     public ResponseEntity create(@RequestBody CreateEmployeeRequest request) {
         EmployeeDto savedEmployeeDto = employeeService.createEmployee(request);
         return ResponseEntity.ok(Response.success(new CreateEmployeeResponse(
@@ -27,19 +27,19 @@ public class EmployeeRestController {
                 "signed up")));
     }
 
-    @PostMapping("/employees/login")
+    @PostMapping("/login")
     public ResponseEntity login(@RequestBody LoginEmployeeRequest request) {
         LoginEmployeeResponse response = employeeService.loginEmployee(request);
         return ResponseEntity.ok(Response.success(response));
     }
 
-    @PostMapping("/employees/findAccount")
+    @PostMapping("/findAccount")
     public ResponseEntity findAccount(@RequestBody FindAccountEmployeeRequest request) {
         FindAccountEmployeeResponse response = employeeService.findAccountEmployee(request);
         return ResponseEntity.ok(Response.success(response));
     }
 
-    @PutMapping("/employees/findPassword")
+    @PutMapping("/findPassword")
     public ResponseEntity changePassword(@RequestBody ChangePasswordEmployeeRequest request) {
         EmployeeDto updatedEmployeeDto = employeeService.changePasswordEmployee(request);
         return ResponseEntity.ok(Response.success(new ChangePasswordEmployeeResponse(
@@ -48,20 +48,20 @@ public class EmployeeRestController {
                 updatedEmployeeDto.getAccount() + "updated")));
     }
 
-    @DeleteMapping("/employees/{employeeId}")
+    @DeleteMapping("/{employeeId}")
     public ResponseEntity delete(@PathVariable Long employeeId) {
         DeleteEmployeeResponse response = employeeService.deleteEmployee(employeeId);
         return ResponseEntity.ok(Response.success(response));
     }
 
-    @GetMapping("/employees/{employeeId}/my")
+    @GetMapping("/{employeeId}/my")
     public ResponseEntity read(@PathVariable Long employeeId) {
         ReadEmployeeResponse response = employeeService.readEmployee(employeeId);
         return ResponseEntity.ok(Response.success(response));
     }
 
-    // 관리자 회원만 접근할 수 있는, 전체 회원 보기
-    @GetMapping("/employees")
+    // 관리자(ADMIN) 회원만 접근할 수 있는, 전체 회원 보기
+    @GetMapping("")
     public ResponseEntity readAll(Authentication authentication, Pageable pageable) {
 
         String requestAccount = authentication.getName();
@@ -71,5 +71,7 @@ public class EmployeeRestController {
 
         return ResponseEntity.ok(Response.success(response));
     }
+
+
 
 }
