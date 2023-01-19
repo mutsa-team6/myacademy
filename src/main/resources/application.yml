@@ -3,7 +3,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/myacademy-db
     username: root
-    password: password
+    password: 12341234
   jpa:
     hibernate:
       ddl-auto: update
