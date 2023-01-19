@@ -52,4 +52,5 @@ public class EmployeeRestController {
         ReadAllEmployeeResponse response = employeeService.readAll(employeeId);
         return ResponseEntity.ok(Response.success(response));
     }
+
 }

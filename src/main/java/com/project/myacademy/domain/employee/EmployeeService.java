@@ -30,7 +30,9 @@ public class EmployeeService {
     public EmployeeDto createEmployee(CreateEmployeeRequest request) {
         String account = request.getAccount();
         employeeRepository.findByAccount(account)
-                .ifPresent(employee -> new AppException(ErrorCode.DUPLICATED_ACCOUNT, ErrorCode.DUPLICATED_ACCOUNT.getMessage()));
+                .ifPresent(employee -> {
+                    throw new AppException(ErrorCode.DUPLICATED_ACCOUNT, ErrorCode.DUPLICATED_ACCOUNT.getMessage());
+                });
         String encryptedPassword = bCryptPasswordEncoder.encode(request.getPassword());
         Employee savedEmployee = employeeRepository.save(request.toEmployee(account, encryptedPassword, DEFAULT_EMPLOYEE_ROLE));
         return savedEmployee.toEmployeeDto();
@@ -41,7 +43,7 @@ public class EmployeeService {
         String password = request.getPassword();
         Employee foundEmployee = employeeRepository.findByAccount(account)
                 .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND, ErrorCode.EMPLOYEE_NOT_FOUND.getMessage()));
-        if(!bCryptPasswordEncoder.matches(password, foundEmployee.getPassword())) {
+        if (!bCryptPasswordEncoder.matches(password, foundEmployee.getPassword())) {
             throw new AppException(ErrorCode.INVALID_PASSWORD, ErrorCode.INVALID_PASSWORD.getMessage());
         }
         return new LoginEmployeeResponse(JwtTokenUtil.createToken(account, secretKey, expiredTimeMs), "login succeeded");
@@ -62,7 +64,9 @@ public class EmployeeService {
         Employee foundEmployee = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND, ErrorCode.EMPLOYEE_NOT_FOUND.getMessage()));
         employeeRepository.findByAccount(account)
-                .ifPresent(employee -> new AppException(ErrorCode.DUPLICATED_ACCOUNT, ErrorCode.DUPLICATED_ACCOUNT.getMessage()));
+                .ifPresent(employee -> {
+                    throw new AppException(ErrorCode.DUPLICATED_ACCOUNT, ErrorCode.DUPLICATED_ACCOUNT.getMessage());
+                });
         foundEmployee.update(request);
         Employee updatedEmployee = employeeRepository.save(foundEmployee);
         return updatedEmployee.toEmployeeDto();
@@ -72,17 +76,23 @@ public class EmployeeService {
     public DeleteEmployeeResponse deleteEmployee(Long employeeId) {
         Employee foundEmployee = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND, ErrorCode.EMPLOYEE_NOT_FOUND.getMessage()));
-        validAccessibleRole(foundEmployee);
+
         employeeRepository.delete(foundEmployee);
         return new DeleteEmployeeResponse(employeeId, "Employee deleted : " + employeeId);
     }
-    public void validAccessibleRole(Employee foundEmployee) {
-        if(foundEmployee.getEmployeeRole() != EmployeeRole.ROLE_ADMIN) throw new AppException(ErrorCode.INVALID_PERMISSION, ErrorCode.INVALID_PERMISSION.getMessage());
-    }
+
 
     public ReadAllEmployeeResponse readAll(Long employeeId) {
         Employee foundEmployee = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND, ErrorCode.EMPLOYEE_NOT_FOUND.getMessage()));
         return new ReadAllEmployeeResponse(foundEmployee);
     }
+
+    /**
+     * JwtTokenFilter 에서 사용하기 위해 만든 메서드 ( 계정 찾아와서 권한 부여하기 위함 )
+     */
+    public EmployeeRole findRoleByAccount(String account) {
+        return employeeRepository.findByAccount(account).get().getEmployeeRole();
+    }
+
 }
