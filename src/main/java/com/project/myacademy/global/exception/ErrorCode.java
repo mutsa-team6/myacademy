@@ -26,6 +26,7 @@ public enum ErrorCode {
     UNIQUENESS_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 특이사항을 찾을 수 없습니다."),
     TEACHER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 강사를 찾을 수 없습니다."),
     PAYMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 결제내역을 찾을 수 없습니다."),
+    STUDENT_LECTURE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 학생-수강 이력을 찾을 수 없습니다."),
 
     INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "패스워드가 잘못되었습니다."),
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "잘못된 토큰입니다."),
