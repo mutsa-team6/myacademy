@@ -24,7 +24,7 @@ public class StudentService {
     /**
      *
      * @param request 학생등록 정보가 담긴 dto
-     * @param account jwt로 받아온 사용자(Employ) 계정
+     * @param account jwt로 받아온 사용자(Employee) 계정
      */
     @Transactional
     public CreateStudentResponse createStudent(CreateStudentRequest request, String account) {
@@ -51,7 +51,7 @@ public class StudentService {
     /**
      *
      * @param studentsId PathVariable로 받아온 조회할 학생 id
-     * @param account jwt로 받아온 사용자(Employ) 계정
+     * @param account jwt로 받아온 사용자(Employee) 계정
      */
     public FindStudentResponse findStudent(Long studentsId, String account) {
 
@@ -69,7 +69,7 @@ public class StudentService {
     /**
      *
      * @param pageable page 설정 : 20개씩 조회
-     * @param account jwt로 받아온 사용자(Employ) 계정
+     * @param account jwt로 받아온 사용자(Employee) 계정
      */
     public Page<FindAllStudentResponse> findAllStudent(PageRequest pageable, String account) {
 
@@ -84,7 +84,7 @@ public class StudentService {
      *
      * @param studentId PathVariable로 받아온 수정할 학생 id
      * @param request 수정할 내용을 담은 requestDto
-     * @param account jwt로 받아온 사용자(Employ) 계정
+     * @param account jwt로 받아온 사용자(Employee) 계정
      */
     @Transactional
     public UpdateStudentResponse updateStudent(long studentId, UpdateStudentRequest request, String account) {
@@ -105,7 +105,7 @@ public class StudentService {
     /**
      *
      * @param studentId PathVariable로 받아온 삭제할 학생 id
-     * @param account jwt로 받아온 사용자(Employ) 계정
+     * @param account jwt로 받아온 사용자(Employee) 계정
      */
     @Transactional
     public DeleteStudentResponse deleteStudent(Long studentId, String account) {
