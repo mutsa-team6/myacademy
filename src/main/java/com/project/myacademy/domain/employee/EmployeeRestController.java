@@ -65,13 +65,24 @@ public class EmployeeRestController {
     public ResponseEntity readAll(Authentication authentication, Pageable pageable) {
 
         String requestAccount = authentication.getName();
-        log.info("🔎 조회를 요청한 사용자 계정 {} ", requestAccount);
+        log.info("🔎 조회를 요청한 사용자 계정 [{}] ", requestAccount);
 
         Page<ReadEmployeeResponse> response = employeeService.readAllEmployees(requestAccount, pageable);
 
         return ResponseEntity.ok(Response.success(response));
     }
 
+    // 관리자(ADMIN) 혹은 직원(STAFF) 등급은 다른 직원의 등급을 USER -> STAFF 혹은 STAFF -> USER 로 변경할 수 있다.
+    @PutMapping("/changeRole/{employeeId}")
+    public ResponseEntity changeRole(Authentication authentication, @PathVariable Long employeeId) {
 
+        String requestAccount = authentication.getName();
+        log.info("🛠 등급 변경를 요청한 사용자 계정 [{}] ", requestAccount);
+
+        ChangeRoleEmployeeResponse response = employeeService.changeRoleEmployee(requestAccount, employeeId);
+
+        return ResponseEntity.ok(Response.success(response));
+
+    }
 
 }

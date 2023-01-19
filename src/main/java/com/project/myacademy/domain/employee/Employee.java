@@ -42,7 +42,7 @@ public class Employee extends BaseEntity {
     @NotBlank
     private String account;
 
-    @Column(name ="employee_role")
+    @Column(name = "employee_role")
     @Enumerated(EnumType.STRING)
     private EmployeeRole employeeRole;
 
@@ -70,7 +70,12 @@ public class Employee extends BaseEntity {
 
     // 강좌 개설 권한 확인 메서드
     public static boolean hasAuthorityToCreateLecture(Employee employee) {
-        if(employee.getEmployeeRole().equals(ROLE_USER)) return true;
+        if (employee.getEmployeeRole().equals(ROLE_USER)) return true;
         else return false;
+    }
+
+    // ADMIN, STAFF 가 사용하는 등급 변경 메서드
+    public void changeRole(EmployeeRole employeeRole) {
+        this.employeeRole = employeeRole;
     }
 }

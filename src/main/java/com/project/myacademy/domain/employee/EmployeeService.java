@@ -119,4 +119,47 @@ public class EmployeeService {
 
         return employeeRepository.findAll(pageable).map(employee -> new ReadEmployeeResponse(employee));
     }
+
+    /**
+     * 관리자(ADMIN) 혹은 직원(STAFF) 등급은 다른 직원의 등급을 USER -> STAFF 혹은 STAFF -> USER 로 변경할 수 있다.
+     * 변경하려는 계정이 ADMIN 인 경우는 에러 처리
+     * @param requestAccount 등급 변경을 요청한 직원의 계정
+     * @param employeeId 등급 변경이 될 직원의 기본키(id)
+     * @return
+     */
+    @Transactional
+    public ChangeRoleEmployeeResponse changeRoleEmployee(String requestAccount, Long employeeId) {
+
+        // 요청한 직원이 존재하지 않는 경우 에러 처리
+        employeeRepository.findByAccount(requestAccount)
+                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND, ErrorCode.EMPLOYEE_NOT_FOUND.getMessage()));
+
+        // 등급을 변경하려는 직원이 존재하지 않는 경우 에러 처리
+        Employee foundEmployee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND, ErrorCode.EMPLOYEE_NOT_FOUND.getMessage()));
+
+        // 등급을 변경하려는 직원의 변경하기 전 등급
+        EmployeeRole foundEmployeeRole = foundEmployee.getEmployeeRole();
+        log.info("🛠 등급 변경이 변경될 사용자 계정 [{}] || 현재 등급[{}] ", foundEmployee.getAccount(),foundEmployeeRole);
+
+
+        EmployeeRole changedRole = EmployeeRole.ROLE_STAFF;
+
+        // USER 등급인 회원인 경우 STAFF로 바꿔준다.
+        if (foundEmployeeRole.equals(EmployeeRole.ROLE_USER)) {
+            foundEmployee.changeRole(changedRole);
+
+        // STAFF 등급인 회원인 경우 USER로 바꿔준다.
+        } else if (foundEmployeeRole.equals(EmployeeRole.ROLE_STAFF)) {
+            changedRole = EmployeeRole.ROLE_USER;
+            foundEmployee.changeRole(changedRole);
+
+        // ADMIN 등급인 회원을 변경하려는 경우 권한 없음 에러처리한다.
+        } else {
+            throw new AppException(ErrorCode.INVALID_PERMISSION, ErrorCode.INVALID_PERMISSION.getMessage());
+        }
+
+        return new ChangeRoleEmployeeResponse(employeeId, foundEmployee.getAccount() + " 계정의 권한을 " + changedRole + "로 변경했습니다");
+
+    }
 }
