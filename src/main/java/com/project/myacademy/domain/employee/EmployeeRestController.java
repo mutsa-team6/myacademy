@@ -25,18 +25,18 @@ public class EmployeeRestController {
     }
     @PostMapping("/employees/login")
     public ResponseEntity login(@RequestBody LoginEmployeeRequest request) {
-        LoginEmployeeResponse response = employeeService.login(request);
+        LoginEmployeeResponse response = employeeService.loginEmployee(request);
         return ResponseEntity.ok(Response.success(response));
     }
-    @PostMapping("/employees/findaccount")
-    public ResponseEntity read(@RequestBody ReadEmployeeAccountRequest request) {
-        ReadEmployeeResponse response = employeeService.readAccount(request);
+    @PostMapping("/employees/findAccount")
+    public ResponseEntity findAccount(@RequestBody FindAccountEmployeeRequest request) {
+        FindAccountEmployeeResponse response = employeeService.findAccountEmployee(request);
         return ResponseEntity.ok(Response.success(response));
     }
-    @PutMapping("/employees/{employeeId}")
-    public ResponseEntity update(@PathVariable Long employeeId, @RequestBody UpdateEmployeeRequest request) {
-        EmployeeDto updatedEmployeeDto = employeeService.updateEmployee(employeeId, request);
-        return ResponseEntity.ok(Response.success(new UpdateEmployeeResponse(
+    @PutMapping("/employees/findPassword")
+    public ResponseEntity changePassword(@RequestBody ChangePasswordEmployeeRequest request) {
+        EmployeeDto updatedEmployeeDto = employeeService.changePasswordEmployee(request);
+        return ResponseEntity.ok(Response.success(new ChangePasswordEmployeeResponse(
                 updatedEmployeeDto.getName(),
                 updatedEmployeeDto.getAccount(),
                 updatedEmployeeDto.getAccount()+ "updated")));
@@ -48,8 +48,8 @@ public class EmployeeRestController {
     }
 
     @GetMapping("/employees/{employeeId}/my")
-    public ResponseEntity readAll(@PathVariable Long employeeId) {
-        ReadAllEmployeeResponse response = employeeService.readAll(employeeId);
+    public ResponseEntity read(@PathVariable Long employeeId) {
+        ReadEmployeeResponse response = employeeService.readEmployee(employeeId);
         return ResponseEntity.ok(Response.success(response));
     }
 

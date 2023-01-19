@@ -38,7 +38,7 @@ public class EmployeeService {
         return savedEmployee.toEmployeeDto();
     }
 
-    public LoginEmployeeResponse login(LoginEmployeeRequest request) {
+    public LoginEmployeeResponse loginEmployee(LoginEmployeeRequest request) {
         String account = request.getAccount();
         String password = request.getPassword();
         Employee foundEmployee = employeeRepository.findByAccount(account)
@@ -49,24 +49,32 @@ public class EmployeeService {
         return new LoginEmployeeResponse(JwtTokenUtil.createToken(account, secretKey, expiredTimeMs), "login succeeded");
     }
 
-    public ReadEmployeeResponse readAccount(ReadEmployeeAccountRequest request) {
+    public FindAccountEmployeeResponse findAccountEmployee(FindAccountEmployeeRequest request) {
         String name = request.getName();
         String email = request.getEmail();
         Employee foundEmployee = employeeRepository.findByNameAndEmail(name, email)
                 .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND, ErrorCode.EMPLOYEE_NOT_FOUND.getMessage()));
         String account = foundEmployee.getAccount();
-        return new ReadEmployeeResponse(account, "Account found : " + account);
+        return new FindAccountEmployeeResponse(account, "Account found : " + account);
     }
 
+    /**
+     * requestdto에 직원 계정, 이메일, 변경하고싶은 비밀번호
+     * 직원 계정으로 db에 있는지 확인 -> 없으면 에러처리
+     * 직원계정 + 이메일 2개가 동시에 일치하는 데이터가 있는지? -> 없으면 에러처리
+     *
+     */
     @Transactional
-    public EmployeeDto updateEmployee(Long employeeId, UpdateEmployeeRequest request) {
+    public EmployeeDto changePasswordEmployee(ChangePasswordEmployeeRequest request) {
         String account = request.getAccount();
-        Employee foundEmployee = employeeRepository.findById(employeeId)
+        Employee foundEmployee = employeeRepository.findById(1L)
                 .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND, ErrorCode.EMPLOYEE_NOT_FOUND.getMessage()));
+
         employeeRepository.findByAccount(account)
                 .ifPresent(employee -> {
                     throw new AppException(ErrorCode.DUPLICATED_ACCOUNT, ErrorCode.DUPLICATED_ACCOUNT.getMessage());
                 });
+
         foundEmployee.update(request);
         Employee updatedEmployee = employeeRepository.save(foundEmployee);
         return updatedEmployee.toEmployeeDto();
@@ -82,10 +90,10 @@ public class EmployeeService {
     }
 
 
-    public ReadAllEmployeeResponse readAll(Long employeeId) {
+    public ReadEmployeeResponse readEmployee(Long employeeId) {
         Employee foundEmployee = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND, ErrorCode.EMPLOYEE_NOT_FOUND.getMessage()));
-        return new ReadAllEmployeeResponse(foundEmployee);
+        return new ReadEmployeeResponse(foundEmployee);
     }
 
     /**
