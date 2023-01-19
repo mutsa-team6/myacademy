@@ -148,7 +148,7 @@ public class EmployeeService {
     /**
      * 관리자(ADMIN) 혹은 직원(STAFF) 등급은 다른 직원의 등급을 USER -> STAFF 혹은 STAFF -> USER 로 변경할 수 있다.
      * 변경하려는 계정이 ADMIN 인 경우는 에러 처리
-     *
+     * 본인 계정을 변경하려고 요청하면 에러 처리
      * @param requestAccount 등급 변경을 요청한 직원의 계정
      * @param employeeId     등급 변경이 될 직원의 기본키(id)
      * @return
@@ -163,6 +163,11 @@ public class EmployeeService {
         // 등급을 변경하려는 직원이 존재하지 않는 경우 에러 처리
         Employee foundEmployee = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND, ErrorCode.EMPLOYEE_NOT_FOUND.getMessage()));
+
+        // 변경하려는 계정이 자기 자신인 경우 에러 처리
+        if (foundEmployee.getAccount().equals(requestAccount)) {
+            throw new AppException(ErrorCode.BAD_CHANGE_REQUEST, ErrorCode.BAD_CHANGE_REQUEST.getMessage());
+        }
 
         // 등급을 변경하려는 직원의 변경하기 전 등급
         EmployeeRole foundEmployeeRole = foundEmployee.getEmployeeRole();
