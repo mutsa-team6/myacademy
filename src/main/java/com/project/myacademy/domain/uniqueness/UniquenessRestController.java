@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -21,40 +22,41 @@ public class UniquenessRestController {
     /**
      * 학생 특이사항 작성
      */
-    @PostMapping("students/{studentId}/uniqueness")
-    public ResponseEntity<Response<CreateUniquenessResponse>> create(@PathVariable Long studentId, CreateUniquenessRequest request) {
-        CreateUniquenessResponse response = uniquenessService.createUniqueness(studentId, request);
+    @PostMapping("/students/{studentId}/uniqueness")
+    public ResponseEntity<Response<CreateUniquenessResponse>> create(@PathVariable Long studentId, CreateUniquenessRequest request, Authentication authentication) {
+        String account = authentication.getName();
+        CreateUniquenessResponse response = uniquenessService.createUniqueness(studentId, request, account);
         return ResponseEntity.ok().body(Response.success(response));
     }
 
     /**
      * 특정 학생 특이사항 목록 조회
      */
-    @GetMapping("students/{studentId}/uniqueness")
-    public ResponseEntity<Response<Page<ReadAllUniquenessResponse>>> readAll(@PathVariable Long studentId) {
+    @GetMapping("/students/{studentId}/uniqueness")
+    public ResponseEntity<Response<Page<ReadAllUniquenessResponse>>> readAll(@PathVariable Long studentId, Authentication authentication) {
+        String account = authentication.getName();
         PageRequest pageable = PageRequest.of(0, 20, Sort.by("id").descending());
-        Page<ReadAllUniquenessResponse> responses = uniquenessService.readAllUniqueness(studentId, pageable);
+        Page<ReadAllUniquenessResponse> responses = uniquenessService.readAllUniqueness(studentId, pageable, account);
         return ResponseEntity.ok().body(Response.success(responses));
     }
 
     /**
-     * @param studentId    특이사항의 대상이 되는 학생 Id
-     * @param uniquenessId 수정하려고하는 특이사항 Id
-     * @param request      수정내용이 담긴 dto
+     * 특정 특이사항 수정
      */
-    @PutMapping("students/{studentId}/uniqueness/{uniquenessId}")
-    public ResponseEntity<Response<UpdateUniquenessResponse>> update(@PathVariable Long studentId, @PathVariable Long uniquenessId, UpdateUniquenessRequest request) {
-        UpdateUniquenessResponse response = uniquenessService.updateUniqueness(studentId, uniquenessId, request);
+    @PutMapping("/students/{studentId}/uniqueness/{uniquenessId}")
+    public ResponseEntity<Response<UpdateUniquenessResponse>> update(@PathVariable Long studentId, @PathVariable Long uniquenessId, UpdateUniquenessRequest request, Authentication authentication) {
+        String account = authentication.getName();
+        UpdateUniquenessResponse response = uniquenessService.updateUniqueness(studentId, uniquenessId, request, account);
         return ResponseEntity.ok().body(Response.success(response));
     }
 
     /**
-     * @param studentId    특이사항의 대상이 되는 학생 Id
-     * @param uniquenessId 삭제하려고 하는 특이사항 Id
+     * 특정 특이사항 수정
      */
-    @DeleteMapping("students/{studentId}/uniqueness/{uniquenessId}")
-    public ResponseEntity<Response<DeleteUniquenessResponse>> delete(@PathVariable Long studentId, @PathVariable Long uniquenessId) {
-        DeleteUniquenessResponse response = uniquenessService.deleteUniqueness(studentId, uniquenessId);
+    @DeleteMapping("/students/{studentId}/uniqueness/{uniquenessId}")
+    public ResponseEntity<Response<DeleteUniquenessResponse>> delete(@PathVariable Long studentId, @PathVariable Long uniquenessId, Authentication authentication) {
+        String account = authentication.getName();
+        DeleteUniquenessResponse response = uniquenessService.deleteUniqueness(studentId, uniquenessId, account);
         return ResponseEntity.ok().body(Response.success(response));
     }
 }
