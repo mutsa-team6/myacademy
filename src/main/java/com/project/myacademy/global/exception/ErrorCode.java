@@ -33,8 +33,13 @@ public enum ErrorCode {
     TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "토큰이 존재하지 않습니다."),
     INVALID_PERMISSION(HttpStatus.UNAUTHORIZED, "사용자가 권한이 없습니다."),
 
+    NOT_ALLOWED_ROLE(HttpStatus.UNAUTHORIZED, "특정 권한의 회원만 접근할 수 있습니다."),
+    NOT_ALLOWED_CHANGE(HttpStatus.UNAUTHORIZED, "ADMIN 계정을 변경하거나 삭제할 수 없습니다."),
+
     DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "DB에러가 발생했습니다."),
     INVALID_VALUE(HttpStatus.BAD_REQUEST, "요청이 이상합니다."),
+    BAD_DELETE_REQUEST(HttpStatus.BAD_REQUEST, "자신의 계정을 삭제할 수 없습니다."),
+    BAD_CHANGE_REQUEST(HttpStatus.BAD_REQUEST, "자신의 계정 등급을 변경할 수 없습니다."),
     PAYMENT_REQUIRED(HttpStatus.PAYMENT_REQUIRED, "결제 정보가 필요합니다.");
 
     private HttpStatus httpStatus;
