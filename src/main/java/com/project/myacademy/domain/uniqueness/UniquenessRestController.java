@@ -19,8 +19,7 @@ public class UniquenessRestController {
     private final UniquenessService uniquenessService;
 
     /**
-     * @param studentId 특이사항의 대상이 되는 학생 Id
-     * @param request   특이사항의 요청시 받는 request Dto
+     * 학생 특이사항 작성
      */
     @PostMapping("students/{studentId}/uniqueness")
     public ResponseEntity<Response<CreateUniquenessResponse>> create(@PathVariable Long studentId, CreateUniquenessRequest request) {
@@ -29,7 +28,7 @@ public class UniquenessRestController {
     }
 
     /**
-     * @param studentId 특이사항의 대상이 되는 학생 Id
+     * 특정 학생 특이사항 목록 조회
      */
     @GetMapping("students/{studentId}/uniqueness")
     public ResponseEntity<Response<Page<ReadAllUniquenessResponse>>> readAll(@PathVariable Long studentId) {
