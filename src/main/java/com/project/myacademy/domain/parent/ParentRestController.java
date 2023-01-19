@@ -39,7 +39,7 @@ public class ParentRestController {
     /**
      * 부모 정보 수정
      */
-    @PutMapping("{parentId}")
+    @PutMapping("/{parentId}")
     public ResponseEntity<Response<UpdateParentResponse>> update(@PathVariable Long parentId, UpdateParentRequest request, Authentication authentication) {
         String account = authentication.getName();
         UpdateParentResponse response = parentService.updateParent(parentId, request, account);
@@ -49,7 +49,7 @@ public class ParentRestController {
     /**
      * 부모 정보 삭제
      */
-    @DeleteMapping("{parentId}")
+    @DeleteMapping("/{parentId}")
     public ResponseEntity<Response<DeleteParentResponse>> delete(@PathVariable Long parentId, Authentication authentication) {
         String account = authentication.getName();
         DeleteParentResponse response = parentService.deleteParent(parentId, account);
