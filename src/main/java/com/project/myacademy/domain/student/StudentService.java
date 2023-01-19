@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 public class StudentService {
     private final StudentRepository studentRepository;
     private final ParentRepository parentRepository;
