@@ -20,36 +20,29 @@ import static com.project.myacademy.domain.employee.EmployeeRole.ROLE_USER;
 public class TeacherService {
 
     /**
-     * 학원 로그인, 회원 로그인 개념은 아직 추가하지 않았음
-     * 학원은 Authentication에 저장되어 있는 필드로, 회원은 회원 이름 필드로 가져올 예정
-     * 아래 메서드 모두 추가해야 함
+     * 회원만 로그인 하는 것으로 변경
+     * 회원은 회원 계정 필드로 가져올 예정
      */
-    private final AcademyRepository academyRepository;
     private final TeacherRepository teacherRepository;
     private final EmployeeRepository employeeRepository;
 
     /**
-     *
-     * @param academyId 강사 생성을 진행하는 유저의 학원 id
-     * @param employeeId 강사 생성을 진행하는 유저의 id
-     * @param request 강사이름, 과목이 들어간 요청 DTO
+     * @param request 강사이름, 과목이 들어간 등록 요청 DTO
+     * @param account 직원 계정
      */
-    public CreateTeacherResponse createTeacher(Long academyId, Long employeeId, CreateTeacherRequest request) {
-//        // 학원의 존재 유무 확인
-//        Academy academy = academyRepository.findById(academyId)
-//                .orElseThrow(() -> new AppException(ErrorCode.ACADEMY_NOT_FOUND));
+    public CreateTeacherResponse createTeacher(CreateTeacherRequest request, String account) {
 
-        // 직원의 존재 유무 확인
-        Employee employee = employeeRepository.findById(employeeId)
+        // Authentication으로 넘어온 직원의 계정 존재 유무 확인
+        Employee employee = employeeRepository.findByAccount(account)
                 .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
 
         //직원의 role이 강사일때만 강좌에 강사 배정, 아닐 시 에러 처리
         Teacher teacher;
-        if(!employee.getEmployeeRole().equals(ROLE_USER)) {
+        if(Teacher.isNotTeacher(employee)) {
             log.info("강사가 아닙니다");
             throw new AppException(ErrorCode.INVALID_PERMISSION);
         } else {
-            teacher = Teacher.addTeacherToLecture(request, employee);
+            teacher = Teacher.addTeacher(request, employee);
         }
 
         Teacher savedTeacher = teacherRepository.save(teacher);
@@ -57,37 +50,38 @@ public class TeacherService {
     }
 
     /**
-     *
-     * @param academyId 강사 정보 변경을 진행하는 유저의 학원 id
-     * @param teacherId 강사 정보 변경을 진행하는 유저의 id
-     * @param request 변경하고자 하는 정보가 담긴 강사이름, 과목이 들어간 요청 DTO
+     * @param teacherId 수정되고자 하는 강사 id
+     * @param request   강사이름, 과목이 들어간 수정 요청 DTO
+     * @param account   직원 계정
      */
-    public UpdateTeacherResponse updateTeacher(Long academyId, Long teacherId, UpdateTeacherRequest request) {
+    public UpdateTeacherResponse updateTeacher(Long teacherId, UpdateTeacherRequest request, String account) {
+
         // 유효성 검증
-        Teacher teacher = validateTeacher(academyId, teacherId);
+        Teacher teacher = validateTeacher(account, teacherId);
 
         // 강사 정보 수정
-        teacher.updateTeacherInLecture(request);
+        teacher.updateTeacher(request);
         return UpdateTeacherResponse.of(teacherId);
     }
 
     /**
-     *
-     * @param academyId 강사 정보 삭제를 진행하는 유저의 학원 id
-     * @param teacherId 강사 정보 삭제를를 진행하 유저의 id
+     * @param teacherId 수정되고자 하는 강사 id
+     * @param account   직원 계정
      */
-    public DeleteTeacherResponse deleteTeacher(Long academyId, Long teacherId) {
+    public DeleteTeacherResponse deleteTeacher(Long teacherId, String account) {
+
         // 유효성 검증
-        Teacher teacher = validateTeacher(academyId, teacherId);
+        Teacher teacher = validateTeacher(account, teacherId);
 
         teacherRepository.delete(teacher);
         return DeleteTeacherResponse.of(teacherId);
     }
 
-    private Teacher validateTeacher(Long academyId, Long teacherId) {
-//        // 학원의 존재 유무 확인
-//        Academy academy = academyRepository.findById(academyId)
-//                .orElseThrow(() -> new AppException(ErrorCode.ACADEMY_NOT_FOUND));
+    private Teacher validateTeacher(String account, Long teacherId) {
+
+        // Authentication으로 넘어온 직원의 계정 존재 유무 확인
+        Employee employee = employeeRepository.findByAccount(account)
+                .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
 
         // 강사의 존재 유뮤 확인
         Teacher teacher = teacherRepository.findById(teacherId)
