@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping("api/v1/academies")
+@RequestMapping("api/v1/students")
 public class StudentRestController {
 
     private final StudentService studentService;
@@ -21,7 +21,7 @@ public class StudentRestController {
     /**
      * 학생 등록
      */
-    @PostMapping("/students")
+    @PostMapping("")
     public ResponseEntity<Response<CreateStudentResponse>> create(CreateStudentRequest request) {
         //String userName = authentication.getName();
         CreateStudentResponse response = studentService.createStudent(request);
@@ -31,7 +31,7 @@ public class StudentRestController {
     /**
      * 학생 정보 단건 조회
      */
-    @GetMapping("/students/{studentId}")
+    @GetMapping("/{studentId}")
     public ResponseEntity<Response<FindStudentResponse>> find(@PathVariable Long studentId) {
         FindStudentResponse response = studentService.findStudent(studentId);
         return ResponseEntity.ok().body(Response.success(response));
@@ -40,7 +40,7 @@ public class StudentRestController {
     /**
      * 학생 정보 전체 조회
      */
-    @GetMapping("/students")
+    @GetMapping("")
     public ResponseEntity<Response<Page<FindAllStudentResponse>>> findAll() {
         PageRequest pageable = PageRequest.of(0, 20, Sort.by("id").descending());
         Page<FindAllStudentResponse> responses = studentService.findAllStudent(pageable);
@@ -50,7 +50,7 @@ public class StudentRestController {
     /**
      * 학생 정보 수정
      */
-    @PutMapping("/students/{studentId}")
+    @PutMapping("/{studentId}")
     public ResponseEntity<Response<UpdateStudentResponse>> update(@PathVariable Long studentId, UpdateStudentRequest request) {
         UpdateStudentResponse response = studentService.updateStudent(studentId, request);
         return ResponseEntity.ok().body(Response.success(response));
@@ -59,7 +59,7 @@ public class StudentRestController {
     /**
      * 학생 정보 삭제
      */
-    @DeleteMapping("/students/{studentId}")
+    @DeleteMapping("/{studentId}")
     public ResponseEntity<Response<DeleteStudentResponse>> delete(@PathVariable Long studentId) {
         DeleteStudentResponse response = studentService.deleteStudent(studentId);
         return ResponseEntity.ok().body(Response.success(response));
