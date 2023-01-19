@@ -10,13 +10,15 @@ public enum ErrorCode {
 
     DUPLICATED_ACADEMY(HttpStatus.CONFLICT, "이미 존재하는 학원입니다."),
     DUPLICATED_EMPLOYEE(HttpStatus.CONFLICT, "이미 존재하는 회원입니다."),
+    DUPLICATED_ACCOUNT(HttpStatus.CONFLICT, "이미 존재하는 계정명입니다."),
     DUPLICATED_STUDENT(HttpStatus.CONFLICT, "이미 존재하는 학생입니다."),
     DUPLICATED_PARENT(HttpStatus.CONFLICT, "이미 등록된 부모입니다."),
     DUPLICATED_LECTURE(HttpStatus.CONFLICT, "이미 존재하는 수업입니다."),
     DUPLICATED_TEACHER(HttpStatus.CONFLICT, "이미 존재하는 강사입니다."),
     DUPLICATED_PAYMENT(HttpStatus.CONFLICT, "이미 결제된 내역입니다."),
 
-    ACCOUNT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 계정을 찾을 수 없습니다."),
+    ACCOUNT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 계정명을 찾을 수 없습니다."),
+    EMPLOYEE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 직원을 찾을 수 없습니다."),
     ACADEMY_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 학원을 찾을 수 없습니다."),
     PARENT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 부모를 찾을 수 없습니다."),
     LECTURE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 수업을 찾을 수 없습니다."),
