@@ -1,6 +1,5 @@
 package com.project.myacademy.domain.student;
 
-import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.domain.employee.EmployeeRepository;
 import com.project.myacademy.domain.parent.Parent;
 import com.project.myacademy.domain.parent.ParentRepository;
@@ -23,7 +22,9 @@ public class StudentService {
     private final EmployeeRepository employeeRepository;
 
     /**
-     * 학생 등록
+     *
+     * @param request 학생등록 정보가 담긴 dto
+     * @param account jwt로 받아온 사용자(Employ) 계정
      */
     @Transactional
     public CreateStudentResponse createStudent(CreateStudentRequest request, String account) {
@@ -32,7 +33,7 @@ public class StudentService {
         employeeRepository.findByAccount(account)
                         .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
 
-        //중복체크
+        //학생 중복 체크
         studentRepository.findByPhoneNum(request.getPhoneNum())
                 .ifPresent(user -> {
                     throw new AppException(ErrorCode.DUPLICATED_STUDENT);
@@ -48,7 +49,9 @@ public class StudentService {
     }
 
     /**
-     * 학생 정보 단건 조회
+     *
+     * @param studentsId PathVariable로 받아온 조회할 학생 id
+     * @param account jwt로 받아온 사용자(Employ) 계정
      */
     public FindStudentResponse findStudent(Long studentsId, String account) {
 
@@ -56,6 +59,7 @@ public class StudentService {
         employeeRepository.findByAccount(account)
                 .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
 
+        //student Id에 해당하는 학생이 존재하는지 확인
         Student student = studentRepository.findById(studentsId)
                 .orElseThrow(() -> new AppException(ErrorCode.STUDENT_NOT_FOUND));
 
@@ -63,7 +67,9 @@ public class StudentService {
     }
 
     /**
-     * 학생 정보 전체 조회
+     *
+     * @param pageable page 설정 : 20개씩 조회
+     * @param account jwt로 받아온 사용자(Employ) 계정
      */
     public Page<FindAllStudentResponse> findAllStudent(PageRequest pageable, String account) {
 
@@ -75,16 +81,20 @@ public class StudentService {
     }
 
     /**
-     * 학생 정보 수정
+     *
+     * @param studentId PathVariable로 받아온 수정할 학생 id
+     * @param request 수정할 내용을 담은 requestDto
+     * @param account jwt로 받아온 사용자(Employ) 계정
      */
     @Transactional
-    public UpdateStudentResponse updateStudent(long studentsId, UpdateStudentRequest request, String account) {
+    public UpdateStudentResponse updateStudent(long studentId, UpdateStudentRequest request, String account) {
 
         //JWT에서 받은 Employee account가 존재하는지 확인
         employeeRepository.findByAccount(account)
                 .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
 
-        Student student = studentRepository.findById(studentsId)
+        //student Id에 해당하는 학생이 존재하는지 확인
+        Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new AppException(ErrorCode.STUDENT_NOT_FOUND));
 
         student.updateStudent(request);
@@ -93,7 +103,9 @@ public class StudentService {
     }
 
     /**
-     * 학생 정보 삭제
+     *
+     * @param studentId PathVariable로 받아온 삭제할 학생 id
+     * @param account jwt로 받아온 사용자(Employ) 계정
      */
     @Transactional
     public DeleteStudentResponse deleteStudent(Long studentId, String account) {
@@ -102,6 +114,7 @@ public class StudentService {
         employeeRepository.findByAccount(account)
                 .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
 
+        //student Id에 해당하는 학생이 존재하는지 확인
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new AppException(ErrorCode.STUDENT_NOT_FOUND));
 
