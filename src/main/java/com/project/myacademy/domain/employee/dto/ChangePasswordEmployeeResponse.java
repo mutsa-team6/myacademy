@@ -7,10 +7,8 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 @Builder
-public class UpdateEmployeeRequest {
+public class ChangePasswordEmployeeResponse {
     private String name;
-    private String address;
-    private String email;
-    private String password;
-    private String phoneNum;
+    private String account;
+    private String message;
 }

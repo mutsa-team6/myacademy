@@ -7,7 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 @Builder
-public class UpdateEmployeeResponse {
-    private Long employeeId;
+public class FindAccountEmployeeResponse {
+    private String account;
     private String message;
 }

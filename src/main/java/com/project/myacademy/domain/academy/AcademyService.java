@@ -47,7 +47,7 @@ public class AcademyService {
         log.info("등록번호로 저장소에서 학원정보를 조회합니다.");
         academyRepository.findByBusinessRegistrationNumber(businessRegistrationNumber)
                 .ifPresent(academy -> {
-                    throw new AppException(ErrorCode.DUPLICATED_ACADEMY, ErrorCode.DUPLICATED_ACADEMY.getMessage());
+                    throw new AppException(ErrorCode.DUPLICATED_ACADEMY);
                 });
         log.info("학원정보를 저장소에서 조회했습니다.");
 
@@ -73,19 +73,19 @@ public class AcademyService {
         // 인증 확인
         log.info("인증정보로 저장소에서 계정정보를 확인합니다.");
         Employee employee = employeeRepository.findByName(name)
-                .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND, ErrorCode.ACCOUNT_NOT_FOUND.getMessage()));
+                .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
         log.info("계정정보가 확인되었습니다.");
 
         // academyId로 학원정보  확인
         log.info("academyId로 저장소에서 학원정보를 조회합니다.");
         Academy academy = academyRepository.findById(academyId)
-                .orElseThrow(() -> new AppException(ErrorCode.ACADEMY_NOT_FOUND, ErrorCode.ACADEMY_NOT_FOUND.getMessage()));
+                .orElseThrow(() -> new AppException(ErrorCode.ACADEMY_NOT_FOUND));
         log.info("저장소에서 학원정보가 조회되었습니다.");
 
         // 권한 확인
         log.info("학원정보의 소유자와 인증정보로 권한을 확인합니다.");
         if(!academy.getOwner().equals(name) && !employee.getEmployeeRole().equals(EmployeeRole.ROLE_ADMIN)) {
-            throw new AppException(ErrorCode.INVALID_PERMISSION, ErrorCode.INVALID_PERMISSION.getMessage());
+            throw new AppException(ErrorCode.INVALID_PERMISSION);
         }
         log.info("권한이 확인되었습니다.");
 
@@ -114,19 +114,19 @@ public class AcademyService {
         // 인증 확인
         log.info("인증정보로 저장소에서 계정정보를 확인합니다.");
         Employee employee = employeeRepository.findByName(name)
-                .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND, ErrorCode.ACCOUNT_NOT_FOUND.getMessage()));
+                .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
         log.info("계정정보가 확인되었습니다.");
 
         // academyId로 학원정보  확인
         log.info("academyId로 저장소에서 학원정보를 조회합니다.");
         Academy academy = academyRepository.findById(academyId)
-                .orElseThrow(() -> new AppException(ErrorCode.ACADEMY_NOT_FOUND, ErrorCode.ACADEMY_NOT_FOUND.getMessage()));
+                .orElseThrow(() -> new AppException(ErrorCode.ACADEMY_NOT_FOUND));
         log.info("저장소에서 학원정보가 조회되었습니다.");
 
         // 권한 확인
         log.info("학원정보의 소유자와 인증정보로 권한을 확인합니다.");
         if(!academy.getOwner().equals(name) && !employee.getEmployeeRole().equals(EmployeeRole.ROLE_ADMIN)) {
-            throw new AppException(ErrorCode.INVALID_PERMISSION, ErrorCode.INVALID_PERMISSION.getMessage());
+            throw new AppException(ErrorCode.INVALID_PERMISSION);
         }
         log.info("권한이 확인되었습니다.");
 
@@ -155,14 +155,14 @@ public class AcademyService {
         log.info("등록번호로 저장소에서 학원정보를 조회합니다.");
         Academy academy = academyRepository.findByBusinessRegistrationNumber(businessRegistrationNumber)
                 .orElseThrow(() -> {
-                    throw new AppException(ErrorCode.ACADEMY_NOT_FOUND, ErrorCode.ACADEMY_NOT_FOUND.getMessage());
+                    throw new AppException(ErrorCode.ACADEMY_NOT_FOUND);
                 });
         log.info("학원정보를 저장소에서 조회했습니다.");
 
         // 권한 확인
         log.info("조회된 학원정보와 요청의 비밀번호로 권한을 확인합니다.");
         if (!bCryptPasswordEncoder.matches(request.getPassword(), academy.getPassword())) {
-            throw new AppException(ErrorCode.INVALID_PASSWORD, ErrorCode.INVALID_PASSWORD.getMessage());
+            throw new AppException(ErrorCode.INVALID_PASSWORD);
         }
         log.info("조회된 학원정보와 요청의 비밀번호가 일치합니다.");
         log.info("학원 토큰이 발급됩니다.");

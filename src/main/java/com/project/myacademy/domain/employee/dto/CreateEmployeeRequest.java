@@ -1,5 +1,6 @@
 package com.project.myacademy.domain.employee.dto;
 
+import com.project.myacademy.domain.academy.Academy;
 import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.domain.employee.EmployeeRole;
 import lombok.AllArgsConstructor;
@@ -17,15 +18,4 @@ public class CreateEmployeeRequest {
     private String account;
     private String password;
 
-    public Employee toEmployee(String account, String encryptedPassword, EmployeeRole role) {
-        return Employee.builder()
-                .name(this.name)
-                .address(this.address)
-                .phoneNum(this.phoneNum)
-                .email(this.email)
-                .employeeRole(role)
-                .account(account)
-                .password(encryptedPassword)
-                .build();
-    }
 }
