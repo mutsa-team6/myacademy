@@ -127,7 +127,7 @@ public class EmployeeService {
 
         // 로그인을 요청한 회원이 해당 학원에 존재하지 않는 경우 예외 처리
         Employee foundEmployee = employeeRepository.findByAccountAndAcademy(requestAccount, foundAcademy)
-                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND));
 
         String password = request.getPassword();
 
@@ -179,6 +179,7 @@ public class EmployeeService {
      * 자기 자신을 삭제 요청할 시, 에러 처리 ( 본인 탈퇴 기능은 따로 구현 )
      * ADMIN 계정을 삭제하려고 할 시, 에러 처리
      * USER 가 삭제하려고하는 경우는 security로 에러 처리
+     *
      * @param requestAccount 삭제 요청한 직원 계정
      * @param employeeId     삭제를 할 직원 기본키 id
      * @return
@@ -192,7 +193,7 @@ public class EmployeeService {
 
         // 삭제를 요청한 계정이 해당 학원에 존재하지 않은 경우 에러 처리
         Employee requestEmployee = employeeRepository.findByAccountAndAcademy(requestAccount, foundAcademy)
-                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND));
 
         // 삭제하려는 계정이 해당 학원에 존재하지 않으면 에러 처리
         Employee foundEmployee = employeeRepository.findByIdAndAcademy(employeeId, foundAcademy)
@@ -233,16 +234,23 @@ public class EmployeeService {
 
     /**
      * 관리자(ADMIN)는 모든 회원 정보를 조회할 수 있다.
-     *
+     * 정보를 조회하려는 학원이 존재하지 않는 경우 에러 처리
+     * 조회를 요청한 회원이 해당 학원에 존재하지 않는 경우 에러 처리
+     * ADMIN 이 아니면 접근할 수 없는 에러처리는 security 단 에서 진행
      * @param requestAccount 조회를 요청한 사용자 계정
      * @param pageable
      * @return 모든 회원 목록 반환
      */
-    public Page<ReadEmployeeResponse> readAllEmployees(String requestAccount, Pageable pageable) {
+    public Page<ReadEmployeeResponse> readAllEmployees(String requestAccount, Long academyId, Pageable pageable) {
 
-        // 요청한 회원이 존재하지 않는 경우 에러 처리
-        employeeRepository.findByAccount(requestAccount)
-                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
+        //학원이 존재하지 않는 경우
+        Academy foundAcademy = academyRepository.findById(academyId)
+                .orElseThrow(() -> new AppException(ErrorCode.ACADEMY_NOT_FOUND));
+
+
+        // 조회를 요청한 회원이 해당 학원에 존재하지 않는 경우 에러 처리
+        employeeRepository.findByAccountAndAcademy(requestAccount, foundAcademy)
+                .orElseThrow(() -> new AppException(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND));
 
 
         return employeeRepository.findAll(pageable).map(employee -> new ReadEmployeeResponse(employee));

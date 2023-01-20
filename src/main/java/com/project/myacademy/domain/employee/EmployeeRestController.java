@@ -75,13 +75,13 @@ public class EmployeeRestController {
     }
 
     // 관리자(ADMIN) 회원만 접근할 수 있는, 전체 회원 보기
-    @GetMapping("")
-    public ResponseEntity readAll(Authentication authentication, Pageable pageable) {
+    @GetMapping("/{academyId}/employees")
+    public ResponseEntity readAll(@PathVariable Long academyId, Authentication authentication, Pageable pageable) {
 
         String requestAccount = authentication.getName();
-        log.info("🔎 조회를 요청한 사용자 계정 [{}] ", requestAccount);
+        log.info("🔎 조회를 요청한 사용자 계정 [{}] || 접근하려는 학원 id [{}] ", requestAccount, academyId);
 
-        Page<ReadEmployeeResponse> response = employeeService.readAllEmployees(requestAccount, pageable);
+        Page<ReadEmployeeResponse> response = employeeService.readAllEmployees(requestAccount,academyId, pageable);
 
         return ResponseEntity.ok(Response.success(response));
     }

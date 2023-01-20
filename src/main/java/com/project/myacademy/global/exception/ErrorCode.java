@@ -19,6 +19,7 @@ public enum ErrorCode {
 
     ACCOUNT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 계정명을 찾을 수 없습니다."),
     EMPLOYEE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 직원을 찾을 수 없습니다."),
+    REQUEST_EMPLOYEE_NOT_FOUND(HttpStatus.NOT_FOUND, "요청한 직원을 해당 학원에서 찾을 수 없습니다."),
     ACADEMY_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 학원을 찾을 수 없습니다."),
     PARENT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 부모를 찾을 수 없습니다."),
     LECTURE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 수업을 찾을 수 없습니다."),
