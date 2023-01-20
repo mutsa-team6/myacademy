@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping("api/v1/students")
+@RequestMapping("api/v1/academies")
 public class StudentRestController {
 
     private final StudentService studentService;
@@ -22,51 +22,51 @@ public class StudentRestController {
     /**
      * 학생 등록
      */
-    @PostMapping("")
-    public ResponseEntity<Response<CreateStudentResponse>> create(CreateStudentRequest request, Authentication authentication) {
+    @PostMapping("/{academyId}/students")
+    public ResponseEntity<Response<CreateStudentResponse>> create(@PathVariable Long academyId, CreateStudentRequest request, Authentication authentication) {
         String account = authentication.getName();
-        CreateStudentResponse response = studentService.createStudent(request, account);
+        CreateStudentResponse response = studentService.createStudent(academyId, request, account);
         return ResponseEntity.ok().body(Response.success(response));
     }
 
     /**
      * 학생 정보 단건 조회
      */
-    @GetMapping("/{studentId}")
-    public ResponseEntity<Response<FindStudentResponse>> find(@PathVariable Long studentId, Authentication authentication) {
+    @GetMapping("/{academyId}students/{studentId}")
+    public ResponseEntity<Response<FindStudentResponse>> find(@PathVariable Long academyId, @PathVariable Long studentId, Authentication authentication) {
         String account = authentication.getName();
-        FindStudentResponse response = studentService.findStudent(studentId, account);
+        FindStudentResponse response = studentService.findStudent(academyId, studentId, account);
         return ResponseEntity.ok().body(Response.success(response));
     }
 
     /**
      * 학생 정보 전체 조회
      */
-    @GetMapping("")
-    public ResponseEntity<Response<Page<FindAllStudentResponse>>> findAll(Authentication authentication) {
+    @GetMapping("/{academyId}students")
+    public ResponseEntity<Response<Page<FindAllStudentResponse>>> findAll(@PathVariable Long academyId, Authentication authentication) {
         String account = authentication.getName();
         PageRequest pageable = PageRequest.of(0, 20, Sort.by("id").descending());
-        Page<FindAllStudentResponse> responses = studentService.findAllStudent(pageable,account);
+        Page<FindAllStudentResponse> responses = studentService.findAllStudent(academyId, pageable, account);
         return ResponseEntity.ok().body(Response.success(responses));
     }
 
     /**
      * 학생 정보 수정
      */
-    @PutMapping("/{studentId}")
-    public ResponseEntity<Response<UpdateStudentResponse>> update(@PathVariable Long studentId, UpdateStudentRequest request, Authentication authentication) {
+    @PutMapping("/{academyId}students/{studentId}")
+    public ResponseEntity<Response<UpdateStudentResponse>> update(@PathVariable Long academyId, @PathVariable Long studentId, UpdateStudentRequest request, Authentication authentication) {
         String account = authentication.getName();
-        UpdateStudentResponse response = studentService.updateStudent(studentId, request, account);
+        UpdateStudentResponse response = studentService.updateStudent(academyId,studentId, request, account);
         return ResponseEntity.ok().body(Response.success(response));
     }
 
     /**
      * 학생 정보 삭제
      */
-    @DeleteMapping("/{studentId}")
-    public ResponseEntity<Response<DeleteStudentResponse>> delete(@PathVariable Long studentId, Authentication authentication) {
+    @DeleteMapping("/{academyId}students/{studentId}")
+    public ResponseEntity<Response<DeleteStudentResponse>> delete(@PathVariable Long academyId, @PathVariable Long studentId, Authentication authentication) {
         String account = authentication.getName();
-        DeleteStudentResponse response = studentService.deleteStudent(studentId,account);
+        DeleteStudentResponse response = studentService.deleteStudent(academyId, studentId,account);
         return ResponseEntity.ok().body(Response.success(response));
     }
 }
