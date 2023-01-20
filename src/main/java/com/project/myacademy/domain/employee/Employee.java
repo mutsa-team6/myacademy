@@ -78,4 +78,10 @@ public class Employee extends BaseEntity {
     public void changeRole(EmployeeRole employeeRole) {
         this.employeeRole = employeeRole;
     }
+
+    // 강좌 개설 권한 확인 메서드
+    public static boolean hasNotAuthorityToCreateLecture(Employee employee) {
+        if(employee.getEmployeeRole().equals(ROLE_USER)) return true;
+        else return false;
+    }
 }
