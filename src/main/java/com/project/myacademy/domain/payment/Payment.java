@@ -1,15 +1,16 @@
 package com.project.myacademy.domain.payment;
 
 import com.project.myacademy.domain.BaseEntity;
+import com.project.myacademy.domain.employee.Employee;
+import com.project.myacademy.domain.enrollment.Enrollment;
+import com.project.myacademy.domain.lecture.Lecture;
 import com.project.myacademy.domain.parent.Parent;
 import com.project.myacademy.domain.student.Student;
-import com.project.myacademy.domain.studentlecture.StudentLecture;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -28,10 +29,15 @@ public class Payment extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_id")
-    private Parent parent;
+    @JoinColumn(name = "student_id")
+    private Student student;
 
-    @OneToMany(mappedBy = "payment")
-    private List<StudentLecture> studentLectures;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "lecture_id")
+    private Lecture lecture;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "employee_id")
+    private Employee employee;
 
 }
