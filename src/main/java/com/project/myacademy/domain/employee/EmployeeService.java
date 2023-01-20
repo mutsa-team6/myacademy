@@ -191,7 +191,7 @@ public class EmployeeService {
         Employee requestEmployee = validateRequestEmployee(requestAccount, foundAcademy);
 
         // 삭제하려는 계정이 해당 학원에 존재하지 않으면 에러 처리
-        Employee foundEmployee =  validateEmployee(employeeId, foundAcademy);
+        Employee foundEmployee = validateEmployee(employeeId, foundAcademy);
 
 
         // 삭제하려는 계정이 자기 자신인 경우 에러 처리
@@ -212,11 +212,23 @@ public class EmployeeService {
         return new DeleteEmployeeResponse(employeeId, foundEmployee.getAccount() + " 계정이 삭제되었습니다. ");
     }
 
+    /**
+     * 본인 인적사항은 jwt 토큰으로 추출하기 때문에, 다른 사람이 접근할 수 없음
+     * @param academyId 학원 기본키
+     * @param requestAccount 본인 인적사항을 확인할 계정
+     * @return
+     */
 
-    public ReadEmployeeResponse readEmployee(Long employeeId) {
-        Employee foundEmployee = employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
-        return new ReadEmployeeResponse(foundEmployee);
+    public ReadEmployeeResponse readEmployee(Long academyId, String requestAccount) {
+
+        //학원이 존재하는지 확인
+        Academy foundAcademy = validateAcademy(academyId);
+
+        //마이페이지 조회를 요청한 회원이 해당 학원에 존재하는지 확인
+        Employee RequestEmployee = validateRequestEmployee(requestAccount, foundAcademy);
+
+
+        return new ReadEmployeeResponse(RequestEmployee);
     }
 
     /**
@@ -304,6 +316,35 @@ public class EmployeeService {
 
     }
 
+    /**
+     * ADMIN 회원은 본인 탈퇴 불가
+     * @param requestAccount 탈퇴 요청한 계정명
+     * @param academyId
+     * @return
+     */
+    @Transactional
+    public DeleteEmployeeResponse selfDeleteEmployee(String requestAccount, Long academyId) {
+
+        //해당 학원이 존재하는지 확인
+        Academy foundAcademy = validateAcademy(academyId);
+
+        // 본인 탈퇴를 요청한 회원이 해당 학원에 존재하는지 확인
+        Employee requestEmployee = validateRequestEmployee(requestAccount,foundAcademy);
+
+        EmployeeRole requestEmployeeRole = requestEmployee.getEmployeeRole();
+        log.info(" ❌ 본인 탈퇴를 요청한 사용자 권한 [{}] ", requestEmployeeRole);
+
+        // ADMIN 계정은 본인 탈퇴 불가
+        if (requestEmployeeRole.equals(EmployeeRole.ROLE_ADMIN)) {
+            throw new AppException(ErrorCode.NOT_ALLOWED_CHANGE);
+        }
+
+        employeeRepository.delete(requestEmployee);
+
+        return new DeleteEmployeeResponse(requestEmployee.getId(), requestAccount + " 계정이 삭제되었습니다. ");
+
+    }
+
     // 접근하려는 학원이 존재하는지 확인
     private Academy validateAcademy(Long academyId) {
         Academy validateAcademy = academyRepository.findById(academyId)
@@ -329,5 +370,6 @@ public class EmployeeService {
 
         return validateEmployee;
     }
+
 
 }

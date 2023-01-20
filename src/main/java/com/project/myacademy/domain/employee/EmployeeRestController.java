@@ -40,6 +40,19 @@ public class EmployeeRestController {
         return ResponseEntity.ok(Response.success(response));
     }
 
+    // 본인 탈퇴 기능
+
+    @DeleteMapping("/{academyId}")
+    public ResponseEntity selfDelete(Authentication authentication, @PathVariable Long academyId) {
+
+        String requestAccount = authentication.getName();
+        log.info(" ❌ 본인 탈퇴를 요청한 사용자 계정 [{}] || 학원 아이디 [{}] ", requestAccount, academyId);
+
+        DeleteEmployeeResponse response = employeeService.selfDeleteEmployee(requestAccount, academyId);
+
+        return ResponseEntity.ok(Response.success(response));
+    }
+
     @PostMapping("/findAccount")
     public ResponseEntity findAccount(@RequestBody FindAccountEmployeeRequest request) {
         FindAccountEmployeeResponse response = employeeService.findAccountEmployee(request);
@@ -68,9 +81,14 @@ public class EmployeeRestController {
         return ResponseEntity.ok(Response.success(response));
     }
 
-    @GetMapping("/{employeeId}/my")
-    public ResponseEntity read(@PathVariable Long employeeId) {
-        ReadEmployeeResponse response = employeeService.readEmployee(employeeId);
+    // 직원 마이페이지 조회
+    @GetMapping("/{academyId}/my")
+    public ResponseEntity read(Authentication authentication,@PathVariable Long academyId) {
+
+        String requestAccount = authentication.getName();
+        log.info(" 🔎 마이페이지 조회를 요청한 사용자 계정 [{}] || 학원 아이디 [{}] ", requestAccount, academyId);
+
+        ReadEmployeeResponse response = employeeService.readEmployee(academyId,requestAccount);
         return ResponseEntity.ok(Response.success(response));
     }
 
