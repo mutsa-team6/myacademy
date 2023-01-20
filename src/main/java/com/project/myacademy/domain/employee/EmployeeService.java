@@ -33,6 +33,16 @@ public class EmployeeService {
     private String secretKey;
     private long expiredTimeMs = 1000 * 60 * 60;
 
+    /**
+     * 학원이 존재하지 않는 경우 예외 처리
+     * 가입 요청한 계정명이 이미 그 학원에 존재하는 경우 예외 처리
+     * 계정명이 admin이고 학원 대표자명과 회원가입을 요청한 실명이 동일하면 USER_ADMIN 권한을 준다.
+     * 계정명이 admin이지만, 학원 대표자명과 일치 하지 않는 경우 예외 처리
+     * 그 외 일반적인 경우는 ROLE_USER 권한을 준다.
+     * @param request 회원가입을 요청한 사용자의 정보
+     * @param academyId 회원가입을 요청한 사용자의 학원
+     * @return
+     */
     @Transactional
     public CreateEmployeeResponse createEmployee(CreateEmployeeRequest request, Long academyId) {
 
@@ -52,7 +62,7 @@ public class EmployeeService {
         // 계정명이 admin 이고 학원 대표자명과 회원가입을 요청한 실명이 동일하면 admin 계정을 준다.
         String requestRealName = request.getName();
         String ownerName = foundAcademy.getOwner();
-        log.info("🙇🏻‍♂️회원가입을 요청한 사용자의 실명 [{}] || 학원 대표자명 [{}]", requestRealName, ownerName);
+        log.info("⭐ 회원가입 요청한 사용자의 실명 [{}] || 학원 대표자명 [{}]", requestRealName, ownerName);
 
         String encryptedPassword = bCryptPasswordEncoder.encode(request.getPassword());
 
@@ -96,15 +106,26 @@ public class EmployeeService {
 
     }
 
-    public LoginEmployeeResponse loginEmployee(LoginEmployeeRequest request) {
-        String account = request.getAccount();
-        String password = request.getPassword();
-        Employee foundEmployee = employeeRepository.findByAccount(account)
+    public LoginEmployeeResponse loginEmployee(LoginEmployeeRequest request, Long academyId) {
+
+        //학원이 존재하지 않는 경우
+        Academy foundAcademy = academyRepository.findById(academyId)
+                .orElseThrow(() -> new AppException(ErrorCode.ACADEMY_NOT_FOUND));
+
+        //로그인 요청한 계정
+        String requestAccount = request.getAccount();
+
+        // 로그인을 요청한 회원이 해당 학원에 존재하지 않는 경우 예외 처리
+        Employee foundEmployee = employeeRepository.findByAccountAndAcademy(requestAccount,foundAcademy)
                 .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
+
+        String password = request.getPassword();
+
         if (!bCryptPasswordEncoder.matches(password, foundEmployee.getPassword())) {
             throw new AppException(ErrorCode.INVALID_PASSWORD);
         }
-        return new LoginEmployeeResponse(JwtTokenUtil.createToken(account, secretKey, expiredTimeMs), "login succeeded");
+
+        return new LoginEmployeeResponse(JwtTokenUtil.createToken(requestAccount, secretKey, expiredTimeMs), requestAccount+" 계정 로그인 성공");
     }
 
     public FindAccountEmployeeResponse findAccountEmployee(FindAccountEmployeeRequest request) {

@@ -22,7 +22,7 @@ public class EmployeeRestController {
     @PostMapping("/{academyId}/employees/signup")
     public ResponseEntity create(@PathVariable Long academyId, @RequestBody CreateEmployeeRequest request) {
 
-        log.info("🙇🏻‍♂️요청한 학원 id [{}] 요청한 사용자 계정 [{}]",academyId,request.getAccount());
+        log.info("⭐ 회원가입 요청한 id [{}] 요청한 사용자 계정 [{}]", academyId, request.getAccount());
 
         CreateEmployeeResponse response = employeeService.createEmployee(request, academyId);
 
@@ -30,9 +30,13 @@ public class EmployeeRestController {
         return ResponseEntity.ok(Response.success(response));
     }
 
-    @PostMapping("/login")
-    public ResponseEntity login(@RequestBody LoginEmployeeRequest request) {
-        LoginEmployeeResponse response = employeeService.loginEmployee(request);
+    @PostMapping("/{academyId}/employees/login")
+    public ResponseEntity login(@PathVariable Long academyId, @RequestBody LoginEmployeeRequest request) {
+
+        log.info("✨ 로그인 요청한 학원 id [{}] 요청한 사용자 계정 [{}]", academyId, request.getAccount());
+
+        LoginEmployeeResponse response = employeeService.loginEmployee(request, academyId);
+
         return ResponseEntity.ok(Response.success(response));
     }
 
