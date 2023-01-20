@@ -16,6 +16,7 @@ public enum ErrorCode {
     DUPLICATED_LECTURE(HttpStatus.CONFLICT, "이미 존재하는 수업입니다."),
     DUPLICATED_TEACHER(HttpStatus.CONFLICT, "이미 존재하는 강사입니다."),
     DUPLICATED_PAYMENT(HttpStatus.CONFLICT, "이미 결제된 내역입니다."),
+    DUPLICATED_ENROLLMENT(HttpStatus.CONFLICT, "이미 존재하는 수강 내역입니다."),
 
     ACCOUNT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 계정명을 찾을 수 없습니다."),
     EMPLOYEE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 직원을 찾을 수 없습니다."),
