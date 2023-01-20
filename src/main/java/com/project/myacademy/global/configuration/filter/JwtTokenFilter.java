@@ -1,6 +1,7 @@
 package com.project.myacademy.global.configuration.filter;
 
 
+import com.project.myacademy.domain.employee.EmployeeService;
 import com.project.myacademy.global.util.JwtTokenUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +24,7 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 @Slf4j
 public class JwtTokenFilter extends OncePerRequestFilter {
 
-//    private final EmployeeService employeeService;
+    private final EmployeeService employeeService;
     private final String secretKey;
 
     @Override
@@ -59,13 +60,13 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         String account = JwtTokenUtil.getAccount(token,secretKey);
         log.info("account:{}", account);
 
+        //계정에 맞는 권한 부여
+        String employeeRole = employeeService.findRoleByAccount(account).name();
+        log.info("employeeRole :{}", employeeRole);
 
-//        String employeeRole = employeeService.findRoleByAccount(account).name();
-//        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userName, null, List.of(new SimpleGrantedAuthority(employeeRole)));
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(account, null, List.of(new SimpleGrantedAuthority(employeeRole)));
 
-        //권한부여
-        UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(account, null, List.of(new SimpleGrantedAuthority("USER")));
+        log.info("{}",authenticationToken);
 
         authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 

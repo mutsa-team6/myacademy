@@ -46,9 +46,10 @@ public class Teacher extends BaseEntity {
                 .build();
     }
 
-    // 강사 권한 확인
-    public static boolean isNotTeacher(Employee employee) {
-        if(!employee.getEmployeeRole().equals(EmployeeRole.ROLE_USER)) return true;
+    // 직원이 강사 테이블에 등록될 때 직원의 권한이 강사인지를 확인하는 메서드
+    // 강사 테이블에 등록되는 사람의 권한을 확인하는 것이지 강사 테이블을 등록하는 주체의 권한을 확인하는 메서드가 아님
+    public static boolean isTeacher(Employee employee) {
+        if(employee.getEmployeeRole().equals(EmployeeRole.ROLE_USER)) return true;
         else return false;
     }
 
