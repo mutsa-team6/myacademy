@@ -106,6 +106,14 @@ public class EmployeeService {
 
     }
 
+    /**
+     * 학원이 존재하지 않는 경우 에러 처리
+     * 로그인을 요청한 회원이 해당 학원에 존재하지 않는 경우 에러 처리
+     * 입력한 비밀번호와 저장되어 있는 비밀번호가 다른 경우 예외 처리
+     * @param request 로그인을 요청한 사용자의 정보
+     * @param academyId 로그인을 요청한 사용자의 학원 id
+     * @return
+     */
     public LoginEmployeeResponse loginEmployee(LoginEmployeeRequest request, Long academyId) {
 
         //학원이 존재하지 않는 경우
