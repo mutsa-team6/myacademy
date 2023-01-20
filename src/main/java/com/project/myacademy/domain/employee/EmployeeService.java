@@ -39,7 +39,8 @@ public class EmployeeService {
      * 계정명이 admin이고 학원 대표자명과 회원가입을 요청한 실명이 동일하면 USER_ADMIN 권한을 준다.
      * 계정명이 admin이지만, 학원 대표자명과 일치 하지 않는 경우 예외 처리
      * 그 외 일반적인 경우는 ROLE_USER 권한을 준다.
-     * @param request 회원가입을 요청한 사용자의 정보
+     *
+     * @param request   회원가입을 요청한 사용자의 정보
      * @param academyId 회원가입을 요청한 사용자의 학원
      * @return
      */
@@ -54,7 +55,7 @@ public class EmployeeService {
         String requestAccount = request.getAccount();
 
         // 가입 요청한 계정명이 이미 그 학원에 존재하는 경우 예외 처리
-        employeeRepository.findByAccountAndAcademy(requestAccount,foundAcademy)
+        employeeRepository.findByAccountAndAcademy(requestAccount, foundAcademy)
                 .ifPresent(employee -> {
                     throw new AppException(ErrorCode.DUPLICATED_ACCOUNT);
                 });
@@ -110,7 +111,8 @@ public class EmployeeService {
      * 학원이 존재하지 않는 경우 에러 처리
      * 로그인을 요청한 회원이 해당 학원에 존재하지 않는 경우 에러 처리
      * 입력한 비밀번호와 저장되어 있는 비밀번호가 다른 경우 예외 처리
-     * @param request 로그인을 요청한 사용자의 정보
+     *
+     * @param request   로그인을 요청한 사용자의 정보
      * @param academyId 로그인을 요청한 사용자의 학원 id
      * @return
      */
@@ -124,7 +126,7 @@ public class EmployeeService {
         String requestAccount = request.getAccount();
 
         // 로그인을 요청한 회원이 해당 학원에 존재하지 않는 경우 예외 처리
-        Employee foundEmployee = employeeRepository.findByAccountAndAcademy(requestAccount,foundAcademy)
+        Employee foundEmployee = employeeRepository.findByAccountAndAcademy(requestAccount, foundAcademy)
                 .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
 
         String password = request.getPassword();
@@ -133,9 +135,10 @@ public class EmployeeService {
             throw new AppException(ErrorCode.INVALID_PASSWORD);
         }
 
-        return new LoginEmployeeResponse(JwtTokenUtil.createToken(requestAccount, secretKey, expiredTimeMs), requestAccount+" 계정 로그인 성공");
+        return new LoginEmployeeResponse(JwtTokenUtil.createToken(requestAccount, secretKey, expiredTimeMs), requestAccount + " 계정 로그인 성공");
     }
 
+    // 이메일 인증 기능 완성 후 구현
     public FindAccountEmployeeResponse findAccountEmployee(FindAccountEmployeeRequest request) {
         String name = request.getName();
         String email = request.getEmail();
@@ -144,6 +147,8 @@ public class EmployeeService {
         String account = foundEmployee.getAccount();
         return new FindAccountEmployeeResponse(account, "Account found : " + account);
     }
+
+    // 이메일 인증 기능 완성 후 구현
 
     /**
      * requestdto에 직원 계정, 이메일, 변경하고싶은 비밀번호
@@ -168,19 +173,31 @@ public class EmployeeService {
 
     /**
      * ADMIN 혹은 STAFF 계정은 ADMIN을 제외한 다른 계정을 삭제할 수 있다.
+     * 접근하려는 학원이 존재하지 않는 경우 에러 처리
+     * 삭제를 요청한 계정이 해당 학원에 존재하지 않는 경우 에러 처리
+     * 삭제해버릴 계정이 해당 학원에 존재하지 않는 경우 에러 처리
      * 자기 자신을 삭제 요청할 시, 에러 처리 ( 본인 탈퇴 기능은 따로 구현 )
      * ADMIN 계정을 삭제하려고 할 시, 에러 처리
-     *
+     * USER 가 삭제하려고하는 경우는 security로 에러 처리
      * @param requestAccount 삭제 요청한 직원 계정
      * @param employeeId     삭제를 할 직원 기본키 id
      * @return
      */
     @Transactional
-    public DeleteEmployeeResponse deleteEmployee(String requestAccount, Long employeeId) {
+    public DeleteEmployeeResponse deleteEmployee(String requestAccount, Long academyId, Long employeeId) {
 
-        // 삭제하려는 계정이 존재하지 않으면 에러 처리
-        Employee foundEmployee = employeeRepository.findById(employeeId)
+        //학원이 존재하지 않는 경우
+        Academy foundAcademy = academyRepository.findById(academyId)
+                .orElseThrow(() -> new AppException(ErrorCode.ACADEMY_NOT_FOUND));
+
+        // 삭제를 요청한 계정이 해당 학원에 존재하지 않은 경우 에러 처리
+        Employee requestEmployee = employeeRepository.findByAccountAndAcademy(requestAccount, foundAcademy)
                 .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
+
+        // 삭제하려는 계정이 해당 학원에 존재하지 않으면 에러 처리
+        Employee foundEmployee = employeeRepository.findByIdAndAcademy(employeeId, foundAcademy)
+                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
+
 
         // 삭제하려는 계정이 자기 자신인 경우 에러 처리
         if (foundEmployee.getAccount().equals(requestAccount)) {
