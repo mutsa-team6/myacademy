@@ -1,5 +1,6 @@
 package com.project.myacademy.domain.employee;
 
+import com.project.myacademy.domain.academy.AcademyService;
 import com.project.myacademy.domain.employee.dto.*;
 import com.project.myacademy.global.Response;
 import lombok.RequiredArgsConstructor;
@@ -11,20 +12,22 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/employees")
+@RequestMapping("/api/v1/academies/")
 @RequiredArgsConstructor
 @Slf4j
 public class EmployeeRestController {
 
     private final EmployeeService employeeService;
 
-    @PostMapping("/signup")
-    public ResponseEntity create(@RequestBody CreateEmployeeRequest request) {
-        EmployeeDto savedEmployeeDto = employeeService.createEmployee(request);
-        return ResponseEntity.ok(Response.success(new CreateEmployeeResponse(
-                savedEmployeeDto.getName(),
-                savedEmployeeDto.getAccount(),
-                "signed up")));
+    @PostMapping("/{academyId}/employees/signup")
+    public ResponseEntity create(@PathVariable Long academyId, @RequestBody CreateEmployeeRequest request) {
+
+        log.info("🙇🏻‍♂️요청한 학원 id [{}] 요청한 사용자 계정 [{}]",academyId,request.getAccount());
+
+        CreateEmployeeResponse response = employeeService.createEmployee(request, academyId);
+
+
+        return ResponseEntity.ok(Response.success(response));
     }
 
     @PostMapping("/login")

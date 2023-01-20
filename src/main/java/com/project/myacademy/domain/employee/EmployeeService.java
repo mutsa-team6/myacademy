@@ -1,5 +1,8 @@
 package com.project.myacademy.domain.employee;
 
+import com.project.myacademy.domain.academy.Academy;
+import com.project.myacademy.domain.academy.AcademyRepository;
+import com.project.myacademy.domain.academy.AcademyService;
 import com.project.myacademy.domain.employee.dto.*;
 import com.project.myacademy.global.exception.AppException;
 import com.project.myacademy.global.exception.ErrorCode;
@@ -20,6 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class EmployeeService {
 
     private final EmployeeRepository employeeRepository;
+
+    private final AcademyRepository academyRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     private final EmployeeRole DEFAULT_EMPLOYEE_ROLE = EmployeeRole.ROLE_USER;
@@ -29,24 +34,75 @@ public class EmployeeService {
     private long expiredTimeMs = 1000 * 60 * 60;
 
     @Transactional
-    public EmployeeDto createEmployee(CreateEmployeeRequest request) {
-        String account = request.getAccount();
-        employeeRepository.findByAccount(account)
+    public CreateEmployeeResponse createEmployee(CreateEmployeeRequest request, Long academyId) {
+
+        //학원이 존재하지 않는 경우
+        Academy foundAcademy = academyRepository.findById(academyId)
+                .orElseThrow(() -> new AppException(ErrorCode.ACADEMY_NOT_FOUND));
+
+
+        String requestAccount = request.getAccount();
+
+        // 가입 요청한 계정명이 이미 그 학원에 존재하는 경우 예외 처리
+        employeeRepository.findByAccountAndAcademy(requestAccount,foundAcademy)
                 .ifPresent(employee -> {
-                    throw new AppException(ErrorCode.DUPLICATED_ACCOUNT, ErrorCode.DUPLICATED_ACCOUNT.getMessage());
+                    throw new AppException(ErrorCode.DUPLICATED_ACCOUNT);
                 });
+
+        // 계정명이 admin 이고 학원 대표자명과 회원가입을 요청한 실명이 동일하면 admin 계정을 준다.
+        String requestRealName = request.getName();
+        String ownerName = foundAcademy.getOwner();
+        log.info("🙇🏻‍♂️회원가입을 요청한 사용자의 실명 [{}] || 학원 대표자명 [{}]", requestRealName, ownerName);
+
         String encryptedPassword = bCryptPasswordEncoder.encode(request.getPassword());
-        Employee savedEmployee = employeeRepository.save(request.toEmployee(account, encryptedPassword, DEFAULT_EMPLOYEE_ROLE));
-        return savedEmployee.toEmployeeDto();
+
+        // 계정 이름을 admin으로 했지만, 대표자명과 일치하지 않는 경우 예외 처리
+        if (requestAccount.equals("admin") && !requestRealName.equals(ownerName)) {
+            throw new AppException(ErrorCode.NOT_MATCH_OWNER);
+        }
+
+        // 계정 이름도 admin이고 대표자명과 가입 요청한 사용자의 이름이 같은 경우 admin 권한 부여
+        if (requestAccount.equals("admin") && requestRealName.equals(ownerName)) {
+
+            Employee employee = Employee.builder()
+                    .name(request.getName())
+                    .employeeRole(EmployeeRole.ROLE_ADMIN)
+                    .account("admin")
+                    .phoneNum(request.getPhoneNum())
+                    .email(request.getEmail())
+                    .address(request.getAddress())
+                    .academy(foundAcademy)
+                    .password(encryptedPassword)
+                    .build();
+            Employee saved = employeeRepository.save(employee);
+            return new CreateEmployeeResponse(saved, foundAcademy.getName());
+        }
+
+        //그 외는 일반 USER 등급 && 요청한 아이디로 가입
+        Employee employee = Employee.builder()
+                .name(request.getName())
+                .employeeRole(DEFAULT_EMPLOYEE_ROLE)
+                .account(requestAccount)
+                .phoneNum(request.getPhoneNum())
+                .email(request.getEmail())
+                .address(request.getAddress())
+                .academy(foundAcademy)
+                .password(encryptedPassword)
+                .build();
+
+        Employee saved = employeeRepository.save(employee);
+
+        return new CreateEmployeeResponse(saved, foundAcademy.getName());
+
     }
 
     public LoginEmployeeResponse loginEmployee(LoginEmployeeRequest request) {
         String account = request.getAccount();
         String password = request.getPassword();
         Employee foundEmployee = employeeRepository.findByAccount(account)
-                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND, ErrorCode.EMPLOYEE_NOT_FOUND.getMessage()));
+                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
         if (!bCryptPasswordEncoder.matches(password, foundEmployee.getPassword())) {
-            throw new AppException(ErrorCode.INVALID_PASSWORD, ErrorCode.INVALID_PASSWORD.getMessage());
+            throw new AppException(ErrorCode.INVALID_PASSWORD);
         }
         return new LoginEmployeeResponse(JwtTokenUtil.createToken(account, secretKey, expiredTimeMs), "login succeeded");
     }
@@ -55,7 +111,7 @@ public class EmployeeService {
         String name = request.getName();
         String email = request.getEmail();
         Employee foundEmployee = employeeRepository.findByNameAndEmail(name, email)
-                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND, ErrorCode.EMPLOYEE_NOT_FOUND.getMessage()));
+                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
         String account = foundEmployee.getAccount();
         return new FindAccountEmployeeResponse(account, "Account found : " + account);
     }
@@ -69,11 +125,11 @@ public class EmployeeService {
     public EmployeeDto changePasswordEmployee(ChangePasswordEmployeeRequest request) {
         String account = request.getAccount();
         Employee foundEmployee = employeeRepository.findById(1L)
-                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND, ErrorCode.EMPLOYEE_NOT_FOUND.getMessage()));
+                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
 
         employeeRepository.findByAccount(account)
                 .ifPresent(employee -> {
-                    throw new AppException(ErrorCode.DUPLICATED_ACCOUNT, ErrorCode.DUPLICATED_ACCOUNT.getMessage());
+                    throw new AppException(ErrorCode.DUPLICATED_ACCOUNT);
                 });
 
         foundEmployee.update(request);
@@ -85,8 +141,9 @@ public class EmployeeService {
      * ADMIN 혹은 STAFF 계정은 ADMIN을 제외한 다른 계정을 삭제할 수 있다.
      * 자기 자신을 삭제 요청할 시, 에러 처리 ( 본인 탈퇴 기능은 따로 구현 )
      * ADMIN 계정을 삭제하려고 할 시, 에러 처리
+     *
      * @param requestAccount 삭제 요청한 직원 계정
-     * @param employeeId 삭제를 할 직원 기본키 id
+     * @param employeeId     삭제를 할 직원 기본키 id
      * @return
      */
     @Transactional
@@ -94,11 +151,11 @@ public class EmployeeService {
 
         // 삭제하려는 계정이 존재하지 않으면 에러 처리
         Employee foundEmployee = employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND, ErrorCode.EMPLOYEE_NOT_FOUND.getMessage()));
+                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
 
         // 삭제하려는 계정이 자기 자신인 경우 에러 처리
         if (foundEmployee.getAccount().equals(requestAccount)) {
-            throw new AppException(ErrorCode.BAD_DELETE_REQUEST, ErrorCode.BAD_DELETE_REQUEST.getMessage());
+            throw new AppException(ErrorCode.BAD_DELETE_REQUEST);
         }
 
         EmployeeRole foundEmployeeRole = foundEmployee.getEmployeeRole();
@@ -106,7 +163,7 @@ public class EmployeeService {
 
         // 삭제하려는 계정이 ADMIN 인 경우 에러처리
         if (foundEmployeeRole.equals(EmployeeRole.ROLE_ADMIN)) {
-            throw new AppException(ErrorCode.NOT_ALLOWED_CHANGE, ErrorCode.NOT_ALLOWED_CHANGE.getMessage());
+            throw new AppException(ErrorCode.NOT_ALLOWED_CHANGE);
         }
 
         employeeRepository.delete(foundEmployee);
@@ -117,7 +174,7 @@ public class EmployeeService {
 
     public ReadEmployeeResponse readEmployee(Long employeeId) {
         Employee foundEmployee = employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND, ErrorCode.EMPLOYEE_NOT_FOUND.getMessage()));
+                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
         return new ReadEmployeeResponse(foundEmployee);
     }
 
@@ -139,7 +196,7 @@ public class EmployeeService {
 
         // 요청한 회원이 존재하지 않는 경우 에러 처리
         employeeRepository.findByAccount(requestAccount)
-                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND, ErrorCode.EMPLOYEE_NOT_FOUND.getMessage()));
+                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
 
 
         return employeeRepository.findAll(pageable).map(employee -> new ReadEmployeeResponse(employee));
@@ -149,6 +206,7 @@ public class EmployeeService {
      * 관리자(ADMIN) 혹은 직원(STAFF) 등급은 다른 직원의 등급을 USER -> STAFF 혹은 STAFF -> USER 로 변경할 수 있다.
      * 변경하려는 계정이 ADMIN 인 경우는 에러 처리
      * 본인 계정을 변경하려고 요청하면 에러 처리
+     *
      * @param requestAccount 등급 변경을 요청한 직원의 계정
      * @param employeeId     등급 변경이 될 직원의 기본키(id)
      * @return
@@ -158,15 +216,15 @@ public class EmployeeService {
 
         // 요청한 직원이 존재하지 않는 경우 에러 처리
         employeeRepository.findByAccount(requestAccount)
-                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND, ErrorCode.EMPLOYEE_NOT_FOUND.getMessage()));
+                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
 
         // 등급을 변경하려는 직원이 존재하지 않는 경우 에러 처리
         Employee foundEmployee = employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND, ErrorCode.EMPLOYEE_NOT_FOUND.getMessage()));
+                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
 
         // 변경하려는 계정이 자기 자신인 경우 에러 처리
         if (foundEmployee.getAccount().equals(requestAccount)) {
-            throw new AppException(ErrorCode.BAD_CHANGE_REQUEST, ErrorCode.BAD_CHANGE_REQUEST.getMessage());
+            throw new AppException(ErrorCode.BAD_CHANGE_REQUEST);
         }
 
         // 등급을 변경하려는 직원의 변경하기 전 등급
@@ -187,7 +245,7 @@ public class EmployeeService {
 
             // ADMIN 등급인 회원을 변경하려는 경우 권한 없음 에러처리한다.
         } else {
-            throw new AppException(ErrorCode.NOT_ALLOWED_CHANGE, ErrorCode.NOT_ALLOWED_CHANGE.getMessage());
+            throw new AppException(ErrorCode.NOT_ALLOWED_CHANGE);
         }
 
         return new ChangeRoleEmployeeResponse(employeeId, foundEmployee.getAccount() + " 계정의 권한을 " + changedRole + "로 변경했습니다");
