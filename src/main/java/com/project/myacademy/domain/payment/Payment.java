@@ -3,11 +3,14 @@ package com.project.myacademy.domain.payment;
 import com.project.myacademy.domain.BaseEntity;
 import com.project.myacademy.domain.parent.Parent;
 import com.project.myacademy.domain.student.Student;
+import com.project.myacademy.domain.studentlecture.StudentLecture;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -28,9 +31,7 @@ public class Payment extends BaseEntity {
     @JoinColumn(name = "parent_id")
     private Parent parent;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "student_id")
-    private Student student;
-
+    @OneToMany(mappedBy = "payment")
+    private List<StudentLecture> studentLectures;
 
 }
