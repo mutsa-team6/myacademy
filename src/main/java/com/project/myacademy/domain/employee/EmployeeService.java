@@ -163,7 +163,7 @@ public class EmployeeService {
                     throw new AppException(ErrorCode.DUPLICATED_ACCOUNT);
                 });
 
-        foundEmployee.update(request);
+//        foundEmployee.update(request);
         Employee updatedEmployee = employeeRepository.save(foundEmployee);
         return updatedEmployee.toEmployeeDto();
     }
@@ -214,7 +214,8 @@ public class EmployeeService {
 
     /**
      * 본인 인적사항은 jwt 토큰으로 추출하기 때문에, 다른 사람이 접근할 수 없음
-     * @param academyId 학원 기본키
+     *
+     * @param academyId      학원 기본키
      * @param requestAccount 본인 인적사항을 확인할 계정
      * @return
      */
@@ -318,6 +319,7 @@ public class EmployeeService {
 
     /**
      * ADMIN 회원은 본인 탈퇴 불가
+     *
      * @param requestAccount 탈퇴 요청한 계정명
      * @param academyId
      * @return
@@ -329,7 +331,7 @@ public class EmployeeService {
         Academy foundAcademy = validateAcademy(academyId);
 
         // 본인 탈퇴를 요청한 회원이 해당 학원에 존재하는지 확인
-        Employee requestEmployee = validateRequestEmployee(requestAccount,foundAcademy);
+        Employee requestEmployee = validateRequestEmployee(requestAccount, foundAcademy);
 
         EmployeeRole requestEmployeeRole = requestEmployee.getEmployeeRole();
         log.info(" ❌ 본인 탈퇴를 요청한 사용자 권한 [{}] ", requestEmployeeRole);
@@ -343,6 +345,28 @@ public class EmployeeService {
 
         return new DeleteEmployeeResponse(requestEmployee.getId(), requestAccount + " 계정이 삭제되었습니다. ");
 
+    }
+
+    /**
+     * 계정명, 등급은 본인이 변경 불가
+     *
+     * @param requestAccount
+     * @param academyId
+     * @return
+     */
+    @Transactional
+    public UpdateEmployeeResponse updateEmployee(UpdateEmployeeRequest request, String requestAccount, Long academyId) {
+
+        //해당 학원이 존재하는지 확인
+        Academy foundAcademy = validateAcademy(academyId);
+
+        // 본인 정보 수정을 요청한 회원이 해당 학원에 존재하는지 확인
+        Employee requestEmployee = validateRequestEmployee(requestAccount, foundAcademy);
+
+        //정보 수정
+        requestEmployee.update(request);
+
+        return new UpdateEmployeeResponse(requestEmployee.getId(), requestAccount + "계정 정보를 수정했습니다");
     }
 
     // 접근하려는 학원이 존재하는지 확인

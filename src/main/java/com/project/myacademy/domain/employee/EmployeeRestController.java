@@ -1,6 +1,5 @@
 package com.project.myacademy.domain.employee;
 
-import com.project.myacademy.domain.academy.AcademyService;
 import com.project.myacademy.domain.employee.dto.*;
 import com.project.myacademy.global.Response;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +35,19 @@ public class EmployeeRestController {
         log.info("✨ 로그인 요청한 학원 id [{}] 요청한 사용자 계정 [{}]", academyId, request.getAccount());
 
         LoginEmployeeResponse response = employeeService.loginEmployee(request, academyId);
+
+        return ResponseEntity.ok(Response.success(response));
+    }
+
+    // 본인 정보 수정
+
+    @PutMapping("/{academyId}")
+    public ResponseEntity update(Authentication authentication, @PathVariable Long academyId, @RequestBody UpdateEmployeeRequest request) {
+
+        String requestAccount = authentication.getName();
+        log.info(" 🛠 본인 정보 수정을 요청한 사용자 계정 [{}] || 학원 아이디 [{}] ", requestAccount, academyId);
+
+        UpdateEmployeeResponse response = employeeService.updateEmployee(request, requestAccount, academyId);
 
         return ResponseEntity.ok(Response.success(response));
     }
@@ -83,12 +95,12 @@ public class EmployeeRestController {
 
     // 직원 마이페이지 조회
     @GetMapping("/{academyId}/my")
-    public ResponseEntity read(Authentication authentication,@PathVariable Long academyId) {
+    public ResponseEntity read(Authentication authentication, @PathVariable Long academyId) {
 
         String requestAccount = authentication.getName();
         log.info(" 🔎 마이페이지 조회를 요청한 사용자 계정 [{}] || 학원 아이디 [{}] ", requestAccount, academyId);
 
-        ReadEmployeeResponse response = employeeService.readEmployee(academyId,requestAccount);
+        ReadEmployeeResponse response = employeeService.readEmployee(academyId, requestAccount);
         return ResponseEntity.ok(Response.success(response));
     }
 
@@ -111,7 +123,7 @@ public class EmployeeRestController {
         String requestAccount = authentication.getName();
         log.info("🛠 등급 변경를 요청한 사용자 계정 [{}] || 접근하려는 학원 id [{}]", requestAccount, academyId);
 
-        ChangeRoleEmployeeResponse response = employeeService.changeRoleEmployee(requestAccount,academyId, employeeId);
+        ChangeRoleEmployeeResponse response = employeeService.changeRoleEmployee(requestAccount, academyId, employeeId);
 
         return ResponseEntity.ok(Response.success(response));
 

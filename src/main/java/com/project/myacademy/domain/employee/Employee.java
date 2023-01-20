@@ -4,6 +4,7 @@ import com.project.myacademy.domain.academy.Academy;
 import com.project.myacademy.domain.BaseEntity;
 import com.project.myacademy.domain.employee.dto.EmployeeDto;
 import com.project.myacademy.domain.employee.dto.ChangePasswordEmployeeRequest;
+import com.project.myacademy.domain.employee.dto.UpdateEmployeeRequest;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
@@ -60,7 +61,7 @@ public class Employee extends BaseEntity {
                 .build();
     }
 
-    public void update(ChangePasswordEmployeeRequest request) {
+    public void update(UpdateEmployeeRequest request) {
         this.name = request.getName();
         this.address = request.getAddress();
         this.phoneNum = request.getPhoneNum();
