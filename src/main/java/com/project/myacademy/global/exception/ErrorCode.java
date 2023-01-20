@@ -19,6 +19,7 @@ public enum ErrorCode {
 
     ACCOUNT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 계정명을 찾을 수 없습니다."),
     EMPLOYEE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 직원을 찾을 수 없습니다."),
+    REQUEST_EMPLOYEE_NOT_FOUND(HttpStatus.NOT_FOUND, "요청한 직원을 해당 학원에서 찾을 수 없습니다."),
     ACADEMY_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 학원을 찾을 수 없습니다."),
     PARENT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 부모를 찾을 수 없습니다."),
     LECTURE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 수업을 찾을 수 없습니다."),
@@ -37,6 +38,7 @@ public enum ErrorCode {
 
     DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "DB에러가 발생했습니다."),
     INVALID_VALUE(HttpStatus.BAD_REQUEST, "요청이 이상합니다."),
+    NOT_MATCH_OWNER(HttpStatus.BAD_REQUEST, "admin 계정 생성 시 학원 대표자 명과 일치해야 합니다."),
     BAD_DELETE_REQUEST(HttpStatus.BAD_REQUEST, "자신의 계정을 삭제할 수 없습니다."),
     BAD_CHANGE_REQUEST(HttpStatus.BAD_REQUEST, "자신의 계정 등급을 변경할 수 없습니다."),
     PAYMENT_REQUIRED(HttpStatus.PAYMENT_REQUIRED, "결제 정보가 필요합니다.");
