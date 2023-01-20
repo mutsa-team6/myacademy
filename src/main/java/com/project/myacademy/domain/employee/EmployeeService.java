@@ -48,8 +48,7 @@ public class EmployeeService {
     public CreateEmployeeResponse createEmployee(CreateEmployeeRequest request, Long academyId) {
 
         //학원이 존재하지 않는 경우
-        Academy foundAcademy = academyRepository.findById(academyId)
-                .orElseThrow(() -> new AppException(ErrorCode.ACADEMY_NOT_FOUND));
+        Academy foundAcademy = validateAcademy(academyId);
 
 
         String requestAccount = request.getAccount();
@@ -119,19 +118,17 @@ public class EmployeeService {
     public LoginEmployeeResponse loginEmployee(LoginEmployeeRequest request, Long academyId) {
 
         //학원이 존재하지 않는 경우
-        Academy foundAcademy = academyRepository.findById(academyId)
-                .orElseThrow(() -> new AppException(ErrorCode.ACADEMY_NOT_FOUND));
+        Academy foundAcademy = validateAcademy(academyId);
 
         //로그인 요청한 계정
         String requestAccount = request.getAccount();
 
         // 로그인을 요청한 회원이 해당 학원에 존재하지 않는 경우 예외 처리
-        Employee foundEmployee = employeeRepository.findByAccountAndAcademy(requestAccount, foundAcademy)
-                .orElseThrow(() -> new AppException(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND));
+        Employee requestEmployee = validateRequestEmployee(requestAccount, foundAcademy);
 
         String password = request.getPassword();
 
-        if (!bCryptPasswordEncoder.matches(password, foundEmployee.getPassword())) {
+        if (!bCryptPasswordEncoder.matches(password, requestEmployee.getPassword())) {
             throw new AppException(ErrorCode.INVALID_PASSWORD);
         }
 
@@ -188,16 +185,13 @@ public class EmployeeService {
     public DeleteEmployeeResponse deleteEmployee(String requestAccount, Long academyId, Long employeeId) {
 
         //학원이 존재하지 않는 경우
-        Academy foundAcademy = academyRepository.findById(academyId)
-                .orElseThrow(() -> new AppException(ErrorCode.ACADEMY_NOT_FOUND));
+        Academy foundAcademy = validateAcademy(academyId);
 
         // 삭제를 요청한 계정이 해당 학원에 존재하지 않은 경우 에러 처리
-        Employee requestEmployee = employeeRepository.findByAccountAndAcademy(requestAccount, foundAcademy)
-                .orElseThrow(() -> new AppException(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND));
+        Employee requestEmployee = validateRequestEmployee(requestAccount, foundAcademy);
 
         // 삭제하려는 계정이 해당 학원에 존재하지 않으면 에러 처리
-        Employee foundEmployee = employeeRepository.findByIdAndAcademy(employeeId, foundAcademy)
-                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
+        Employee foundEmployee =  validateEmployee(employeeId, foundAcademy);
 
 
         // 삭제하려는 계정이 자기 자신인 경우 에러 처리
@@ -245,13 +239,11 @@ public class EmployeeService {
     public Page<ReadEmployeeResponse> readAllEmployees(String requestAccount, Long academyId, Pageable pageable) {
 
         //학원이 존재하지 않는 경우
-        Academy foundAcademy = academyRepository.findById(academyId)
-                .orElseThrow(() -> new AppException(ErrorCode.ACADEMY_NOT_FOUND));
+        Academy foundAcademy = validateAcademy(academyId);
 
 
         // 조회를 요청한 회원이 해당 학원에 존재하지 않는 경우 에러 처리
-        employeeRepository.findByAccountAndAcademy(requestAccount, foundAcademy)
-                .orElseThrow(() -> new AppException(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND));
+        validateRequestEmployee(requestAccount, foundAcademy);
 
 
         return employeeRepository.findAll(pageable).map(employee -> new ReadEmployeeResponse(employee));
@@ -259,8 +251,12 @@ public class EmployeeService {
 
     /**
      * 관리자(ADMIN) 혹은 직원(STAFF) 등급은 다른 직원의 등급을 USER -> STAFF 혹은 STAFF -> USER 로 변경할 수 있다.
-     * 변경하려는 계정이 ADMIN 인 경우는 에러 처리
+     * 접근하려는 학원이 존재하지 않는 경우 에러 처리
+     * 등급 수정을 요청한 계정이 해당 학원에 존재하지 않는 경우 에러 처리
+     * 수정할 계정이 해당 학원에 존재하지 않는 경우 에러 처리
+     * 수정할 계정이 ADMIN 인 경우는 에러 처리
      * 본인 계정을 변경하려고 요청하면 에러 처리
+     * USER 접근 제어는 Security 단에서 처리
      *
      * @param requestAccount 등급 변경을 요청한 직원의 계정
      * @param employeeId     등급 변경이 될 직원의 기본키(id)
@@ -270,16 +266,13 @@ public class EmployeeService {
     public ChangeRoleEmployeeResponse changeRoleEmployee(String requestAccount, Long academyId, Long employeeId) {
 
         //학원이 존재하지 않는 경우
-        Academy foundAcademy = academyRepository.findById(academyId)
-                .orElseThrow(() -> new AppException(ErrorCode.ACADEMY_NOT_FOUND));
+        Academy foundAcademy = validateAcademy(academyId);
 
         // 등급 수정을 요청한 계정이 해당 학원에 존재하지 않은 경우 에러 처리
-        Employee requestEmployee = employeeRepository.findByAccountAndAcademy(requestAccount, foundAcademy)
-                .orElseThrow(() -> new AppException(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND));
+        Employee requestEmployee = validateRequestEmployee(requestAccount, foundAcademy);
 
         // 수정하려는 계정이 해당 학원에 존재하지 않으면 에러 처리
-        Employee foundEmployee = employeeRepository.findByIdAndAcademy(employeeId, foundAcademy)
-                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
+        Employee foundEmployee = validateEmployee(employeeId, foundAcademy);
 
         // 변경하려는 계정이 자기 자신인 경우 에러 처리
         if (foundEmployee.getAccount().equals(requestAccount)) {
@@ -310,4 +303,31 @@ public class EmployeeService {
         return new ChangeRoleEmployeeResponse(employeeId, foundEmployee.getAccount() + " 계정의 권한을 " + changedRole + "로 변경했습니다");
 
     }
+
+    // 접근하려는 학원이 존재하는지 확인
+    private Academy validateAcademy(Long academyId) {
+        Academy validateAcademy = academyRepository.findById(academyId)
+                .orElseThrow(() -> new AppException(ErrorCode.ACADEMY_NOT_FOUND));
+        return validateAcademy;
+    }
+
+    // 특정 요청을 한 회원이 특정 요청이 적용될 학원에 존재하지 않는 경우 예외 처리 (다른 학원 직원이라는 의미)
+    private Employee validateRequestEmployee(String requestAccount, Academy academy) {
+
+        Employee validateRequestEmployee = employeeRepository.findByAccountAndAcademy(requestAccount, academy)
+                .orElseThrow(() -> new AppException(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND));
+
+        return validateRequestEmployee;
+    }
+
+    // 특정 요청이 적용될 회원이 학원에 존재하지 않는 경우 예외 처리
+
+    private Employee validateEmployee(Long employeeId, Academy academy) {
+
+        Employee validateEmployee = employeeRepository.findByIdAndAcademy(employeeId, academy)
+                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
+
+        return validateEmployee;
+    }
+
 }
