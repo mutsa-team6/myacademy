@@ -9,7 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("api/v1/teachers")
+@RequestMapping("api/v1/academies")
 @RequiredArgsConstructor
 @Slf4j
 public class TeacherRestController {
@@ -17,31 +17,34 @@ public class TeacherRestController {
     private final TeacherService teacherService;
 
     // 강사 정보 등록
-    @PostMapping("")
-    public ResponseEntity<Response<CreateTeacherResponse>> create(@RequestBody CreateTeacherRequest request,
+    @PostMapping("/{academyId}/teachers")
+    public ResponseEntity<Response<CreateTeacherResponse>> create(@PathVariable("academyId") Long academyId,
+                                                                  @RequestBody CreateTeacherRequest request,
                                                                   Authentication authentication) {
-        CreateTeacherResponse createdTeacher = teacherService.createTeacher(request, authentication.getName());
+        CreateTeacherResponse createdTeacher = teacherService.createTeacher(academyId, request, authentication.getName());
         log.info("강좌의 강사 배정 성공");
         return ResponseEntity.ok().body(Response.success(createdTeacher));
     }
 
     // 강사 정보 수정
-    @PutMapping("/{teacherId}")
-    public ResponseEntity<Response<UpdateTeacherResponse>> update(@PathVariable("teacherId") Long teacherId,
+    @PutMapping("/{academyId}/teachers/{teacherId}")
+    public ResponseEntity<Response<UpdateTeacherResponse>> update(@PathVariable("academyId") Long academyId,
+                                                                  @PathVariable("teacherId") Long teacherId,
                                                                   @RequestBody UpdateTeacherRequest request,
                                                                   Authentication authentication) {
 
-        UpdateTeacherResponse updatedTeacher = teacherService.updateTeacher(teacherId, request, authentication.getName());
+        UpdateTeacherResponse updatedTeacher = teacherService.updateTeacher(academyId, teacherId, request, authentication.getName());
         log.info("강좌의 강사 정보 변경 성공");
         return ResponseEntity.ok().body(Response.success(updatedTeacher));
     }
 
     // 강사 삭제
-    @DeleteMapping("/{teacherId}")
-    public ResponseEntity<Response<DeleteTeacherResponse>> delete(@PathVariable("teacherId") Long teacherId,
+    @DeleteMapping("/{academyId}/teachers/{teacherId}")
+    public ResponseEntity<Response<DeleteTeacherResponse>> delete(@PathVariable("academyId") Long academyId,
+                                                                  @PathVariable("teacherId") Long teacherId,
                                                                   Authentication authentication) {
 
-        DeleteTeacherResponse deletedTeacher = teacherService.deleteTeacher(teacherId, authentication.getName());
+        DeleteTeacherResponse deletedTeacher = teacherService.deleteTeacher(academyId, teacherId, authentication.getName());
         log.info("강좌의 강사 정보 삭제 성공");
         return ResponseEntity.ok().body(Response.success(deletedTeacher));
     }
