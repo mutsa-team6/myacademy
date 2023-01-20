@@ -33,9 +33,9 @@ public class StudentRestController {
      * 학생 정보 단건 조회
      */
     @GetMapping("/{academyId}students/{studentId}")
-    public ResponseEntity<Response<FindStudentResponse>> find(@PathVariable Long academyId, @PathVariable Long studentId, Authentication authentication) {
+    public ResponseEntity<Response<ReadStudentResponse>> read(@PathVariable Long academyId, @PathVariable Long studentId, Authentication authentication) {
         String account = authentication.getName();
-        FindStudentResponse response = studentService.findStudent(academyId, studentId, account);
+        ReadStudentResponse response = studentService.readStudent(academyId, studentId, account);
         return ResponseEntity.ok().body(Response.success(response));
     }
 
@@ -43,10 +43,10 @@ public class StudentRestController {
      * 학생 정보 전체 조회
      */
     @GetMapping("/{academyId}students")
-    public ResponseEntity<Response<Page<FindAllStudentResponse>>> findAll(@PathVariable Long academyId, Authentication authentication) {
+    public ResponseEntity<Response<Page<ReadAllStudentResponse>>> readAll(@PathVariable Long academyId, Authentication authentication) {
         String account = authentication.getName();
         PageRequest pageable = PageRequest.of(0, 20, Sort.by("id").descending());
-        Page<FindAllStudentResponse> responses = studentService.findAllStudent(academyId, pageable, account);
+        Page<ReadAllStudentResponse> responses = studentService.readAllStudent(academyId, pageable, account);
         return ResponseEntity.ok().body(Response.success(responses));
     }
 

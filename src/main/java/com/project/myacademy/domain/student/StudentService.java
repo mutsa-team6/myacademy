@@ -63,7 +63,7 @@ public class StudentService {
      * @param academyId 학원 id
      * @param account    jwt로 받아온 사용자(Employee) 계정
      */
-    public FindStudentResponse findStudent(Long academyId, Long studentId, String account) {
+    public ReadStudentResponse readStudent(Long academyId, Long studentId, String account) {
 
         //academyId 존재 유무 확인
         Academy academy = validateAcademy(academyId);
@@ -72,7 +72,7 @@ public class StudentService {
         //student Id에 해당하는 학생이 존재하는지 확인
         Student student = validateStudent(studentId);
 
-        return FindStudentResponse.of(student);
+        return ReadStudentResponse.of(student);
     }
 
     /**
@@ -80,14 +80,14 @@ public class StudentService {
      * @param pageable  page 설정 : 20개씩 조회
      * @param account   jwt로 받아온 사용자(Employee) 계정
      */
-    public Page<FindAllStudentResponse> findAllStudent(Long academyId, PageRequest pageable, String account) {
+    public Page<ReadAllStudentResponse> readAllStudent(Long academyId, PageRequest pageable, String account) {
 
         //academyId 존재 유무 확인
         Academy academy = validateAcademy(academyId);
         //account 유효검사
         Employee employee = validateAcademyEmployee(account, academy);
 
-        return studentRepository.findAll(pageable).map(student -> FindAllStudentResponse.of(student));
+        return studentRepository.findAll(pageable).map(student -> ReadAllStudentResponse.of(student));
     }
 
     /**
