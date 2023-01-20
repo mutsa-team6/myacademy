@@ -11,7 +11,6 @@ import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -56,6 +55,7 @@ public class Lecture extends BaseEntity {
     @JoinColumn(name = "teacher_id")
     private Teacher teacher;
 
+    // 강좌 생성 메서드
     public static Lecture addLecture(CreateLectureRequest request, Teacher teacher) {
         return Lecture.builder()
                 .name(request.getLectureName())
@@ -70,6 +70,7 @@ public class Lecture extends BaseEntity {
                 .build();
     }
 
+    // 강좌 수정 메서드
     public void updateLecture(UpdateLectureRequest request) {
         this.name = request.getLectureName();
         this.price = request.getLecturePrice();

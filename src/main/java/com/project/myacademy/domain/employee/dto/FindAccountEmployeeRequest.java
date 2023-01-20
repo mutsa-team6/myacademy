@@ -7,7 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 @Builder
-public class ReadEmployeeAccountRequest {
+public class FindAccountEmployeeRequest {
     private String name;
     private String email;
 }
