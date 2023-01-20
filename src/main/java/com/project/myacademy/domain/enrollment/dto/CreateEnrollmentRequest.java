@@ -1,4 +1,4 @@
-package com.project.myacademy.domain.studentlecture.dto;
+package com.project.myacademy.domain.enrollment.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 @Builder
-public class UpdateStudentLectureRequest {
+public class CreateEnrollmentRequest {
 
     private String memo;
+    private Integer paymentYN;
+    private Long employeeId;
 }
