@@ -68,8 +68,8 @@ public class Employee extends BaseEntity {
         this.password = request.getPassword();
     }
 
-    // 강좌 개설 권한 확인 메서드
-    public static boolean hasAuthorityToCreateLecture(Employee employee) {
+    // 강사 테이블에 등록하는 주체의 권한을 확인하는 메서드
+    public static boolean isTeacherAuthority(Employee employee) {
         if (employee.getEmployeeRole().equals(ROLE_USER)) return true;
         else return false;
     }
