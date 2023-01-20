@@ -237,6 +237,7 @@ public class EmployeeService {
      * 정보를 조회하려는 학원이 존재하지 않는 경우 에러 처리
      * 조회를 요청한 회원이 해당 학원에 존재하지 않는 경우 에러 처리
      * ADMIN 이 아니면 접근할 수 없는 에러처리는 security 단 에서 진행
+     *
      * @param requestAccount 조회를 요청한 사용자 계정
      * @param pageable
      * @return 모든 회원 목록 반환
@@ -266,14 +267,18 @@ public class EmployeeService {
      * @return
      */
     @Transactional
-    public ChangeRoleEmployeeResponse changeRoleEmployee(String requestAccount, Long employeeId) {
+    public ChangeRoleEmployeeResponse changeRoleEmployee(String requestAccount, Long academyId, Long employeeId) {
 
-        // 요청한 직원이 존재하지 않는 경우 에러 처리
-        employeeRepository.findByAccount(requestAccount)
-                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
+        //학원이 존재하지 않는 경우
+        Academy foundAcademy = academyRepository.findById(academyId)
+                .orElseThrow(() -> new AppException(ErrorCode.ACADEMY_NOT_FOUND));
 
-        // 등급을 변경하려는 직원이 존재하지 않는 경우 에러 처리
-        Employee foundEmployee = employeeRepository.findById(employeeId)
+        // 등급 수정을 요청한 계정이 해당 학원에 존재하지 않은 경우 에러 처리
+        Employee requestEmployee = employeeRepository.findByAccountAndAcademy(requestAccount, foundAcademy)
+                .orElseThrow(() -> new AppException(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND));
+
+        // 수정하려는 계정이 해당 학원에 존재하지 않으면 에러 처리
+        Employee foundEmployee = employeeRepository.findByIdAndAcademy(employeeId, foundAcademy)
                 .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
 
         // 변경하려는 계정이 자기 자신인 경우 에러 처리
