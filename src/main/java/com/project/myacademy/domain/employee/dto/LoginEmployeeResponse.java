@@ -9,5 +9,5 @@ import lombok.Getter;
 @Builder
 public class LoginEmployeeResponse {
     private String jwt;
-    private String message;
+    private String EmployeeName;
 }
