@@ -38,6 +38,7 @@ public class EmployeeService {
      * 가입 요청한 계정명이 이미 그 학원에 존재하는 경우 예외 처리
      * 계정명이 admin이고 학원 대표자명과 회원가입을 요청한 실명이 동일하면 USER_ADMIN 권한을 준다.
      * 계정명이 admin이지만, 학원 대표자명과 일치 하지 않는 경우 예외 처리
+     * 가입 요청한 사용자의 실명과 이메일 둘다 일치하는 데이터가 이미 존재할시(다른 학원도 포함) 에러 처리 -> 소셜 로그인때문에
      * 그 외 일반적인 경우는 ROLE_USER 권한을 준다.
      *
      * @param request   회원가입을 요청한 사용자의 정보
@@ -52,9 +53,18 @@ public class EmployeeService {
 
 
         String requestAccount = request.getAccount();
+        String requestEmail = request.getEmail();
+        log.info("⭐ 회원가입 요청한 사용자의 계정 [{}] || 이메일 [{}]", requestAccount, requestEmail);
+
 
         // 가입 요청한 계정명이 이미 그 학원에 존재하는 경우 예외 처리
         employeeRepository.findByAccountAndAcademy(requestAccount, foundAcademy)
+                .ifPresent(employee -> {
+                    throw new AppException(ErrorCode.DUPLICATED_ACCOUNT);
+                });
+
+        // 이미 같은 실명과 이메일이 일치하는 데이터가 존재하는 경우 예외 처리
+        employeeRepository.findByNameAndEmail(requestAccount,requestEmail)
                 .ifPresent(employee -> {
                     throw new AppException(ErrorCode.DUPLICATED_ACCOUNT);
                 });
