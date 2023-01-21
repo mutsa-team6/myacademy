@@ -12,6 +12,4 @@ import lombok.NoArgsConstructor;
 public class UpdateEnrollmentRequest {
 
     private String memo;
-    private Integer paymentYN;
-    private Long employeeId;
 }

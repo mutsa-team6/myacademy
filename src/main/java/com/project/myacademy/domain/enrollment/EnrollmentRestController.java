@@ -27,7 +27,7 @@ public class EnrollmentRestController {
                                                                      @PathVariable("lectureId") Long lectureId,
                                                                      @RequestBody CreateEnrollmentRequest request,
                                                                      Authentication authentication) {
-        CreateEnrollmentResponse createdStudentLecture = enrollmentService.createStudentLecture(academyId, studentId, lectureId, request, authentication.getName());
+        CreateEnrollmentResponse createdStudentLecture = enrollmentService.createEnrollment(academyId, studentId, lectureId, request, authentication.getName());
         log.info("수강 등록 성공");
         return ResponseEntity.ok().body(Response.success(createdStudentLecture));
     }
@@ -49,7 +49,7 @@ public class EnrollmentRestController {
                                                                      @PathVariable("enrollmentId") Long enrollmentId,
                                                                      @RequestBody UpdateEnrollmentRequest request,
                                                                      Authentication authentication) {
-        UpdateEnrollmentResponse updatedStudentLecture = enrollmentService.updateStudentLecture(academyId, studentId, lectureId, enrollmentId, request, authentication.getName());
+        UpdateEnrollmentResponse updatedStudentLecture = enrollmentService.updateEnrollment(academyId, studentId, lectureId, enrollmentId, request, authentication.getName());
         log.info("수강 이력 수정 성공");
         return ResponseEntity.ok().body(Response.success(updatedStudentLecture));
     }
@@ -61,7 +61,7 @@ public class EnrollmentRestController {
                                                                      @PathVariable("lectureId") Long lectureId,
                                                                      @PathVariable("enrollmentId") Long enrollmentId,
                                                                      Authentication authentication) {
-        DeleteEnrollmentResponse deletedStudentLecture = enrollmentService.deleteStudentLecture(academyId, studentId, lectureId, enrollmentId, authentication.getName());
+        DeleteEnrollmentResponse deletedStudentLecture = enrollmentService.deleteEnrollment(academyId, studentId, lectureId, enrollmentId, authentication.getName());
         log.info("수강 이력 삭제 성공");
         return ResponseEntity.ok().body(Response.success(deletedStudentLecture));
     }
