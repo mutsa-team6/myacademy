@@ -9,7 +9,6 @@ import com.project.myacademy.domain.lecture.Lecture;
 import com.project.myacademy.domain.lecture.LectureRepository;
 import com.project.myacademy.domain.student.Student;
 import com.project.myacademy.domain.student.StudentRepository;
-import com.project.myacademy.domain.teacher.TeacherRepository;
 import com.project.myacademy.global.exception.AppException;
 import com.project.myacademy.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -38,27 +37,31 @@ public class EnrollmentService {
      * @param request   수강 등록 요청 DTO
      * @param account   직원 계정
      */
-    public CreateEnrollmentResponse createStudentLecture(Long academyId, Long studentId, Long lectureId, CreateEnrollmentRequest request, String account) {
+    public CreateEnrollmentResponse createEnrollment(Long academyId, Long studentId, Long lectureId, CreateEnrollmentRequest request, String account) {
 
+        // 등록 주체 권한 확인(학원 존재 유무, 해당 학원 직원인지 확인)
         Academy academy = validateAcademy(academyId);
         Employee employee = validateAcademyEmployee(account, academy);
+
+        // 학생, 강좌 존재 유무 확인
         Student student = validateStudent(studentId);
         Lecture lecture = validateLecture(lectureId);
 
-        // 직원이 학생-수강을 개설할 권한이 있는지 확인(강사만 불가능)
-        if (Employee.hasNotAuthorityToCreateLecture(employee)) {
+        // 직원이 수강을 개설할 권한이 있는지 확인(강사만 불가능)
+        if (Employee.isTeacherAuthority(employee)) {
             throw new AppException(ErrorCode.INVALID_PERMISSION);
         }
 
-        // 수강 중복 확인
+        // 수강 이력 중복 확인
         enrollmentRepository.findByStudentAndLecture(student,lecture)
                 .ifPresent((enrollment -> {
                     throw new AppException(ErrorCode.DUPLICATED_ENROLLMENT);
                 }));
 
-        Enrollment enrollment = Enrollment.createEnrollment(student, lecture, request);
+        // 수강 내역 생성
+        Enrollment enrollment = Enrollment.createEnrollment(student, lecture, employee, request);
 
-        // 학생-수강 등록
+        // 수강 내역 저장
         Enrollment savedEnrollment = enrollmentRepository.save(enrollment);
 
         return CreateEnrollmentResponse.of(savedEnrollment.getId());
@@ -71,8 +74,9 @@ public class EnrollmentService {
     @Transactional(readOnly = true)
     public Page<ReadAllEnrollmentResponse> readAllEnrollments(Long academyId, String account, Pageable pageable) {
 
+        // 조회 주체 권한 확인(학원 존재 유무, 해당 학원 직원인지 확인)
         Academy academy = validateAcademy(academyId);
-        Employee employee = validateAcademyEmployee(account, academy);
+        validateAcademyEmployee(account, academy);
 
         Page<Enrollment> enrollments = enrollmentRepository.findAll(pageable);
 
@@ -87,16 +91,19 @@ public class EnrollmentService {
      * @param request       수정 요청 DTO
      * @param account       직원 계정
      */
-    public UpdateEnrollmentResponse updateStudentLecture(Long academyId, Long studentId, Long lectureId, Long enrollmentId, UpdateEnrollmentRequest request, String account) {
+    public UpdateEnrollmentResponse updateEnrollment(Long academyId, Long studentId, Long lectureId, Long enrollmentId, UpdateEnrollmentRequest request, String account) {
 
+        // 수정 주체 권한 확인(학원 존재 유무, 해당 학원 직원인지 확인)
         Academy academy = validateAcademy(academyId);
         Employee employee = validateAcademyEmployee(account, academy);
+
+        // 학생, 강좌, 수강 존재 유무 확인
         validateStudent(studentId);
         validateLecture(lectureId);
         Enrollment enrollment = validateEnrollment(enrollmentId);
 
         // 수강 이력 정보 수정(강사는 불가능)
-        enrollment.updateEnrollment(request);
+        enrollment.updateEnrollment(employee, request);
 
         return UpdateEnrollmentResponse.of(enrollmentId);
     }
@@ -108,15 +115,18 @@ public class EnrollmentService {
      * @param enrollmentId  수강 id
      * @param account       직원 계정
      */
-    public DeleteEnrollmentResponse deleteStudentLecture(Long academyId, Long studentId, Long lectureId, Long enrollmentId, String account) {
+    public DeleteEnrollmentResponse deleteEnrollment(Long academyId, Long studentId, Long lectureId, Long enrollmentId, String account) {
 
+        // 수정 주체 권한 확인(학원 존재 유무, 해당 학원 직원인지 확인)
         Academy academy = validateAcademy(academyId);
-        Employee employee = validateAcademyEmployee(account, academy);
+        validateAcademyEmployee(account, academy);
+
+        // 학생, 강좌, 수강 존재 유무 확인
         validateStudent(studentId);
         validateLecture(lectureId);
         Enrollment enrollment = validateEnrollment(enrollmentId);
 
-        // 학생-수강 이력 삭제 - 강사는 불가능하게 하려면 위에 권한 체크해야함
+        // 수강 이력 삭제(강사는 불가능)
         enrollmentRepository.delete(enrollment);
 
         return DeleteEnrollmentResponse.of(enrollmentId);
