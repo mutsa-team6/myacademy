@@ -16,7 +16,7 @@ public class CreateTeacherResponse {
     public static CreateTeacherResponse of(Teacher teacher) {
         return CreateTeacherResponse.builder()
                 .teacherId(teacher.getId())
-                .message("강사 배정 완료")
+                .message("강사 등록 완료")
                 .build();
     }
 }
