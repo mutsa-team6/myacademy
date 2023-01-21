@@ -61,6 +61,15 @@ class MyacademyApplicationTests {
 	void addExampleData() {
 		Academy academy = Academy.builder()
 				.name("Academy name")
+				.businessRegistrationNumber("123-456")
+				.address("Academy address")
+				.owner("Academy owner")
+				.phoneNum("Academy phone number")
+				.build();
+
+		Academy academy2 = Academy.builder()
+				.name("Academy name")
+				.businessRegistrationNumber("123-789")
 				.address("Academy address")
 				.owner("Academy owner")
 				.phoneNum("Academy phone number")
@@ -134,6 +143,7 @@ class MyacademyApplicationTests {
 
 
 		academyRepository.save(academy);
+		academyRepository.save(academy2);
 		employeeRepository.save(employee);
 		lectureRepository.save(lecture);
 		parentRepository.save(parent);
