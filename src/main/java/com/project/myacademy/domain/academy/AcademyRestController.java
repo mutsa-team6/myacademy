@@ -15,26 +15,27 @@ import org.springframework.web.bind.annotation.*;
 public class AcademyRestController {
 
     // 학원 관련 기능은 일단 닫아두기 (관리자가 입력해줌)
-//
-//    private final AcademyService academyService;
-//
-//    /**
-//     * 학원 등록
-//     *
-//     * @param request
-//     * @return ResponseEntity
-//     */
-//    @PostMapping("/join")
-//    public ResponseEntity create(@RequestBody CreateAcademyRequest request) {
-//        AcademyDto savedAcademyDto = academyService.createAcademy(request);
-//
-//        return ResponseEntity.ok(Response.success(new CreateAcademyResponse(
-//                savedAcademyDto.getId(),
-//                savedAcademyDto.getName(),
-//                savedAcademyDto.getOwner(),
-//                "학원 등록이 정상적으로 완료되었습니다.")));
-//    }
-//
+
+    private final AcademyService academyService;
+
+    /**
+     * 학원 이름과 사업자 등록 번호를 받아서
+     * 학원 찾기
+     *
+     * @param request
+     * @return ResponseEntity
+     */
+    @PostMapping("/find")
+    public ResponseEntity find(@RequestBody FindAcademyRequest request) {
+
+        FindAcademyResponse response = academyService.findAcademy(request);
+
+        log.info("🔎 검색하려는 학원이 존재함");
+
+        return ResponseEntity.ok(Response.success(response.getAcademyId()));
+    }
+}
+
 //    /**
 //     * 학원 정보 수정
 //     *
@@ -90,4 +91,3 @@ public class AcademyRestController {
 //
 //        return ResponseEntity.ok(Response.success(response));
 //    }
-}

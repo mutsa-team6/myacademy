@@ -17,12 +17,13 @@ public class TeacherRestController {
     private final TeacherService teacherService;
 
     // 강사 정보 등록
-    @PostMapping("/{academyId}/teachers")
+    @PostMapping("/{academyId}/employees/{employeeId}/teachers")
     public ResponseEntity<Response<CreateTeacherResponse>> create(@PathVariable("academyId") Long academyId,
+                                                                  @PathVariable("employeeId") Long employeeId,
                                                                   @RequestBody CreateTeacherRequest request,
                                                                   Authentication authentication) {
-        CreateTeacherResponse createdTeacher = teacherService.createTeacher(academyId, request, authentication.getName());
-        log.info("강좌의 강사 배정 성공");
+        CreateTeacherResponse createdTeacher = teacherService.createTeacher(academyId, employeeId, request, authentication.getName());
+        log.info("강사 배정 성공");
         return ResponseEntity.ok().body(Response.success(createdTeacher));
     }
 
@@ -34,7 +35,7 @@ public class TeacherRestController {
                                                                   Authentication authentication) {
 
         UpdateTeacherResponse updatedTeacher = teacherService.updateTeacher(academyId, teacherId, request, authentication.getName());
-        log.info("강좌의 강사 정보 변경 성공");
+        log.info("강사 정보 변경 성공");
         return ResponseEntity.ok().body(Response.success(updatedTeacher));
     }
 
@@ -45,7 +46,7 @@ public class TeacherRestController {
                                                                   Authentication authentication) {
 
         DeleteTeacherResponse deletedTeacher = teacherService.deleteTeacher(academyId, teacherId, authentication.getName());
-        log.info("강좌의 강사 정보 삭제 성공");
+        log.info("강사 정보 삭제 성공");
         return ResponseEntity.ok().body(Response.success(deletedTeacher));
     }
 }

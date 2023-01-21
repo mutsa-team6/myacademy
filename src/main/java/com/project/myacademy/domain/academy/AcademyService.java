@@ -84,7 +84,7 @@ public class AcademyService {
 
         // 권한 확인
         log.info("학원정보의 소유자와 인증정보로 권한을 확인합니다.");
-        if(!academy.getOwner().equals(name) && !employee.getEmployeeRole().equals(EmployeeRole.ROLE_ADMIN)) {
+        if (!academy.getOwner().equals(name) && !employee.getEmployeeRole().equals(EmployeeRole.ROLE_ADMIN)) {
             throw new AppException(ErrorCode.INVALID_PERMISSION);
         }
         log.info("권한이 확인되었습니다.");
@@ -125,7 +125,7 @@ public class AcademyService {
 
         // 권한 확인
         log.info("학원정보의 소유자와 인증정보로 권한을 확인합니다.");
-        if(!academy.getOwner().equals(name) && !employee.getEmployeeRole().equals(EmployeeRole.ROLE_ADMIN)) {
+        if (!academy.getOwner().equals(name) && !employee.getEmployeeRole().equals(EmployeeRole.ROLE_ADMIN)) {
             throw new AppException(ErrorCode.INVALID_PERMISSION);
         }
         log.info("권한이 확인되었습니다.");
@@ -168,5 +168,21 @@ public class AcademyService {
         log.info("학원 토큰이 발급됩니다.");
 
         return new LoginAcademyResponse(academy.getId(), JwtTokenUtil.createToken(request.getBusinessRegistrationNumber(), secretKey, expiredTimeMs));
+    }
+
+    public FindAcademyResponse findAcademy(FindAcademyRequest request) {
+        String requestAcademyName = request.getName();
+        log.info("🔎 찾으려는 학원 이름 [{}] ", requestAcademyName);
+
+        // 검색하려는 학원 데이터가 존재하지 않음
+        Academy academy = academyRepository.findByName(requestAcademyName)
+                .orElseThrow(() -> {
+                    throw new AppException(ErrorCode.ACADEMY_NOT_FOUND);
+                });
+
+        FindAcademyResponse response = new FindAcademyResponse(academy.getId());
+
+        return response;
+
     }
 }
