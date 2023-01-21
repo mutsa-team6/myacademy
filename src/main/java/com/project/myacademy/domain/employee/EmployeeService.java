@@ -142,7 +142,7 @@ public class EmployeeService {
             throw new AppException(ErrorCode.INVALID_PASSWORD);
         }
 
-        return new LoginEmployeeResponse(JwtTokenUtil.createToken(requestAccount, secretKey, expiredTimeMs), requestAccount + " 계정 로그인 성공");
+        return new LoginEmployeeResponse(JwtTokenUtil.createToken(requestAccount, secretKey, expiredTimeMs), requestEmployee.getName());
     }
 
     // 이메일 인증 기능 완성 후 구현
