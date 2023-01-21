@@ -34,6 +34,7 @@ public class AcademyRestController {
 
         return ResponseEntity.ok(Response.success(response.getAcademyId()));
     }
+}
 
 //    /**
 //     * 학원 정보 수정
