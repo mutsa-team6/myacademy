@@ -73,7 +73,7 @@ public class Employee extends BaseEntity {
         this.employeeRole = employeeRole;
     }
 
-    // 강사 테이블에 등록하는 주체의 권한을 확인하는 메서드
+    // 등록, 수정, 삭제 작업을 진행하는 직원의 권한을 확인하는 메서드
     public static boolean isTeacherAuthority(Employee employee) {
         if (employee.getEmployeeRole().equals(ROLE_USER)) return true;
         else return false;
