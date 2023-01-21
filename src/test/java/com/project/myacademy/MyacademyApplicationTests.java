@@ -13,8 +13,8 @@ import com.project.myacademy.domain.payment.Payment;
 import com.project.myacademy.domain.payment.PaymentRepository;
 import com.project.myacademy.domain.student.Student;
 import com.project.myacademy.domain.student.StudentRepository;
-import com.project.myacademy.domain.studentlecture.StudentLecture;
-import com.project.myacademy.domain.studentlecture.StudentLectureRepository;
+import com.project.myacademy.domain.enrollment.Enrollment;
+import com.project.myacademy.domain.enrollment.EnrollmentRepository;
 import com.project.myacademy.domain.teacher.Teacher;
 import com.project.myacademy.domain.teacher.TeacherRepository;
 import com.project.myacademy.domain.uniqueness.Uniqueness;
@@ -44,7 +44,7 @@ class MyacademyApplicationTests {
 	@Autowired
 	PaymentRepository paymentRepository;
 	@Autowired
-	StudentLectureRepository studentLectureRepository;
+	EnrollmentRepository enrollmentRepository;
 	@Autowired
 	StudentRepository studentRepository;
 	@Autowired
@@ -61,6 +61,15 @@ class MyacademyApplicationTests {
 	void addExampleData() {
 		Academy academy = Academy.builder()
 				.name("Academy name")
+				.businessRegistrationNumber("123-456")
+				.address("Academy address")
+				.owner("Academy owner")
+				.phoneNum("Academy phone number")
+				.build();
+
+		Academy academy2 = Academy.builder()
+				.name("Academy name")
+				.businessRegistrationNumber("123-789")
 				.address("Academy address")
 				.owner("Academy owner")
 				.phoneNum("Academy phone number")
@@ -113,10 +122,11 @@ class MyacademyApplicationTests {
 
 		Payment payment = Payment.builder()
 				.student(student)
-				.parent(parent)
+				.lecture(lecture)
+				.employee(employee)
 				.build();
 
-		StudentLecture studentLecture = StudentLecture.builder()
+		Enrollment enrollment = Enrollment.builder()
 				.student(student)
 				.lecture(lecture)
 				.memo("Student Lecture memo")
@@ -134,11 +144,12 @@ class MyacademyApplicationTests {
 
 
 		academyRepository.save(academy);
+		academyRepository.save(academy2);
 		employeeRepository.save(employee);
 		lectureRepository.save(lecture);
 		parentRepository.save(parent);
 		paymentRepository.save(payment);
-		studentLectureRepository.save(studentLecture);
+		enrollmentRepository.save(enrollment);
 		studentRepository.save(student);
 		teacherRepository.save(teacher);
 		uniquenessRepository.save(uniqueness);

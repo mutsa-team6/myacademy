@@ -7,7 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 @Builder
-public class LoginEmployeeResponse {
-    private String jwt;
-    private String EmployeeName;
+public class UpdateEmployeeResponse {
+    private Long employeeId;
+    private String message;
 }
