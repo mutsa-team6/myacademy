@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface AcademyRepository extends JpaRepository<Academy, Long> {
     Optional<Academy> findByBusinessRegistrationNumber(String businessRegistrationNumber);
-    Optional<Academy> findByNameAndBusinessRegistrationNumber(String academyName, String businessRegistrationNumber);
+    Optional<Academy> findByName(String academyName);
 
 
 }

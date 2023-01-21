@@ -172,11 +172,10 @@ public class AcademyService {
 
     public FindAcademyResponse findAcademy(FindAcademyRequest request) {
         String requestAcademyName = request.getName();
-        String requestBusinessRegistrationNumber = request.getBusinessRegistrationNumber();
-        log.info("🔎 찾으려는 학원 이름 [{}] || 찾으려는 학원 사업자 등록 번호 [{}] ", requestAcademyName, requestBusinessRegistrationNumber);
+        log.info("🔎 찾으려는 학원 이름 [{}] ", requestAcademyName);
 
         // 검색하려는 학원 데이터가 존재하지 않음
-        Academy academy = academyRepository.findByNameAndBusinessRegistrationNumber(requestAcademyName, requestBusinessRegistrationNumber)
+        Academy academy = academyRepository.findByName(requestAcademyName)
                 .orElseThrow(() -> {
                     throw new AppException(ErrorCode.ACADEMY_NOT_FOUND);
                 });

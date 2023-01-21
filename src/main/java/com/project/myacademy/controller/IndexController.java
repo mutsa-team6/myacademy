@@ -1,7 +1,6 @@
 package com.project.myacademy.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,7 +16,7 @@ import javax.servlet.http.HttpSession;
 public class IndexController {
 
 
-    @GetMapping("/")
+    @GetMapping("/main")
     public String index(HttpServletRequest request, Model model){
 
         //회원 이름 표시
@@ -28,7 +27,7 @@ public class IndexController {
             log.info("세션에 저장된 실명 : [{}]",loginUserName);
             model.addAttribute("name", loginUserName);
         }
-        return "index";
+        return "main";
     }
     @GetMapping("/join")
     public String join(){
@@ -66,7 +65,7 @@ public class IndexController {
         cookieGenerator.addCookie(response,token);
         cookieGenerator.setCookieMaxAge(60*60);//1시간
         log.info("🍪 쿠키에 저장한 토큰 {}",token);
-        return "redirect:/";
+        return "redirect:/main";
     }
 
 
