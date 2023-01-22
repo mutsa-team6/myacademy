@@ -2,6 +2,7 @@ package com.project.myacademy.domain.lecture;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.project.myacademy.domain.BaseEntity;
+import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.domain.lecture.dto.CreateLectureRequest;
 import com.project.myacademy.domain.lecture.dto.UpdateLectureRequest;
 import com.project.myacademy.domain.teacher.Teacher;
@@ -28,7 +29,6 @@ public class Lecture extends BaseEntity {
     private Long id;
 
     private String name;
-
     private Integer price;
 
     @Column(name = "minimum_capcity")
@@ -55,8 +55,15 @@ public class Lecture extends BaseEntity {
     @JoinColumn(name = "teacher_id")
     private Teacher teacher;
 
+    @Column(name = "first_register_employee")
+    private String registerEmployee;
+
+    @Column(name = "last_modified_employee")
+    private String modifiedEmployee;
+
     // 강좌 생성 메서드
-    public static Lecture addLecture(CreateLectureRequest request, Teacher teacher) {
+    public static Lecture addLecture(Employee employee, Teacher teacher, CreateLectureRequest request) {
+        StringBuilder sb = new StringBuilder();
         return Lecture.builder()
                 .name(request.getLectureName())
                 .price(request.getLecturePrice())
@@ -67,11 +74,14 @@ public class Lecture extends BaseEntity {
                 .startDate(request.getStartDate())
                 .finishDate(request.getFinishDate())
                 .teacher(teacher)
+                .registerEmployee(sb.append(employee.getId()).append(" (").append(employee.getName()).append(")").toString())
+                .modifiedEmployee(sb.toString())
                 .build();
     }
 
     // 강좌 수정 메서드
-    public void updateLecture(UpdateLectureRequest request) {
+    public void updateLecture(Employee employee, UpdateLectureRequest request) {
+        StringBuilder sb = new StringBuilder();
         this.name = request.getLectureName();
         this.price = request.getLecturePrice();
         this.minimumCapacity = request.getMinimumCapacity();
@@ -80,6 +90,11 @@ public class Lecture extends BaseEntity {
         this.LectureTime = request.getLectureTime();
         this.startDate = request.getStartDate();
         this.finishDate = request.getFinishDate();
+        this.modifiedEmployee = sb.append(employee.getId()).append(" (").append(employee.getName()).append(")").toString();
     }
 
+    public void recordDeleteEmployee(Employee employee) {
+        StringBuilder sb = new StringBuilder();
+        this.modifiedEmployee = sb.append(employee.getId()).append(" (").append(employee.getName()).append(")").toString();
+    }
 }
