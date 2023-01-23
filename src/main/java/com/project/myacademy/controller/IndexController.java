@@ -53,7 +53,7 @@ public class IndexController {
 
         HttpSession session = request.getSession();
         session.removeAttribute("name");
-        return "index";
+        return "redirect:/";
     }
 
     @GetMapping("/oauth2/redirect")
