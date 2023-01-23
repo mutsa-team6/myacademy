@@ -119,16 +119,19 @@ public class EnrollmentService {
 
         // 수정 주체 권한 확인(학원 존재 유무, 해당 학원 직원인지 확인)
         Academy academy = validateAcademy(academyId);
-        validateAcademyEmployee(account, academy);
+        Employee employee = validateAcademyEmployee(account, academy);
 
         // 학생, 강좌, 수강 존재 유무 확인
         validateStudent(studentId);
         validateLecture(lectureId);
         Enrollment enrollment = validateEnrollment(enrollmentId);
 
+        // 마지막 수정 직원 필드 수강내역 삭제 직원으로 업데이트 즉시 DB 반영
+        enrollment.recordDeleteEmployee(employee);
+        enrollmentRepository.saveAndFlush(enrollment);
+
         // 수강 이력 삭제(강사는 불가능)
         enrollmentRepository.delete(enrollment);
-
         return DeleteEnrollmentResponse.of(enrollmentId);
     }
 

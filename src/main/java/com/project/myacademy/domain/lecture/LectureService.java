@@ -73,7 +73,7 @@ public class LectureService {
                     throw new AppException(ErrorCode.DUPLICATED_LECTURE);
                 }));
 
-        Lecture savedLecture = lectureRepository.save(Lecture.addLecture(request, teacher));
+        Lecture savedLecture = lectureRepository.save(Lecture.addLecture(employee, teacher, request));
         return CreateLectureResponse.of(savedLecture);
     }
 
@@ -98,7 +98,7 @@ public class LectureService {
         }
 
         // 강좌 정보 수정
-        lecture.updateLecture(request);
+        lecture.updateLecture(employee, request);
         return UpdateLectureResponse.of(lectureId);
     }
 
@@ -120,6 +120,10 @@ public class LectureService {
         if(Employee.isTeacherAuthority(employee)) {
             throw new AppException(ErrorCode.INVALID_PERMISSION);
         }
+
+        // 마지막 수정 직원 필드 강좌 삭제 직원으로 업데이트 즉시 DB 반영
+        lecture.recordDeleteEmployee(employee);
+        lectureRepository.saveAndFlush(lecture);
 
         // 강좌 삭제
         lectureRepository.delete(lecture);

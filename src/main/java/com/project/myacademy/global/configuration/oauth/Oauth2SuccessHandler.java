@@ -11,7 +11,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -26,11 +25,6 @@ public class Oauth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     @Value("${jwt.token.secret}")
     private String key;
-
-    @Value("${app.oauth2.authorizedRedirectUri}")
-    private String redirectUri;
-
-    private String targetUrl;
 
     private final EmployeeRepository employeeRepository;
 
@@ -64,11 +58,7 @@ public class Oauth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         // 회원 계정으로 토큰 생성 후 쿼리 파라미터로 보냄
         String token = JwtTokenUtil.createToken(foundAccount,key,1000*60*60);
 
-        targetUrl = UriComponentsBuilder.fromUriString(redirectUri)
-                .queryParam("token", token)
-                .build().toUriString();
+        response.sendRedirect("/oauth2/redirect"+"?token="+token);
 
-        clearAuthenticationAttributes(request);
-        getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
 }
