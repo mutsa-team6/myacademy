@@ -63,5 +63,10 @@ public class Enrollment extends BaseEntity {
         this.modifiedEmployee = sb.append(employee.getId()).append(" (").append(employee.getName()).append(")").toString();
         this.memo = request.getMemo();
     }
+
+    public void recordDeleteEmployee(Employee employee) {
+        StringBuilder sb = new StringBuilder();
+        this.modifiedEmployee = sb.append(employee.getId()).append(" (").append(employee.getName()).append(")").toString();
+    }
 }
 
