@@ -1,9 +1,8 @@
 package com.project.myacademy.domain.employee;
 
-import com.project.myacademy.domain.academy.Academy;
 import com.project.myacademy.domain.BaseEntity;
+import com.project.myacademy.domain.academy.Academy;
 import com.project.myacademy.domain.employee.dto.EmployeeDto;
-import com.project.myacademy.domain.employee.dto.ChangePasswordEmployeeRequest;
 import com.project.myacademy.domain.employee.dto.UpdateEmployeeRequest;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
@@ -69,20 +68,14 @@ public class Employee extends BaseEntity {
         this.password = request.getPassword();
     }
 
-    // 강사 테이블에 등록하는 주체의 권한을 확인하는 메서드
-    public static boolean isTeacherAuthority(Employee employee) {
-        if (employee.getEmployeeRole().equals(ROLE_USER)) return true;
-        else return false;
-    }
-
     // ADMIN, STAFF 가 사용하는 등급 변경 메서드
     public void changeRole(EmployeeRole employeeRole) {
         this.employeeRole = employeeRole;
     }
 
-    // 강좌 개설 권한 확인 메서드
-    public static boolean hasNotAuthorityToCreateLecture(Employee employee) {
-        if(employee.getEmployeeRole().equals(ROLE_USER)) return true;
+    // 등록, 수정, 삭제 작업을 진행하는 직원의 권한을 확인하는 메서드
+    public static boolean isTeacherAuthority(Employee employee) {
+        if (employee.getEmployeeRole().equals(ROLE_USER)) return true;
         else return false;
     }
 }

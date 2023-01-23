@@ -15,7 +15,7 @@ public class DeleteTeacherResponse {
     public static DeleteTeacherResponse of(Long teacherId) {
         return DeleteTeacherResponse.builder()
                 .teacherId(teacherId)
-                .message("강좌의 강사 정보 삭제 완료")
+                .message("강사 삭제 완료")
                 .build();
     }
 }

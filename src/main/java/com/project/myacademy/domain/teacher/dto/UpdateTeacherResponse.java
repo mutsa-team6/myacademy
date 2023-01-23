@@ -15,7 +15,7 @@ public class UpdateTeacherResponse {
     public static UpdateTeacherResponse of(Long teacherId) {
         return UpdateTeacherResponse.builder()
                 .teacherId(teacherId)
-                .message("강좌의 강사 정보 수정 완료")
+                .message("강사 수정 완료")
                 .build();
     }
 }
