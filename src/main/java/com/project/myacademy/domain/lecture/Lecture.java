@@ -31,10 +31,10 @@ public class Lecture extends BaseEntity {
     private String name;
     private Integer price;
 
-    @Column(name = "minimum_capcity")
+    @Column(name = "minimum_capacity")
     private Integer minimumCapacity;
 
-    @Column(name = "maximum_capcity")
+    @Column(name = "maximum_capacity")
     private Integer maximumCapacity;
 
     @Column(name = "lecture_day")
@@ -93,6 +93,7 @@ public class Lecture extends BaseEntity {
         this.modifiedEmployee = sb.append(employee.getId()).append(" (").append(employee.getName()).append(")").toString();
     }
 
+    // 강좌 삭제 전에 마지막 수정 직원 필드 삭제 직원으로 업데이트
     public void recordDeleteEmployee(Employee employee) {
         StringBuilder sb = new StringBuilder();
         this.modifiedEmployee = sb.append(employee.getId()).append(" (").append(employee.getName()).append(")").toString();
