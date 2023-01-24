@@ -61,6 +61,9 @@ public class Lecture extends BaseEntity {
     @Column(name = "last_modified_employee")
     private String modifiedEmployee;
 
+    @Column(name = "current_enrollment_number")
+    private Integer currentEnrollmentNumber;
+
     // 강좌 생성 메서드
     public static Lecture addLecture(Employee employee, Teacher teacher, CreateLectureRequest request) {
         StringBuilder sb = new StringBuilder();
@@ -76,6 +79,7 @@ public class Lecture extends BaseEntity {
                 .teacher(teacher)
                 .registerEmployee(sb.append(employee.getId()).append(" (").append(employee.getName()).append(")").toString())
                 .modifiedEmployee(sb.toString())
+                .currentEnrollmentNumber(request.getCurrentRegisterNumber())
                 .build();
     }
 
@@ -97,5 +101,15 @@ public class Lecture extends BaseEntity {
     public void recordDeleteEmployee(Employee employee) {
         StringBuilder sb = new StringBuilder();
         this.modifiedEmployee = sb.append(employee.getId()).append(" (").append(employee.getName()).append(")").toString();
+    }
+
+    // 현재 등록인원 +
+    public void plusCurrentEnrollmentNumber(Integer number) {
+        this.currentEnrollmentNumber += number;
+    }
+
+    // 현재 등록인원 -
+    public void minusCurrentEnrollmentNumber(Integer number) {
+        this.currentEnrollmentNumber -= number;
     }
 }

@@ -27,9 +27,9 @@ public class EnrollmentRestController {
                                                                      @PathVariable("lectureId") Long lectureId,
                                                                      @RequestBody CreateEnrollmentRequest request,
                                                                      Authentication authentication) {
-        CreateEnrollmentResponse createdStudentLecture = enrollmentService.createEnrollment(academyId, studentId, lectureId, request, authentication.getName());
+        CreateEnrollmentResponse createdEnrollment = enrollmentService.createEnrollment(academyId, studentId, lectureId, request, authentication.getName());
         log.info("수강 등록 성공");
-        return ResponseEntity.ok().body(Response.success(createdStudentLecture));
+        return ResponseEntity.ok().body(Response.success(createdEnrollment));
     }
 
     // 수강 전체 리스트 조회
@@ -49,20 +49,22 @@ public class EnrollmentRestController {
                                                                      @PathVariable("enrollmentId") Long enrollmentId,
                                                                      @RequestBody UpdateEnrollmentRequest request,
                                                                      Authentication authentication) {
-        UpdateEnrollmentResponse updatedStudentLecture = enrollmentService.updateEnrollment(academyId, studentId, lectureId, enrollmentId, request, authentication.getName());
+        UpdateEnrollmentResponse updatedEnrollment = enrollmentService.updateEnrollment(academyId, studentId, lectureId, enrollmentId, request, authentication.getName());
         log.info("수강 이력 수정 성공");
-        return ResponseEntity.ok().body(Response.success(updatedStudentLecture));
+        return ResponseEntity.ok().body(Response.success(updatedEnrollment));
     }
 
     // 수강 삭제
-    @DeleteMapping("/{academyId}/students/{studentId}/lectures/{lectureId}/enrollments/{enrollmentId}")
+    @PostMapping("/{academyId}/students/{studentId}/lectures/{lectureId}/enrollments/{enrollmentId}/waitinglists/{waitinglistId}")
     public ResponseEntity<Response<DeleteEnrollmentResponse>> delete(@PathVariable("academyId") Long academyId,
                                                                      @PathVariable("studentId") Long studentId,
                                                                      @PathVariable("lectureId") Long lectureId,
                                                                      @PathVariable("enrollmentId") Long enrollmentId,
+                                                                     @PathVariable("waitinglistId") Long waitinglistId,
+                                                                     @RequestBody CreateEnrollmentRequest request,
                                                                      Authentication authentication) {
-        DeleteEnrollmentResponse deletedStudentLecture = enrollmentService.deleteEnrollment(academyId, studentId, lectureId, enrollmentId, authentication.getName());
+        DeleteEnrollmentResponse deletedEnrollment = enrollmentService.deleteEnrollment(academyId, studentId, lectureId, enrollmentId, waitinglistId, request, authentication.getName());
         log.info("수강 이력 삭제 성공");
-        return ResponseEntity.ok().body(Response.success(deletedStudentLecture));
+        return ResponseEntity.ok().body(Response.success(deletedEnrollment));
     }
 }

@@ -46,6 +46,7 @@ public class Enrollment extends BaseEntity {
     @Column(name = "last_modified_employee")
     private String modifiedEmployee;
 
+    // 수강 생성 메서드
     public static Enrollment createEnrollment(Student student, Lecture lecture, Employee employee, CreateEnrollmentRequest request) {
         StringBuilder sb = new StringBuilder();
         return Enrollment.builder()
@@ -58,12 +59,14 @@ public class Enrollment extends BaseEntity {
                 .build();
     }
 
+    // 수강 수정 메서드
     public void updateEnrollment(Employee employee, UpdateEnrollmentRequest request) {
         StringBuilder sb = new StringBuilder();
         this.modifiedEmployee = sb.append(employee.getId()).append(" (").append(employee.getName()).append(")").toString();
         this.memo = request.getMemo();
     }
 
+    // 수강 삭제 시 해당 작업 진행한 직원 업데이트
     public void recordDeleteEmployee(Employee employee) {
         StringBuilder sb = new StringBuilder();
         this.modifiedEmployee = sb.append(employee.getId()).append(" (").append(employee.getName()).append(")").toString();

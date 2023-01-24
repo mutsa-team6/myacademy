@@ -19,8 +19,8 @@ import com.project.myacademy.domain.teacher.Teacher;
 import com.project.myacademy.domain.teacher.TeacherRepository;
 import com.project.myacademy.domain.uniqueness.Uniqueness;
 import com.project.myacademy.domain.uniqueness.UniquenessRepository;
-import com.project.myacademy.domain.waitinglist.WaitingList;
-import com.project.myacademy.domain.waitinglist.WaitingListRepository;
+import com.project.myacademy.domain.waitinglist.Waitinglist;
+import com.project.myacademy.domain.waitinglist.WaitinglistRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +52,7 @@ class MyacademyApplicationTests {
 	@Autowired
 	UniquenessRepository uniquenessRepository;
 	@Autowired
-	WaitingListRepository waitingListRepository;
+	WaitinglistRepository waitinglistRepository;
 
 	@Test
 	@DisplayName("가짜 데이터 넣기")
@@ -102,6 +102,7 @@ class MyacademyApplicationTests {
 				.minimumCapacity(5)
 				.startDate(LocalDate.now())
 				.finishDate(LocalDate.now().plusDays(10))
+				.currentEnrollmentNumber(1)
 				.build();
 
 		Parent parent =Parent.builder()
@@ -137,9 +138,10 @@ class MyacademyApplicationTests {
 				.student(student)
 				.build();
 
-		WaitingList waitingList = WaitingList.builder()
+		Waitinglist waitingList = Waitinglist.builder()
 				.lecture(lecture)
 				.student(student)
+				.memo("memo")
 				.build();
 
 
@@ -153,7 +155,7 @@ class MyacademyApplicationTests {
 		studentRepository.save(student);
 		teacherRepository.save(teacher);
 		uniquenessRepository.save(uniqueness);
-		waitingListRepository.save(waitingList);
+		waitinglistRepository.save(waitingList);
 	}
 
 }
