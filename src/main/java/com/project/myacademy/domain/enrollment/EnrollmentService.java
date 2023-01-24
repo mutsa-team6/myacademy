@@ -9,6 +9,8 @@ import com.project.myacademy.domain.lecture.Lecture;
 import com.project.myacademy.domain.lecture.LectureRepository;
 import com.project.myacademy.domain.student.Student;
 import com.project.myacademy.domain.student.StudentRepository;
+import com.project.myacademy.domain.waitinglist.Waitinglist;
+import com.project.myacademy.domain.waitinglist.WaitinglistRepository;
 import com.project.myacademy.global.exception.AppException;
 import com.project.myacademy.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +31,7 @@ public class EnrollmentService {
     private final EmployeeRepository employeeRepository;
     private final StudentRepository studentRepository;
     private final LectureRepository lectureRepository;
+    private final WaitinglistRepository waitinglistRepository;
 
     /**
      * @param academyId 직원의 소속 학원 id
@@ -39,7 +42,7 @@ public class EnrollmentService {
      */
     public CreateEnrollmentResponse createEnrollment(Long academyId, Long studentId, Long lectureId, CreateEnrollmentRequest request, String account) {
 
-        // 등록 주체 권한 확인(학원 존재 유무, 해당 학원 직원인지 확인)
+        // 등록하는 직원 존재 유무 확인(학원 존재 유무, 해당 학원 직원인지 확인)
         Academy academy = validateAcademy(academyId);
         Employee employee = validateAcademyEmployee(account, academy);
 
@@ -59,10 +62,21 @@ public class EnrollmentService {
                 }));
 
         // 수강 내역 생성
-        Enrollment enrollment = Enrollment.createEnrollment(student, lecture, employee, request);
+        Enrollment savedEnrollment;
 
-        // 수강 내역 저장
-        Enrollment savedEnrollment = enrollmentRepository.save(enrollment);
+        // 현재까지 강좌에 등록된 인원수 가져오기
+        Long currentEnrollmentNumber = enrollmentRepository.countByLecture_Id(lecture.getId());
+
+        // (해당 강좌에 등록할 인원 + 이미 등록되어 있는 인원)이 최대 수강정원을 넘지 않으면 수강 내역 저장
+        if(currentEnrollmentNumber + 1 <= lecture.getMaximumCapacity()) {
+            lecture.plusCurrentEnrollmentNumber(1);
+            savedEnrollment = enrollmentRepository.save(Enrollment.createEnrollment(student, lecture, employee, request));
+        }
+        // 그렇지 않으면 수강정원 초과 에러처리
+        else {
+//            waitinglistRepository.saveAndFlush(Waitinglist.makeWaitinglist(lecture, student));
+            throw new AppException(ErrorCode.OVER_REGISTRATION_NUMBER);
+        }
 
         return CreateEnrollmentResponse.of(savedEnrollment.getId());
     }
@@ -93,7 +107,7 @@ public class EnrollmentService {
      */
     public UpdateEnrollmentResponse updateEnrollment(Long academyId, Long studentId, Long lectureId, Long enrollmentId, UpdateEnrollmentRequest request, String account) {
 
-        // 수정 주체 권한 확인(학원 존재 유무, 해당 학원 직원인지 확인)
+        // 수정 진행하는 직원 유무 존재(학원 존재 유무, 해당 학원 직원인지 확인)
         Academy academy = validateAcademy(academyId);
         Employee employee = validateAcademyEmployee(account, academy);
 
@@ -101,6 +115,11 @@ public class EnrollmentService {
         validateStudent(studentId);
         validateLecture(lectureId);
         Enrollment enrollment = validateEnrollment(enrollmentId);
+
+        // 직원이 수강을 수정할 권한이 있는지 확인(강사만 불가능)
+        if (Employee.isTeacherAuthority(employee)) {
+            throw new AppException(ErrorCode.INVALID_PERMISSION);
+        }
 
         // 수강 이력 정보 수정(강사는 불가능)
         enrollment.updateEnrollment(employee, request);
@@ -113,26 +132,46 @@ public class EnrollmentService {
      * @param studentId     학생 id
      * @param lectureId     강좌 id
      * @param enrollmentId  수강 id
+     * @param waitinglistId 수강 내역으로 넘어올 대기번호 id
      * @param account       직원 계정
      */
-    public DeleteEnrollmentResponse deleteEnrollment(Long academyId, Long studentId, Long lectureId, Long enrollmentId, String account) {
+    public DeleteEnrollmentResponse deleteEnrollment(Long academyId, Long studentId, Long lectureId, Long enrollmentId, Long waitinglistId, CreateEnrollmentRequest request, String account) {
 
-        // 수정 주체 권한 확인(학원 존재 유무, 해당 학원 직원인지 확인)
+        // 삭제 진행하는 직원 권한 확인(학원 존재 유무, 해당 학원 직원인지 확인)
         Academy academy = validateAcademy(academyId);
         Employee employee = validateAcademyEmployee(account, academy);
 
         // 학생, 강좌, 수강 존재 유무 확인
         validateStudent(studentId);
-        validateLecture(lectureId);
+        Lecture lecture = validateLecture(lectureId);
         Enrollment enrollment = validateEnrollment(enrollmentId);
 
-        // 마지막 수정 직원 필드 수강내역 삭제 직원으로 업데이트 즉시 DB 반영
+        // 직원이 수강 삭제, 대기번호 -> 수강등록을 진행할 권한이 있는지 확인(강사만 불가능)
+        if (Employee.isTeacherAuthority(employee)) {
+            throw new AppException(ErrorCode.INVALID_PERMISSION);
+        }
+
+        // 마지막 수정 직원 필드 -> 수강내역 삭제 직원으로 업데이트
+        // 현재 등록 인원수 1명 down
         enrollment.recordDeleteEmployee(employee);
+        // DB 즉시 반영
         enrollmentRepository.saveAndFlush(enrollment);
 
-        // 수강 이력 삭제(강사는 불가능)
+        // 수강 이력 먼저 삭제
         enrollmentRepository.delete(enrollment);
-        return DeleteEnrollmentResponse.of(enrollmentId);
+        // 현재 등록인원 -1
+        lecture.minusCurrentEnrollmentNumber(1);
+
+        // 대기번호 존재 유무 확인
+        Waitinglist waitinglist = validateWaitinglist(waitinglistId);
+
+        // 대기번호 -> 수강등록으로 정보 변경
+        Long newEnrollmentId = createEnrollmentFromWaitinglist(academy.getId(), waitinglist.getStudent().getId(), waitinglist.getLecture().getId(), request, account);
+
+        // 수강등록이 끝나면 기존 대기번호 삭제
+        waitinglistRepository.delete(waitinglist);
+
+        return DeleteEnrollmentResponse.of(enrollmentId, newEnrollmentId);
     }
 
     private Academy validateAcademy(Long academyId) {
@@ -163,8 +202,42 @@ public class EnrollmentService {
 
     private Enrollment validateEnrollment(Long enrollmentId) {
         Enrollment validatedEnrollment = enrollmentRepository.findById(enrollmentId)
-                .orElseThrow(() -> new AppException(ErrorCode.STUDENT_LECTURE_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.ENROLLMENT_NOT_FOUND));
         return validatedEnrollment;
+    }
+
+    private Waitinglist validateWaitinglist(Long waitinglistId) {
+        Waitinglist validatedWaitinglist = waitinglistRepository.findById(waitinglistId)
+                .orElseThrow(() -> new AppException(ErrorCode.WAITINGLIST_NOT_FOUND));
+        return validatedWaitinglist;
+    }
+
+    // 대기번호 -> 수강등록으로 이동하게 하는 메서드
+    private Long createEnrollmentFromWaitinglist(Long academyId, Long studentId, Long lectureId, CreateEnrollmentRequest request, String account) {
+
+        // 등록 주체 권한 확인(학원 존재 유무, 해당 학원 직원인지 확인)
+        Academy academy = validateAcademy(academyId);
+        Employee employee = validateAcademyEmployee(account, academy);
+
+        // 학생, 강좌 존재 유무 확인
+        Student student = validateStudent(studentId);
+        Lecture lecture = validateLecture(lectureId);
+
+        // 수강 이력 중복 확인
+        enrollmentRepository.findByStudentAndLecture(student,lecture)
+                .ifPresent((enrollment -> {
+                    throw new AppException(ErrorCode.DUPLICATED_ENROLLMENT);
+                }));
+
+        // 수강 내역 생성
+        lecture.plusCurrentEnrollmentNumber(1);
+        Enrollment enrollment = Enrollment.createEnrollment(student, lecture, employee, request);
+
+        // 수강 내역 저장 즉시 DB 반영 -> 반환 DTO에 새롭게 생성된 수강 내역의 enrollmentId 추출하기 위함
+//        Enrollment newEnrollment = enrollmentRepository.saveAndFlush(enrollment);
+        Enrollment newEnrollment = enrollmentRepository.save(enrollment);
+
+        return newEnrollment.getId();
     }
 
 }
