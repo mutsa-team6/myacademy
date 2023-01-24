@@ -2,6 +2,7 @@ package com.project.myacademy.domain.academy;
 
 import com.project.myacademy.domain.BaseEntity;
 import com.project.myacademy.domain.academy.dto.AcademyDto;
+import com.project.myacademy.domain.academy.dto.CreateAcademyRequest;
 import com.project.myacademy.domain.academy.dto.UpdateAcademyReqeust;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
@@ -35,7 +36,17 @@ public class Academy extends BaseEntity {
 
     private String businessRegistrationNumber;
 
-    private String password;
+    public Academy(String name, String address, String phoneNum, String owner, String businessRegistrationNumber) {
+        this.name = name;
+        this.address = address;
+        this.phoneNum = phoneNum;
+        this.owner = owner;
+        this.businessRegistrationNumber = businessRegistrationNumber;
+    }
+
+    public static Academy createAcademy(CreateAcademyRequest request) {
+        return new Academy(request.getName(), request.getAddress(), request.getPhoneNum(), request.getOwner(), request.getBusinessRegistrationNumber());
+    }
 
     public AcademyDto toAcademyDto() {
         return new AcademyDto(this.id, this.name, this.owner, "");
@@ -47,6 +58,5 @@ public class Academy extends BaseEntity {
         this.phoneNum = reqeust.getPhoneNum();
         this.owner = reqeust.getOwner();
         this.businessRegistrationNumber = reqeust.getBusinessRegistrationNumber();
-        this.password = reqeust.getPassword();
     }
 }
