@@ -104,12 +104,12 @@ public class Lecture extends BaseEntity {
     }
 
     // 현재 등록인원 +
-    public void plusCurrentEnrollmentNumber(Integer number) {
-        this.currentEnrollmentNumber += number;
+    public void plusCurrentEnrollmentNumber() {
+        this.currentEnrollmentNumber += 1;
     }
 
     // 현재 등록인원 -
-    public void minusCurrentEnrollmentNumber(Integer number) {
-        this.currentEnrollmentNumber -= number;
+    public void minusCurrentEnrollmentNumber() {
+        this.currentEnrollmentNumber -= 1;
     }
 }
