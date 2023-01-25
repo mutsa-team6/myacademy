@@ -32,7 +32,7 @@ public class StudentRestController {
     /**
      * 학생 정보 단건 조회
      */
-    @GetMapping("/{academyId}students/{studentId}")
+    @GetMapping("/{academyId}/students/{studentId}")
     public ResponseEntity<Response<ReadStudentResponse>> read(@PathVariable Long academyId, @PathVariable Long studentId, Authentication authentication) {
         String account = authentication.getName();
         ReadStudentResponse response = studentService.readStudent(academyId, studentId, account);
@@ -42,7 +42,7 @@ public class StudentRestController {
     /**
      * 학생 정보 전체 조회
      */
-    @GetMapping("/{academyId}students")
+    @GetMapping("/{academyId}/students")
     public ResponseEntity<Response<Page<ReadAllStudentResponse>>> readAll(@PathVariable Long academyId, Authentication authentication) {
         String account = authentication.getName();
         PageRequest pageable = PageRequest.of(0, 20, Sort.by("id").descending());
@@ -53,7 +53,7 @@ public class StudentRestController {
     /**
      * 학생 정보 수정
      */
-    @PutMapping("/{academyId}students/{studentId}")
+    @PutMapping("/{academyId}/students/{studentId}")
     public ResponseEntity<Response<UpdateStudentResponse>> update(@PathVariable Long academyId, @PathVariable Long studentId, UpdateStudentRequest request, Authentication authentication) {
         String account = authentication.getName();
         UpdateStudentResponse response = studentService.updateStudent(academyId,studentId, request, account);
@@ -63,7 +63,7 @@ public class StudentRestController {
     /**
      * 학생 정보 삭제
      */
-    @DeleteMapping("/{academyId}students/{studentId}")
+    @DeleteMapping("/{academyId}/students/{studentId}")
     public ResponseEntity<Response<DeleteStudentResponse>> delete(@PathVariable Long academyId, @PathVariable Long studentId, Authentication authentication) {
         String account = authentication.getName();
         DeleteStudentResponse response = studentService.deleteStudent(academyId, studentId,account);
