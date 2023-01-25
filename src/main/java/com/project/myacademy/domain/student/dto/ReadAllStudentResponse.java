@@ -11,6 +11,9 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 public class ReadAllStudentResponse {
+    //학원 Id
+    private Long academyId;
+    //학생 Id
     private Long id;
     //학생 이름
     private String name;
@@ -31,6 +34,7 @@ public class ReadAllStudentResponse {
 
     public static ReadAllStudentResponse of(Student student) {
         return ReadAllStudentResponse.builder()
+                .academyId(student.getAcademyId())
                 .id(student.getId())
                 .name(student.getName())
                 .address(student.getAddress())

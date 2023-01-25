@@ -9,6 +9,8 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 public class ReadParentResponse {
+    //부모가 등록된 학원 id
+    private Long academyId;
     //부모 Id
     private Long id;
     //부모 이름
@@ -26,6 +28,7 @@ public class ReadParentResponse {
 
     public static ReadParentResponse of(Parent parent) {
         return ReadParentResponse.builder()
+                .academyId(parent.getAcademyId())
                 .id(parent.getId())
                 .name(parent.getName())
                 .parentRecognizedCode(parent.getParentRecognizedCode())

@@ -41,19 +41,17 @@ public class StudentService {
         Academy academy = validateAcademy(academyId);
         //account 유효검사
         Employee employee = validateAcademyEmployee(account, academy);
+        //학원 id에 부모 존재 유무 확인
+        Parent parent = validateParent(academyId,request.getParentPhoneNum());
 
-        //학생이 학원을 두개다닌다면? (이부분 처리 필요함)
-        //학생 중복 체크
-        studentRepository.findByPhoneNum(request.getPhoneNum())
+        //학생 PhoneNum 과 academyId로 학생 중복 체크
+        studentRepository.findByPhoneNumAndAcademyId(request.getPhoneNum(),academyId)
                 .ifPresent(user -> {
                     throw new AppException(ErrorCode.DUPLICATED_STUDENT);
                 });
 
-        //request의 parentPhoneNum으로 조회했을때 없으면 null 값을 parent에 저장
-        Parent parent = parentRepository.findByPhoneNum(request.getParentPhoneNum())
-                .orElseGet(() -> null);
 
-        Student savedStudent = studentRepository.save(Student.toStudent(request, parent));
+        Student savedStudent = studentRepository.save(Student.toStudent(request, parent, academyId));
 
         return CreateStudentResponse.of(savedStudent);
     }
@@ -70,7 +68,7 @@ public class StudentService {
         //account 유효검사
         Employee employee = validateAcademyEmployee(account, academy);
         //student Id에 해당하는 학생이 존재하는지 확인
-        Student student = validateStudent(studentId);
+        Student student = validateStudent(academyId, studentId);
 
         return ReadStudentResponse.of(student);
     }
@@ -87,7 +85,7 @@ public class StudentService {
         //account 유효검사
         Employee employee = validateAcademyEmployee(account, academy);
 
-        return studentRepository.findAll(pageable).map(student -> ReadAllStudentResponse.of(student));
+        return studentRepository.findAllByAcademyId(pageable, academyId).map(ReadAllStudentResponse::of);
     }
 
     /**
@@ -104,7 +102,7 @@ public class StudentService {
         //account 유효검사
         Employee employee = validateAcademyEmployee(account, academy);
         //student Id에 해당하는 학생이 존재하는지 확인
-        Student student = validateStudent(studentId);
+        Student student = validateStudent(academyId, studentId);
 
         student.updateStudent(request);
 
@@ -124,25 +122,32 @@ public class StudentService {
         //account 유효검사
         Employee employee = validateAcademyEmployee(account, academy);
         //student Id에 해당하는 학생이 존재하는지 확인
-        Student student = validateStudent(studentId);
+        Student student = validateStudent(academyId,studentId);
 
         studentRepository.delete(student);
 
         return DeleteStudentResponse.of(student);
     }
 
-    private Student validateStudent(Long studentId) {
+    private Student validateStudent(Long academyId, Long studentId) {
         // 학생 존재 유무 확인
-        Student validateStudent = studentRepository.findById(studentId)
+        Student student = studentRepository.findByAcademyIdAndId(academyId, studentId)
                 .orElseThrow(() -> new AppException(ErrorCode.STUDENT_NOT_FOUND));
-        return validateStudent;
+        return student;
     }
 
     private Academy validateAcademy(Long academyId) {
         // 학원 존재 유무 확인
-        Academy validatedAcademy = academyRepository.findById(academyId)
+        Academy academy = academyRepository.findById(academyId)
                 .orElseThrow(() -> new AppException(ErrorCode.ACADEMY_NOT_FOUND));
-        return validatedAcademy;
+        return academy;
+    }
+
+    private Parent validateParent(Long academyId, String phoneNum) {
+        //부모 존재 유무 확인
+        Parent parent = parentRepository.findByPhoneNumAndAcademyId(phoneNum,academyId)
+                .orElseThrow(() -> new AppException(ErrorCode.PARENT_NOT_FOUND));
+        return parent;
     }
 
     private Employee validateAcademyEmployee(String account, Academy academy) {

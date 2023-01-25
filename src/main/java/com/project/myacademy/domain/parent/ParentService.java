@@ -35,17 +35,13 @@ public class ParentService {
         //account 유효검사
         Employee employee = validateAcademyEmployee(account, academy);
 
-        //JWT에서 받은 Employee account가 존재하는지 확인
-        employeeRepository.findByAccount(account)
-                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
-
-        //중복체크
-        parentRepository.findByPhoneNum(request.getPhoneNum())
+        //부모 핸드폰번호와 academyId 로 중복되는 부모가 있는지 확인함.
+        parentRepository.findByPhoneNumAndAcademyId(request.getPhoneNum(),academyId)
                 .ifPresent(user -> {
                     throw new AppException(ErrorCode.DUPLICATED_PARENT);
                 });
 
-        Parent savedParent = parentRepository.save(Parent.toParent(request));
+        Parent savedParent = parentRepository.save(Parent.toParent(request, academyId));
 
         return CreateParentResponse.of(savedParent);
     }
@@ -61,10 +57,8 @@ public class ParentService {
         Academy academy = validateAcademy(academyId);
         //account 유효검사
         Employee employee = validateAcademyEmployee(account, academy);
-
-        //parentId에 해당하는 부모 정보가 존재하는지 확인
-        Parent parent = parentRepository.findById(parentId)
-                .orElseThrow(() -> new AppException(ErrorCode.PARENT_NOT_FOUND));
+        //parentId와 academyId에 해당하는 부모 정보가 존재하는지 확인
+        Parent parent = validateParent(parentId, academyId);
 
         return ReadParentResponse.of(parent);
     }
@@ -82,14 +76,8 @@ public class ParentService {
         Academy academy = validateAcademy(academyId);
         //account 유효검사
         Employee employee = validateAcademyEmployee(account, academy);
-
-        //JWT에서 받은 Employee account가 존재하는지 확인
-        employeeRepository.findByAccount(account)
-                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
-
-        //parentId에 해당하는 부모 정보가 존재하는지 확인
-        Parent parent = parentRepository.findById(parentId)
-                .orElseThrow(() -> new AppException(ErrorCode.PARENT_NOT_FOUND));
+        //parentId와 academyId에 해당하는 부모 정보가 존재하는지 확인
+        Parent parent = validateParent(parentId, academyId);
 
         parent.updateParent(request);
 
@@ -108,14 +96,19 @@ public class ParentService {
         Academy academy = validateAcademy(academyId);
         //account 유효검사
         Employee employee = validateAcademyEmployee(account, academy);
-
-        //parentId에 해당하는 부모 정보가 존재하는지 확인
-        Parent parent = parentRepository.findById(parentId)
-                .orElseThrow(() -> new AppException(ErrorCode.PARENT_NOT_FOUND));
+        //parentId와 academyId에 해당하는 부모 정보가 존재하는지 확인
+        Parent parent = validateParent(parentId, academyId);
 
         parentRepository.delete(parent);
 
         return DeleteParentResponse.of(parent);
+    }
+
+    private Parent validateParent(Long parentId, Long academyId) {
+        // parentId와 academyId에 해당하는 부모 존재 유무 확인
+        Parent parent = parentRepository.findByIdAndAcademyId(parentId, academyId)
+                .orElseThrow(() -> new AppException(ErrorCode.PARENT_NOT_FOUND));
+        return parent;
     }
 
     private Academy validateAcademy(Long academyId) {
