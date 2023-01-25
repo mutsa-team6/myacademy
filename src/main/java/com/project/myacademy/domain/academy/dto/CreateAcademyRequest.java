@@ -14,16 +14,5 @@ public class CreateAcademyRequest {
     private String phoneNum;
     private String owner;
     private String businessRegistrationNumber;
-    private String password;
 
-    public Academy toAcademy(String password) {
-        return Academy.builder()
-                .name(this.name)
-                .address(this.address)
-                .phoneNum(this.phoneNum)
-                .owner(this.owner)
-                .businessRegistrationNumber(this.businessRegistrationNumber)
-                .password(password)
-                .build();
-    }
 }
