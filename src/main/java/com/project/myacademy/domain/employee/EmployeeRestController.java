@@ -80,13 +80,10 @@ public class EmployeeRestController {
         return ResponseEntity.ok(Response.success(response));
     }
 
-    @PutMapping("/findPassword")
-    public ResponseEntity changePassword(@RequestBody ChangePasswordEmployeeRequest request) {
-        EmployeeDto updatedEmployeeDto = employeeService.changePasswordEmployee(request);
-        return ResponseEntity.ok(Response.success(new ChangePasswordEmployeeResponse(
-                updatedEmployeeDto.getName(),
-                updatedEmployeeDto.getAccount(),
-                updatedEmployeeDto.getAccount() + "updated")));
+    @PutMapping("/{academyId}/employee/findPassword")
+    public ResponseEntity changePassword(@PathVariable Long academyId, @RequestBody ChangePasswordEmployeeRequest request) {
+        ChangePasswordEmployeeResponse response = employeeService.changePasswordEmployee(request, academyId);
+        return ResponseEntity.ok(Response.success(response));
     }
 
     // 관리자(ADMIN) 혹은 직원(STAFF) 등급은 다른 직원 계정을 삭제할 수 있다.
