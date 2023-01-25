@@ -15,7 +15,19 @@ import javax.servlet.http.HttpSession;
 @Slf4j
 public class IndexController {
 
+    @GetMapping("/")
+    public String index2(HttpServletRequest request, Model model){
 
+        //회원 이름 표시
+        HttpSession session = request.getSession(true);
+
+        if (session.getAttribute("name") != null) {
+            String loginUserName = (String)session.getAttribute("name");
+            log.info("세션에 저장된 실명 : [{}]",loginUserName);
+            model.addAttribute("name", loginUserName);
+        }
+        return "index";
+    }
     @GetMapping("/main")
     public String index(HttpServletRequest request, Model model){
 
