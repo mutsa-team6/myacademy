@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping("api/v1/parents")
+@RequestMapping("api/v1/academies")
 public class ParentRestController {
 
     private final ParentService parentService;
@@ -19,40 +19,40 @@ public class ParentRestController {
     /**
      * 부모 등록
      */
-    @PostMapping("")
-    public ResponseEntity<Response<CreateParentResponse>> create(CreateParentRequest request, Authentication authentication) {
+    @PostMapping("/{academyId}/parents")
+    public ResponseEntity<Response<CreateParentResponse>> create(@PathVariable Long academyId, CreateParentRequest request, Authentication authentication) {
         String account = authentication.getName();
-        CreateParentResponse response = parentService.createParent(request, account);
+        CreateParentResponse response = parentService.createParent(academyId, request, account);
         return ResponseEntity.ok().body(Response.success(response));
     }
 
     /**
      * 부모 정보 단건 조회
      */
-    @GetMapping("/{parentId}")
-    public ResponseEntity<Response<FindParentResponse>> find(@PathVariable Long parentId, Authentication authentication) {
+    @GetMapping("/{academyId}/parents/{parentId}")
+    public ResponseEntity<Response<ReadParentResponse>> read(@PathVariable Long academyId, @PathVariable Long parentId, Authentication authentication) {
         String account = authentication.getName();
-        FindParentResponse response = parentService.findParent(parentId, account);
+        ReadParentResponse response = parentService.readParent(academyId, parentId, account);
         return ResponseEntity.ok().body(Response.success(response));
     }
 
     /**
      * 부모 정보 수정
      */
-    @PutMapping("/{parentId}")
-    public ResponseEntity<Response<UpdateParentResponse>> update(@PathVariable Long parentId, UpdateParentRequest request, Authentication authentication) {
+    @PutMapping("/{academyId}/parents/{parentId}")
+    public ResponseEntity<Response<UpdateParentResponse>> update(@PathVariable Long academyId, @PathVariable Long parentId, UpdateParentRequest request, Authentication authentication) {
         String account = authentication.getName();
-        UpdateParentResponse response = parentService.updateParent(parentId, request, account);
+        UpdateParentResponse response = parentService.updateParent(academyId, parentId, request, account);
         return ResponseEntity.ok().body(Response.success(response));
     }
 
     /**
      * 부모 정보 삭제
      */
-    @DeleteMapping("/{parentId}")
-    public ResponseEntity<Response<DeleteParentResponse>> delete(@PathVariable Long parentId, Authentication authentication) {
+    @DeleteMapping("/{academyId}/parents/{parentId}")
+    public ResponseEntity<Response<DeleteParentResponse>> delete(@PathVariable Long academyId, @PathVariable Long parentId, Authentication authentication) {
         String account = authentication.getName();
-        DeleteParentResponse response = parentService.deleteParent(parentId, account);
+        DeleteParentResponse response = parentService.deleteParent(academyId, parentId, account);
         return ResponseEntity.ok().body(Response.success(response));
     }
 }
