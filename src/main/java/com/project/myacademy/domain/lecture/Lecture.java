@@ -2,6 +2,7 @@ package com.project.myacademy.domain.lecture;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.project.myacademy.domain.BaseEntity;
+import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.domain.lecture.dto.CreateLectureRequest;
 import com.project.myacademy.domain.lecture.dto.UpdateLectureRequest;
 import com.project.myacademy.domain.teacher.Teacher;
@@ -28,13 +29,12 @@ public class Lecture extends BaseEntity {
     private Long id;
 
     private String name;
-
     private Integer price;
 
-    @Column(name = "minimum_capcity")
+    @Column(name = "minimum_capacity")
     private Integer minimumCapacity;
 
-    @Column(name = "maximum_capcity")
+    @Column(name = "maximum_capacity")
     private Integer maximumCapacity;
 
     @Column(name = "lecture_day")
@@ -55,8 +55,18 @@ public class Lecture extends BaseEntity {
     @JoinColumn(name = "teacher_id")
     private Teacher teacher;
 
+    @Column(name = "first_register_employee")
+    private String registerEmployee;
+
+    @Column(name = "last_modified_employee")
+    private String modifiedEmployee;
+
+    @Column(name = "current_enrollment_number")
+    private Integer currentEnrollmentNumber;
+
     // 강좌 생성 메서드
-    public static Lecture addLecture(CreateLectureRequest request, Teacher teacher) {
+    public static Lecture addLecture(Employee employee, Teacher teacher, CreateLectureRequest request) {
+        StringBuilder sb = new StringBuilder();
         return Lecture.builder()
                 .name(request.getLectureName())
                 .price(request.getLecturePrice())
@@ -67,11 +77,15 @@ public class Lecture extends BaseEntity {
                 .startDate(request.getStartDate())
                 .finishDate(request.getFinishDate())
                 .teacher(teacher)
+                .registerEmployee(sb.append(employee.getId()).append(" (").append(employee.getName()).append(")").toString())
+                .modifiedEmployee(sb.toString())
+                .currentEnrollmentNumber(request.getCurrentRegisterNumber())
                 .build();
     }
 
     // 강좌 수정 메서드
-    public void updateLecture(UpdateLectureRequest request) {
+    public void updateLecture(Employee employee, UpdateLectureRequest request) {
+        StringBuilder sb = new StringBuilder();
         this.name = request.getLectureName();
         this.price = request.getLecturePrice();
         this.minimumCapacity = request.getMinimumCapacity();
@@ -80,6 +94,22 @@ public class Lecture extends BaseEntity {
         this.LectureTime = request.getLectureTime();
         this.startDate = request.getStartDate();
         this.finishDate = request.getFinishDate();
+        this.modifiedEmployee = sb.append(employee.getId()).append(" (").append(employee.getName()).append(")").toString();
     }
 
+    // 강좌 삭제 전에 마지막 수정 직원 필드 삭제 직원으로 업데이트
+    public void recordDeleteEmployee(Employee employee) {
+        StringBuilder sb = new StringBuilder();
+        this.modifiedEmployee = sb.append(employee.getId()).append(" (").append(employee.getName()).append(")").toString();
+    }
+
+    // 현재 등록인원 +
+    public void plusCurrentEnrollmentNumber(Integer number) {
+        this.currentEnrollmentNumber += number;
+    }
+
+    // 현재 등록인원 -
+    public void minusCurrentEnrollmentNumber(Integer number) {
+        this.currentEnrollmentNumber -= number;
+    }
 }

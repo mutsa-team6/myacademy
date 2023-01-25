@@ -1,11 +1,11 @@
 package com.project.myacademy.domain.enrollment;
 
 import com.project.myacademy.domain.BaseEntity;
-import com.project.myacademy.domain.lecture.Lecture;
-import com.project.myacademy.domain.payment.Payment;
-import com.project.myacademy.domain.student.Student;
+import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.domain.enrollment.dto.CreateEnrollmentRequest;
 import com.project.myacademy.domain.enrollment.dto.UpdateEnrollmentRequest;
+import com.project.myacademy.domain.lecture.Lecture;
+import com.project.myacademy.domain.student.Student;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
@@ -28,30 +28,48 @@ public class Enrollment extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "lecture_id")
-    private Lecture lecture;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "student_id")
     private Student student;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "lecture_id")
+    private Lecture lecture;
+
     private String memo;
-    private Integer paymentYN;
 
-    @Column(name = "employee_id")
-    private Long employeeId;
+    @Column(name = "paymentYN")
+    private Boolean paymentYN;
 
-    public static Enrollment createEnrollment(Student student, Lecture lecture, CreateEnrollmentRequest request) {
+    @Column(name = "first_register_employee")
+    private String registerEmployee;
+
+    @Column(name = "last_modified_employee")
+    private String modifiedEmployee;
+
+    // 수강 생성 메서드
+    public static Enrollment createEnrollment(Student student, Lecture lecture, Employee employee, CreateEnrollmentRequest request) {
+        StringBuilder sb = new StringBuilder();
         return Enrollment.builder()
                 .student(student)
                 .lecture(lecture)
                 .memo(request.getMemo())
                 .paymentYN(request.getPaymentYN())
-                .employeeId(request.getEmployeeId())
+                .registerEmployee(sb.append(employee.getId()).append(" (").append(employee.getName()).append(")").toString())
+                .modifiedEmployee(sb.toString())
                 .build();
     }
 
-    public void updateEnrollment(UpdateEnrollmentRequest request) {
+    // 수강 수정 메서드
+    public void updateEnrollment(Employee employee, UpdateEnrollmentRequest request) {
+        StringBuilder sb = new StringBuilder();
+        this.modifiedEmployee = sb.append(employee.getId()).append(" (").append(employee.getName()).append(")").toString();
         this.memo = request.getMemo();
     }
+
+    // 수강 삭제 시 해당 작업 진행한 직원 업데이트
+    public void recordDeleteEmployee(Employee employee) {
+        StringBuilder sb = new StringBuilder();
+        this.modifiedEmployee = sb.append(employee.getId()).append(" (").append(employee.getName()).append(")").toString();
+    }
 }
+

@@ -12,6 +12,5 @@ import lombok.NoArgsConstructor;
 public class CreateEnrollmentRequest {
 
     private String memo;
-    private Integer paymentYN;
-    private Long employeeId;
+    private Boolean paymentYN = false;
 }

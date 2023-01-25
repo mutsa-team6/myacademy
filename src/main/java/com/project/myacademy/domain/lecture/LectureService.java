@@ -16,8 +16,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.project.myacademy.domain.employee.EmployeeRole.ROLE_USER;
-
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -61,13 +59,13 @@ public class LectureService {
         // 등록을 진행하는 직원이 해당 학원 소속 직원인지 확인
         Employee employee = validateAcademyEmployee(account, academy);
 
-        // 강사의 존재 유무 확인
-        Teacher teacher = validateTeacher(teacherId);
-
-        // 직원이 강좌를 개설할 권한이 있는지 확인(강사는 불가능)
-        if(Employee.hasNotAuthorityToCreateLecture(employee)) {
+        // 직원이 강좌를 개설할 권한이 있는지 확인(강사만 불가능)
+        if(Employee.isTeacherAuthority(employee)) {
             throw new AppException(ErrorCode.INVALID_PERMISSION);
         }
+
+        // 강좌에 등록될 강사의 존재 유무 확인
+        Teacher teacher = validateTeacher(teacherId);
 
         // 강좌 중복 확인
         lectureRepository.findByName(request.getLectureName())
@@ -75,7 +73,7 @@ public class LectureService {
                     throw new AppException(ErrorCode.DUPLICATED_LECTURE);
                 }));
 
-        Lecture savedLecture = lectureRepository.save(Lecture.addLecture(request, teacher));
+        Lecture savedLecture = lectureRepository.save(Lecture.addLecture(employee, teacher, request));
         return CreateLectureResponse.of(savedLecture);
     }
 
@@ -88,10 +86,7 @@ public class LectureService {
      */
     public UpdateLectureResponse updateLecture(Long academyId, Long teacherId, Long lectureId, UpdateLectureRequest request, String account) {
 
-        // 학원 존재 유무 확인
-        // 수정을 진행하는 직원이 해당 학원 소속 직원인지 확인
-        // 강사 존재 유무 확인
-        // 수정할 강좌 존재 유무 유효성 검증
+        // 학원 존재 유무 확인, 수정을 진행하는 직원이 해당 학원 소속 직원인지 확인, 강사 존재 유무, 수정할 강좌 존재 유무 유효성 검증
         Academy academy = validateAcademy(academyId);
         Employee employee = validateAcademyEmployee(account, academy);
         validateTeacher(teacherId);
@@ -103,7 +98,7 @@ public class LectureService {
         }
 
         // 강좌 정보 수정
-        lecture.updateLecture(request);
+        lecture.updateLecture(employee, request);
         return UpdateLectureResponse.of(lectureId);
     }
 
@@ -125,6 +120,10 @@ public class LectureService {
         if(Employee.isTeacherAuthority(employee)) {
             throw new AppException(ErrorCode.INVALID_PERMISSION);
         }
+
+        // 마지막 수정 직원 필드 강좌 삭제 직원으로 업데이트 즉시 DB 반영
+        lecture.recordDeleteEmployee(employee);
+        lectureRepository.saveAndFlush(lecture);
 
         // 강좌 삭제
         lectureRepository.delete(lecture);

@@ -10,6 +10,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
 @RestController
 @RequestMapping("/api/v1/academies/")
 @RequiredArgsConstructor
@@ -30,12 +33,16 @@ public class EmployeeRestController {
     }
 
     @PostMapping("/{academyId}/employees/login")
-    public ResponseEntity login(@PathVariable Long academyId, @RequestBody LoginEmployeeRequest request) {
+    public ResponseEntity login(@PathVariable Long academyId, @RequestBody LoginEmployeeRequest request, HttpServletRequest httpRequest) {
 
         log.info("✨ 로그인 요청한 학원 id [{}] 요청한 사용자 계정 [{}]", academyId, request.getAccount());
 
         LoginEmployeeResponse response = employeeService.loginEmployee(request, academyId);
 
+        if (response.getJwt() != null) {
+            HttpSession session = httpRequest.getSession(true);
+            session.setAttribute("name", response.getEmployeeName());
+        }
         return ResponseEntity.ok(Response.success(response));
     }
 
