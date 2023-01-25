@@ -64,7 +64,7 @@ public class EmployeeService {
                 });
 
         // 이미 같은 실명과 이메일이 일치하는 데이터가 존재하는 경우 예외 처리
-        employeeRepository.findByNameAndEmail(requestAccount,requestEmail)
+        employeeRepository.findByNameAndEmail(requestAccount, requestEmail)
                 .ifPresent(employee -> {
                     throw new AppException(ErrorCode.DUPLICATED_ACCOUNT);
                 });
@@ -145,14 +145,36 @@ public class EmployeeService {
         return new LoginEmployeeResponse(JwtTokenUtil.createToken(requestAccount, secretKey, expiredTimeMs), requestEmployee.getName());
     }
 
-    // 이메일 인증 기능 완성 후 구현
+    /**
+     * 계정 찾기 구현 ( 학원 이름, 사용자 실명, 사용자 이메일로 찾기)
+     *
+     * @param request
+     * @return
+     */
     public FindAccountEmployeeResponse findAccountEmployee(FindAccountEmployeeRequest request) {
-        String name = request.getName();
-        String email = request.getEmail();
-        Employee foundEmployee = employeeRepository.findByNameAndEmail(name, email)
+        String academyName = request.getAcademyName();
+
+        log.info("🔎 아이디 찾기를 요청한 학원 이름 [{}]", academyName);
+        // 존재하는 학원인지 확인
+        academyRepository.findByName(academyName)
+                .orElseThrow(() -> new AppException(ErrorCode.ACADEMY_NOT_FOUND));
+
+        String requestEmployeeName = request.getName();
+        String requestEmployeeEmail = request.getEmail();
+
+        log.info("🔎 아이디 찾기를 요청한 사용자 실명 [{}]  || 사용자 이메일 [{}] ", requestEmployeeName, requestEmployeeEmail);
+
+        // 실명과 이메일에 해당하는 사용자 계정이 있는지 확인
+        Employee foundEmployee = employeeRepository.findByNameAndEmail(requestEmployeeName, requestEmployeeEmail)
                 .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
+
+
         String account = foundEmployee.getAccount();
-        return new FindAccountEmployeeResponse(account, "Account found : " + account);
+
+        log.info("🔎 찾은 계정 [{}] ", account);
+
+
+        return new FindAccountEmployeeResponse(foundEmployee.getId(), account);
     }
 
     // 이메일 인증 기능 완성 후 구현
