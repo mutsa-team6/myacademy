@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Builder
-public class FindStudentResponse {
+public class ReadStudentResponse {
     //학생 Id
     private Long id;
     //학생 이름
@@ -28,8 +28,8 @@ public class FindStudentResponse {
     //학생 정보 마지막 수정 일시
     private LocalDateTime lastModifiedAt;
 
-    public static FindStudentResponse of(Student student) {
-        return FindStudentResponse.builder()
+    public static ReadStudentResponse of(Student student) {
+        return ReadStudentResponse.builder()
                 .id(student.getId())
                 .name(student.getName())
                 .address(student.getAddress())
