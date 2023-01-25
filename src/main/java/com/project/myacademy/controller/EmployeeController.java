@@ -18,12 +18,24 @@ public class EmployeeController {
 
     @GetMapping("/join")
     public String join() {
-        return "join";
+        return "/employee/join";
     }
 
     @GetMapping("/login")
     public String login() {
-        return "login";
+        return "/employee/login";
+    }
+
+    @GetMapping("/find/account")
+    public String findAccount() {
+
+        return "/employee/find";
+    }
+
+    @GetMapping("/find/password")
+    public String findPassword() {
+
+        return "/employee/findPassword";
     }
 
     @GetMapping("/oauthFail")
