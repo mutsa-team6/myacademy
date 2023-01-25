@@ -55,15 +55,14 @@ public class EnrollmentRestController {
     }
 
     // 수강 삭제
-    @PostMapping("/{academyId}/students/{studentId}/lectures/{lectureId}/enrollments/{enrollmentId}/waitinglists/{waitinglistId}")
+    @PostMapping("/{academyId}/students/{studentId}/lectures/{lectureId}/enrollments/{enrollmentId}")
     public ResponseEntity<Response<DeleteEnrollmentResponse>> delete(@PathVariable("academyId") Long academyId,
                                                                      @PathVariable("studentId") Long studentId,
                                                                      @PathVariable("lectureId") Long lectureId,
                                                                      @PathVariable("enrollmentId") Long enrollmentId,
-                                                                     @PathVariable("waitinglistId") Long waitinglistId,
                                                                      @RequestBody CreateEnrollmentRequest request,
                                                                      Authentication authentication) {
-        DeleteEnrollmentResponse deletedEnrollment = enrollmentService.deleteEnrollment(academyId, studentId, lectureId, enrollmentId, waitinglistId, request, authentication.getName());
+        DeleteEnrollmentResponse deletedEnrollment = enrollmentService.deleteEnrollment(academyId, studentId, lectureId, enrollmentId, request, authentication.getName());
         log.info("수강 이력 삭제 성공");
         return ResponseEntity.ok().body(Response.success(deletedEnrollment));
     }
