@@ -1,0 +1,276 @@
+<!--
+=========================================================
+* Material Dashboard 2 - v3.0.4
+=========================================================
+
+* Product Page: https://www.creative-tim.com/product/material-dashboard
+* Copyright 2022 Creative Tim (https://www.creative-tim.com)
+* Licensed under MIT (https://www.creative-tim.com/license)
+* Coded by Creative Tim
+
+=========================================================
+
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+-->
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="apple-touch-icon" sizes="76x76" href="./assets/img/apple-icon.png">
+    <link rel="icon" type="image/png" href="./assets/img/favicon.png">
+    <title>
+        Material Dashboard 2 by Creative Tim
+    </title>
+    <!--     Fonts and icons     -->
+    <link rel="stylesheet" type="text/css"
+          href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900|Roboto+Slab:400,700"/>
+    <!-- Nucleo Icons -->
+    <link href="./assets/css/nucleo-icons.css" rel="stylesheet"/>
+    <link href="./assets/css/nucleo-svg.css" rel="stylesheet"/>
+    <!-- Font Awesome Icons -->
+    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <!--    Axios-->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- CSS Files -->
+    <link id="pagestyle" href="./assets/css/material-dashboard.css?v=3.0.4" rel="stylesheet"/>
+</head>
+
+<body class="">
+<div class="container position-sticky z-index-sticky top-0">
+    <div class="row">
+        <div class="col-12">
+
+        </div>
+    </div>
+</div>
+<main class="main-content  mt-0">
+<!--    <div   style="background-image: url('https://raw.githubusercontent.com/buinq/imageServer/main/img/image-20230125160037269.png');">-->
+        <section>
+            <div class="page-header min-vh-100">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-xl-8 col-lg-5 col-md-7 d-flex flex-column ms-auto me-auto ms-lg-auto me-lg-5">
+
+                            <div class="card my-4">
+                                <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                                    <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+                                        <h6 class="text-white text-capitalize ps-3">등록된 학원 정보</h6>
+                                    </div>
+                                </div>
+                                <div class="card-body px-0 pb-2">
+                                    <div class="table-responsive p-0">
+                                        <table class="table align-items-center mb-0">
+                                            <thead>
+                                            <tr>
+                                                <th class="text-center text-uppercase  font-weight-bolder">
+                                                    학원 이름
+                                                </th>
+                                                <th class="text-center text-uppercase  font-weight-bolder ">
+                                                    학원 대표자명
+                                                </th>
+                                                <th class="text-center text-uppercase font-weight-bolder ">
+                                                    학원 주소
+                                                </th>
+                                                <th class="text-center text-uppercase  font-weight-bolder">
+                                                    학원 사업자 등록 번호
+                                                </th>
+                                                <th class="text-center text-uppercase font-weight-bolder">
+                                                    학원 전화번호
+                                                </th>
+                                                <th class="text-secondary opacity-7"></th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr th:each="academy : ${academies}">
+                                                <th class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${academy.name}"></span>
+                                                </th>
+                                                <td class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${academy.owner}"></span>
+                                                </td>
+                                                <td class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${academy.address}"></span>
+                                                </td>
+                                                <td class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${academy.businessRegistrationNumber}"></span>
+                                                </td>
+                                                <td class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${academy.phoneNum}"></span>
+                                                </td>
+                                                <td class="align-middle">
+
+                                                    <a href="javascript:;"
+                                                       th:onclick="|academy.delete(${academy.academyId})|" type="button"
+                                                       class="text-secondary font-weight-bold text-xs"
+                                                       data-toggle="tooltip"
+                                                       data-original-title="delete-academy">
+                                                        delete
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-3 col-lg-5 col-md-7 d-flex flex-column ms-auto me-auto ms-lg-auto me-lg-5">
+                            <div class="card card-plain">
+                                <h4 class="font-weight-bolder">학원 등록</h4>
+                            </div>
+
+                            <p class="mb-0">등록할 학원 정보를 입력해주세요.</p>
+                            <br>
+                            <div class="card-body">
+                                <form role="form">
+                                    <div class="input-group input-group-outline mb-3">
+                                        <input type="text" class="form-control" id="input-academyName"
+                                               placeholder="학원 이름">
+                                    </div>
+                                    <div class="input-group input-group-outline mb-3">
+                                        <input type="text" class="form-control" id="input-academyOwner"
+                                               placeholder="학원 대표자명">
+                                    </div>
+                                    <div class="input-group input-group-outline mb-3">
+                                        <input type="text" class="form-control" id="address_kakao" readonly
+                                               placeholder="학원 주소">
+                                    </div>
+                                    <div class="input-group input-group-outline mb-3">
+                                        <input type="text" class="form-control" id="address_detail_kakao"
+                                               name="address_detail"
+                                               placeholder="상세 주소">
+                                    </div>
+                                    <div class="input-group input-group-outline mb-3">
+                                        <input type="text" class="form-control" id="input-academybusinessNum"
+                                               placeholder="학원 사업자 등록 번호">
+                                    </div>
+                                    <div class="input-group input-group-outline mb-3">
+                                        <input type="text" class="form-control" id="input-academyphoneNum"
+                                               placeholder="학원 전화번호">
+                                    </div>
+
+                                    <div class="text-center">
+                                        <button th:onclick="|academy.create()|" type="button"
+                                                class="btn btn-lg bg-gradient-primary btn-lg w-100 mt-4 mb-0">학원 등록
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                            <br>
+                            <div class="card-footer text-center pt-0 px-lg-2 px-1">
+                                <p class="mb-2 text-sm mx-auto">
+                                    <a th:href="@{/}" class="text-primary text-gradient font-weight-bold">메인 화면으로 </a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+<!--    </div>-->
+</main>
+<!--   Core JS Files   -->
+
+<script>
+    var win = navigator.platform.indexOf('Win') > -1;
+    if (win && document.querySelector('#sidenav-scrollbar')) {
+        var options = {
+            damping: '0.5'
+        }
+        Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
+    }
+</script>
+<!-- Github buttons -->
+<script async defer src="https://buttons.github.io/buttons.js"></script>
+<!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
+<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<Script>
+
+    let academy = {
+        init: function () {
+            var _this = this;
+        },
+        create: function () {
+            let data = {
+                name: document.querySelector('#input-academyName').value.trim(),
+                address: document.querySelector("#address_kakao").value.trim() + "  " + document.querySelector("#address_detail_kakao").value.trim(),
+                phoneNum: document.querySelector('#input-academyphoneNum').value.trim(),
+                owner: document.querySelector('#input-academyOwner').value.trim(),
+                businessRegistrationNumber: document.querySelector('#input-academybusinessNum').value.trim()
+            };
+            console.log(data);
+
+            axios.post("/api/v1/academies",
+                JSON.stringify(data), {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                }
+            ).then((response) => {
+                console.log(response);
+                alert("학원등록 성공");
+                window.location.href = '/academies';
+
+            }).catch((error) => {
+                console.log(error);
+                if (error.response.data.result["errorCode"] == "DUPLICATED_ACADEMY") {
+                    alert("학원 이름은 중복될 수 없습니다.");
+                    window.location.href = '/academies';
+                }
+
+
+            });
+
+        },
+
+        delete: function (academyId) {
+
+            const con_check = confirm("삭제하시겠습니까?(나중에는 학원 사업자 등록 번호 입력해야 삭제할 수 있게끔 구현)");
+
+            if (con_check === true) {
+                axios.delete("/api/v1/academies/" + academyId + "/delete",
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    }
+                ).then((response) => {
+                    alert("학원삭제 성공");
+                    window.location.href = '/academies';
+                }).catch((error) => {
+                });
+            }
+        }
+    };
+
+    academy.init();
+
+</script>
+<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<script>
+    window.onload = function () {
+        document.getElementById("address_kakao").addEventListener("click", function () { //주소입력칸을 클릭하면
+            //카카오 지도 발생
+            new daum.Postcode({
+                oncomplete: function (data) { //선택시 입력값 세팅
+                    document.getElementById("address_kakao").value = data.address; // 주소 넣기
+                    document.querySelector("input[name=address_detail]").focus(); //상세입력 포커싱
+                }
+            }).open();
+        });
+    }
+</script>
+</body>
+
+</html>
