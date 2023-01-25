@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping("api/v1/students")
+@RequestMapping("api/v1/academies")
 public class UniquenessRestController {
 
     private final UniquenessService uniquenessService;
@@ -22,41 +22,47 @@ public class UniquenessRestController {
     /**
      * 학생 특이사항 작성
      */
-    @PostMapping("/{studentId}/uniqueness")
-    public ResponseEntity<Response<CreateUniquenessResponse>> create(@PathVariable Long studentId, CreateUniquenessRequest request, Authentication authentication) {
+    @PostMapping("/{academyId}/students/{studentId}/uniqueness")
+    public ResponseEntity<Response<CreateUniquenessResponse>> create(@PathVariable Long academyId,
+                                                                     @PathVariable Long studentId, CreateUniquenessRequest request, Authentication authentication) {
         String account = authentication.getName();
-        CreateUniquenessResponse response = uniquenessService.createUniqueness(studentId, request, account);
+        CreateUniquenessResponse response = uniquenessService.createUniqueness(academyId, studentId, request, account);
         return ResponseEntity.ok().body(Response.success(response));
     }
 
     /**
      * 특정 학생 특이사항 목록 조회
      */
-    @GetMapping("/{studentId}/uniqueness")
-    public ResponseEntity<Response<Page<ReadAllUniquenessResponse>>> readAll(@PathVariable Long studentId, Authentication authentication) {
+    @GetMapping("/{academyId}/students/{studentId}/uniqueness")
+    public ResponseEntity<Response<Page<ReadAllUniquenessResponse>>> readAll(@PathVariable Long academyId,
+                                                                             @PathVariable Long studentId, Authentication authentication) {
         String account = authentication.getName();
         PageRequest pageable = PageRequest.of(0, 20, Sort.by("id").descending());
-        Page<ReadAllUniquenessResponse> responses = uniquenessService.readAllUniqueness(studentId, pageable, account);
+        Page<ReadAllUniquenessResponse> responses = uniquenessService.readAllUniqueness(academyId, studentId, pageable, account);
         return ResponseEntity.ok().body(Response.success(responses));
     }
 
     /**
      * 특정 특이사항 수정
      */
-    @PutMapping("/{studentId}/uniqueness/{uniquenessId}")
-    public ResponseEntity<Response<UpdateUniquenessResponse>> update(@PathVariable Long studentId, @PathVariable Long uniquenessId, UpdateUniquenessRequest request, Authentication authentication) {
+    @PutMapping("/{academyId}/students/{studentId}/uniqueness/{uniquenessId}")
+    public ResponseEntity<Response<UpdateUniquenessResponse>> update(@PathVariable Long academyId,
+                                                                     @PathVariable Long studentId,
+                                                                     @PathVariable Long uniquenessId, UpdateUniquenessRequest request, Authentication authentication) {
         String account = authentication.getName();
-        UpdateUniquenessResponse response = uniquenessService.updateUniqueness(studentId, uniquenessId, request, account);
+        UpdateUniquenessResponse response = uniquenessService.updateUniqueness(academyId, studentId, uniquenessId, request, account);
         return ResponseEntity.ok().body(Response.success(response));
     }
 
     /**
      * 특정 특이사항 수정
      */
-    @DeleteMapping("/{studentId}/uniqueness/{uniquenessId}")
-    public ResponseEntity<Response<DeleteUniquenessResponse>> delete(@PathVariable Long studentId, @PathVariable Long uniquenessId, Authentication authentication) {
+    @DeleteMapping("/{academyId}/students/{studentId}/uniqueness/{uniquenessId}")
+    public ResponseEntity<Response<DeleteUniquenessResponse>> delete(@PathVariable Long academyId,
+                                                                     @PathVariable Long studentId,
+                                                                     @PathVariable Long uniquenessId, Authentication authentication) {
         String account = authentication.getName();
-        DeleteUniquenessResponse response = uniquenessService.deleteUniqueness(studentId, uniquenessId, account);
+        DeleteUniquenessResponse response = uniquenessService.deleteUniqueness(academyId, studentId, uniquenessId, account);
         return ResponseEntity.ok().body(Response.success(response));
     }
 }
