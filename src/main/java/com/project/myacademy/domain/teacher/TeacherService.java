@@ -26,10 +26,11 @@ public class TeacherService {
 
     /**
      * @param academyId 학원 id
+     * @param employeeId 직원 -> 강사로 등록될 직원의 id
      * @param request   강사이름, 과목이 들어간 등록 요청 DTO
-     * @param account   직원 계정
+     * @param account   등록 진행하는 직원 계정
      */
-    public CreateTeacherResponse createTeacher(Long academyId, CreateTeacherRequest request, String account) {
+    public CreateTeacherResponse createTeacher(Long academyId, Long employeeId, CreateTeacherRequest request, String account) {
 
         // 학원 존재 유무 확인
         Academy academy = validateAcademy(academyId);
@@ -37,16 +38,25 @@ public class TeacherService {
         // 해당 학원 소속 직원인지 확인
         Employee employee = validateAcademyEmployee(account, academy);
 
+        // 현 시점에서 직원 -> 강사 테이블로 등록될 직원이 존재하는지 확인
+        Employee employeeToTeacher = validateEmployee(employeeId, academy);
+
+        // 강사 등록하는 주체인 직원의 권한 확인(당연히 강사는 안됨)
+        if(Employee.isTeacherAuthority(employee)) {
+            throw new AppException(ErrorCode.INVALID_PERMISSION);
+        }
+
         // 일대일 관계이므로 직원이 강사에 2번 등록되면 안됨
         teacherRepository.findByEmployee(employee)
                 .ifPresent(teacher -> {
                     throw new AppException(ErrorCode.DUPLICATED_TEACHER);
                 });
 
-        // 강사 테이블에 등록될 직원의 권한이 강사일때만 강좌에 강사 배정, 아닐 시 에러 처리
+        // 강사 테이블에 등록될 직원의 권한이 강사일때만 가능
+        // 여기서 이미 등록 주체는 직원임
         Teacher teacher;
-        if (Teacher.isTeacher(employee)) {
-            teacher = Teacher.addTeacher(request, employee);
+        if (Teacher.isTeacher(employeeToTeacher)) {
+            teacher = Teacher.addTeacher(request, employeeToTeacher);
         } else {
             log.info("강사가 아닙니다");
             throw new AppException(ErrorCode.INVALID_PERMISSION);
@@ -108,12 +118,20 @@ public class TeacherService {
         return validatedAcademy;
     }
 
+    // 직원 ->  강사 테이블로 등록될 직원이 존재하는지 검증
+    private Employee validateEmployee(Long employeeId, Academy academy) {
+        Employee validateEmployee = employeeRepository.findByIdAndAcademy(employeeId, academy)
+                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
+        return validateEmployee;
+    }
+
     private Teacher validateTeacher(Long teacherId) {
         // 강사의 존재 유뮤 확인
         Teacher teacher = teacherRepository.findById(teacherId)
                 .orElseThrow(() -> new AppException(ErrorCode.TEACHER_NOT_FOUND));
         return teacher;
     }
+
     private Employee validateAcademyEmployee(String account, Academy academy) {
         // 해당 학원 소속 직원 맞는지 확인
         Employee employee = employeeRepository.findByAccountAndAcademy(account, academy)

@@ -9,4 +9,7 @@ import java.util.Optional;
 public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
 
     Optional<Enrollment> findByStudentAndLecture(Student student, Lecture lecture);
+
+    // 현재 강좌 등록인원
+    Long countByLecture_Id(Long lectureId);
 }

@@ -1,4 +1,4 @@
-package com.project.myacademy.domain.enrollment.dto;
+package com.project.myacademy.domain.waitinglist.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 @Builder
-public class UpdateEnrollmentRequest {
+public class CreateWaitinglistRequest {
 
     private String memo;
 }

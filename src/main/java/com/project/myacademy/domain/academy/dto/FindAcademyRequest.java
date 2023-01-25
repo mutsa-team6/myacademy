@@ -1,16 +1,15 @@
-package com.project.myacademy.domain.teacher.dto;
+package com.project.myacademy.domain.academy.dto;
 
+import com.project.myacademy.domain.academy.Academy;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Builder
-public class UpdateTeacherRequest {
-
+@NoArgsConstructor
+public class FindAcademyRequest {
     private String name;
-    private String subject;
 }
