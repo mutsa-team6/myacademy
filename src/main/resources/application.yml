@@ -1,4 +1,8 @@
 spring:
+  mail:
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
   profiles:
     include: oauth
   datasource:
