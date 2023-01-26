@@ -48,6 +48,10 @@ public enum ErrorCode {
     NOT_MATCH_OWNER(HttpStatus.BAD_REQUEST, "admin 계정 생성 시 학원 대표자 명과 일치해야 합니다."),
     BAD_DELETE_REQUEST(HttpStatus.BAD_REQUEST, "자신의 계정을 삭제할 수 없습니다."),
     BAD_CHANGE_REQUEST(HttpStatus.BAD_REQUEST, "자신의 계정 등급을 변경할 수 없습니다."),
+
+    PAYMENT_ERROR_ORDER_PRICE(HttpStatus.FORBIDDEN,"요청하신 가격이 일치하지 않습니다."),
+    PAYMENT_ERROR_ORDER_PAY_TYPE(HttpStatus.FORBIDDEN,"요청하신 지불방식이 일치하지 않습니다."),
+    PAYMENT_ERROR_ORDER_NAME(HttpStatus.FORBIDDEN,"요청하신 주문 이름이 일치하지 않습니다."),
     PAYMENT_REQUIRED(HttpStatus.PAYMENT_REQUIRED, "결제 정보가 필요합니다.");
 
     private HttpStatus httpStatus;
