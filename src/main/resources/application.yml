@@ -21,6 +21,11 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
 jwt:
   token:
     secret: faketoken
@@ -39,3 +44,14 @@ springdoc:
     operations-sorter: alpha
     display-request-duration: true
 
+cloud:
+  aws:
+    credentials:
+      accessKey: ${AWS_ACCESS_KEY_ID}       # AWS IAM AccessKey
+      secretKey: ${AWS_SECRET_ACCESS_KEY}   # AWS IAM SecretKey
+    s3:
+      bucket: bucket    # 버킷 이름
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
