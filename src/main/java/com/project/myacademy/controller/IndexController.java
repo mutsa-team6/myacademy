@@ -15,7 +15,6 @@ import javax.servlet.http.HttpSession;
 @Slf4j
 public class IndexController {
 
-
     @GetMapping("/main")
     public String index(HttpServletRequest request, Model model){
 
@@ -29,44 +28,7 @@ public class IndexController {
         }
         return "main";
     }
-    @GetMapping("/join")
-    public String join(){
-        return "join";
-    }
 
-    @GetMapping("/login")
-    public String login(){
-        return "login";
-    }
-
-    @GetMapping("/oauthFail")
-    public String oauthFail(){
-        return "oauthFail";
-    }
-
-    @GetMapping("/logoutEmployee")
-    public String logout(HttpServletRequest request,HttpServletResponse response){
-        CookieGenerator cookieGenerator = new CookieGenerator();
-        cookieGenerator.setCookieName("token");
-        cookieGenerator.addCookie(response,"deleted");
-        cookieGenerator.setCookieMaxAge(0);
-
-        HttpSession session = request.getSession();
-        session.removeAttribute("name");
-        return "redirect:/";
-    }
-
-    @GetMapping("/oauth2/redirect")
-    public String login(@RequestParam String token, HttpServletResponse response){
-        CookieGenerator cookieGenerator = new CookieGenerator();
-        cookieGenerator.setCookieName("token");
-        cookieGenerator.setCookieHttpOnly(true);
-        cookieGenerator.setCookieSecure(true);
-        cookieGenerator.addCookie(response,token);
-        cookieGenerator.setCookieMaxAge(60*60);//1시간
-        log.info("🍪 쿠키에 저장한 토큰 {}",token);
-        return "redirect:/main";
-    }
 
 
 }

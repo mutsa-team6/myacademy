@@ -72,19 +72,28 @@ public class EmployeeRestController {
         return ResponseEntity.ok(Response.success(response));
     }
 
-    @PostMapping("/findAccount")
+    /**
+     * 계정명 찾기
+     * @param request
+     * @return
+     */
+    @PostMapping("employee/findAccount")
     public ResponseEntity findAccount(@RequestBody FindAccountEmployeeRequest request) {
+
         FindAccountEmployeeResponse response = employeeService.findAccountEmployee(request);
+
         return ResponseEntity.ok(Response.success(response));
     }
 
-    @PutMapping("/findPassword")
+    /**
+     * 비밀번호 찾기
+     * @param request
+     * @return
+     */
+    @PutMapping("/employee/findPassword")
     public ResponseEntity changePassword(@RequestBody ChangePasswordEmployeeRequest request) {
-        EmployeeDto updatedEmployeeDto = employeeService.changePasswordEmployee(request);
-        return ResponseEntity.ok(Response.success(new ChangePasswordEmployeeResponse(
-                updatedEmployeeDto.getName(),
-                updatedEmployeeDto.getAccount(),
-                updatedEmployeeDto.getAccount() + "updated")));
+        ChangePasswordEmployeeResponse response = employeeService.changePasswordEmployee(request);
+        return ResponseEntity.ok(Response.success(response));
     }
 
     // 관리자(ADMIN) 혹은 직원(STAFF) 등급은 다른 직원 계정을 삭제할 수 있다.

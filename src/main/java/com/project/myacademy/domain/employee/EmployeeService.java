@@ -2,10 +2,10 @@ package com.project.myacademy.domain.employee;
 
 import com.project.myacademy.domain.academy.Academy;
 import com.project.myacademy.domain.academy.AcademyRepository;
-import com.project.myacademy.domain.academy.AcademyService;
 import com.project.myacademy.domain.employee.dto.*;
 import com.project.myacademy.global.exception.AppException;
 import com.project.myacademy.global.exception.ErrorCode;
+import com.project.myacademy.global.util.EmailUtil;
 import com.project.myacademy.global.util.JwtTokenUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +26,7 @@ public class EmployeeService {
 
     private final AcademyRepository academyRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final EmailUtil emailUtil;
 
     private final EmployeeRole DEFAULT_EMPLOYEE_ROLE = EmployeeRole.ROLE_USER;
 
@@ -64,7 +65,7 @@ public class EmployeeService {
                 });
 
         // 이미 같은 실명과 이메일이 일치하는 데이터가 존재하는 경우 예외 처리
-        employeeRepository.findByNameAndEmail(requestAccount,requestEmail)
+        employeeRepository.findByNameAndEmail(requestAccount, requestEmail)
                 .ifPresent(employee -> {
                     throw new AppException(ErrorCode.DUPLICATED_ACCOUNT);
                 });
@@ -145,37 +146,72 @@ public class EmployeeService {
         return new LoginEmployeeResponse(JwtTokenUtil.createToken(requestAccount, secretKey, expiredTimeMs), requestEmployee.getName());
     }
 
-    // 이메일 인증 기능 완성 후 구현
+    /**
+     * 계정 찾기 구현 ( 사용자 실명, 사용자 이메일로 찾기 -> 실명과 이메일 둘다 동일한 같은 데이터는 존재하지 않는다.)
+     *
+     * @param request
+     * @return
+     */
     public FindAccountEmployeeResponse findAccountEmployee(FindAccountEmployeeRequest request) {
-        String name = request.getName();
-        String email = request.getEmail();
-        Employee foundEmployee = employeeRepository.findByNameAndEmail(name, email)
+
+        String requestEmployeeName = request.getName();
+        String requestEmployeeEmail = request.getEmail();
+
+        log.info("🔎 아이디 찾기를 요청한 사용자 실명 [{}]  || 사용자 이메일 [{}] ", requestEmployeeName, requestEmployeeEmail);
+
+        // 실명과 이메일에 해당하는 사용자 계정이 있는지 확인
+        Employee foundEmployee = employeeRepository.findByNameAndEmail(requestEmployeeName, requestEmployeeEmail)
                 .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
+
+
         String account = foundEmployee.getAccount();
-        return new FindAccountEmployeeResponse(account, "Account found : " + account);
+
+        log.info("🔎 찾은 계정 [{}] ", account);
+
+        return new FindAccountEmployeeResponse(foundEmployee.getId(), account);
     }
 
     // 이메일 인증 기능 완성 후 구현
 
     /**
-     * requestdto에 직원 계정, 이메일, 변경하고싶은 비밀번호
+     * 직원 비밀번호 찾기
      * 직원 계정으로 db에 있는지 확인 -> 없으면 에러처리
      * 직원계정 + 이메일 2개가 동시에 일치하는 데이터가 있는지? -> 없으면 에러처리
+     * 임시 비밀번호를 생성해서 복호화한 뒤 직원계정의 정보에 반영하고 저장소에 저장
+     * 임시 비밀번호를 요청된 이메일로 전송
      */
     @Transactional
-    public EmployeeDto changePasswordEmployee(ChangePasswordEmployeeRequest request) {
+    public ChangePasswordEmployeeResponse changePasswordEmployee(ChangePasswordEmployeeRequest request) {
+
         String account = request.getAccount();
-        Employee foundEmployee = employeeRepository.findById(1L)
-                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
+        String name = request.getName();
+        String email = request.getEmail();
 
         employeeRepository.findByAccount(account)
-                .ifPresent(employee -> {
-                    throw new AppException(ErrorCode.DUPLICATED_ACCOUNT);
-                });
+                .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
 
-//        foundEmployee.update(request);
-        Employee updatedEmployee = employeeRepository.save(foundEmployee);
-        return updatedEmployee.toEmployeeDto();
+        Employee foundEmployee = employeeRepository.findByNameAndEmail(name, email)
+                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
+
+        String tempPassword = getTempPassword();
+        String encodedTempPassword = bCryptPasswordEncoder.encode(tempPassword);
+
+        foundEmployee.updatePasswordOnly(encodedTempPassword);
+
+        Employee changedEmployee = employeeRepository.save(foundEmployee);
+
+        String title = String.format("%s님의 임시 비밀번호 안내 메일입니다.", account);
+        String body = String.format("안녕하세요.%n%nMyAcademy 임시 비밀번호 안내 관련 메일입니다.%n%n%s님의 임시 비밀번호는 %s입니다.%n%n발급된 임시 비밀번호로 로그인해서 새 비밀번호로 변경 후 이용바랍니다.%n%n감사합니다.", account, tempPassword);
+
+        emailUtil.sendEmail(email, title, body);
+
+        return new ChangePasswordEmployeeResponse(
+                changedEmployee.getId(),
+                changedEmployee.getName(),
+                changedEmployee.getAccount(),
+                changedEmployee.getEmail()
+        );
+
     }
 
     /**
@@ -358,6 +394,7 @@ public class EmployeeService {
     }
 
     /**
+     * 직원 정보 변경
      * 계정명, 등급은 본인이 변경 불가
      *
      * @param requestAccount
@@ -372,6 +409,10 @@ public class EmployeeService {
 
         // 본인 정보 수정을 요청한 회원이 해당 학원에 존재하는지 확인
         Employee requestEmployee = validateRequestEmployee(requestAccount, foundAcademy);
+
+        // 요청 비밀번호 복호화
+        String encodedPassword = bCryptPasswordEncoder.encode(request.getPassword());
+        request.setPassword(encodedPassword);
 
         //정보 수정
         requestEmployee.update(request);
@@ -405,5 +446,17 @@ public class EmployeeService {
         return validateEmployee;
     }
 
+    public String getTempPassword(){
+        char[] charSet = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
+                'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
 
+        String str = "";
+
+        int idx = 0;
+        for (int i = 0; i < 10; i++) {
+            idx = (int) (charSet.length * Math.random());
+            str += charSet[idx];
+        }
+        return str;
+    }
 }

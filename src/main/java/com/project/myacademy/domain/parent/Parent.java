@@ -24,12 +24,14 @@ public class Parent extends BaseEntity {
     @Column(name = "parent_id")
     private Long id;
 
+    private Long academyId;
+
     private String name;
 
     @Column(name = "parent_recognized_code")
     private Integer parentRecognizedCode;
 
-    @Column(name = "phone_number", unique = true)
+    @Column(name = "phone_number")
     private String phoneNum;
 
     private String address;
@@ -41,8 +43,9 @@ public class Parent extends BaseEntity {
         this.address = request.getAddress();
     }
 
-    public static Parent toParent(CreateParentRequest request) {
+    public static Parent toParent(CreateParentRequest request, Long academyId) {
         return Parent.builder()
+                .academyId(academyId)
                 .name(request.getName())
                 .parentRecognizedCode(request.getParentRecognizedCode())
                 .phoneNum(request.getPhoneNum())
