@@ -50,7 +50,7 @@ public class TeacherProfileS3UploadService {
     public CreateTeacherProfileResponse UploadTeacherProfile(Long academyId, Long teacherId, MultipartFile multipartFile, String account) throws IOException {
 
         // 파일이 들어있는지 확인
-        validateFilExists(multipartFile);
+        validateFileExists(multipartFile);
         // 학원 존재 유무 확인
         Academy academy = validateAcademy(academyId);
         // 업로드를 진행하는 직원이 해당 학원 소속 직원인지 확인
@@ -100,6 +100,11 @@ public class TeacherProfileS3UploadService {
 
         // 파일 삭제를 진행하는 직원이 해당 학원 소속 직원인지 확인
         Employee employee = validateAcademyEmployee(account, academy);
+
+        // 직원이 파일 삭제할 권한이 있는지 확인(강사만 불가능)
+        if(Employee.isTeacherAuthority(employee)) {
+            throw new AppException(ErrorCode.INVALID_PERMISSION);
+        }
 
         // 프로필 사진 대상인 강사 존재 유무 확인
         validateTeacher(teacherId);
@@ -186,7 +191,7 @@ public class TeacherProfileS3UploadService {
     }
 
     // 빈 파일이 아닌지 확인, 파일 자체를 첨부안하거나 첨부해도 내용이 비어있으면 에러 처리
-    private void validateFilExists(MultipartFile multipartFile) {
+    private void validateFileExists(MultipartFile multipartFile) {
         if (multipartFile.isEmpty()) {
             throw new AppException(ErrorCode.FILE_NOT_EXISTS);
         }
