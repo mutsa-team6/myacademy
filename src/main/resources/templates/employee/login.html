@@ -15,29 +15,8 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="apple-touch-icon" sizes="76x76" href="./assets/img/apple-icon.png">
-    <link rel="icon" type="image/png" href="./assets/img/favicon.png">
-    <title>
-        Material Dashboard 2 by Creative Tim
-    </title>
-    <!--     Fonts and icons     -->
-    <link rel="stylesheet" type="text/css"
-          href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900|Roboto+Slab:400,700"/>
-    <!-- Nucleo Icons -->
-    <link href="../assets/css/nucleo-icons.css" rel="stylesheet"/>
-    <link href="../assets/css/nucleo-svg.css" rel="stylesheet"/>
-    <!-- Font Awesome Icons -->
-    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
-    <!--    Axios-->
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <!-- Material Icons -->
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
-    <!-- CSS Files -->
-    <link id="pagestyle" href="../assets/css/material-dashboard.css?v=3.0.4" rel="stylesheet"/>
-</head>
+<th:block th:replace="layout/header :: headerFragment"></th:block>
+
 
 <body class="bg-gray-200">
 <div class="container position-sticky z-index-sticky top-0">
@@ -81,11 +60,11 @@
                                 </div>
                             <form role="form" class="text-start">
                                 <div class="input-group input-group-outline my-3">
-                                    <label class="form-label">Account</label>
+                                    <label class="form-label">계정</label>
                                     <input type="account" class="form-control" id="input-employeeAccount">
                                 </div>
                                 <div class="input-group input-group-outline mb-3">
-                                    <label class="form-label">Password</label>
+                                    <label class="form-label">비밀번호</label>
                                     <input type="password" class="form-control" id="input-employeePassword">
                                 </div>
 <!--                                <div class="form-check form-switch d-flex align-items-center mb-3">-->
@@ -147,8 +126,6 @@
         Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
     }
 </script>
-<!-- Github buttons -->
-<script async defer src="https://buttons.github.io/buttons.js"></script>
 <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
 <script src="../assets/js/material-dashboard.min.js?v=3.0.4"></script>
 </body>
@@ -205,7 +182,13 @@
                 window.location.href = '/main';
 
             }).catch((error) => {
-                alert("가입되어있지 않은 회원입니다.");
+                if (error.response.data.result["errorCode"] == "ACADEMY_NOT_FOUND") {
+                    alert("등록된 학원이 아닙니다. 등록 후 진행해주세요");
+                } else if(error.response.data.result["errorCode"] == "EMPLOYEE_NOT_FOUND"){
+                    alert("가입되어있지 않은 회원입니다.");
+                }else if(error.response.data.result["errorCode"] == "INVALID_PASSWORD"){
+                    alert("비밀번호가 일치하지 않습니다.");
+                }
                 console.log(academyId);
                 console.log(error);
 

@@ -15,29 +15,7 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="apple-touch-icon" sizes="76x76" href="../assets/img/apple-icon.png">
-    <link rel="icon" type="image/png" href="../assets/img/favicon.png">
-    <title>
-        Material Dashboard 2 by Creative Tim
-    </title>
-    <!--     Fonts and icons     -->
-    <link rel="stylesheet" type="text/css"
-          href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900|Roboto+Slab:400,700"/>
-    <!-- Nucleo Icons -->
-    <link href="../assets/css/nucleo-icons.css" rel="stylesheet"/>
-    <link href="../assets/css/nucleo-svg.css" rel="stylesheet"/>
-    <!-- Font Awesome Icons -->
-    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
-    <!--    Axios-->
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <!-- Material Icons -->
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
-    <!-- CSS Files -->
-    <link id="pagestyle" href="../assets/css/material-dashboard.css?v=3.0.4" rel="stylesheet"/>
-</head>
+<th:block th:replace="layout/header :: headerFragment"></th:block>
 
 <body class="bg-gray-200">
 <div class="container position-sticky z-index-sticky top-0">
@@ -65,19 +43,7 @@
                             </div>
                         </div>
                         <div class="card-body">
-                            <div class="row">
-                                <div class="col-9 align-self-center">
-                                    <div class=" input-group input-group-outline my-3">
-                                        <label class="form-label">학원 이름</label>
-                                        <input type="text" class="form-control" id="input-academyName">
-                                    </div>
-                                </div>
-                                <div class="col-3 align-self-center m-0">
-                                    <button th:onclick="|find.findAcademy()|" type="button"
-                                            class="btn btn-sm bg-gradient-primary btn-lg w-100 mb-0">검색
-                                    </button>
-                                </div>
-                            </div>
+
                             <form role="form" class="text-start">
                                 <div class="input-group input-group-outline my-3">
                                     <label class="form-label">사용자 실명</label>
@@ -97,8 +63,8 @@
                                     </button>
                                 </div>
                                 <p class="mt-4 text-sm text-end">
-                                    <a th:href="@{/find/password}"
-                                       class="text-info text-gradient font-weight-bold opacity-5">비밀번호 찾기</a>
+                                    <a th:href="@{/login}" class="text-info text-gradient font-weight-bold opacity-5">로그인</a> |
+                                    <a th:href="@{/find/password}" class="text-info text-gradient font-weight-bold opacity-5">비밀번호 찾기</a>
                                 </p>
 
                             </form>
@@ -124,56 +90,26 @@
         Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
     }
 </script>
-<!-- Github buttons -->
-<script async defer src="https://buttons.github.io/buttons.js"></script>
 <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
 <script src="../assets/js/material-dashboard.min.js?v=3.0.4"></script>
 </body>
 <Script>
-    let academyId = 0;
 
     let find = {
         init: function () {
             var _this = this;
         },
 
-        findAcademy: function () {
-            let data = {
-                name: document.querySelector('#input-academyName').value.trim()
-            };
-            console.log(data);
-
-            axios.post("/api/v1/academies/find",
-                JSON.stringify(data), {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
-                }
-            ).then((response) => {
-                console.log(response);
-                alert("등록된 학원입니다. 회원가입을 진행해주세요");
-                academyId = response.data.result;
-                console.log(academyId);
-            }).catch((error) => {
-                console.log(error);
-                if (error.response.data.result["errorCode"] == "ACADEMY_NOT_FOUND") {
-                    alert("등록된 학원이 아닙니다. 등록 후 진행해주세요");
-                }
-            });
-
-        },
-
 
         findEmployeeAccount: function () {
             let data = {
 
-                academyName: document.querySelector('#input-academyName').value.trim(),
                 name: document.querySelector('#input-employeeName').value.trim(),
                 email: document.querySelector('#input-employeeEmail').value.trim(),
             };
             console.log(data);
 
-            axios.post("/api/v1/academies/findAccount",
+            axios.post("/api/v1/academies/employee/findAccount",
                 JSON.stringify(data), {
                     headers: {
                         'Content-Type': 'application/json',
@@ -200,7 +136,7 @@
 
     };
 
-    login.init();
+    find.init();
 
 </script>
 </html>
