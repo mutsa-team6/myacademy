@@ -34,6 +34,7 @@ public enum ErrorCode {
     ANNOUNCEMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 공지사항을 찾을 수 없습니다."),
     ENROLLMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 수강 이력을 찾을 수 없습니다."),
     WAITINGLIST_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 대기번호를 찾을 수 없습니다."),
+    TEACHER_PROFILE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 강사 파일을 찾을 수 없습니다."),
 
     INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "패스워드가 잘못되었습니다."),
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "잘못된 토큰입니다."),
@@ -48,6 +49,8 @@ public enum ErrorCode {
     NOT_MATCH_OWNER(HttpStatus.BAD_REQUEST, "admin 계정 생성 시 학원 대표자 명과 일치해야 합니다."),
     BAD_DELETE_REQUEST(HttpStatus.BAD_REQUEST, "자신의 계정을 삭제할 수 없습니다."),
     BAD_CHANGE_REQUEST(HttpStatus.BAD_REQUEST, "자신의 계정 등급을 변경할 수 없습니다."),
+    FILE_NOT_EXISTS(HttpStatus.BAD_REQUEST, "보낼 파일이 비어있습니다."),
+    FILE_SIZE_EXCEED(HttpStatus.BAD_REQUEST, "파일 업로드 용량을 초과했습니다."),
     PAYMENT_REQUIRED(HttpStatus.PAYMENT_REQUIRED, "결제 정보가 필요합니다.");
 
     private HttpStatus httpStatus;
