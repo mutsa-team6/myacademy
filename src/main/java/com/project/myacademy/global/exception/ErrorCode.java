@@ -45,12 +45,14 @@ public enum ErrorCode {
     NOT_ALLOWED_CHANGE(HttpStatus.UNAUTHORIZED, "ADMIN 계정을 변경하거나 삭제할 수 없습니다."),
 
     DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "DB에러가 발생했습니다."),
+    FILE_UPLOAD_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드에 실패했습니다."),
     INVALID_VALUE(HttpStatus.BAD_REQUEST, "요청이 이상합니다."),
     NOT_MATCH_OWNER(HttpStatus.BAD_REQUEST, "admin 계정 생성 시 학원 대표자 명과 일치해야 합니다."),
     BAD_DELETE_REQUEST(HttpStatus.BAD_REQUEST, "자신의 계정을 삭제할 수 없습니다."),
     BAD_CHANGE_REQUEST(HttpStatus.BAD_REQUEST, "자신의 계정 등급을 변경할 수 없습니다."),
     FILE_NOT_EXISTS(HttpStatus.BAD_REQUEST, "보낼 파일이 비어있습니다."),
     FILE_SIZE_EXCEED(HttpStatus.BAD_REQUEST, "파일 업로드 용량을 초과했습니다."),
+    WRONG_FILE_FORMAT(HttpStatus.BAD_REQUEST, "잘못된 형식의 파일입니다"),
     PAYMENT_REQUIRED(HttpStatus.PAYMENT_REQUIRED, "결제 정보가 필요합니다.");
 
     private HttpStatus httpStatus;
