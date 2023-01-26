@@ -30,23 +30,26 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        final String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
         String token = null;
 
         Cookie[] list = request.getCookies();
-
-        for(Cookie cookie:list) {
-            if(cookie.getName().equals("token")) {
-                token = cookie.getValue();
+        
+        //쿠키가 없는 경우 그냥 진행
+        try {
+            for (Cookie cookie : list) {
+                if (cookie.getName().equals("token")) {
+                    token = cookie.getValue();
+                }
             }
-        }
-
-        //조건 -> 올바른 형식이 아니라면 권한을 부여하지 않음
-        if(authorization == null || !authorization.startsWith("Bearer ")) {
+        }catch(Exception e) {
             filterChain.doFilter(request, response);
             return;
         }
 
+        if (token == null || token.equals("deleted")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         //토큰만료 check
         if (JwtTokenUtil.isExpired(token, secretKey)) {
             log.error("Token 이 만료되었습니다.");
