@@ -1,5 +1,7 @@
 spring:
   mail:
+    host: smtp.gmail.com
+    port: 587
     username: my.academy.company
     password: fakepassword
     properties:
