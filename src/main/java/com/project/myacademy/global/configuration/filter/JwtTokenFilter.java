@@ -5,6 +5,7 @@ import com.project.myacademy.domain.employee.EmployeeService;
 import com.project.myacademy.global.util.JwtTokenUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,12 +14,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
-
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -29,21 +29,20 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        //UserName Token에서 꺼내기
-        final String authorization = request.getHeader(AUTHORIZATION);
+
+        final String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
+        String token = null;
+
+        Cookie[] list = request.getCookies();
+
+        for(Cookie cookie:list) {
+            if(cookie.getName().equals("token")) {
+                token = cookie.getValue();
+            }
+        }
 
         //조건 -> 올바른 형식이 아니라면 권한을 부여하지 않음
         if(authorization == null || !authorization.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        //Token 분리
-        final String token;
-        try {
-            token = authorization.split(" ")[1].trim(); // 1번에는 토큰내용
-        } catch(Exception e) { // 예외발생 -> Filter종료
-            log.error("Token 추출에 실패했습니다.");
             filterChain.doFilter(request, response);
             return;
         }
