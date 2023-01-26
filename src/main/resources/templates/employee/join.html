@@ -86,7 +86,7 @@
 
                         <br>
                         <br>
-                        <p class="mb-0">가입할 사용자 정보를 입력해주세요.</p>
+                        <p class="mb-0">사용할 계정명과 비밀번호를 입력해주세요</p>
                         <br>
                         <div class="card-body">
                             <div class="input-group input-group-outline mb-3">
@@ -95,8 +95,16 @@
                             </div>
                             <div class="input-group input-group-outline mb-3">
                                 <label class="form-label">비밀번호</label>
-                                <input type="text" class="form-control" id="input-employeePassword">
+                                <input type="password" class="form-control" id="input-employeePassword">
                             </div>
+                            <div class="input-group input-group-outline mb-3">
+                                <label class="form-label">비밀번호 2차 입력</label>
+                                <input type="password" class="form-control" id="employeePasswordCheck">
+                            </div>
+
+                            <p class="mb-0">사용자 정보를 입력해주세요.</p>
+                            <br>
+
                             <div class="input-group input-group-outline mb-3">
                                 <label class="form-label">이름</label>
                                 <input type="text" class="form-control" id="input-employeeName">
@@ -214,6 +222,25 @@
                 phoneNum: document.querySelector('#input-employeePhone').value.trim()
             };
             console.log(data);
+
+            var blank_pattern = /[\s]/g;
+
+            if (blank_pattern.test(data.account) == true || data.account == '') {
+                alert('계정명에 공백이 입력되었습니다. 다시 입력해주세요');
+                return;
+            }
+            if (blank_pattern.test(data.password) == true || data.password == '') {
+                alert('비밀번호에 공백이 입력되었습니다. 다시 입력해주세요');
+                return;
+            }
+
+            const password = document.querySelector('#input-employeePassword').value.trim();
+            const passwordCheck = document.querySelector('#input-employeePasswordCheck').value.trim();
+
+            if (password != passwordCheck) {
+                alert('비밀번호가 일치하지 않습니다. 다시 입력해주세요');
+                return;
+            }
 
             axios.post("/api/v1/academies/" + academyId + "/employees/signup",
                 JSON.stringify(data), {
