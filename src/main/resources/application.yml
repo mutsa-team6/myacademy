@@ -1,4 +1,12 @@
 spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: my.academy.company
+    password: fakepassword
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
   profiles:
     include: oauth
   datasource:
