@@ -47,8 +47,8 @@ springdoc:
 cloud:
   aws:
     credentials:
-      accessKey: ${AWS_ACCESS_KEY_ID}       # AWS IAM AccessKey
-      secretKey: ${AWS_SECRET_ACCESS_KEY}   # AWS IAM SecretKey
+      accessKey: fakeId      # AWS IAM AccessKey
+      secretKey: fakeKey   # AWS IAM SecretKey
     s3:
       bucket: bucket    # 버킷 이름
     region:

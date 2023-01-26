@@ -48,6 +48,7 @@ public class SecurityConfig {
                 .antMatchers(HttpMethod.PUT, "/api/v1/academies/**/changeRole/**").hasAnyRole("ADMIN","STAFF")
                 .antMatchers(HttpMethod.GET, "/api/v1/academies/**/employees").hasAnyRole("ADMIN")
                 .antMatchers("api/v1/academies/**").authenticated()
+                .antMatchers("/academy/**").authenticated()
                 .and()
 
                 .oauth2Login().loginPage("/login")

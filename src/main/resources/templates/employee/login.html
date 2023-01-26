@@ -179,7 +179,7 @@
                 }
             ).then((response) => {
                 alert("로그인에 성공하였습니다!");
-                window.location.href = '/main';
+                window.location.href = '/academy/main';
 
             }).catch((error) => {
                 if (error.response.data.result["errorCode"] == "ACADEMY_NOT_FOUND") {
