@@ -72,7 +72,7 @@ public class EmployeeRestController {
         return ResponseEntity.ok(Response.success(response));
     }
 
-    @PostMapping("/findAccount")
+    @PostMapping("employee/findAccount")
     public ResponseEntity findAccount(@RequestBody FindAccountEmployeeRequest request) {
 
         FindAccountEmployeeResponse response = employeeService.findAccountEmployee(request);

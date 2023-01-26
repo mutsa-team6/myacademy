@@ -146,18 +146,12 @@ public class EmployeeService {
     }
 
     /**
-     * 계정 찾기 구현 ( 학원 이름, 사용자 실명, 사용자 이메일로 찾기)
+     * 계정 찾기 구현 ( 사용자 실명, 사용자 이메일로 찾기 -> 실명과 이메일 둘다 동일한 같은 데이터는 존재하지 않는다.)
      *
      * @param request
      * @return
      */
     public FindAccountEmployeeResponse findAccountEmployee(FindAccountEmployeeRequest request) {
-        String academyName = request.getAcademyName();
-
-        log.info("🔎 아이디 찾기를 요청한 학원 이름 [{}]", academyName);
-        // 존재하는 학원인지 확인
-        academyRepository.findByName(academyName)
-                .orElseThrow(() -> new AppException(ErrorCode.ACADEMY_NOT_FOUND));
 
         String requestEmployeeName = request.getName();
         String requestEmployeeEmail = request.getEmail();
@@ -172,7 +166,6 @@ public class EmployeeService {
         String account = foundEmployee.getAccount();
 
         log.info("🔎 찾은 계정 [{}] ", account);
-
 
         return new FindAccountEmployeeResponse(foundEmployee.getId(), account);
     }

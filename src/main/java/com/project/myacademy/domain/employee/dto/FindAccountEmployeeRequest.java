@@ -8,7 +8,6 @@ import lombok.Getter;
 @Getter
 @Builder
 public class FindAccountEmployeeRequest {
-    private String academyName;
     private String name;
     private String email;
 }
