@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,7 +25,7 @@ public class TeacherProfileController {
     @PostMapping("/{academyId}/teachers/{teacherId}/files/upload")
     public ResponseEntity<Response<CreateTeacherProfileResponse>> upload(@PathVariable("academyId") Long academyId,
                                                                          @PathVariable("teacherId") Long teacherId,
-                                                                         @RequestPart MultipartFile multipartFile,
+                                                                         @RequestPart List<MultipartFile> multipartFile,
                                                                          Authentication authentication) throws IOException {
         return ResponseEntity.ok().body(Response.success(teacherProfileS3UploadService.UploadTeacherProfile(academyId, teacherId, multipartFile, authentication.getName())));
     }

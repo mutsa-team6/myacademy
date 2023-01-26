@@ -30,6 +30,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -47,12 +49,14 @@ public class TeacherProfileS3UploadService {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
-    public CreateTeacherProfileResponse UploadTeacherProfile(Long academyId, Long teacherId, MultipartFile multipartFile, String account) throws IOException {
+    public CreateTeacherProfileResponse UploadTeacherProfile(Long academyId, Long teacherId, List<MultipartFile> multipartFile, String account) {
 
         // 파일이 들어있는지 확인
         validateFileExists(multipartFile);
+
         // 학원 존재 유무 확인
         Academy academy = validateAcademy(academyId);
+
         // 업로드를 진행하는 직원이 해당 학원 소속 직원인지 확인
         Employee employee = validateAcademyEmployee(account, academy);
 
@@ -64,33 +68,54 @@ public class TeacherProfileS3UploadService {
         // 프로필 사진 대상인 강사 존재 유무 확인
         Teacher teacher = validateTeacher(teacherId);
 
-        ObjectMetadata objectMetadata = new ObjectMetadata();
-        objectMetadata.setContentType(multipartFile.getContentType());
-        objectMetadata.setContentLength(multipartFile.getSize());
+        // 원본 파일 이름, S3에 저장될 파일 이름 리스트
+        List<String> originalFileNameList = new ArrayList<>();
+        List<String> storedFileNameList = new ArrayList<>();
 
-        String originalFilename = multipartFile.getOriginalFilename();
-        int index = originalFilename.lastIndexOf(".");
-        String ext = originalFilename.substring(index + 1);
+        multipartFile.forEach(file -> {
+            ObjectMetadata objectMetadata = new ObjectMetadata();
+            objectMetadata.setContentType(file.getContentType());
+            objectMetadata.setContentLength(file.getSize());
 
-        // 저장될 파일 이름
-        String storeFileName = UUID.randomUUID() + "." + ext;
+            String originalFilename = file.getOriginalFilename();
+//            log.info("originalFilename : {}", originalFilename);
 
-        // 저장할 디렉토리 경로 + 파일 이름
-        String key = "teacher/" + storeFileName;
+            int index;
+            // file 형식이 잘못된 경우를 확인
+            try {
+                index = originalFilename.lastIndexOf(".");
+//            log.info("index : {}", index);
+            } catch (StringIndexOutOfBoundsException e) {
+                throw new AppException(ErrorCode.WRONG_FILE_FORMAT);
+            }
 
-        try (InputStream inputStream = multipartFile.getInputStream()) {
-            amazonS3Client.putObject(new PutObjectRequest(bucket, key, inputStream, objectMetadata)
-                    .withCannedAcl(CannedAccessControlList.PublicRead));
-        } catch (IOException e) {
-            throw new FileUploadException();
-        }
+            String ext = originalFilename.substring(index + 1);
+//            log.info("ext : {}", ext);
 
-        String storeFileUrl = amazonS3Client.getUrl(bucket, key).toString();
-        TeacherProfile teacherProfile = TeacherProfile.makeTeacherProfile(originalFilename, storeFileUrl, teacher);
-        TeacherProfile savedFile = teacherProfileRepository.save(teacherProfile);
+            // 저장될 파일 이름
+            String storedFileName = UUID.randomUUID() + "." + ext;
+
+            // 저장할 디렉토리 경로 + 파일 이름
+            String key = "teacher/" + storedFileName;
+
+            try (InputStream inputStream = file.getInputStream()) {
+                amazonS3Client.putObject(new PutObjectRequest(bucket, key, inputStream, objectMetadata)
+                        .withCannedAcl(CannedAccessControlList.PublicRead));
+            } catch (IOException e) {
+                throw new AppException(ErrorCode.FILE_UPLOAD_ERROR);
+            }
+
+            String storeFileUrl = amazonS3Client.getUrl(bucket, key).toString();
+            TeacherProfile teacherProfile = TeacherProfile.makeTeacherProfile(originalFilename, storeFileUrl, teacher);
+            teacherProfileRepository.save(teacherProfile);
+
+            storedFileNameList.add(storedFileName);
+            originalFileNameList.add(originalFilename);
+
+        });
 
         log.info("파일 등록 완료");
-        return CreateTeacherProfileResponse.of(savedFile);
+        return CreateTeacherProfileResponse.of(originalFileNameList, storedFileNameList);
     }
 
     public DeleteTeacherProfileResponse deleteTeacherProfile(Long academyId, Long teacherId, Long teacherProfileId, String filePath, String account) {
@@ -125,7 +150,6 @@ public class TeacherProfileS3UploadService {
         }
         return DeleteTeacherProfileResponse.of(employee);
     }
-
 
     public ResponseEntity<byte[]> downloadTeacherProfile(Long academyId, Long teacherId, String fileUrl, String account) throws IOException {
 
@@ -191,9 +215,11 @@ public class TeacherProfileS3UploadService {
     }
 
     // 빈 파일이 아닌지 확인, 파일 자체를 첨부안하거나 첨부해도 내용이 비어있으면 에러 처리
-    private void validateFileExists(MultipartFile multipartFile) {
-        if (multipartFile.isEmpty()) {
-            throw new AppException(ErrorCode.FILE_NOT_EXISTS);
+    private void validateFileExists(List<MultipartFile> multipartFile) {
+        for(MultipartFile mf : multipartFile) {
+            if (mf.isEmpty()) {
+                throw new AppException(ErrorCode.FILE_NOT_EXISTS);
+            }
         }
     }
 
