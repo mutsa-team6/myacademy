@@ -87,13 +87,12 @@ public class EmployeeRestController {
 
     /**
      * 비밀번호 찾기
-     * @param academyId
      * @param request
      * @return
      */
-    @PutMapping("/{academyId}/employee/findPassword")
-    public ResponseEntity changePassword(@PathVariable Long academyId, @RequestBody ChangePasswordEmployeeRequest request) {
-        ChangePasswordEmployeeResponse response = employeeService.changePasswordEmployee(request, academyId);
+    @PutMapping("/employee/findPassword")
+    public ResponseEntity changePassword(@RequestBody ChangePasswordEmployeeRequest request) {
+        ChangePasswordEmployeeResponse response = employeeService.changePasswordEmployee(request);
         return ResponseEntity.ok(Response.success(response));
     }
 
