@@ -72,6 +72,11 @@ public class EmployeeRestController {
         return ResponseEntity.ok(Response.success(response));
     }
 
+    /**
+     * 계정명 찾기
+     * @param request
+     * @return
+     */
     @PostMapping("/findAccount")
     public ResponseEntity findAccount(@RequestBody FindAccountEmployeeRequest request) {
 
@@ -80,6 +85,12 @@ public class EmployeeRestController {
         return ResponseEntity.ok(Response.success(response));
     }
 
+    /**
+     * 비밀번호 찾기
+     * @param academyId
+     * @param request
+     * @return
+     */
     @PutMapping("/{academyId}/employee/findPassword")
     public ResponseEntity changePassword(@PathVariable Long academyId, @RequestBody ChangePasswordEmployeeRequest request) {
         ChangePasswordEmployeeResponse response = employeeService.changePasswordEmployee(request, academyId);

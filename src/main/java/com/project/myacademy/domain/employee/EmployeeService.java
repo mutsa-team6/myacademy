@@ -178,12 +178,12 @@ public class EmployeeService {
         return new FindAccountEmployeeResponse(foundEmployee.getId(), account);
     }
 
-    // 이메일 인증 기능 완성 후 구현
-
     /**
-     * requestdto에 직원 계정, 이메일, 변경하고싶은 비밀번호
+     * 직원 비밀번호 찾기
      * 직원 계정으로 db에 있는지 확인 -> 없으면 에러처리
      * 직원계정 + 이메일 2개가 동시에 일치하는 데이터가 있는지? -> 없으면 에러처리
+     * 임시 비밀번호를 생성해서 복호화한 뒤 직원계정의 정보에 반영하고 저장소에 저장
+     * 임시 비밀번호를 요청된 이메일로 전송
      */
     @Transactional
     public ChangePasswordEmployeeResponse changePasswordEmployee(ChangePasswordEmployeeRequest request, Long academyId) {
@@ -400,6 +400,7 @@ public class EmployeeService {
     }
 
     /**
+     * 직원 정보 변경
      * 계정명, 등급은 본인이 변경 불가
      *
      * @param requestAccount
@@ -414,6 +415,10 @@ public class EmployeeService {
 
         // 본인 정보 수정을 요청한 회원이 해당 학원에 존재하는지 확인
         Employee requestEmployee = validateRequestEmployee(requestAccount, foundAcademy);
+
+        // 요청 비밀번호 복호화
+        String encodedPassword = bCryptPasswordEncoder.encode(request.getPassword());
+        request.setPassword(encodedPassword);
 
         //정보 수정
         requestEmployee.update(request);
