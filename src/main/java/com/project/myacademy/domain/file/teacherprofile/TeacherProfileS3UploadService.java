@@ -49,6 +49,12 @@ public class TeacherProfileS3UploadService {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
+    /**
+     * @param academyId     학원 id
+     * @param teacherId     파입 업로드 대상인 강사 id
+     * @param multipartFile 파일 업로드를 위한 객체
+     * @param account       파일 업로드 진행하는 직원 계정
+     */
     public CreateTeacherProfileResponse UploadTeacherProfile(Long academyId, Long teacherId, List<MultipartFile> multipartFile, String account) {
 
         // 파일이 들어있는지 확인
@@ -118,6 +124,14 @@ public class TeacherProfileS3UploadService {
         return CreateTeacherProfileResponse.of(originalFileNameList, storedFileNameList);
     }
 
+    /**
+     * @param academyId         학원 id
+     * @param teacherId         파입 업로드 대상인 강사 id
+     * @param teacherProfileId  강사 파일 id
+     * @param filePath          S3버킷 폴더 이하의 디렉토리 경로
+     * @param account           파일 삭제 진행하는 직원 계정
+     * @return
+     */
     public DeleteTeacherProfileResponse deleteTeacherProfile(Long academyId, Long teacherId, Long teacherProfileId, String filePath, String account) {
 
         // 학원 존재 유무 확인
@@ -151,6 +165,13 @@ public class TeacherProfileS3UploadService {
         return DeleteTeacherProfileResponse.of(employee);
     }
 
+    /**
+     * @param academyId 학원 id
+     * @param teacherId 파입 업로드 대상인 강사 id
+     * @param fileUrl   S3버킷에 저장된 객체의 전체 URL
+     * @param account   파일 다운로드 진행하는 직원 계정
+     */
+    @Transactional(readOnly = true)
     public ResponseEntity<byte[]> downloadTeacherProfile(Long academyId, Long teacherId, String fileUrl, String account) throws IOException {
 
         // 학원 존재 유무 확인
