@@ -1,84 +1,56 @@
 package com.project.myacademy.controller;
 
+import com.project.myacademy.domain.academy.Academy;
+import com.project.myacademy.domain.employee.EmployeeService;
+import com.project.myacademy.domain.employee.dto.ReadEmployeeResponse;
+import com.project.myacademy.global.util.AuthenticationUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.util.CookieGenerator;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 @Controller
 @Slf4j
+@RequiredArgsConstructor
 public class IndexController {
 
-    @GetMapping("/")
-    public String index2(HttpServletRequest request, Model model){
+    private final EmployeeService employeeService;
+    @GetMapping("/academy/main")
+    public String main(HttpServletRequest request, Model model, Authentication authentication){
+
+        Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
+        String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
+        log.info("⭐ 메인 요청한 사용자의 학원 id [{}] || 요청한 사용자의 계정 [{}]",academyId,requestAccount);
+
+
 
         //회원 이름 표시
         HttpSession session = request.getSession(true);
 
         if (session.getAttribute("name") != null) {
-            String loginUserName = (String)session.getAttribute("name");
-            log.info("세션에 저장된 실명 : [{}]",loginUserName);
+            String loginUserName = (String) session.getAttribute("name");
+            log.info("세션에 저장된 실명 : [{}]", loginUserName);
             model.addAttribute("name", loginUserName);
+        } else {
+            ReadEmployeeResponse found = employeeService.readEmployee(academyId, requestAccount);
+            Academy foundAcademy = found.getAcademy();
+            String foundName = found.getName();
+            session.setAttribute("name",foundName);
+            model.addAttribute("name", foundName);
         }
-        return "index";
-    }
-    @GetMapping("/main")
-    public String index(HttpServletRequest request, Model model){
-
-        //회원 이름 표시
-        HttpSession session = request.getSession(true);
-
-        if (session.getAttribute("name") != null) {
-            String loginUserName = (String)session.getAttribute("name");
-            log.info("세션에 저장된 실명 : [{}]",loginUserName);
-            model.addAttribute("name", loginUserName);
-        }
-        return "main";
-    }
-    @GetMapping("/join")
-    public String join(){
-        return "join";
+        return "pages/main";
     }
 
-    @GetMapping("/login")
-    public String login(){
-        return "login";
+
+    @GetMapping("/payment")
+    public String payment(){
+        return "payment/payment";
     }
-
-    @GetMapping("/oauthFail")
-    public String oauthFail(){
-        return "oauthFail";
-    }
-
-    @GetMapping("/logoutEmployee")
-    public String logout(HttpServletRequest request,HttpServletResponse response){
-        CookieGenerator cookieGenerator = new CookieGenerator();
-        cookieGenerator.setCookieName("token");
-        cookieGenerator.addCookie(response,"deleted");
-        cookieGenerator.setCookieMaxAge(0);
-
-        HttpSession session = request.getSession();
-        session.removeAttribute("name");
-        return "redirect:/";
-    }
-
-    @GetMapping("/oauth2/redirect")
-    public String login(@RequestParam String token, HttpServletResponse response){
-        CookieGenerator cookieGenerator = new CookieGenerator();
-        cookieGenerator.setCookieName("token");
-        cookieGenerator.setCookieHttpOnly(true);
-        cookieGenerator.setCookieSecure(true);
-        cookieGenerator.addCookie(response,token);
-        cookieGenerator.setCookieMaxAge(60*60);//1시간
-        log.info("🍪 쿠키에 저장한 토큰 {}",token);
-        return "redirect:/main";
-    }
-
 
 }

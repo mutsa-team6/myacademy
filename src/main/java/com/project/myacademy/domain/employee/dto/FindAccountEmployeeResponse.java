@@ -8,6 +8,6 @@ import lombok.Getter;
 @Getter
 @Builder
 public class FindAccountEmployeeResponse {
+    private Long employeeId;
     private String account;
-    private String message;
 }
