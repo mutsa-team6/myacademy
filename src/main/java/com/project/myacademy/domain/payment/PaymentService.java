@@ -6,6 +6,8 @@ import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.domain.employee.EmployeeRepository;
 import com.project.myacademy.domain.enrollment.Enrollment;
 import com.project.myacademy.domain.enrollment.EnrollmentRepository;
+import com.project.myacademy.domain.lecture.Lecture;
+import com.project.myacademy.domain.lecture.LectureRepository;
 import com.project.myacademy.domain.payment.dto.PaymentRequest;
 import com.project.myacademy.domain.payment.dto.PaymentResponse;
 import com.project.myacademy.domain.payment.dto.ApproveResponse;
@@ -38,6 +40,7 @@ public class PaymentService {
     private final EnrollmentRepository enrollmentRepository;
     private final StudentRepository studentRepository;
     private final EmployeeRepository employeeRepository;
+    private final LectureRepository lectureRepository;
 
     @Value("${payment.toss.test_client_api_key}")
     private String testClientApiKey;
@@ -74,14 +77,17 @@ public class PaymentService {
         Student foundStudent = studentRepository.findById(studentId)
                 .orElseThrow(() -> new AppException(ErrorCode.STUDENT_NOT_FOUND));
 
+        Lecture foundLecture = lectureRepository.findById(request.getLectureId())
+                .orElseThrow(() -> new AppException(ErrorCode.LECTURE_NOT_FOUND));
+
         //결제할 학생이 수강신청한 수업
-        Enrollment studentEnrollment = enrollmentRepository.findByStudentId(studentId)
+        Enrollment studentEnrollment = enrollmentRepository.findByStudentAndLecture(foundStudent,foundLecture)
                 .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
 
         //수강 결제가 된거면 중복 결제안되도록 막기
-        if (studentEnrollment.getPaymentYN() != false) {
-            throw new AppException(ErrorCode.DUPLICATED_PAYMENT);
-        }
+//        if (studentEnrollment.getPaymentYN() != false) {
+//            throw new AppException(ErrorCode.DUPLICATED_PAYMENT);
+//        }
 
         Integer amount = request.getAmount();
         String payType = request.getPayType().getName();
