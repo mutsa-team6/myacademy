@@ -1,11 +1,11 @@
 package com.project.myacademy.global.configuration.filter;
 
 
+import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.domain.employee.EmployeeService;
 import com.project.myacademy.global.util.JwtTokenUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -60,15 +60,16 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         //userName 분리
         // Claims은 Object 타입으로 들어가는데 꺼낼 때는 String 타입으로 저장해야 한다.
         String account = JwtTokenUtil.getAccount(token,secretKey);
-        log.info("account:{}", account);
+
+        String email = JwtTokenUtil.getEmail(token,secretKey);
 
         //계정에 맞는 권한 부여
-        String employeeRole = employeeService.findRoleByAccount(account).name();
-        log.info("employeeRole :{}", employeeRole);
+        Employee found = employeeService.findByAccountAndEmail(account, email);
+        String employeeRole = found.getEmployeeRole().name();
 
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(account, null, List.of(new SimpleGrantedAuthority(employeeRole)));
+        String employeeInfo = account + "@" + found.getAcademy().getId();
 
-        log.info("{}",authenticationToken);
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(employeeInfo, null, List.of(new SimpleGrantedAuthority(employeeRole)));
 
         authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
