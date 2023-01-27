@@ -43,6 +43,9 @@ public class Student extends BaseEntity {
     @JoinColumn(name = "parent_id")
     private Parent parent;
 
+    //학원 Id
+    private Long academyId;
+
     public void updateStudent(UpdateStudentRequest request) {
         this.name = request.getName();
         this.school = request.getSchool();
@@ -52,7 +55,7 @@ public class Student extends BaseEntity {
         this.address = request.getAddress();
     }
 
-    public static Student toStudent(CreateStudentRequest request, Parent parent) {
+    public static Student toStudent(CreateStudentRequest request, Parent parent, Long academyId) {
         return Student.builder()
                 .name(request.getName())
                 .school(request.getSchool())
@@ -61,6 +64,7 @@ public class Student extends BaseEntity {
                 .email(request.getEmail())
                 .address(request.getAddress())
                 .parent(parent)
+                .academyId(academyId)
                 .build();
     }
 }

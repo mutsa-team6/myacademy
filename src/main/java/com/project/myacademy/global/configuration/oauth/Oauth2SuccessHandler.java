@@ -32,33 +32,33 @@ public class Oauth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
             throws IOException, ServletException {
 
-        OAuth2User oAuth2User = (OAuth2User)authentication.getPrincipal();
+        OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
 
         // 구글 인증시 아래 로직
-        String realName = (String)oAuth2User.getAttribute("name");
-        String email = (String)oAuth2User.getAttribute("email");
-        log.info("🌈 구글 인증 시 이름 추출 [{}] || 이메일 추출 [{}]",realName,email);
+        String realName = (String) oAuth2User.getAttribute("name");
+        String email = (String) oAuth2User.getAttribute("email");
+        log.info("🌈 구글 인증 시 이름 추출 [{}] || 이메일 추출 [{}]", realName, email);
 
         Map<String, Object> attributes = oAuth2User.getAttributes();
 
         // 네이버 인증 시 아래 로직
-        if(attributes.get("sub")==null){
-            Map<String, Object> response2 =(Map<String, Object>) attributes.get("response");
+        if (attributes.get("sub") == null) {
+            Map<String, Object> response2 = (Map<String, Object>) attributes.get("response");
             realName = (String) response2.get("name");
             email = (String) response2.get("email");
-            log.info("🌈 네이버 인증 시 이름 추출 [{}] || 이메일 추출 [{}]",realName,email);
+            log.info("🌈 네이버 인증 시 이름 추출 [{}] || 이메일 추출 [{}]", realName, email);
         }
 
         // 이름과 이메일이 둘다 일치하는 회원이 저장되어있을 것
         Employee foundEmployee = employeeRepository.findByNameAndEmail(realName, email).get();
         String foundAccount = foundEmployee.getAccount();
-        log.info("🌈 소셜 로그인 인증한 계정명 [{}]",foundAccount);
+        log.info("🌈 소셜 로그인 인증한 계정명 [{}]", foundAccount);
 
 
         // 회원 계정으로 토큰 생성 후 쿼리 파라미터로 보냄
-        String token = JwtTokenUtil.createToken(foundAccount,key,1000*60*60);
+        String token = JwtTokenUtil.createToken(foundAccount, email, key, 1000 * 60 * 60);
 
-        response.sendRedirect("/oauth2/redirect"+"?token="+token);
+        response.sendRedirect("/oauth2/redirect" + "?token=" + token);
 
     }
 }

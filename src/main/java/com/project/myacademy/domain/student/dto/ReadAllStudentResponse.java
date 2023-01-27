@@ -10,7 +10,10 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 @AllArgsConstructor
-public class FindAllStudentResponse {
+public class ReadAllStudentResponse {
+    //학원 Id
+    private Long academyId;
+    //학생 Id
     private Long id;
     //학생 이름
     private String name;
@@ -29,8 +32,9 @@ public class FindAllStudentResponse {
     //학생 정보 마지막 수정 일시
     private LocalDateTime lastModifiedAt;
 
-    public static FindAllStudentResponse of(Student student) {
-        return FindAllStudentResponse.builder()
+    public static ReadAllStudentResponse of(Student student) {
+        return ReadAllStudentResponse.builder()
+                .academyId(student.getAcademyId())
                 .id(student.getId())
                 .name(student.getName())
                 .address(student.getAddress())

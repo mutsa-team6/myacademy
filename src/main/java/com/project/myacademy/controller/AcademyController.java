@@ -18,12 +18,12 @@ public class AcademyController {
     private final AcademyService academyService;
 
     @GetMapping("/academies")
-    public String readAll(Model model, Pageable pageable) {
+    public String academy(Model model, Pageable pageable) {
 
         Page<ReadAcademyResponse> academies = academyService.readAllAcademies(pageable);
 
         model.addAttribute("academies", academies);
 
-        return "academy/readAll";
+        return "academy/academies";
     }
 }

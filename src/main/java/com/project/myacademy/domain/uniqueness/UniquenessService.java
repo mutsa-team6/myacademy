@@ -39,10 +39,6 @@ public class UniquenessService {
         Academy academy = validateAcademy(academyId);
         //account 유효검사
         Employee employee = validateAcademyEmployee(account, academy);
-        // 학생 특이사항을 수정할 수 있는 권한인지 확인(강사만 불가능)
-        if(Employee.isTeacherAuthority(employee)) {
-            throw new AppException(ErrorCode.INVALID_PERMISSION);
-        }
         //student Id에 해당하는 학생이 존재하는지 확인
         Student student = validateStudent(studentId);
 
@@ -62,10 +58,6 @@ public class UniquenessService {
         Academy academy = validateAcademy(academyId);
         //account 유효검사
         Employee employee = validateAcademyEmployee(account, academy);
-        // 학생 특이사항을 수정할 수 있는 권한인지 확인(강사만 불가능)
-        if(Employee.isTeacherAuthority(employee)) {
-            throw new AppException(ErrorCode.INVALID_PERMISSION);
-        }
         //student Id에 해당하는 학생이 존재하는지 확인
         Student student = validateStudent(studentId);
 
@@ -85,10 +77,6 @@ public class UniquenessService {
         Academy academy = validateAcademy(academyId);
         //account 유효검사
         Employee employee = validateAcademyEmployee(account, academy);
-        // 학생 특이사항을 수정할 수 있는 권한인지 확인(강사만 불가능)
-        if(Employee.isTeacherAuthority(employee)) {
-            throw new AppException(ErrorCode.INVALID_PERMISSION);
-        }
         //student Id에 해당하는 학생이 존재하는지 확인
         Student student = validateStudent(studentId);
         //uniquenessId에 등록된 특이사항이 있는지 확인
@@ -111,10 +99,6 @@ public class UniquenessService {
         Academy academy = validateAcademy(academyId);
         //account 유효검사
         Employee employee = validateAcademyEmployee(account, academy);
-        // 학생 특이사항을 수정할 수 있는 권한인지 확인(강사만 불가능)
-        if(Employee.isTeacherAuthority(employee)) {
-            throw new AppException(ErrorCode.INVALID_PERMISSION);
-        }
         //student Id에 해당하는 학생이 존재하는지 확인
         Student student = validateStudent(studentId);
         //uniquenessId에 등록된 특이사항이 있는지 확인
