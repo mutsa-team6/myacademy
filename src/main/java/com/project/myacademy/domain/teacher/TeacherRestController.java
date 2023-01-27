@@ -2,12 +2,15 @@ package com.project.myacademy.domain.teacher;
 
 import com.project.myacademy.domain.teacher.dto.*;
 import com.project.myacademy.global.Response;
+import com.project.myacademy.global.util.AuthenticationUtil;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "강사")
 @RestController
 @RequestMapping("api/v1/academies")
 @RequiredArgsConstructor
@@ -22,7 +25,8 @@ public class TeacherRestController {
                                                                   @PathVariable("employeeId") Long employeeId,
                                                                   @RequestBody CreateTeacherRequest request,
                                                                   Authentication authentication) {
-        CreateTeacherResponse createdTeacher = teacherService.createTeacher(academyId, employeeId, request, authentication.getName());
+        String account = AuthenticationUtil.getAccountFromAuth(authentication);
+        CreateTeacherResponse createdTeacher = teacherService.createTeacher(academyId, employeeId, request, account);
         log.info("강사 배정 성공");
         return ResponseEntity.ok().body(Response.success(createdTeacher));
     }
@@ -33,8 +37,8 @@ public class TeacherRestController {
                                                                   @PathVariable("teacherId") Long teacherId,
                                                                   @RequestBody UpdateTeacherRequest request,
                                                                   Authentication authentication) {
-
-        UpdateTeacherResponse updatedTeacher = teacherService.updateTeacher(academyId, teacherId, request, authentication.getName());
+        String account = AuthenticationUtil.getAccountFromAuth(authentication);
+        UpdateTeacherResponse updatedTeacher = teacherService.updateTeacher(academyId, teacherId, request, account);
         log.info("강사 정보 변경 성공");
         return ResponseEntity.ok().body(Response.success(updatedTeacher));
     }
@@ -44,8 +48,8 @@ public class TeacherRestController {
     public ResponseEntity<Response<DeleteTeacherResponse>> delete(@PathVariable("academyId") Long academyId,
                                                                   @PathVariable("teacherId") Long teacherId,
                                                                   Authentication authentication) {
-
-        DeleteTeacherResponse deletedTeacher = teacherService.deleteTeacher(academyId, teacherId, authentication.getName());
+        String account = AuthenticationUtil.getAccountFromAuth(authentication);
+        DeleteTeacherResponse deletedTeacher = teacherService.deleteTeacher(academyId, teacherId, account);
         log.info("강사 정보 삭제 성공");
         return ResponseEntity.ok().body(Response.success(deletedTeacher));
     }

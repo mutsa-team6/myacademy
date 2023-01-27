@@ -2,6 +2,8 @@ package com.project.myacademy.domain.student;
 
 import com.project.myacademy.domain.student.dto.*;
 import com.project.myacademy.global.Response;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import com.project.myacademy.global.util.AuthenticationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -11,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "학생")
 @RestController
 @RequiredArgsConstructor
 @Slf4j
@@ -24,8 +27,8 @@ public class StudentRestController {
      */
     @PostMapping("/{academyId}/students")
     public ResponseEntity<Response<CreateStudentResponse>> create(@PathVariable Long academyId, CreateStudentRequest request, Authentication authentication) {
-        String account = authentication.getName();
-        CreateStudentResponse response = studentService.createStudent(academyId, request, account);
+        String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
+        CreateStudentResponse response = studentService.createStudent(academyId, request, requestAccount);
         return ResponseEntity.ok().body(Response.success(response));
     }
 
@@ -34,8 +37,8 @@ public class StudentRestController {
      */
     @GetMapping("/{academyId}/students/{studentId}")
     public ResponseEntity<Response<ReadStudentResponse>> read(@PathVariable Long academyId, @PathVariable Long studentId, Authentication authentication) {
-        String account = authentication.getName();
-        ReadStudentResponse response = studentService.readStudent(academyId, studentId, account);
+        String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
+        ReadStudentResponse response = studentService.readStudent(academyId, studentId, requestAccount);
         return ResponseEntity.ok().body(Response.success(response));
     }
 
@@ -44,9 +47,9 @@ public class StudentRestController {
      */
     @GetMapping("/{academyId}/students")
     public ResponseEntity<Response<Page<ReadAllStudentResponse>>> readAll(@PathVariable Long academyId, Authentication authentication) {
-        String account = authentication.getName();
+        String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
         PageRequest pageable = PageRequest.of(0, 20, Sort.by("id").descending());
-        Page<ReadAllStudentResponse> responses = studentService.readAllStudent(academyId, pageable, account);
+        Page<ReadAllStudentResponse> responses = studentService.readAllStudent(academyId, pageable, requestAccount);
         return ResponseEntity.ok().body(Response.success(responses));
     }
 
@@ -55,8 +58,8 @@ public class StudentRestController {
      */
     @PutMapping("/{academyId}/students/{studentId}")
     public ResponseEntity<Response<UpdateStudentResponse>> update(@PathVariable Long academyId, @PathVariable Long studentId, UpdateStudentRequest request, Authentication authentication) {
-        String account = authentication.getName();
-        UpdateStudentResponse response = studentService.updateStudent(academyId,studentId, request, account);
+        String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
+        UpdateStudentResponse response = studentService.updateStudent(academyId,studentId, request, requestAccount);
         return ResponseEntity.ok().body(Response.success(response));
     }
 
@@ -65,8 +68,8 @@ public class StudentRestController {
      */
     @DeleteMapping("/{academyId}/students/{studentId}")
     public ResponseEntity<Response<DeleteStudentResponse>> delete(@PathVariable Long academyId, @PathVariable Long studentId, Authentication authentication) {
-        String account = authentication.getName();
-        DeleteStudentResponse response = studentService.deleteStudent(academyId, studentId,account);
+        String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
+        DeleteStudentResponse response = studentService.deleteStudent(academyId, studentId,requestAccount);
         return ResponseEntity.ok().body(Response.success(response));
     }
 }

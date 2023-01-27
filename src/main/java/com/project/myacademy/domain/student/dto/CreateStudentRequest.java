@@ -17,8 +17,6 @@ public class CreateStudentRequest {
     private String email;
     //학생 생년월일
     private String birth;
-    //학생 주소
-    private String address;
     //부모 전화번호
     private String parentPhoneNum;
 

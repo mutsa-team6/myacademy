@@ -2,6 +2,8 @@ package com.project.myacademy.domain.enrollment;
 
 import com.project.myacademy.domain.enrollment.dto.*;
 import com.project.myacademy.global.Response;
+import com.project.myacademy.global.util.AuthenticationUtil;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -12,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "수강신청")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/academies")
@@ -27,7 +30,8 @@ public class EnrollmentRestController {
                                                                      @PathVariable("lectureId") Long lectureId,
                                                                      @RequestBody CreateEnrollmentRequest request,
                                                                      Authentication authentication) {
-        CreateEnrollmentResponse createdEnrollment = enrollmentService.createEnrollment(academyId, studentId, lectureId, request, authentication.getName());
+        String account = AuthenticationUtil.getAccountFromAuth(authentication);
+        CreateEnrollmentResponse createdEnrollment = enrollmentService.createEnrollment(academyId, studentId, lectureId, request, account);
         log.info("수강 등록 성공");
         return ResponseEntity.ok().body(Response.success(createdEnrollment));
     }
@@ -36,7 +40,8 @@ public class EnrollmentRestController {
     @GetMapping("/{academyId}/enrollments")
     public ResponseEntity<Response<Page<ReadAllEnrollmentResponse>>> readAll(@PathVariable("academyId") Long academyId, Authentication authentication,
              @PageableDefault(size = 20, sort = {"createdAt"}, direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<ReadAllEnrollmentResponse> enrollments = enrollmentService.readAllEnrollments(academyId, authentication.getName(), pageable);
+        String account = AuthenticationUtil.getAccountFromAuth(authentication);
+        Page<ReadAllEnrollmentResponse> enrollments = enrollmentService.readAllEnrollments(academyId, account, pageable);
         log.info("수강 리스트 조회");
         return ResponseEntity.ok().body(Response.success(enrollments));
     }
@@ -49,7 +54,8 @@ public class EnrollmentRestController {
                                                                      @PathVariable("enrollmentId") Long enrollmentId,
                                                                      @RequestBody UpdateEnrollmentRequest request,
                                                                      Authentication authentication) {
-        UpdateEnrollmentResponse updatedEnrollment = enrollmentService.updateEnrollment(academyId, studentId, lectureId, enrollmentId, request, authentication.getName());
+        String account = AuthenticationUtil.getAccountFromAuth(authentication);
+        UpdateEnrollmentResponse updatedEnrollment = enrollmentService.updateEnrollment(academyId, studentId, lectureId, enrollmentId, request, account);
         log.info("수강 이력 수정 성공");
         return ResponseEntity.ok().body(Response.success(updatedEnrollment));
     }
@@ -62,7 +68,8 @@ public class EnrollmentRestController {
                                                                      @PathVariable("enrollmentId") Long enrollmentId,
                                                                      @RequestBody CreateEnrollmentRequest request,
                                                                      Authentication authentication) {
-        DeleteEnrollmentResponse deletedEnrollment = enrollmentService.deleteEnrollment(academyId, studentId, lectureId, enrollmentId, request, authentication.getName());
+        String account = AuthenticationUtil.getAccountFromAuth(authentication);
+        DeleteEnrollmentResponse deletedEnrollment = enrollmentService.deleteEnrollment(academyId, studentId, lectureId, enrollmentId, request, account);
         log.info("수강 이력 삭제 성공");
         return ResponseEntity.ok().body(Response.success(deletedEnrollment));
     }
