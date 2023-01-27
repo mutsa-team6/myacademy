@@ -49,5 +49,9 @@ public class IndexController {
     }
 
 
+    @GetMapping("/payment")
+    public String payment(){
+        return "payment/payment";
+    }
 
 }

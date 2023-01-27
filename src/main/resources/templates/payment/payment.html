@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>
+        수강 결제
+    </title>
+    <!-- Toss -->
+    <script src="https://js.tosspayments.com/v1/payment"></script>
+</head>
+
+<body>
+<h1>Payment</h1>
+<br>
+<button th:onclick="payment()">결제하기</button>
+<br>
+
+<!-- toss pay -->
+<script>
+    const tossPayments = TossPayments("test_ck_Kma60RZblrq6QJ6djWx8wzYWBn14");
+    function payment(){
+        var method = "카드";
+
+        var paymentData = {
+            amount: 300000,
+            orderId: "67918cd9-6b35-45b8-91f4-8ab82d9a57dd",
+            orderName: "lecture name",
+            successUrl: "http://localhost:8080/payment/success",
+            failUrl: "http://localhost:8080/payment/fail"
+        };
+
+        tossPayments.requestPayment(method, paymentData);
+    }
+</script>
+</body>
+
+</html>

@@ -53,7 +53,12 @@ public enum ErrorCode {
     FILE_NOT_EXISTS(HttpStatus.BAD_REQUEST, "보낼 파일이 비어있습니다."),
     FILE_SIZE_EXCEED(HttpStatus.BAD_REQUEST, "파일 업로드 용량을 초과했습니다."),
     WRONG_FILE_FORMAT(HttpStatus.BAD_REQUEST, "잘못된 형식의 파일입니다"),
-    PAYMENT_REQUIRED(HttpStatus.PAYMENT_REQUIRED, "결제 정보가 필요합니다.");
+
+    PAYMENT_ERROR_ORDER_PRICE(HttpStatus.FORBIDDEN,"요청하신 가격이 일치하지 않습니다."),
+    PAYMENT_ERROR_ORDER_PAY_TYPE(HttpStatus.FORBIDDEN,"요청하신 지불방식이 일치하지 않습니다."),
+    PAYMENT_ERROR_ORDER_NAME(HttpStatus.FORBIDDEN,"요청하신 주문 이름이 일치하지 않습니다."),
+    PAYMENT_REQUIRED(HttpStatus.PAYMENT_REQUIRED, "결제 정보가 필요합니다."),
+    ALREADY_PAYMENT(HttpStatus.CONFLICT,"이미 결제된 수업입니다.");
 
     private HttpStatus httpStatus;
     private String message;
