@@ -145,8 +145,18 @@ public class PaymentService {
      */
     @Transactional
     public ApproveResponse requestFinalPayment(String paymentKey, String orderId, Integer amount) {
+        //이미 결제되있는지 확인
         Payment selcetedPayment = paymentRepository.findByOrderId(orderId)
                 .orElseThrow(() -> new AppException(ErrorCode.PAYMENT_NOT_FOUND));
+
+        Enrollment enrollment = enrollmentRepository.findByStudentAndLecture(selcetedPayment.getStudent(), selcetedPayment.getLecture())
+                .orElseThrow(()-> new AppException(ErrorCode.ENROLLMENT_NOT_FOUND));
+
+        if (enrollment.getPaymentYN() == true) {
+            throw new AppException(ErrorCode.ALREADY_PAYMENT);
+        }
+
+        enrollment.updatePaymentYN();
 
         RestTemplate rest = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -164,7 +174,7 @@ public class PaymentService {
 
         //url로 요청
         return rest.postForEntity(
-                        tossOriginUrl + "/payments/" + paymentKey,
+                        tossOriginUrl+ paymentKey,
                         new HttpEntity<>(param, headers),
                         ApproveResponse.class)
                 .getBody();
