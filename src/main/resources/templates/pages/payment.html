@@ -253,17 +253,29 @@
 
 
         <div class="row mb-4">
-            <div class="col-lg-6 col-md-6 mb-md-0 mb-4">
+            <div class="col-lg-10 col-md-6 mb-md-0 mb-4">
                 <div class="card">
                     <div class="card-header pb-0">
                         <div class="row">
-                            <div class="col-lg-6 col-7">
-                                <h4>공지 사항</h4>
+                            <div class="col-lg-9 col-7">
+                                <h4>결제 화면</h4>
                             </div>
-                            <div class="col-lg-6 col-5 my-auto text-end">
-                                <div class="dropdown float-lg-end pe-4">
-                                    <a th:href="@{/announcements}" class="text-info text-xs text-gradient font-weight-bold opacity-5">전체 보기</a>
-                                </div>
+                            <div class="col-lg-3 col-5 my-auto text-end">
+                                <form class="form-inline w-100 justify-content-center " action="/academy/pay"
+                                      method="get">
+                                    <div class="row mb-4">
+                                        <div class="col-9 align-self-center">
+                                            <div class="input-group input-group-outline  ">
+                                                <label class="form-label">학생 이름</label>
+                                                <input type="text" class="form-control" name="studentName">
+                                            </div>
+                                        </div>
+                                        <div class="col-3  align-self-center">
+                                            <button type="submit"
+                                                    class="btn btn-sm bg-gradient-primary btn-lg w-100 mb-0">검색
+                                            </button>
+                                        </div>
+                                    </div>
                             </div>
                         </div>
                     </div>
@@ -272,30 +284,65 @@
                             <table class="table align-items-center mb-0">
                                 <thead>
                                 <tr>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                        제목
+                                    <th class="text-center text-uppercase  font-weight-bolder">
+                                        학생 이름
                                     </th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                        작성자
+                                    <th class="text-center text-uppercase  font-weight-bolder">
+                                        학생 전화번호
                                     </th>
-                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                        작성 날짜
+                                    <th class="text-center text-uppercase  font-weight-bolder">
+                                        강좌 이름
                                     </th>
+                                    <th class="text-center text-uppercase  font-weight-bolder">
+                                        강사 이름
+                                    </th>
+                                    <th class="text-center text-uppercase  font-weight-bolder">
+                                        가격
+                                    </th>
+                                    <th class="text-center text-uppercase  font-weight-bolder">
+                                        할인 가격
+                                    </th>
+                                    <th class="text-center text-uppercase  font-weight-bolder">
+                                        결제 여부
+                                    </th>
+
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr th:each="announcement : ${announcements}">
+                                <tr th:each="enrollment : ${enrollments}">
                                     <th class="align-middle text-center">
                                                 <span class=" text-xs font-weight-bold"
-                                                      th:text="${announcement.title}"></span>
+                                                      th:text="${enrollment.studentName}"></span>
                                     </th>
                                     <td class="align-middle text-center">
                                                 <span class=" text-xs font-weight-bold"
-                                                      th:text="${announcement.writer}"></span>
+                                                      th:text="${enrollment.studentPhoneNum}"></span>
                                     </td>
                                     <td class="align-middle text-center">
                                                 <span class=" text-xs font-weight-bold"
-                                                      th:text="${announcement.createdAt}"></span>
+                                                      th:text="${enrollment.lectureName}"></span>
+                                    </td>
+                                    <th class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${enrollment.teacherName}"></span>
+                                    </th>
+                                    <td class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${enrollment.price}"></span>
+                                    </td>
+                                    <td class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${enrollment.discount}"></span>
+                                    </td>
+                                    <td class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${enrollment.paymentYN}"></span>
+                                    </td>
+                                    <td class="align-middle text-center">
+
+                                        <button  type="button"
+                                                class="btn btn-sm bg-gradient-primary btn-lg w-100 mb-0">선택
+                                        </button>
                                     </td>
 
                                 </tr>
@@ -305,252 +352,13 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-6 col-md-6 mb-md-0 mb-4">
-                <div class="card">
-                    <div class="card-header pb-0">
-                        <div class="row">
-                            <div class="col-lg-6 col-7">
-                                <h4>입시 정보</h4>
-                            </div>
-                            <div class="col-lg-6 col-5 my-auto text-end">
-                                <div class="dropdown float-lg-end pe-4">
-                                    <a th:href="@{/announcements}" class="text-info text-xs text-gradient font-weight-bold opacity-5">전체 보기</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body px-0 pb-2">
-                        <div class="table-responsive">
-                            <table class="table align-items-center mb-0">
-                                <thead>
-                                <tr>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                        제목
-                                    </th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                        작성자
-                                    </th>
-                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                        작성 날짜
-                                    </th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr th:each="announcement : ${announcements}">
-                                    <th class="align-middle text-center">
-                                                <span class=" text-xs font-weight-bold"
-                                                      th:text="${announcement.title}"></span>
-                                    </th>
-                                    <td class="align-middle text-center">
-                                                <span class=" text-xs font-weight-bold"
-                                                      th:text="${announcement.writer}"></span>
-                                    </td>
-                                    <td class="align-middle text-center">
-                                                <span class=" text-xs font-weight-bold"
-                                                      th:text="${announcement.createdAt}"></span>
-                                    </td>
-
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
+        <td class="align-middle text-center">
 
-        <div class="card card-plain mb-4">
-            <div class="card-body p-3">
-                <div class="row">
-                    <div class="col-lg-6">
-                        <div class="d-flex flex-column h-100">
-                            <h1 th:text="${name} + '님 환영합니다!!'"></h1>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row mb-4">
-            <div class="col-lg-6 position-relative z-index-2">
-                <div class="row mt-4">
-                    <div class="col-10">
-                        <div class="card mb-4 ">
-                            <div class="d-flex">
-                                <div class="icon icon-shape icon-lg bg-gradient-success shadow text-center border-radius-xl mt-n3 ms-4">
-                                    <i class="material-icons opacity-10" aria-hidden="true">language</i>
-                                </div>
-                                <h6 class="mt-3 mb-2 ms-3 ">Sales by Country</h6>
-                            </div>
-                            <div class="card-body px-0 pb-2">
-                                <div class="table-responsive">
-                                    <table class="table align-items-center mb-0">
-                                        <thead>
-                                        <tr>
-                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                                Companies
-                                            </th>
-                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                                Members
-                                            </th>
-                                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                                Budget
-                                            </th>
-                                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                                Completion
-                                            </th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <tr>
-                                            <td>
-                                                <div class="d-flex px-2 py-1">
-                                                    <div>
-                                                        <img src="../assets/img/small-logos/logo-xd.svg"
-                                                             class="avatar avatar-sm me-3" alt="xd">
-                                                    </div>
-                                                    <div class="d-flex flex-column justify-content-center">
-                                                        <h6 class="mb-0 text-sm">Material XD Version</h6>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div class="avatar-group mt-2">
-                                                    <a href="javascript:;" class="avatar avatar-xs rounded-circle"
-                                                       data-bs-toggle="tooltip" data-bs-placement="bottom" title="Ryan Tompson">
-                                                        <img src="../assets/img/team-1.jpg" alt="team1">
-                                                    </a>
-                                                    <a href="javascript:;" class="avatar avatar-xs rounded-circle"
-                                                       data-bs-toggle="tooltip" data-bs-placement="bottom" title="Romina Hadid">
-                                                        <img src="../assets/img/team-2.jpg" alt="team2">
-                                                    </a>
-                                                    <a href="javascript:;" class="avatar avatar-xs rounded-circle"
-                                                       data-bs-toggle="tooltip" data-bs-placement="bottom"
-                                                       title="Alexander Smith">
-                                                        <img src="../assets/img/team-3.jpg" alt="team3">
-                                                    </a>
-                                                    <a href="javascript:;" class="avatar avatar-xs rounded-circle"
-                                                       data-bs-toggle="tooltip" data-bs-placement="bottom" title="Jessica Doe">
-                                                        <img src="../assets/img/team-4.jpg" alt="team4">
-                                                    </a>
-                                                </div>
-                                            </td>
-                                            <td class="align-middle text-center text-sm">
-                                                <span class="text-xs font-weight-bold"> $14,000 </span>
-                                            </td>
-                                            <td class="align-middle">
-                                                <div class="progress-wrapper w-75 mx-auto">
-                                                    <div class="progress-info">
-                                                        <div class="progress-percentage">
-                                                            <span class="text-xs font-weight-bold">60%</span>
-                                                        </div>
-                                                    </div>
-                                                    <div class="progress">
-                                                        <div class="progress-bar bg-gradient-info w-60" role="progressbar"
-                                                             aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-6 position-relative z-index-2">
-                <div class="row mt-4">
-                    <div class="col-10">
-                        <div class="card mb-4 ">
-                            <div class="d-flex">
-                                <div class="icon icon-shape icon-lg bg-gradient-success shadow text-center border-radius-xl mt-n3 ms-4">
-                                    <i class="material-icons opacity-10" aria-hidden="true">language</i>
-                                </div>
-                                <h6 class="mt-3 mb-2 ms-3 ">Sales by Country</h6>
-                            </div>
-                            <div class="card-body px-0 pb-2">
-                                <div class="table-responsive">
-                                    <table class="table align-items-center mb-0">
-                                        <thead>
-                                        <tr>
-                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                                Companies
-                                            </th>
-                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                                Members
-                                            </th>
-                                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                                Budget
-                                            </th>
-                                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                                Completion
-                                            </th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <tr>
-                                            <td>
-                                                <div class="d-flex px-2 py-1">
-                                                    <div>
-                                                        <img src="../assets/img/small-logos/logo-xd.svg"
-                                                             class="avatar avatar-sm me-3" alt="xd">
-                                                    </div>
-                                                    <div class="d-flex flex-column justify-content-center">
-                                                        <h6 class="mb-0 text-sm">Material XD Version</h6>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div class="avatar-group mt-2">
-                                                    <a href="javascript:;" class="avatar avatar-xs rounded-circle"
-                                                       data-bs-toggle="tooltip" data-bs-placement="bottom" title="Ryan Tompson">
-                                                        <img src="../assets/img/team-1.jpg" alt="team1">
-                                                    </a>
-                                                    <a href="javascript:;" class="avatar avatar-xs rounded-circle"
-                                                       data-bs-toggle="tooltip" data-bs-placement="bottom" title="Romina Hadid">
-                                                        <img src="../assets/img/team-2.jpg" alt="team2">
-                                                    </a>
-                                                    <a href="javascript:;" class="avatar avatar-xs rounded-circle"
-                                                       data-bs-toggle="tooltip" data-bs-placement="bottom"
-                                                       title="Alexander Smith">
-                                                        <img src="../assets/img/team-3.jpg" alt="team3">
-                                                    </a>
-                                                    <a href="javascript:;" class="avatar avatar-xs rounded-circle"
-                                                       data-bs-toggle="tooltip" data-bs-placement="bottom" title="Jessica Doe">
-                                                        <img src="../assets/img/team-4.jpg" alt="team4">
-                                                    </a>
-                                                </div>
-                                            </td>
-                                            <td class="align-middle text-center text-sm">
-                                                <span class="text-xs font-weight-bold"> $14,000 </span>
-                                            </td>
-                                            <td class="align-middle">
-                                                <div class="progress-wrapper w-75 mx-auto">
-                                                    <div class="progress-info">
-                                                        <div class="progress-percentage">
-                                                            <span class="text-xs font-weight-bold">60%</span>
-                                                        </div>
-                                                    </div>
-                                                    <div class="progress">
-                                                        <div class="progress-bar bg-gradient-info w-60" role="progressbar"
-                                                             aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
+            <button th:onclick="|pay.createPay()|" type="button"
+                    class="btn btn-sm bg-gradient-danger btn-lg w-100 mb-0">결제
+            </button>
+        </td>
 
         <footer class="footer py-4  ">
             <div class="container-fluid">
@@ -726,7 +534,65 @@
         Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
     }
 </script>
+<script>
+    const tossPayments = TossPayments("test_ck_Kma60RZblrq6QJ6djWx8wzYWBn14");
+    function payment(){
+        var method = "카드";
 
+        var paymentData = {
+            amount: 300000,
+            orderId: "67918cd9-6b35-45b8-91f4-8ab82d9a57dd",
+            orderName: "lecture name",
+            successUrl: "http://localhost:8080/payment/success",
+            failUrl: "http://localhost:8080/payment/fail"
+        };
+
+        tossPayments.requestPayment(method, paymentData);
+    }
+</script>
+<Script>
+    let academyId = 0;
+
+    let pay = {
+        init: function () {
+            var _this = this;
+        },
+
+
+        createPay: function (studenetId) {
+            let data = {
+                account: document.querySelector('#input-employeeAccount').value.trim(),
+                password: document.querySelector('#input-employeePassword').value.trim(),
+                name: document.querySelector('#input-employeeName').value.trim(),
+                email: document.querySelector('#input-employeeEmail').value.trim(),
+                address: document.querySelector("#address_kakao").value.trim() + "  " + document.querySelector("#address_detail_kakao").value.trim(),
+                phoneNum: document.querySelector('#input-employeePhone').value.trim()
+            };
+            console.log(data);
+
+            axios.post("/api/v1/academies/" + academyId + "/employees/signup",
+                JSON.stringify(data), {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                }
+            ).then((response) => {
+                alert("회원가입에 성공하였습니다! 로그인해주세요!");
+                window.location.href = '/login';
+
+            }).catch((error) => {
+                console.log(academyId);
+                console.log(error);
+
+            });
+
+        }
+
+    };
+
+    pay.init();
+
+</script>
 <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
 <script src="./assets/js/material-dashboard.min.js?v=3.0.4"></script>
 </body>

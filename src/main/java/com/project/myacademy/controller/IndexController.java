@@ -16,13 +16,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 @Controller
-@RequestMapping("/academy/")
 @Slf4j
 @RequiredArgsConstructor
 public class IndexController {
 
     private final EmployeeService employeeService;
-    @GetMapping("main")
+    @GetMapping("/academy/main")
     public String main(HttpServletRequest request, Model model, Authentication authentication){
 
         Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
