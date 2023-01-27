@@ -143,7 +143,7 @@ public class EmployeeService {
             throw new AppException(ErrorCode.INVALID_PASSWORD);
         }
 
-        return new LoginEmployeeResponse(JwtTokenUtil.createToken(requestAccount, secretKey, expiredTimeMs), requestEmployee.getName());
+        return new LoginEmployeeResponse(JwtTokenUtil.createToken(requestAccount, requestEmployee.getEmail(), secretKey, expiredTimeMs), requestEmployee.getName());
     }
 
     /**
@@ -281,8 +281,11 @@ public class EmployeeService {
     /**
      * JwtTokenFilter 에서 사용하기 위해 만든 메서드 ( 계정 찾아와서 권한 부여하기 위함 )
      */
-    public EmployeeRole findRoleByAccount(String account) {
-        return employeeRepository.findByAccount(account).get().getEmployeeRole();
+    public Employee findByAccountAndEmail(String account, String email) {
+        return employeeRepository.findByAccountAndEmail(account, email)
+                .orElseThrow(()->{
+                    throw new AppException(ErrorCode.EMPLOYEE_NOT_FOUND);
+                });
     }
 
     /**
@@ -446,9 +449,9 @@ public class EmployeeService {
         return validateEmployee;
     }
 
-    public String getTempPassword(){
-        char[] charSet = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
-                'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
+    public String getTempPassword() {
+        char[] charSet = new char[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
+                'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
 
         String str = "";
 
