@@ -2,6 +2,7 @@ package com.project.myacademy.domain.parent;
 
 import com.project.myacademy.domain.parent.dto.*;
 import com.project.myacademy.global.Response;
+import com.project.myacademy.global.util.AuthenticationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -21,8 +22,8 @@ public class ParentRestController {
      */
     @PostMapping("/{academyId}/parents")
     public ResponseEntity<Response<CreateParentResponse>> create(@PathVariable Long academyId, CreateParentRequest request, Authentication authentication) {
-        String account = authentication.getName();
-        CreateParentResponse response = parentService.createParent(academyId, request, account);
+        String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
+        CreateParentResponse response = parentService.createParent(academyId, request, requestAccount);
         return ResponseEntity.ok().body(Response.success(response));
     }
 
@@ -31,8 +32,8 @@ public class ParentRestController {
      */
     @GetMapping("/{academyId}/parents/{parentId}")
     public ResponseEntity<Response<ReadParentResponse>> read(@PathVariable Long academyId, @PathVariable Long parentId, Authentication authentication) {
-        String account = authentication.getName();
-        ReadParentResponse response = parentService.readParent(academyId, parentId, account);
+        String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
+        ReadParentResponse response = parentService.readParent(academyId, parentId, requestAccount);
         return ResponseEntity.ok().body(Response.success(response));
     }
 
@@ -41,8 +42,8 @@ public class ParentRestController {
      */
     @PutMapping("/{academyId}/parents/{parentId}")
     public ResponseEntity<Response<UpdateParentResponse>> update(@PathVariable Long academyId, @PathVariable Long parentId, UpdateParentRequest request, Authentication authentication) {
-        String account = authentication.getName();
-        UpdateParentResponse response = parentService.updateParent(academyId, parentId, request, account);
+        String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
+        UpdateParentResponse response = parentService.updateParent(academyId, parentId, request, requestAccount);
         return ResponseEntity.ok().body(Response.success(response));
     }
 
@@ -51,8 +52,8 @@ public class ParentRestController {
      */
     @DeleteMapping("/{academyId}/parents/{parentId}")
     public ResponseEntity<Response<DeleteParentResponse>> delete(@PathVariable Long academyId, @PathVariable Long parentId, Authentication authentication) {
-        String account = authentication.getName();
-        DeleteParentResponse response = parentService.deleteParent(academyId, parentId, account);
+        String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
+        DeleteParentResponse response = parentService.deleteParent(academyId, parentId, requestAccount);
         return ResponseEntity.ok().body(Response.success(response));
     }
 }
