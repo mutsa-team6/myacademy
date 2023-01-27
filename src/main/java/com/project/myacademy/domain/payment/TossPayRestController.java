@@ -2,8 +2,8 @@ package com.project.myacademy.domain.payment;
 
 import com.project.myacademy.domain.payment.dto.PaymentRequest;
 import com.project.myacademy.domain.payment.dto.PaymentResponse;
-import com.project.myacademy.domain.payment.dto.PaymentResponseHandleDto;
-import com.project.myacademy.domain.payment.dto.PaymentResponseHandleFailDto;
+import com.project.myacademy.domain.payment.dto.ApproveResponse;
+import com.project.myacademy.domain.payment.dto.FailApproveResponse;
 import com.project.myacademy.global.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/api/v1/academies/")
+@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 @Slf4j
 public class TossPayRestController {
@@ -28,8 +28,8 @@ public class TossPayRestController {
      * @return
      */
 
-    @PostMapping("/{academyId}/students/{studentId}/payment")
-    public Response<PaymentResponse> requestPayments(@ModelAttribute PaymentRequest request,
+    @PostMapping("/students/{studentId}/payment")
+    public Response<PaymentResponse> requestPayments(@RequestBody PaymentRequest request,
                                                      @PathVariable Long academyId,
                                                      @PathVariable Long studentId,
                                                      Authentication authentication ) {
@@ -40,25 +40,24 @@ public class TossPayRestController {
     }
 
     /**
-     *
      * @param paymentKey
      * @param orderId
      * @param amount
      * @return
      */
-    @GetMapping("/{academyId}/payment/success")
-    public Response<PaymentResponseHandleDto> requestFinalPayments(@RequestParam String paymentKey,
-                                                                   @RequestParam String orderId,
-                                                                   @RequestParam Long amount){
+    @GetMapping("/payment/success")
+    public Response<ApproveResponse> requestFinalPayments(@RequestParam String paymentKey,
+                                                          @RequestParam String orderId,
+                                                          @RequestParam Integer amount){
         paymentService.verifyRequest(paymentKey,orderId,amount);
-        PaymentResponseHandleDto result = paymentService.requestFinalPayment(paymentKey,orderId,amount);
+        ApproveResponse result = paymentService.requestFinalPayment(paymentKey,orderId,amount);
         return Response.success(result);
     }
 
-    @GetMapping("/{academyId}/payment/fail")
-    public Response<PaymentResponseHandleFailDto> requestFail(@RequestParam String errorCode,
-                                                              @RequestParam String errorMsg,
-                                                              @RequestParam String orderId){
+    @GetMapping("/payment/fail")
+    public Response<FailApproveResponse> requestFail(@RequestParam String errorCode,
+                                                     @RequestParam String errorMsg,
+                                                     @RequestParam String orderId){
         return Response.error(errorCode, paymentService.requestFail(errorCode, errorMsg, orderId));
 
     }

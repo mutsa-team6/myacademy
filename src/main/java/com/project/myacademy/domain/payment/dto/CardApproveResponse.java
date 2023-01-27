@@ -1,6 +1,6 @@
 package com.project.myacademy.domain.payment.dto;
 
-public class PaymentResponseHandleCardDto {
+public class CardApproveResponse {
     String company;						// "현대",
     String number;						// "433012******1234",
     String installmentPlanMonths;		// 0,

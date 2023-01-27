@@ -3,7 +3,7 @@ package com.project.myacademy.domain.payment.dto;
 import lombok.Data;
 
 @Data
-public class PaymentResponseHandleDto {
+public class ApproveResponse {
     String mId; //가맹점 ID
     String version;
     String paymentKey;
@@ -20,6 +20,5 @@ public class PaymentResponseHandleDto {
     String approvedAt;
     String useEscrow;
     String cultureExpense;
-    PaymentResponseHandleCardDto card;
-
+    CardApproveResponse card;
 }

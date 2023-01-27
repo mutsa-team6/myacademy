@@ -1,12 +1,10 @@
 package com.project.myacademy.domain.payment.dto;
 import com.project.myacademy.domain.employee.Employee;
+import com.project.myacademy.domain.enrollment.Enrollment;
 import com.project.myacademy.domain.payment.PayType;
 import com.project.myacademy.domain.payment.Payment;
 import com.project.myacademy.domain.student.Student;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.UUID;
 
@@ -14,19 +12,17 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @Getter
+@ToString
 public class PaymentRequest {
     //지불방법
     private PayType payType;
     //지불금액
-    private Long amount;
+    private Integer amount;
     //주문 상품 이름
     private String orderName;
-//    //구매자 이메일
-//    private String studentEmail;
-//    //구매자 이름
-//    private String studentName;
 
-    public Payment toEntity(Employee employee, Student student){
+
+    public Payment toEntity(Employee employee, Student student, Enrollment enrollment){
         return Payment.builder()
                 .orderId(UUID.randomUUID().toString())
                 .payType(payType)
@@ -34,6 +30,7 @@ public class PaymentRequest {
                 .orderName(orderName)
                 .employee(employee)
                 .student(student)
+                .lecture(enrollment.getLecture())
                 .build();
     }
 }

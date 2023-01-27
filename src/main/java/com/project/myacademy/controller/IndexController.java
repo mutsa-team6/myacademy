@@ -80,5 +80,9 @@ public class IndexController {
         return "redirect:/main";
     }
 
+    @GetMapping("/payment")
+    public String payment(){
+        return "payment/payment";
+    }
 
 }

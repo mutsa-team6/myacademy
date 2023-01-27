@@ -12,4 +12,6 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
 
     // 현재 강좌 등록인원
     Long countByLecture_Id(Long lectureId);
+
+    Optional<Enrollment> findByStudentId(Long studentId);
 }

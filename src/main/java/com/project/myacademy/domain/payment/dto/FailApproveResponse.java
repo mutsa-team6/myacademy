@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class PaymentResponseHandleFailDto {
+public class FailApproveResponse {
     ErrorCode errorCode;
     String errorMsg;
     String orderId;

@@ -43,21 +43,11 @@ public class Payment extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private PayType payType;
-    private Long amount;
+    private Integer amount;
     private String paymentKey;
 
     public void setPaymentKey(String paymentKey) {
         this.paymentKey = paymentKey;
     }
 
-    public PaymentResponse toDto(Employee employee,Student student) {
-        return PaymentResponse.builder()
-                .payType(payType)
-                .amount(amount)
-                .orderId(orderId)
-                .orderName(orderName)
-                .studentName(student.getName())
-                .studentEmail(student.getEmail())
-                .build();
-    }
 }
