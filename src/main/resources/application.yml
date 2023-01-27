@@ -55,3 +55,13 @@ cloud:
       static: ap-northeast-2
     stack:
       auto: false
+
+payment:
+  toss:
+    test_client_api_key:
+    test_secret_api_key:
+    success_url:
+    fail_url:
+    origin_url:
+
+
