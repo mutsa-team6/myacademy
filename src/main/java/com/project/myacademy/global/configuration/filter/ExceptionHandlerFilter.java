@@ -61,7 +61,7 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
 
         response.setContentType("text/html; charset=utf-8");
         PrintWriter writer = response.getWriter();
-        writer.println("<script>alert('토큰이 만료되어 토큰을 삭제합니다.');  location.reload();</script>");
+        writer.println("<script>alert('토큰이 유효하지 않아 토큰을 삭제합니다. 다시 로그인해주세요');  location.reload();</script>");
         writer.flush();
     }
 }
