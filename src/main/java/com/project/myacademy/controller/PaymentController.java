@@ -3,8 +3,11 @@ package com.project.myacademy.controller;
 import com.project.myacademy.domain.academy.Academy;
 import com.project.myacademy.domain.employee.EmployeeService;
 import com.project.myacademy.domain.employee.dto.ReadEmployeeResponse;
+<<<<<<< HEAD
 import com.project.myacademy.domain.enrollment.EnrollmentService;
 import com.project.myacademy.domain.enrollment.dto.FindEnrollmentResponse;
+=======
+>>>>>>> 87cd6780bc732b834546fb9372f55678db6d6536
 import com.project.myacademy.global.util.AuthenticationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
