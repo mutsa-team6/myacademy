@@ -1,10 +1,13 @@
 package com.project.myacademy.global.util;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Date;
 
+@Slf4j
 public class JwtTokenUtil {
 
     public static Claims openToken(String token, String key) {
@@ -32,12 +35,22 @@ public class JwtTokenUtil {
                 .get("account", String.class);
     }
 
-    public static String createToken(String account, String key, long expireTime) {
+    public static String getEmail(String token, String key) {
+        return Jwts.parser()
+                .setSigningKey(key)
+                .parseClaimsJws(token)
+                .getBody()
+                .get("email", String.class);
+    }
+
+    public static String createToken(String account, String email, String key, long expireTime) {
         Claims claims = Jwts
                 .claims(); //key-value형태
 
         claims
                 .put("account", account); //claims에 담을 정보를 여기에서 추가해주면 된다.
+        claims
+                .put("email", email); //claims에 담을 정보를 여기에서 추가해주면 된다.
 
 
         return Jwts
