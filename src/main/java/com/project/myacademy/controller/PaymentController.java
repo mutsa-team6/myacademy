@@ -19,10 +19,12 @@ import javax.servlet.http.HttpSession;
 @RequestMapping("/academy/")
 @Slf4j
 @RequiredArgsConstructor
-public class IndexController {
+public class PaymentController {
 
     private final EmployeeService employeeService;
-    @GetMapping("main")
+
+
+    @GetMapping("payment")
     public String main(HttpServletRequest request, Model model, Authentication authentication){
 
         Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
@@ -45,7 +47,7 @@ public class IndexController {
             session.setAttribute("name",foundName);
             model.addAttribute("name", foundName);
         }
-        return "pages/main";
+        return "pages/payment";
     }
 
 
