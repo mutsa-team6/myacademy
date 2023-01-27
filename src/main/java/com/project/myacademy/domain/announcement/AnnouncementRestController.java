@@ -2,6 +2,7 @@ package com.project.myacademy.domain.announcement;
 
 import com.project.myacademy.domain.announcement.dto.*;
 import com.project.myacademy.global.Response;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "학원공지사항")
 @RestController
 @RequiredArgsConstructor
 @Slf4j

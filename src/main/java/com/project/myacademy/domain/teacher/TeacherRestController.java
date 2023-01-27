@@ -2,12 +2,14 @@ package com.project.myacademy.domain.teacher;
 
 import com.project.myacademy.domain.teacher.dto.*;
 import com.project.myacademy.global.Response;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "강사")
 @RestController
 @RequestMapping("api/v1/academies")
 @RequiredArgsConstructor
