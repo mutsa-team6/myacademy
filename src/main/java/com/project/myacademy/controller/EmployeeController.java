@@ -67,6 +67,6 @@ public class EmployeeController {
         cookieGenerator.addCookie(response, token);
         cookieGenerator.setCookieMaxAge(60 * 60);//1시간
         log.info("🍪 쿠키에 저장한 토큰 {}", token);
-        return "redirect:/main";
+        return "redirect:/academy/main";
     }
 }
