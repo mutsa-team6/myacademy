@@ -34,6 +34,10 @@ public class ParentService {
         Academy academy = validateAcademy(academyId);
         //account 유효검사
         Employee employee = validateAcademyEmployee(account, academy);
+        // 부모를 관리 할 수 있는 권한인지 확인(강사만 불가능)
+        if(Employee.isTeacherAuthority(employee)) {
+            throw new AppException(ErrorCode.INVALID_PERMISSION);
+        }
 
         //부모 핸드폰번호와 academyId 로 중복되는 부모가 있는지 확인함.
         parentRepository.findByPhoneNumAndAcademyId(request.getPhoneNum(),academyId)
@@ -57,6 +61,11 @@ public class ParentService {
         Academy academy = validateAcademy(academyId);
         //account 유효검사
         Employee employee = validateAcademyEmployee(account, academy);
+        // 부모를 관리 할 수 있는 권한인지 확인(강사만 불가능)
+        if(Employee.isTeacherAuthority(employee)) {
+            throw new AppException(ErrorCode.INVALID_PERMISSION);
+        }
+
         //parentId와 academyId에 해당하는 부모 정보가 존재하는지 확인
         Parent parent = validateParent(parentId, academyId);
 
@@ -76,6 +85,10 @@ public class ParentService {
         Academy academy = validateAcademy(academyId);
         //account 유효검사
         Employee employee = validateAcademyEmployee(account, academy);
+        // 부모를 관리 할 수 있는 권한인지 확인(강사만 불가능)
+        if(Employee.isTeacherAuthority(employee)) {
+            throw new AppException(ErrorCode.INVALID_PERMISSION);
+        }
         //parentId와 academyId에 해당하는 부모 정보가 존재하는지 확인
         Parent parent = validateParent(parentId, academyId);
 
@@ -96,6 +109,10 @@ public class ParentService {
         Academy academy = validateAcademy(academyId);
         //account 유효검사
         Employee employee = validateAcademyEmployee(account, academy);
+        // 부모를 관리 할 수 있는 권한인지 확인(강사만 불가능)
+        if(Employee.isTeacherAuthority(employee)) {
+            throw new AppException(ErrorCode.INVALID_PERMISSION);
+        }
         //parentId와 academyId에 해당하는 부모 정보가 존재하는지 확인
         Parent parent = validateParent(parentId, academyId);
 
