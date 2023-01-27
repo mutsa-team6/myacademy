@@ -2,12 +2,13 @@ package com.project.myacademy.domain.academy;
 
 import com.project.myacademy.domain.academy.dto.*;
 import com.project.myacademy.global.Response;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-@Tag(name = "학원")
+@Tag(name = "1. 학원")
 @RestController
 @RequestMapping("/api/v1/academies")
 @RequiredArgsConstructor
@@ -25,6 +26,7 @@ public class AcademyRestController {
      * @param request
      * @return ResponseEntity
      */
+    @Operation(summary = "학원 찾기", description = "하나의 학원을 찾습니다.")
     @PostMapping("/find")
     public ResponseEntity find(@RequestBody FindAcademyRequest request) {
 
@@ -35,7 +37,7 @@ public class AcademyRestController {
         return ResponseEntity.ok(Response.success(response.getAcademyId()));
     }
 
-
+    @Operation(summary = "학원 등록", description = "학원을 등록합니다.")
     @PostMapping("")
     public ResponseEntity create(@RequestBody CreateAcademyRequest request) {
 
@@ -50,7 +52,8 @@ public class AcademyRestController {
      * @param academyId
      * @return ResponseEntity
      */
-    @DeleteMapping("/{academyId}/delete")
+        @Operation(summary = "학원 삭제", description = "학원을 soft-delete 합니다.")
+        @DeleteMapping("/{academyId}/delete")
     public ResponseEntity delete(@PathVariable Long academyId) {
 
         Long deletedAcademyId = academyService.deleteAcademy(academyId);
