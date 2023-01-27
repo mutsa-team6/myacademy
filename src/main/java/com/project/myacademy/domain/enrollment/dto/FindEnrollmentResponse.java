@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 public class FindEnrollmentResponse {
 
     private Long studentId;
+    private Long lectureId;
     private String studentName;
     private String studentPhoneNum;
     private String lectureName;
@@ -26,6 +27,7 @@ public class FindEnrollmentResponse {
     private Boolean paymentYN;
     public FindEnrollmentResponse(Student student, Lecture lecture, Teacher teacher, Enrollment enrollment) {
         this.studentId = student.getId();
+        this.lectureId = lecture.getId();
         this.studentName = student.getName();
         this.studentPhoneNum = student.getPhoneNum();
         this.lectureName = lecture.getName();

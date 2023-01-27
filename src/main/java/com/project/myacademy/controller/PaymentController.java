@@ -3,11 +3,9 @@ package com.project.myacademy.controller;
 import com.project.myacademy.domain.academy.Academy;
 import com.project.myacademy.domain.employee.EmployeeService;
 import com.project.myacademy.domain.employee.dto.ReadEmployeeResponse;
-<<<<<<< HEAD
+
 import com.project.myacademy.domain.enrollment.EnrollmentService;
 import com.project.myacademy.domain.enrollment.dto.FindEnrollmentResponse;
-=======
->>>>>>> 87cd6780bc732b834546fb9372f55678db6d6536
 import com.project.myacademy.global.util.AuthenticationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +13,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
@@ -31,6 +28,8 @@ public class PaymentController {
     private final EnrollmentService enrollmentService;
 
 
+    private final String key = "fakefake";
+
     @GetMapping("/academy/pay")
     public String main(@RequestParam(required = false) String studentName,HttpServletRequest request, Model model, Authentication authentication){
 
@@ -45,6 +44,7 @@ public class PaymentController {
             model.addAttribute("enrollments", enrollments);
         }
 
+        model.addAttribute("tossKey", key);
 
         //회원 이름 표시
         HttpSession session = request.getSession(true);

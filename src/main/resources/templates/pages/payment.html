@@ -43,7 +43,7 @@
         <ul class="navbar-nav">
 
             <li class="nav-item">
-                <a class="nav-link text-white " href="/academy/payment">
+                <a class="nav-link text-white " href="/academy/pay">
 
                     <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
                         <i class='far fa-credit-card'></i>
@@ -258,7 +258,7 @@
                     <div class="card-header pb-0">
                         <div class="row">
                             <div class="col-lg-9 col-7">
-                                <h4>결제 화면</h4>
+                                <h4>결제</h4>
                             </div>
                             <div class="col-lg-3 col-5 my-auto text-end">
                                 <form class="form-inline w-100 justify-content-center " action="/academy/pay"
@@ -266,8 +266,8 @@
                                     <div class="row mb-4">
                                         <div class="col-9 align-self-center">
                                             <div class="input-group input-group-outline  ">
-                                                <label class="form-label">학생 이름</label>
-                                                <input type="text" class="form-control" name="studentName">
+
+                                                <input type="text" class="form-control" name="studentName" placeholder="학생 이름">
                                             </div>
                                         </div>
                                         <div class="col-3  align-self-center">
@@ -340,8 +340,9 @@
                                     </td>
                                     <td class="align-middle text-center">
 
-                                        <button  type="button"
-                                                class="btn btn-sm bg-gradient-primary btn-lg w-100 mb-0">선택
+                                        <button  type="button"  th:data-parameter1="${enrollment.studentId}"  th:data-parameter2="${enrollment.price}" th:data-parameter3="${enrollment.lectureName}" th:data-parameter4="${enrollment.lectureId}" th:data-parameter5="${tossKey}"
+                                                 th:onclick="|pay.createOrder(this.getAttribute('data-parameter1'),this.getAttribute('data-parameter2'),this.getAttribute('data-parameter3'),this.getAttribute('data-parameter4'),this.getAttribute('data-parameter5'))|"
+                                                class="btn btn-sm bg-gradient-danger btn-lg w-100 mb-0">결제
                                         </button>
                                     </td>
 
@@ -353,12 +354,6 @@
                 </div>
             </div>
         </div>
-        <td class="align-middle text-center">
-
-            <button th:onclick="|pay.createPay()|" type="button"
-                    class="btn btn-sm bg-gradient-danger btn-lg w-100 mb-0">결제
-            </button>
-        </td>
 
         <footer class="footer py-4  ">
             <div class="container-fluid">
@@ -534,60 +529,65 @@
         Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
     }
 </script>
-<script>
-    const tossPayments = TossPayments("test_ck_Kma60RZblrq6QJ6djWx8wzYWBn14");
-    function payment(){
-        var method = "카드";
-
-        var paymentData = {
-            amount: 300000,
-            orderId: "67918cd9-6b35-45b8-91f4-8ab82d9a57dd",
-            orderName: "lecture name",
-            successUrl: "http://localhost:8080/payment/success",
-            failUrl: "http://localhost:8080/payment/fail"
-        };
-
-        tossPayments.requestPayment(method, paymentData);
-    }
-</script>
 <Script>
-    let academyId = 0;
+    let orderId =null;
+    let orderName =null;
+    let amount = null;
 
     let pay = {
         init: function () {
             var _this = this;
         },
 
-
-        createPay: function (studenetId) {
+        createOrder: function (studentId,amount,orderName,lectureId,tossKey) {
             let data = {
-                account: document.querySelector('#input-employeeAccount').value.trim(),
-                password: document.querySelector('#input-employeePassword').value.trim(),
-                name: document.querySelector('#input-employeeName').value.trim(),
-                email: document.querySelector('#input-employeeEmail').value.trim(),
-                address: document.querySelector("#address_kakao").value.trim() + "  " + document.querySelector("#address_detail_kakao").value.trim(),
-                phoneNum: document.querySelector('#input-employeePhone').value.trim()
+                payType: "CARD",
+                amount: amount,
+                orderName: orderName,
+                lectureId : lectureId
             };
             console.log(data);
 
-            axios.post("/api/v1/academies/" + academyId + "/employees/signup",
+            let key = tossKey
+            axios.post("/api/v1/payments/students/"+studentId,
                 JSON.stringify(data), {
                     headers: {
                         'Content-Type': 'application/json',
                     }
                 }
             ).then((response) => {
-                alert("회원가입에 성공하였습니다! 로그인해주세요!");
-                window.location.href = '/login';
+                console.log(response);
+                orderId = response.data.result.orderId;
+                orderName = response.data.result.orderName;
+                amount = response.data.result.amount;
+                var method = "카드";
 
+                console.log(orderId);
+                console.log(orderName);
+                console.log(amount);
+                console.log(key);
+
+                const tossPayments = TossPayments(key);
+
+                var paymentData = {
+                    amount: amount,
+                    orderId: orderId,
+                    orderName: orderName,
+                    successUrl: "http://localhost:8080/payment/success",
+                    failUrl: "http://localhost:8080/payment/fail"
+                };
+
+                tossPayments.requestPayment(method, paymentData);
+
+                alert("결제를 진행해주세요!");
             }).catch((error) => {
-                console.log(academyId);
                 console.log(error);
-
+                if (error.response.data.result["errorCode"] == "ACADEMY_NOT_FOUND") {
+                    alert("등록된 학원이 아닙니다. 등록 후 진행해주세요");
+                }
             });
 
         }
-
     };
 
     pay.init();
