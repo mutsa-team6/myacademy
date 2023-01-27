@@ -2,6 +2,7 @@ package com.project.myacademy.domain.announcement;
 
 import com.project.myacademy.domain.announcement.dto.*;
 import com.project.myacademy.global.Response;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +25,8 @@ public class AnnouncementRestController {
     /**
      * 특정 학원 공지사항 작성
      */
+    @Tag(name = "3. 공지사항", description = "학원 공지사항 작성,수정,조회")
+    @Operation(summary = "공지사항 작성", description = "ADMIN,STAFF 회원만 작성이 가능합니다.")
     @PostMapping("/{academyId}/announcements")
     public ResponseEntity<Response<CreateAnnouncementResponse>> create(@PathVariable Long academyId, CreateAnnouncementRequest request, Authentication authentication) {
         String account = authentication.getName();
@@ -34,6 +37,8 @@ public class AnnouncementRestController {
     /**
      * 특정 학원 공지사항 목록 조회
      */
+    @Tag(name = "3. 공지사항", description = "학원 공지사항 작성,수정,조회")
+    @Operation(summary = "공지사항 전체 조회", description = "공지사항을 전체 조회합니다.")
     @GetMapping("/{academyId}/announcements")
     public ResponseEntity<Response<Page<ReadAllAnnouncementResponse>>> readAll(@PathVariable Long academyId, Authentication authentication) {
         String account = authentication.getName();
@@ -45,6 +50,8 @@ public class AnnouncementRestController {
     /**
      * 특정 학원 공지사항 단건 조회
      */
+    @Tag(name = "3. 공지사항", description = "학원 공지사항 작성,수정,조회")
+    @Operation(summary = "공지사항 단건 조회", description = "공지사항을 단건 조회합니다.")
     @GetMapping("/{academyId}/announcements/{announcementId}")
     public ResponseEntity<Response<ReadAnnouncementResponse>> read(@PathVariable Long academyId, @PathVariable Long announcementId, Authentication authentication) {
         String account = authentication.getName();
@@ -55,6 +62,8 @@ public class AnnouncementRestController {
     /**
      * 특정 학원 공지사항 수정
      */
+    @Tag(name = "3. 공지사항", description = "학원 공지사항 작성,수정,조회")
+    @Operation(summary = "공지사항 수정", description = "ADMIN,STAFF 회원만 수정이 가능합니다.")
     @PutMapping("/{academyId}/announcements/{announcementId}")
     public ResponseEntity<Response<UpdateAnnouncementResponse>> update(@PathVariable Long academyId, @PathVariable Long announcementId, UpdateAnnouncementRequest request, Authentication authentication) {
         String account = authentication.getName();
@@ -65,6 +74,8 @@ public class AnnouncementRestController {
     /**
      * 특정 학원 공지사항 삭제
      */
+    @Tag(name = "3. 공지사항", description = "학원 공지사항 작성,수정,조회")
+    @Operation(summary = "공지사항 수정", description = "ADMIN,STAFF 회원만 삭제가 가능합니다.")
     @DeleteMapping("/{academyId}/announcements/{announcementId}")
     public ResponseEntity<Response<DeleteAnnouncementResponse>> delete(@PathVariable Long academyId, @PathVariable Long announcementId, Authentication authentication) {
         String account = authentication.getName();
