@@ -1,6 +1,7 @@
 package com.project.myacademy.global.configuration;
 
 import com.project.myacademy.domain.employee.EmployeeService;
+import com.project.myacademy.global.configuration.filter.ExceptionHandlerFilter;
 import com.project.myacademy.global.configuration.filter.JwtTokenFilter;
 import com.project.myacademy.global.configuration.oauth.CustomOAuth2UserService;
 import com.project.myacademy.global.configuration.oauth.Oauth2FailureHandler;
@@ -66,6 +67,7 @@ public class SecurityConfig {
 
                 .and()
                 .addFilterBefore(new JwtTokenFilter(employeeService,secretKey), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new ExceptionHandlerFilter(), JwtTokenFilter.class)
                 .build();
 
     }
