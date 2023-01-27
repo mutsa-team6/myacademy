@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-@Tag(name = "1. 학원")
+@Tag(name = "1. 학원", description = "학원 등록, 조회, 삭제")
 @RestController
 @RequestMapping("/api/v1/academies")
 @RequiredArgsConstructor
