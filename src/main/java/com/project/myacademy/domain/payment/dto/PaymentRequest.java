@@ -21,7 +21,7 @@ public class PaymentRequest {
     //주문 상품 이름
     private String orderName;
 
-
+    private Long lectureId;
     public Payment toEntity(Employee employee, Student student, Enrollment enrollment){
         return Payment.builder()
                 .orderId(UUID.randomUUID().toString())

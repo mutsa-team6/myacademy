@@ -9,6 +9,7 @@ import com.project.myacademy.domain.lecture.Lecture;
 import com.project.myacademy.domain.lecture.LectureRepository;
 import com.project.myacademy.domain.student.Student;
 import com.project.myacademy.domain.student.StudentRepository;
+import com.project.myacademy.domain.teacher.Teacher;
 import com.project.myacademy.domain.waitinglist.Waitinglist;
 import com.project.myacademy.domain.waitinglist.WaitinglistRepository;
 import com.project.myacademy.global.exception.AppException;
@@ -19,6 +20,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -234,4 +238,26 @@ public class EnrollmentService {
         return newEnrollment.getId();
     }
 
+    /**
+     * 결제 UI용 메서드
+     */
+
+    public List<FindEnrollmentResponse> findEnrollmentForPay(Long academyId, String studentName) {
+
+        // 학원과 학생 이름으로 student 객체를 찾아온다.
+        List<Student> foundStudents = studentRepository.findByAcademyIdAndName(academyId, studentName);
+
+        // 모두 이 컬렉션에 저장할 것이다.
+        List<FindEnrollmentResponse> finalEnrollments = new ArrayList<>();
+
+        // student 객체로 수강등록 데이터를 찾아온다 ( 근데 여러개일 수 있다.)
+        for (Student foundStudent : foundStudents) {
+            List<Enrollment> founds = enrollmentRepository.findByStudent(foundStudent);
+            for (Enrollment found : founds) {
+                finalEnrollments.add(new FindEnrollmentResponse(foundStudent,found.getLecture(),found.getLecture().getTeacher(),found));
+            }
+        }
+
+        return finalEnrollments;
+    }
 }
