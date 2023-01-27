@@ -16,6 +16,4 @@ public class UpdateStudentRequest {
     private String email;
     //학생 생년월일
     private String birth;
-    //학생 주소
-    private String address;
 }

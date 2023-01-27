@@ -13,8 +13,6 @@ public class ReadStudentResponse {
     private Long id;
     //학생 이름
     private String name;
-    //학생 주소
-    private String address;
     //학생 생년월일
     private String birth;
     //학생 핸드폰번호
@@ -23,6 +21,8 @@ public class ReadStudentResponse {
     private String email;
     //부모 핸드폰번호
     private String parentPhoneNum;
+    //부모 주소
+    private String address;
     //학생 정보 등록 일시
     private LocalDateTime createAt;
     //학생 정보 마지막 수정 일시
@@ -32,7 +32,7 @@ public class ReadStudentResponse {
         return ReadStudentResponse.builder()
                 .id(student.getId())
                 .name(student.getName())
-                .address(student.getAddress())
+                .address(student.getParent().getAddress())
                 .birth(student.getBirth())
                 .phoneNum(student.getPhoneNum())
                 .email(student.getEmail())
