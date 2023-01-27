@@ -2,6 +2,8 @@ package com.project.myacademy.domain.uniqueness;
 
 import com.project.myacademy.domain.uniqueness.dto.*;
 import com.project.myacademy.global.Response;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import com.project.myacademy.global.util.AuthenticationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -11,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "학생특이사항")
 @RestController
 @RequiredArgsConstructor
 @Slf4j
@@ -25,8 +28,8 @@ public class UniquenessRestController {
     @PostMapping("/{academyId}/students/{studentId}/uniqueness")
     public ResponseEntity<Response<CreateUniquenessResponse>> create(@PathVariable Long academyId,
                                                                      @PathVariable Long studentId, CreateUniquenessRequest request, Authentication authentication) {
-        String account = authentication.getName();
-        CreateUniquenessResponse response = uniquenessService.createUniqueness(academyId, studentId, request, account);
+        String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
+        CreateUniquenessResponse response = uniquenessService.createUniqueness(academyId, studentId, request, requestAccount);
         return ResponseEntity.ok().body(Response.success(response));
     }
 
@@ -36,9 +39,9 @@ public class UniquenessRestController {
     @GetMapping("/{academyId}/students/{studentId}/uniqueness")
     public ResponseEntity<Response<Page<ReadAllUniquenessResponse>>> readAll(@PathVariable Long academyId,
                                                                              @PathVariable Long studentId, Authentication authentication) {
-        String account = authentication.getName();
+        String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
         PageRequest pageable = PageRequest.of(0, 20, Sort.by("id").descending());
-        Page<ReadAllUniquenessResponse> responses = uniquenessService.readAllUniqueness(academyId, studentId, pageable, account);
+        Page<ReadAllUniquenessResponse> responses = uniquenessService.readAllUniqueness(academyId, studentId, pageable, requestAccount);
         return ResponseEntity.ok().body(Response.success(responses));
     }
 
@@ -49,8 +52,8 @@ public class UniquenessRestController {
     public ResponseEntity<Response<UpdateUniquenessResponse>> update(@PathVariable Long academyId,
                                                                      @PathVariable Long studentId,
                                                                      @PathVariable Long uniquenessId, UpdateUniquenessRequest request, Authentication authentication) {
-        String account = authentication.getName();
-        UpdateUniquenessResponse response = uniquenessService.updateUniqueness(academyId, studentId, uniquenessId, request, account);
+        String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
+        UpdateUniquenessResponse response = uniquenessService.updateUniqueness(academyId, studentId, uniquenessId, request, requestAccount);
         return ResponseEntity.ok().body(Response.success(response));
     }
 
@@ -61,8 +64,8 @@ public class UniquenessRestController {
     public ResponseEntity<Response<DeleteUniquenessResponse>> delete(@PathVariable Long academyId,
                                                                      @PathVariable Long studentId,
                                                                      @PathVariable Long uniquenessId, Authentication authentication) {
-        String account = authentication.getName();
-        DeleteUniquenessResponse response = uniquenessService.deleteUniqueness(academyId, studentId, uniquenessId, account);
+        String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
+        DeleteUniquenessResponse response = uniquenessService.deleteUniqueness(academyId, studentId, uniquenessId, requestAccount);
         return ResponseEntity.ok().body(Response.success(response));
     }
 }

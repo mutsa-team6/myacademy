@@ -3,6 +3,7 @@ package com.project.myacademy.domain.employee;
 import com.project.myacademy.domain.employee.dto.*;
 import com.project.myacademy.global.Response;
 import com.project.myacademy.global.util.AuthenticationUtil;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+@Tag(name = "직원")
 @RestController
 @RequestMapping("/api/v1/academies/")
 @RequiredArgsConstructor
