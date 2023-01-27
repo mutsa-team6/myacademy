@@ -1,4 +1,14 @@
 spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: my.academy.company
+    password: fakepassword
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+  profiles:
+    include: oauth
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/myacademy-db
@@ -11,6 +21,11 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
 jwt:
   token:
     secret: faketoken
@@ -29,3 +44,14 @@ springdoc:
     operations-sorter: alpha
     display-request-duration: true
 
+cloud:
+  aws:
+    credentials:
+      accessKey: fakeId      # AWS IAM AccessKey
+      secretKey: fakeKey   # AWS IAM SecretKey
+    s3:
+      bucket: bucket    # 버킷 이름
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false

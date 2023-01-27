@@ -1,0 +1,259 @@
+<!--
+=========================================================
+* Material Dashboard 2 - v3.0.4
+=========================================================
+
+* Product Page: https://www.creative-tim.com/product/material-dashboard
+* Copyright 2022 Creative Tim (https://www.creative-tim.com)
+* Licensed under MIT (https://www.creative-tim.com/license)
+* Coded by Creative Tim
+
+=========================================================
+
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+-->
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<th:block th:replace="layout/header :: headerFragment"></th:block>
+
+
+<body class="">
+<div class="container position-sticky z-index-sticky top-0">
+    <div class="row">
+        <div class="col-12">
+
+        </div>
+    </div>
+</div>
+<main class="main-content  mt-0">
+    <section>
+        <div class="page-header min-vh-100">
+            <div class="container">
+                <div class="row">
+                    <div class="col-6 d-lg-flex d-none h-100 my-auto pe-0 position-absolute top-0 start-0 text-center justify-content-center flex-column">
+                        <div class="position-relative bg-gradient-primary h-100 m-3 px-7 border-radius-lg d-flex flex-column justify-content-center"
+                             style="background-image: url('https://raw.githubusercontent.com/buinq/imageServer/main/img/image-20230121201357931.png'); background-size: contain;">
+                        </div>
+                    </div>
+
+                    <div class="col-xl-4 col-lg-5 col-md-7 d-flex flex-column ms-auto me-auto ms-lg-auto me-lg-5">
+                        <div class="card card-plain">
+                            <h4 class="font-weight-bolder">회원가입</h4>
+                            <p class="mb-0">이용하려는 학원 정보를 입력하여, 확인해주세요.</p>
+                        </div>
+                        <div class="card-body">
+                            <form role="form">
+                                <div class="row ">
+                                    <div class="col-9 align-self-center">
+                                        <div class="input-group input-group-outline  ">
+                                            <label class="form-label">학원 이름</label>
+                                            <input type="text" class="form-control" id="input-academyName">
+                                        </div>
+                                    </div>
+                                    <div class="col-3  align-self-center">
+                                        <button th:onclick="|signUp.findAcademy()|" type="button"
+                                                class="btn btn-sm bg-gradient-primary btn-lg w-100 mb-0">검색
+                                        </button>
+                                    </div>
+
+                                </div>
+                            </form>
+                        </div>
+
+                        <br>
+                        <br>
+                        <p class="mb-0">사용할 계정명과 비밀번호를 입력해주세요</p>
+                        <br>
+                        <div class="card-body">
+                            <div class="input-group input-group-outline mb-3">
+                                <label class="form-label">계정명</label>
+                                <input type="text" class="form-control" id="input-employeeAccount">
+                            </div>
+                            <div class="input-group input-group-outline mb-3">
+                                <label class="form-label">비밀번호</label>
+                                <input type="password" class="form-control" id="input-employeePassword">
+                            </div>
+                            <div class="input-group input-group-outline mb-3">
+                                <label class="form-label">비밀번호 2차 입력</label>
+                                <input type="password" class="form-control" id="input-employeePasswordCheck">
+                            </div>
+
+                            <p class="mb-0">사용자 정보를 입력해주세요.</p>
+                            <br>
+
+                            <div class="input-group input-group-outline mb-3">
+                                <label class="form-label">이름</label>
+                                <input type="text" class="form-control" id="input-employeeName">
+                            </div>
+                            <div class="input-group input-group-outline mb-3">
+                                <label class="form-label">이메일</label>
+                                <input type="text" class="form-control" id="input-employeeEmail">
+                            </div>
+
+                            <div class="input-group input-group-outline mb-3">
+                                <label class="form-label">전화번호</label>
+                                <input type="text" class="form-control" id="input-employeePhone">
+                            </div>
+
+                            <div class="input-group input-group-outline mb-3">
+                                <input type="text" class="form-control" id="address_kakao" readonly
+                                       placeholder="주소">
+                            </div>
+                            <div class="input-group input-group-outline mb-3">
+                                <label class="form-label">상세주소</label>
+                                <input type="text" class="form-control" id="address_detail_kakao"
+                                       name="address_detail"
+                                >
+                            </div>
+                            <div class="form-check form-check-info text-start ps-0">
+                                <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault"
+                                       checked>
+                                <label class="form-check-label" for="flexCheckDefault">
+                                    I agree the <a href="javascript:;" class="text-dark font-weight-bolder">Terms
+                                    and Conditions</a>
+                                </label>
+                            </div>
+                            <div class="text-center">
+                                <button th:onclick="|signUp.createEmployee()|" type="button"
+                                        class="btn btn-lg bg-gradient-primary btn-lg w-100 mt-4 mb-0">회원 가입
+                                </button>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="card-footer text-center pt-0 px-lg-2 px-1">
+                            <p class="mb-2 text-sm mx-auto">
+                                이미 가입하셨습니까?
+                                <a th:href="@{/login}" class="text-primary text-gradient font-weight-bold">로그인</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </section>
+</main>
+<!--   Core JS Files   -->
+<script src="../assets/js/core/popper.min.js"></script>
+<script src="../assets/js/core/bootstrap.min.js"></script>
+<script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>
+<script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
+<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
+<script>
+    var win = navigator.platform.indexOf('Win') > -1;
+    if (win && document.querySelector('#sidenav-scrollbar')) {
+        var options = {
+            damping: '0.5'
+        }
+        Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
+    }
+</script>
+<!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
+<script src="../assets/js/material-dashboard.min.js?v=3.0.4"></script>
+<Script>
+    let academyId = 0;
+
+    let signUp = {
+        init: function () {
+            var _this = this;
+        },
+
+        findAcademy: function () {
+            let data = {
+                name: document.querySelector('#input-academyName').value.trim()
+            };
+            console.log(data);
+
+            axios.post("/api/v1/academies/find",
+                JSON.stringify(data), {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                }
+            ).then((response) => {
+                console.log(response);
+                alert("등록된 학원입니다. 회원가입을 진행해주세요");
+                academyId = response.data.result;
+                console.log(academyId);
+            }).catch((error) => {
+                console.log(error);
+                if (error.response.data.result["errorCode"] == "ACADEMY_NOT_FOUND") {
+                    alert("등록된 학원이 아닙니다. 등록 후 진행해주세요");
+                }
+            });
+
+        },
+
+        createEmployee: function () {
+            let data = {
+                account: document.querySelector('#input-employeeAccount').value.trim(),
+                password: document.querySelector('#input-employeePassword').value.trim(),
+                name: document.querySelector('#input-employeeName').value.trim(),
+                email: document.querySelector('#input-employeeEmail').value.trim(),
+                address: document.querySelector("#address_kakao").value.trim() + "  " + document.querySelector("#address_detail_kakao").value.trim(),
+                phoneNum: document.querySelector('#input-employeePhone').value.trim()
+            };
+            console.log(data);
+
+            var blank_pattern = /[\s]/g;
+
+            if (blank_pattern.test(data.account) == true || data.account == '') {
+                alert('계정명에 공백이 입력되었습니다. 다시 입력해주세요');
+                return;
+            }
+            if (blank_pattern.test(data.password) == true || data.password == '') {
+                alert('비밀번호에 공백이 입력되었습니다. 다시 입력해주세요');
+                return;
+            }
+
+            const password = document.querySelector('#input-employeePassword').value.trim();
+            const passwordCheck = document.querySelector('#input-employeePasswordCheck').value.trim();
+
+            if (password != passwordCheck) {
+                alert('비밀번호가 일치하지 않습니다. 다시 입력해주세요');
+                return;
+            }
+
+            axios.post("/api/v1/academies/" + academyId + "/employees/signup",
+                JSON.stringify(data), {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                }
+            ).then((response) => {
+                alert("회원가입에 성공하였습니다! 로그인해주세요!");
+                window.location.href = '/login';
+
+            }).catch((error) => {
+                console.log(academyId);
+                console.log(error);
+
+            });
+
+        }
+
+    };
+
+    signUp.init();
+
+</script>
+
+<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<script>
+    $(document).ready(function () {
+        document.getElementById("address_kakao").addEventListener("click", function () { //주소입력칸을 클릭하면
+            //카카오 지도 발생
+            new daum.Postcode({
+                oncomplete: function (data) { //선택시 입력값 세팅
+                    document.getElementById("address_kakao").value = data.address; // 주소 넣기
+                    document.querySelector("input[name=address_detail]").focus(); //상세입력 포커싱
+                }
+            }).open();
+        });
+    });
+</script>
+</body>
+
+</html>
