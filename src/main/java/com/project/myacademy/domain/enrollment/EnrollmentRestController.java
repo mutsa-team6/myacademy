@@ -2,6 +2,8 @@ package com.project.myacademy.domain.enrollment;
 
 import com.project.myacademy.domain.enrollment.dto.*;
 import com.project.myacademy.global.Response;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import com.project.myacademy.global.util.AuthenticationUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "수강신청")
+@Tag(name = "9. 수강신청", description = "수강 등록,수정,조회")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/academies")
@@ -24,6 +26,7 @@ public class EnrollmentRestController {
     private final EnrollmentService enrollmentService;
 
     // 수강 등록
+    @Operation(summary = "수강 등록", description = "ADMIN,STAFF 회원만 등록이 가능합니다.")
     @PostMapping("/{academyId}/students/{studentId}/lectures/{lectureId}/enrollments")
     public ResponseEntity<Response<CreateEnrollmentResponse>> create(@PathVariable("academyId") Long academyId,
                                                                      @PathVariable("studentId") Long studentId,
@@ -37,6 +40,7 @@ public class EnrollmentRestController {
     }
 
     // 수강 전체 리스트 조회
+    @Operation(summary = "수강 전체 조회", description = "수강 리스트를 조회합니다.")
     @GetMapping("/{academyId}/enrollments")
     public ResponseEntity<Response<Page<ReadAllEnrollmentResponse>>> readAll(@PathVariable("academyId") Long academyId, Authentication authentication,
              @PageableDefault(size = 20, sort = {"createdAt"}, direction = Sort.Direction.DESC) Pageable pageable) {
@@ -47,6 +51,7 @@ public class EnrollmentRestController {
     }
 
     // 수강 수정
+    @Operation(summary = "수강 수정", description = "ADMIN,STAFF 회원만 수정이 가능합니다.")
     @PutMapping("/{academyId}/students/{studentId}/lectures/{lectureId}/enrollments/{enrollmentId}")
     public ResponseEntity<Response<UpdateEnrollmentResponse>> update(@PathVariable("academyId") Long academyId,
                                                                      @PathVariable("studentId") Long studentId,
@@ -61,6 +66,7 @@ public class EnrollmentRestController {
     }
 
     // 수강 삭제
+    @Operation(summary = "수강 삭제", description = "ADMIN,STAFF 회원만 삭제가 가능합니다. \n\n 수강이력이 삭제되고, 대기번호를 확인한 후, 수강등록이됩니다.")
     @PostMapping("/{academyId}/students/{studentId}/lectures/{lectureId}/enrollments/{enrollmentId}")
     public ResponseEntity<Response<DeleteEnrollmentResponse>> delete(@PathVariable("academyId") Long academyId,
                                                                      @PathVariable("studentId") Long studentId,

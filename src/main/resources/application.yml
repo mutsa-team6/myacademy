@@ -41,7 +41,7 @@ springdoc:
   swagger-ui:
     enabled: true
     tagsSorter: alpha
-    operations-sorter: alpha
+    operations-sorter: method
     display-request-duration: true
 
 cloud:
