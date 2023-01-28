@@ -26,15 +26,15 @@ public enum AcademyFixtureUtil {
         this.password = password;
     }
 
-    public Academy init() {
-        return Academy.builder()
-                .id(this.id)
-                .name(this.name)
-                .address(this.address)
-                .phoneNum(this.phoneNum)
-                .owner(this.owner)
-                .businessRegistrationNumber(this.businessRegistrationNumber)
-                .password(bCryptPasswordEncoder.encode(this.password))
-                .build();
-    }
+//    public Academy init() {
+//        return Academy.builder()
+//                .id(this.id)
+//                .name(this.name)
+//                .address(this.address)
+//                .phoneNum(this.phoneNum)
+//                .owner(this.owner)
+//                .businessRegistrationNumber(this.businessRegistrationNumber)
+//                .password(bCryptPasswordEncoder.encode(this.password))
+//                .build();
+//    }
 }
