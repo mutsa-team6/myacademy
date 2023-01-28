@@ -27,21 +27,19 @@ public class PaymentController {
 
     private final EmployeeService employeeService;
     private final EnrollmentService enrollmentService;
-
-    @Value("${payment.toss.testSecretApiKey}")
-    private final String key;
+    private final String key = "fake";
 
     @GetMapping("/academy/pay")
-    public String main(@RequestParam(required = false) String studentName,HttpServletRequest request, Model model, Authentication authentication){
+    public String main(@RequestParam(required = false) String studentName, HttpServletRequest request, Model model, Authentication authentication) {
 
         Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
-        log.info("⭐ 메인 요청한 사용자의 학원 id [{}] || 요청한 사용자의 계정 [{}]",academyId,requestAccount);
+        log.info("⭐ 메인 요청한 사용자의 학원 id [{}] || 요청한 사용자의 계정 [{}]", academyId, requestAccount);
 
         if (studentName != null) {
 
             List<FindEnrollmentResponse> enrollments = enrollmentService.findEnrollmentForPay(academyId, studentName);
-            log.info("⭐ 검색 학생 이름 [{}] || 강좌 수 [{}] ",studentName,enrollments.size());
+            log.info("⭐ 검색 학생 이름 [{}] || 강좌 수 [{}] ", studentName, enrollments.size());
             model.addAttribute("enrollments", enrollments);
         }
 
@@ -58,12 +56,11 @@ public class PaymentController {
             ReadEmployeeResponse found = employeeService.readEmployee(academyId, requestAccount);
             Academy foundAcademy = found.getAcademy();
             String foundName = found.getName();
-            session.setAttribute("name",foundName);
+            session.setAttribute("name", foundName);
             model.addAttribute("name", foundName);
         }
         return "pages/payment";
     }
-
 
 
 }
