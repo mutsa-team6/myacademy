@@ -66,7 +66,7 @@ public class EnrollmentRestController {
     }
 
     // 수강 삭제
-    @Operation(summary = "수강 삭제", description = "ADMIN,STAFF 회원만 삭제가 가능합니다. \n\n 수강이력이 삭제되고, 대기번호를 확인한 후, 수강등록이됩니다.")
+    @Operation(summary = "수강 삭제", description = "ADMIN,STAFF 회원만 삭제가 가능합니다. \n\n 수강이력이 삭제되고, 다음 대기번호를 확인한 후, 수강 등록이 되면 기존 대기번호가 삭제됩니다.")
     @PostMapping("/{academyId}/students/{studentId}/lectures/{lectureId}/enrollments/{enrollmentId}")
     public ResponseEntity<Response<DeleteEnrollmentResponse>> delete(@PathVariable("academyId") Long academyId,
                                                                      @PathVariable("studentId") Long studentId,
