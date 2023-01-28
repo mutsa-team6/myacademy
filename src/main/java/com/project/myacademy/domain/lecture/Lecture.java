@@ -44,11 +44,9 @@ public class Lecture extends BaseEntity {
     private String LectureTime;
 
     @Column(name = "start_date")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd")
     private LocalDate startDate;
 
     @Column(name = "finish_date")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd")
     private LocalDate finishDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -79,7 +77,7 @@ public class Lecture extends BaseEntity {
                 .teacher(teacher)
                 .registerEmployee(sb.append(employee.getId()).append(" (").append(employee.getName()).append(")").toString())
                 .modifiedEmployee(sb.toString())
-                .currentEnrollmentNumber(request.getCurrentRegisterNumber())
+                .currentEnrollmentNumber(request.getCurrentEnrollmentNumber())
                 .build();
     }
 

@@ -8,10 +8,10 @@ import com.project.myacademy.domain.enrollment.Enrollment;
 import com.project.myacademy.domain.enrollment.EnrollmentRepository;
 import com.project.myacademy.domain.lecture.Lecture;
 import com.project.myacademy.domain.lecture.LectureRepository;
-import com.project.myacademy.domain.payment.dto.PaymentRequest;
-import com.project.myacademy.domain.payment.dto.PaymentResponse;
-import com.project.myacademy.domain.payment.dto.ApproveResponse;
-import com.project.myacademy.domain.payment.dto.FailApproveResponse;
+import com.project.myacademy.domain.payment.dto.CreatePaymentRequest;
+import com.project.myacademy.domain.payment.dto.CreatePaymentResponse;
+import com.project.myacademy.domain.payment.dto.SuccessApprovePaymentResponse;
+import com.project.myacademy.domain.payment.dto.FailApprovePaymentResponse;
 import com.project.myacademy.domain.student.Student;
 import com.project.myacademy.domain.student.StudentRepository;
 import com.project.myacademy.global.exception.AppException;
@@ -54,7 +54,7 @@ public class PaymentService {
      * @param account
      */
     @Transactional
-    public PaymentResponse requestPayments(PaymentRequest request, Long academyId, Long studentId, String account) {
+    public CreatePaymentResponse createPayment(CreatePaymentRequest request, Long academyId, Long studentId, String account) {
         //학원이 존재하는지 여부
         Academy academy = validateAcademy(academyId);
 
@@ -69,13 +69,13 @@ public class PaymentService {
                 .orElseThrow(() -> new AppException(ErrorCode.LECTURE_NOT_FOUND));
 
         //결제할 학생이 수강신청한 수업
-        Enrollment studentEnrollment = enrollmentRepository.findByStudentAndLecture(foundStudent,foundLecture)
+        Enrollment studentEnrollment = enrollmentRepository.findByStudentAndLecture(foundStudent, foundLecture)
                 .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
 
         //수강 결제가 된거면 중복 결제안되도록 막기
-//        if (studentEnrollment.getPaymentYN() != false) {
-//            throw new AppException(ErrorCode.DUPLICATED_PAYMENT);
-//        }
+        if (studentEnrollment.getPaymentYN() != false) {
+            throw new AppException(ErrorCode.DUPLICATED_PAYMENT);
+        }
 
         Integer amount = request.getAmount();
         String payType = request.getPayType().getName();
@@ -99,7 +99,7 @@ public class PaymentService {
 
         Payment savedPayment = paymentRepository.save(request.toEntity(foundEmployee, foundStudent, studentEnrollment));
 
-        PaymentResponse response = PaymentResponse.of(savedPayment);
+        CreatePaymentResponse response = CreatePaymentResponse.of(savedPayment);
         response.setSuccessUrl("http://localhost:8080/payment/success");
         response.setFailUrl("http://localhost:8080/payment/fail");
 
@@ -107,7 +107,7 @@ public class PaymentService {
     }
 
     /**
-     * 결제 요청 - 완료시 `성공시 콜백주소 ? orderID=000 & paymentKey=000 &amount=000`
+     * 결제 승인 전 검증과정
      *
      * @param paymentKey 토스 측 결제 고유 ID
      * @param orderId    우리측 주문 ID
@@ -138,13 +138,13 @@ public class PaymentService {
      * @return
      */
     @Transactional
-    public ApproveResponse requestFinalPayment(String paymentKey, String orderId, Integer amount) {
+    public SuccessApprovePaymentResponse successApprovePayment(String paymentKey, String orderId, Integer amount) {
         //이미 결제되있는지 확인
         Payment selcetedPayment = paymentRepository.findByOrderId(orderId)
                 .orElseThrow(() -> new AppException(ErrorCode.PAYMENT_NOT_FOUND));
 
         Enrollment enrollment = enrollmentRepository.findByStudentAndLecture(selcetedPayment.getStudent(), selcetedPayment.getLecture())
-                .orElseThrow(()-> new AppException(ErrorCode.ENROLLMENT_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.ENROLLMENT_NOT_FOUND));
 
         if (enrollment.getPaymentYN() == true) {
             throw new AppException(ErrorCode.ALREADY_PAYMENT);
@@ -163,14 +163,15 @@ public class PaymentService {
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
 
         JSONObject param = new JSONObject();
-        param.put("orderId", orderId);
+        param.put("paymentKey", paymentKey);
         param.put("amount", amount);
+        param.put("orderId", orderId);
 
         //url로 요청
         return rest.postForEntity(
-                        "http://localhost:8080/payments/confirm",
+                        "https://api.tosspayments.com/v1/payments/confirm",
                         new HttpEntity<>(param, headers),
-                        ApproveResponse.class)
+                        SuccessApprovePaymentResponse.class)
                 .getBody();
     }
 
@@ -182,13 +183,15 @@ public class PaymentService {
      * @param orderId
      * @return
      */
-    public FailApproveResponse requestFail(String errorCode, String errorMsg, String orderId) {
+    public FailApprovePaymentResponse failApprovePayment(String errorCode, String errorMsg, String orderId) {
+
         Payment payment = paymentRepository.findByOrderId(orderId)
                 .orElseThrow(() -> new AppException(ErrorCode.PAYMENT_NOT_FOUND));
-        return FailApproveResponse.builder()
+
+        return FailApprovePaymentResponse.builder()
                 .orderId(orderId)
-                .errorCode(ErrorCode.PAYMENT_NOT_FOUND)
-                .errorMsg(ErrorCode.PAYMENT_NOT_FOUND.getMessage())
+                .errorCode(errorCode)
+                .errorMsg(errorMsg)
                 .build();
     }
 

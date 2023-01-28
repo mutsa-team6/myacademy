@@ -33,7 +33,9 @@ public class SwaggerConfig {
         String[] paths = {
                 "com.project.myacademy.domain.academy",
                 "com.project.myacademy.domain.employee",
-                "com.project.myacademy.domain.announcement"
+                "com.project.myacademy.domain.announcement",
+                "com.project.myacademy.domain.file.announcementfile",
+                "com.project.myacademy.domain.file.employeeprofile"
         };
 
         return GroupedOpenApi
@@ -65,7 +67,8 @@ public class SwaggerConfig {
                 "com.project.myacademy.domain.lecture",
                 "com.project.myacademy.domain.enrollment",
                 "com.project.myacademy.domain.waitinglist",
-                "com.project.myacademy.domain.payment"
+                "com.project.myacademy.domain.payment",
+                "com.project.myacademy.domain.file.teacherprofile"
         };
 
         return GroupedOpenApi

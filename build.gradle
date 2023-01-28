@@ -13,6 +13,9 @@ plugins {
 
 	//querydsl 추가
 	id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
+
+	// jacoco
+	id 'jacoco'
 }
 
 group = 'com.project'
@@ -76,6 +79,96 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+	finalizedBy 'jacocoTestReport'  // Test 이후 커버리지가 동작하도록 finalizedBy 추가
+}
+
+jacoco {
+	toolVersion = '0.8.8'
+}
+
+// 바이너리 커버리지 결과를 사람이 읽기 좋은 형태의 리포트로 저장
+jacocoTestReport {
+	dependsOn test
+	reports {
+		html.enabled true
+		xml.enabled true
+		csv.enabled true
+
+		// html 파일 위치 지정
+		html.destination file('build/reports/myReport.html')
+	}
+
+	def Qdomains = []
+	for (qPattern in '**/QA'..'**/QZ') {
+		Qdomains.add(qPattern + '*')
+	}
+
+
+	// 리포트 작성 시 특정 파일 제외
+	afterEvaluate {
+		classDirectories.setFrom(
+				files(classDirectories.files.collect {
+					fileTree(dir: it, excludes: [
+							'**/MyacademyApplication*',
+							'**/*Request*',
+							'**/*Response*',
+							'**/Swagger*',
+							'**/JpaAuditingConfig*',
+							'**/controller'
+					] + Qdomains)
+				})
+		)
+	}
+
+	finalizedBy 'jacocoTestCoverageVerification'
+}
+
+// 내가 원하는 커버리지 기준을 만족하는지 확인해 주는 task
+// 점수 평가 및 검증 단계
+jacocoTestCoverageVerification {
+
+	def Qdomains = []
+	for (qPattern in '**/QA'..'**/QZ') {
+		Qdomains.add(qPattern + '*')
+	}
+
+	violationRules {
+		rule {
+			enabled = true // 활성화
+			element = 'CLASS' // 클래스 단위로 커버리지 체크
+			// includes = []
+
+			// 라인 커버리지 제한을 80%로 설정
+			limit {
+				counter = 'LINE'
+				value = 'COVEREDRATIO'
+				minimum = 0.80
+			}
+
+			// 브랜치 커버리지 제한을 80%로 설정
+			limit {
+				counter = 'BRANCH'
+				value = 'COVEREDRATIO'
+				minimum = 0.80
+			}
+
+			// 빈 줄을 제외한 코드의 라인수를 최대 200라인으로 제한
+			limit {
+				counter = 'LINE'
+				value = 'TOTALCOUNT'
+				maximum = 200
+			}
+			excludes = [
+					'**.*ProjectApplication*',
+					'**.*Request*',
+					'**.*Response*',
+					'**.*Swagger*',
+					'**.*PasswordEncoder*',
+					'**.*JpaAuditing*',
+					'**.controller'
+			] + Qdomains
+		}
+	}
 }
 
 //Querydsl 추가

@@ -66,7 +66,7 @@ public class TeacherProfileS3UploadService {
         // 업로드를 진행하는 직원이 해당 학원 소속 직원인지 확인
         Employee employee = validateAcademyEmployee(account, academy);
 
-        // 직원이 파일 업로드할 권한이 있는지 확인(강사만 불가능)
+        // 직원이 파일 업로드할 권한이 있는지 확인 (강사 외 모든 직원 가능)
         if(Employee.isTeacherAuthority(employee)) {
             throw new AppException(ErrorCode.INVALID_PERMISSION);
         }
