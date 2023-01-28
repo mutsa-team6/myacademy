@@ -71,5 +71,10 @@ public class Enrollment extends BaseEntity {
         StringBuilder sb = new StringBuilder();
         this.modifiedEmployee = sb.append(employee.getId()).append(" (").append(employee.getName()).append(")").toString();
     }
+
+    // paymentYN 수정
+    public void updatePaymentYN() {
+        this.paymentYN = true;
+    }
 }
 
