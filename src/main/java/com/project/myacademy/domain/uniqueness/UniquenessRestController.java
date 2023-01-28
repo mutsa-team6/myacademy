@@ -14,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "6. 학생 특이사항", description = "학생 특이사항 등록,수정,조회")
+@Tag(name = "06. 학생 특이사항", description = "학생 특이사항 등록,수정,조회")
 @RestController
 @RequiredArgsConstructor
 @Slf4j

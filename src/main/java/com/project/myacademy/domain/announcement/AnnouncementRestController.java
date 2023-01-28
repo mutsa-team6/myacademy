@@ -13,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "3. 학원 공지사항", description = "학원 공지사항 작성,수정,조회")
+@Tag(name = "03. 학원 공지사항", description = "학원 공지사항 작성,수정,조회")
 @RestController
 @RequiredArgsConstructor
 @Slf4j
