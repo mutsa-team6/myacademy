@@ -2,12 +2,13 @@ package com.project.myacademy.domain.academy;
 
 import com.project.myacademy.domain.academy.dto.*;
 import com.project.myacademy.global.Response;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
+@Tag(name = "01. 학원", description = "학원 등록, 조회, 삭제")
 @RestController
 @RequestMapping("/api/v1/academies")
 @RequiredArgsConstructor
@@ -25,6 +26,7 @@ public class AcademyRestController {
      * @param request
      * @return ResponseEntity
      */
+    @Operation(summary = "학원 찾기", description = "하나의 학원을 찾습니다.")
     @PostMapping("/find")
     public ResponseEntity find(@RequestBody FindAcademyRequest request) {
 
@@ -33,6 +35,32 @@ public class AcademyRestController {
         log.info("🔎 검색하려는 학원이 존재함");
 
         return ResponseEntity.ok(Response.success(response.getAcademyId()));
+    }
+
+    @Operation(summary = "학원 등록", description = "학원을 등록합니다.")
+    @PostMapping("")
+    public ResponseEntity create(@RequestBody CreateAcademyRequest request) {
+
+        CreateAcademyResponse response = academyService.createAcademy(request);
+
+        return ResponseEntity.ok(Response.success(response));
+    }
+
+        /**
+     * 학원 삭제
+     *
+     * @param academyId
+     * @return ResponseEntity
+     */
+        @Operation(summary = "학원 삭제", description = "학원을 soft-delete 합니다.")
+        @DeleteMapping("/{academyId}/delete")
+    public ResponseEntity delete(@PathVariable Long academyId) {
+
+        Long deletedAcademyId = academyService.deleteAcademy(academyId);
+
+        return ResponseEntity.ok(Response.success(new DeleteAcademyResponse(
+                deletedAcademyId,
+                "학원 삭제가 정상적으로 완료되었습니다.")));
     }
 }
 
@@ -57,23 +85,7 @@ public class AcademyRestController {
 //                "학원 수정이 정상적으로 완료되었습니다.")));
 //    }
 //
-//    /**
-//     * 학원 삭제
-//     *
-//     * @param academyId
-//     * @param authentication
-//     * @return ResponseEntity
-//     */
-//    @DeleteMapping("/{academyId}")
-//    public ResponseEntity delete(@PathVariable Long academyId, Authentication authentication) {
-//        log.info("Academy id : " + academyId);
-//
-//        Long deletedAcademyId = academyService.deleteAcademy(academyId, authentication.getName());
-//
-//        return ResponseEntity.ok(Response.success(new DeleteAcademyResponse(
-//                deletedAcademyId,
-//                "학원 삭제가 정상적으로 완료되었습니다.")));
-//    }
+
 //
 //    /**
 //     * 학원 로그인

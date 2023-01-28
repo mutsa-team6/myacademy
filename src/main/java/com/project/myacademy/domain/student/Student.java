@@ -36,12 +36,13 @@ public class Student extends BaseEntity {
 
     private String email;
 
-    private String address;
-
     // 학생 : 부모 = 다 : 1 ( 자녀가 여러명이므로 )
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     private Parent parent;
+
+    //학원 Id
+    private Long academyId;
 
     public void updateStudent(UpdateStudentRequest request) {
         this.name = request.getName();
@@ -49,18 +50,17 @@ public class Student extends BaseEntity {
         this.birth = request.getSchool();
         this.phoneNum = request.getPhoneNum();
         this.email = request.getEmail();
-        this.address = request.getAddress();
     }
 
-    public static Student toStudent(CreateStudentRequest request, Parent parent) {
+    public static Student toStudent(CreateStudentRequest request, Parent parent, Long academyId) {
         return Student.builder()
                 .name(request.getName())
                 .school(request.getSchool())
                 .birth(request.getBirth())
                 .phoneNum(request.getPhoneNum())
                 .email(request.getEmail())
-                .address(request.getAddress())
                 .parent(parent)
+                .academyId(academyId)
                 .build();
     }
 }

@@ -47,7 +47,7 @@ public class TeacherService {
         }
 
         // 일대일 관계이므로 직원이 강사에 2번 등록되면 안됨
-        teacherRepository.findByEmployee(employee)
+        teacherRepository.findByEmployee(employeeToTeacher)
                 .ifPresent(teacher -> {
                     throw new AppException(ErrorCode.DUPLICATED_TEACHER);
                 });

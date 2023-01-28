@@ -34,6 +34,9 @@ public enum ErrorCode {
     ANNOUNCEMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 공지사항을 찾을 수 없습니다."),
     ENROLLMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 수강 이력을 찾을 수 없습니다."),
     WAITINGLIST_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 대기번호를 찾을 수 없습니다."),
+    EMPLOYEE_PROFILE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 직원 파일을 찾을 수 없습니다."),
+    TEACHER_PROFILE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 강사 파일을 찾을 수 없습니다."),
+    ANNOUNCEMENT_FILE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 공지사항 파일을 찾을 수 없습니다."),
 
     INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "패스워드가 잘못되었습니다."),
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "잘못된 토큰입니다."),
@@ -44,11 +47,20 @@ public enum ErrorCode {
     NOT_ALLOWED_CHANGE(HttpStatus.UNAUTHORIZED, "ADMIN 계정을 변경하거나 삭제할 수 없습니다."),
 
     DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "DB에러가 발생했습니다."),
+    FILE_UPLOAD_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드에 실패했습니다."),
     INVALID_VALUE(HttpStatus.BAD_REQUEST, "요청이 이상합니다."),
     NOT_MATCH_OWNER(HttpStatus.BAD_REQUEST, "admin 계정 생성 시 학원 대표자 명과 일치해야 합니다."),
     BAD_DELETE_REQUEST(HttpStatus.BAD_REQUEST, "자신의 계정을 삭제할 수 없습니다."),
     BAD_CHANGE_REQUEST(HttpStatus.BAD_REQUEST, "자신의 계정 등급을 변경할 수 없습니다."),
-    PAYMENT_REQUIRED(HttpStatus.PAYMENT_REQUIRED, "결제 정보가 필요합니다.");
+    FILE_NOT_EXISTS(HttpStatus.BAD_REQUEST, "보낼 파일이 비어있습니다."),
+    FILE_SIZE_EXCEED(HttpStatus.BAD_REQUEST, "파일 업로드 용량을 초과했습니다."),
+    WRONG_FILE_FORMAT(HttpStatus.BAD_REQUEST, "잘못된 형식의 파일입니다"),
+
+    PAYMENT_ERROR_ORDER_PRICE(HttpStatus.FORBIDDEN,"요청하신 가격이 일치하지 않습니다."),
+    PAYMENT_ERROR_ORDER_PAY_TYPE(HttpStatus.FORBIDDEN,"요청하신 지불방식이 일치하지 않습니다."),
+    PAYMENT_ERROR_ORDER_NAME(HttpStatus.FORBIDDEN,"요청하신 주문 이름이 일치하지 않습니다."),
+    PAYMENT_REQUIRED(HttpStatus.PAYMENT_REQUIRED, "결제 정보가 필요합니다."),
+    ALREADY_PAYMENT(HttpStatus.CONFLICT,"이미 결제된 수업입니다.");
 
     private HttpStatus httpStatus;
     private String message;

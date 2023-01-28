@@ -68,6 +68,10 @@ public class Employee extends BaseEntity {
         this.password = request.getPassword();
     }
 
+    public void updatePasswordOnly(String password) {
+        this.password = password;
+    }
+
     // ADMIN, STAFF 가 사용하는 등급 변경 메서드
     public void changeRole(EmployeeRole employeeRole) {
         this.employeeRole = employeeRole;

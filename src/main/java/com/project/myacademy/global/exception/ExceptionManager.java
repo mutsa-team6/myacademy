@@ -4,9 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.myacademy.global.ErrorResponse;
 import com.project.myacademy.global.Response;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -21,6 +23,17 @@ public class ExceptionManager {
         log.error("AppException : {}",e.getErrorCode());
         ErrorResponse errorResponse = new ErrorResponse(e.getErrorCode());
         return ResponseEntity.status(e.getErrorCode().getHttpStatus())
+                .body(Response.error("ERROR", errorResponse));
+    }
+
+    /**
+     * 파일 업로드 용량 초과시 발생
+     */
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    protected ResponseEntity<?> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException e) {
+        log.info("handleMaxUploadSizeExceededException", e);
+        ErrorResponse errorResponse = new ErrorResponse(ErrorCode.FILE_SIZE_EXCEED);
+        return ResponseEntity.status(errorResponse.getErrorCode().getHttpStatus())
                 .body(Response.error("ERROR", errorResponse));
     }
 
