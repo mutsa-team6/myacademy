@@ -28,7 +28,7 @@ public class StudentRestController {
      */
     @Operation(summary = "학생 등록", description = "ADMIN,STAFF 회원만 등록이 가능합니다.")
     @PostMapping("/{academyId}/students")
-    public ResponseEntity<Response<CreateStudentResponse>> create(@PathVariable Long academyId, CreateStudentRequest request, Authentication authentication) {
+    public ResponseEntity<Response<CreateStudentResponse>> create(@PathVariable Long academyId, @RequestBody CreateStudentRequest request, Authentication authentication) {
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
         CreateStudentResponse response = studentService.createStudent(academyId, request, requestAccount);
         return ResponseEntity.ok().body(Response.success(response));
@@ -62,7 +62,7 @@ public class StudentRestController {
      */
     @Operation(summary = "학생 수정", description = "ADMIN,STAFF 회원만 수정이 가능합니다.")
     @PutMapping("/{academyId}/students/{studentId}")
-    public ResponseEntity<Response<UpdateStudentResponse>> update(@PathVariable Long academyId, @PathVariable Long studentId, UpdateStudentRequest request, Authentication authentication) {
+    public ResponseEntity<Response<UpdateStudentResponse>> update(@PathVariable Long academyId, @PathVariable Long studentId,@RequestBody UpdateStudentRequest request, Authentication authentication) {
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
         UpdateStudentResponse response = studentService.updateStudent(academyId,studentId, request, requestAccount);
         return ResponseEntity.ok().body(Response.success(response));
