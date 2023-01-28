@@ -2,6 +2,7 @@ package com.project.myacademy.domain.parent;
 
 import com.project.myacademy.domain.academy.Academy;
 import com.project.myacademy.domain.academy.AcademyRepository;
+import com.project.myacademy.domain.academy.dto.FindAcademyResponse;
 import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.domain.employee.EmployeeRepository;
 import com.project.myacademy.domain.parent.dto.*;
@@ -36,7 +37,7 @@ public class ParentService {
         Employee employee = validateAcademyEmployee(account, academy);
 
         //부모 핸드폰번호와 academyId 로 중복되는 부모가 있는지 확인함.
-        parentRepository.findByPhoneNumAndAcademyId(request.getPhoneNum(),academyId)
+        parentRepository.findByPhoneNumAndAcademyId(request.getPhoneNum(), academyId)
                 .ifPresent(user -> {
                     throw new AppException(ErrorCode.DUPLICATED_PARENT);
                 });
@@ -104,6 +105,21 @@ public class ParentService {
         return DeleteParentResponse.of(parent);
     }
 
+    /**
+     * 전화번호와 학원 id로 부모 잧는 메서드 ( UI 용)
+     */
+    public FindParentResponse findParent(String requestPhoneNum, Long academyId) {
+
+        Parent foundParent = parentRepository.findByPhoneNumAndAcademyId(requestPhoneNum, academyId)
+                .orElseThrow(() -> new AppException(ErrorCode.PARENT_NOT_FOUND));
+
+        FindParentResponse response = new FindParentResponse(foundParent.getId(), foundParent.getName());
+
+        return response;
+
+
+    }
+
     private Parent validateParent(Long parentId, Long academyId) {
         // parentId와 academyId에 해당하는 부모 존재 유무 확인
         Parent parent = parentRepository.findByIdAndAcademyId(parentId, academyId)
@@ -124,4 +140,6 @@ public class ParentService {
                 .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
         return employee;
     }
+
+
 }

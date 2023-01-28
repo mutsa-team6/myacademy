@@ -1,7 +1,10 @@
 package com.project.myacademy.domain.parent;
 
+import com.project.myacademy.domain.academy.dto.FindAcademyRequest;
+import com.project.myacademy.domain.academy.dto.FindAcademyResponse;
 import com.project.myacademy.domain.parent.dto.*;
 import com.project.myacademy.global.Response;
+import com.project.myacademy.global.util.AuthenticationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -55,4 +58,19 @@ public class ParentRestController {
         DeleteParentResponse response = parentService.deleteParent(academyId, parentId, account);
         return ResponseEntity.ok().body(Response.success(response));
     }
+
+    /**
+     * 부모 전화번호로 검색
+     */
+    @PostMapping("/{academyId}/parents/find")
+    public ResponseEntity find(@RequestBody FindParentRequest request, Authentication authentication) {
+        String requestPhoneNum = request.getPhoneNum();
+        Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
+        log.info("🔎 검색하려는 부모 전화번호 [{}] || 학원 id [{}]", requestPhoneNum, academyId);
+
+        FindParentResponse response = parentService.findParent(requestPhoneNum, academyId);
+
+        return ResponseEntity.ok(Response.success(response));
+    }
+
 }

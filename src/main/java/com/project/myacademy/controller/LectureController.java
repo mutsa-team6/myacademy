@@ -10,7 +10,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -18,10 +17,10 @@ import javax.servlet.http.HttpSession;
 @Controller
 @Slf4j
 @RequiredArgsConstructor
-public class IndexController {
-
+public class LectureController {
     private final EmployeeService employeeService;
-    @GetMapping("/academy/main")
+
+    @GetMapping("/academy/lecture")
     public String main(HttpServletRequest request, Model model, Authentication authentication){
 
         Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
@@ -44,8 +43,9 @@ public class IndexController {
             session.setAttribute("name",foundName);
             model.addAttribute("name", foundName);
         }
-        return "pages/main";
+        return "pages/lecture";
     }
+
 
 
 }
