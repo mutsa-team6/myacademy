@@ -49,7 +49,7 @@ public class TeacherProfileController {
     }
 
     // S3 파일 다운로드
-    @Operation(summary = "강사 사진다운로드", description = "ADMIN,STAFF 회원만 다운로드가 가능합니다. \n\n AWS S3서버에 저장된 사진을 다운로드합니다.")
+    @Operation(summary = "강사 사진다운로드", description = "인증된 모든 회원은 다운로드 가능합니다. \n\n AWS S3서버에 저장된 사진을 다운로드합니다.")
     @GetMapping("/{academyId}/teachers/{teacherId}/files/download")
     public ResponseEntity<byte[]> download(@PathVariable("academyId") Long academyId,
                                            @PathVariable("teacherId") Long teacherId,
