@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "7-1. 강사", description = "강사 등록,수정,조회")
+@Tag(name = "07-1. 강사", description = "강사 등록,수정,조회")
 @RestController
 @RequestMapping("api/v1/academies")
 @RequiredArgsConstructor
