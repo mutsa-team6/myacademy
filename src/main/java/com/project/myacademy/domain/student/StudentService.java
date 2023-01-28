@@ -12,9 +12,12 @@ import com.project.myacademy.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -86,7 +89,7 @@ public class StudentService {
      * @param pageable  page 설정 : 20개씩 조회
      * @param account   jwt로 받아온 사용자(Employee) 계정
      */
-    public Page<ReadAllStudentResponse> readAllStudent(Long academyId, PageRequest pageable, String account) {
+    public Page<ReadAllStudentResponse> readAllStudent(Long academyId, Pageable pageable, String account) {
 
         //academyId 존재 유무 확인
         Academy academy = validateAcademy(academyId);
@@ -149,6 +152,16 @@ public class StudentService {
         return DeleteStudentResponse.of(student);
     }
 
+    /**
+     * 이름으로 학생 가져오는 UI용 메서드
+     */
+    public List<ReadAllStudentResponse> findStudentForStudentList(Long academyId, String studentName) {
+
+        List<Student> foundStudents = studentRepository.findByAcademyIdAndName(academyId, studentName);
+
+        return foundStudents.stream().map(student -> ReadAllStudentResponse.of(student)).collect(Collectors.toList());
+
+    }
     private Student validateStudent(Long academyId, Long studentId) {
         // 학생 존재 유무 확인
         Student student = studentRepository.findByAcademyIdAndId(academyId, studentId)
