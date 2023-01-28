@@ -13,7 +13,7 @@ import java.util.UUID;
 @Builder
 @Getter
 @ToString
-public class PaymentRequest {
+public class CreatePaymentRequest {
     //지불방법
     private PayType payType;
     //지불금액
