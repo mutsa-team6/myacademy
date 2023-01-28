@@ -73,9 +73,9 @@ public class PaymentService {
                 .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
 
         //수강 결제가 된거면 중복 결제안되도록 막기
-//        if (studentEnrollment.getPaymentYN() != false) {
-//            throw new AppException(ErrorCode.DUPLICATED_PAYMENT);
-//        }
+        if (studentEnrollment.getPaymentYN() != false) {
+            throw new AppException(ErrorCode.DUPLICATED_PAYMENT);
+        }
 
         Integer amount = request.getAmount();
         String payType = request.getPayType().getName();
@@ -163,12 +163,13 @@ public class PaymentService {
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
 
         JSONObject param = new JSONObject();
-        param.put("orderId", orderId);
+        param.put("paymentKey", paymentKey);
         param.put("amount", amount);
+        param.put("orderId", orderId);
 
         //url로 요청
         return rest.postForEntity(
-                        "http://localhost:8080/payments/confirm",
+                        "https://api.tosspayments.com/v1/payments/confirm",
                         new HttpEntity<>(param, headers),
                         ApproveResponse.class)
                 .getBody();
