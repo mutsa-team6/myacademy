@@ -9,6 +9,7 @@ import com.project.myacademy.domain.enrollment.dto.FindEnrollmentResponse;
 import com.project.myacademy.global.util.AuthenticationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,9 +27,7 @@ public class PaymentController {
 
     private final EmployeeService employeeService;
     private final EnrollmentService enrollmentService;
-
-
-    private final String key = "fakefake";
+    private final String key = "fake";
 
     @GetMapping("/academy/pay")
     public String main(@RequestParam(required = false) String studentName,HttpServletRequest request, Model model, Authentication authentication){

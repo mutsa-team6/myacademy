@@ -15,8 +15,6 @@ public class UpdateStudentResponse {
     private Long id;
     //학생 이름
     private String name;
-    //학생 주소
-    private String address;
     //학생 생년월일
     private String birth;
     //학생 핸드폰번호
@@ -31,7 +29,6 @@ public class UpdateStudentResponse {
         return UpdateStudentResponse.builder()
                 .id(student.getId())
                 .name(student.getName())
-                .address(student.getAddress())
                 .birth(student.getBirth())
                 .phoneNum(student.getPhoneNum())
                 .email(student.getEmail())

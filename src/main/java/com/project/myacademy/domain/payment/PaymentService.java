@@ -42,20 +42,8 @@ public class PaymentService {
     private final EmployeeRepository employeeRepository;
     private final LectureRepository lectureRepository;
 
-    @Value("${payment.toss.test_client_api_key}")
-    private String testClientApiKey;
-
-    @Value("${payment.toss.test_secret_api_key}")
+    @Value("${payment.toss.testSecretApiKey}")
     private String testSecretApiKey;
-
-    @Value("${payment.toss.success_url}")
-    private String successCallBackUrl;
-
-    @Value("${payment.toss.fail_url}")
-    private String failCallBackUrl;
-
-    @Value("${payment.toss.origin_url}")
-    private String tossOriginUrl;
 
     /**
      * 결제할 상품 가격,지불 방법, 수업 이름 체크
@@ -112,8 +100,8 @@ public class PaymentService {
         Payment savedPayment = paymentRepository.save(request.toEntity(foundEmployee, foundStudent, studentEnrollment));
 
         PaymentResponse response = PaymentResponse.of(savedPayment);
-        response.setSuccessUrl(successCallBackUrl);
-        response.setFailUrl(failCallBackUrl);
+        response.setSuccessUrl("http://localhost:8080/payment/success");
+        response.setFailUrl("http://localhost:8080/payment/fail");
 
         return response;
     }
@@ -180,7 +168,7 @@ public class PaymentService {
 
         //url로 요청
         return rest.postForEntity(
-                        tossOriginUrl+ paymentKey,
+                        "http://localhost:8080/payments/confirm",
                         new HttpEntity<>(param, headers),
                         ApproveResponse.class)
                 .getBody();
