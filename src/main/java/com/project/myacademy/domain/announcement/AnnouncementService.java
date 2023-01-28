@@ -43,6 +43,10 @@ public class AnnouncementService {
         Academy academy = validateAcademy(academyId);
         //account 유효검사
         Employee employee = validateAcademyEmployee(account, academy);
+        // 공지사항을 관리 할 수 있는 권한인지 확인(강사만 불가능)
+        if(Employee.isTeacherAuthority(employee)) {
+            throw new AppException(ErrorCode.INVALID_PERMISSION);
+        }
 
         Announcement savedAnnouncement = announcementRepository.save(Announcement.toAnnouncement(request, academy));
 
@@ -62,6 +66,10 @@ public class AnnouncementService {
         Academy academy = validateAcademy(academyId);
         //account 유효검사
         Employee employee = validateAcademyEmployee(account, academy);
+        // 공지사항을 관리 할 수 있는 권한인지 확인(강사만 불가능)
+        if(Employee.isTeacherAuthority(employee)) {
+            throw new AppException(ErrorCode.INVALID_PERMISSION);
+        }
 
         return announcementRepository.findAllByAcademy(academy, pageable).map(announcement -> ReadAllAnnouncementResponse.of(announcement));
     }
@@ -78,6 +86,10 @@ public class AnnouncementService {
         Academy academy = validateAcademy(academyId);
         //account 유효검사
         Employee employee = validateAcademyEmployee(account, academy);
+        // 공지사항을 관리 할 수 있는 권한인지 확인(강사만 불가능)
+        if(Employee.isTeacherAuthority(employee)) {
+            throw new AppException(ErrorCode.INVALID_PERMISSION);
+        }
         //announcementId에 해당하는 특이사항이 있는 지확인하고 있으면 가져옴
         Announcement announcement = announcementRepository.findById(announcementId)
                 .orElseThrow(() -> new AppException(ErrorCode.ANNOUNCEMENT_NOT_FOUND));
@@ -97,6 +109,10 @@ public class AnnouncementService {
         Academy academy = validateAcademy(academyId);
         //account 유효검사
         Employee employee = validateAcademyEmployee(account, academy);
+        // 공지사항을 관리 할 수 있는 권한인지 확인(강사만 불가능)
+        if(Employee.isTeacherAuthority(employee)) {
+            throw new AppException(ErrorCode.INVALID_PERMISSION);
+        }
 
         //announcementId에 해당하는 특이사항이 있는지 확인하고 있으면 가져옴
         Announcement announcement = announcementRepository.findById(announcementId)
@@ -118,6 +134,10 @@ public class AnnouncementService {
         Academy academy = validateAcademy(academyId);
         //account 유효검사
         Employee employee = validateAcademyEmployee(account, academy);
+        // 공지사항을 관리 할 수 있는 권한인지 확인(강사만 불가능)
+        if(Employee.isTeacherAuthority(employee)) {
+            throw new AppException(ErrorCode.INVALID_PERMISSION);
+        }
 
         //announcementId에 해당하는 특이사항이 있는지 확인하고 있으면 가져옴
         Announcement announcement = announcementRepository.findById(announcementId)
