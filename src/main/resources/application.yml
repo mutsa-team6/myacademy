@@ -41,7 +41,7 @@ springdoc:
   swagger-ui:
     enabled: true
     tagsSorter: alpha
-    operations-sorter: alpha
+    operations-sorter: method
     display-request-duration: true
 
 cloud:
@@ -58,10 +58,4 @@ cloud:
 
 payment:
   toss:
-    test_client_api_key: fakefake
-    test_secret_api_key: fakefake
-    success_url: fakefake
-    fail_url: fakefake
-    origin_url: fakefake
-
-
+    testSecretApiKey: fake
