@@ -27,7 +27,8 @@ public class PaymentController {
 
     private final EmployeeService employeeService;
     private final EnrollmentService enrollmentService;
-    private final String key = "fake";
+    @Value("${payment.toss.testClientApiKey}")
+    private String key;
 
     @GetMapping("/academy/pay")
     public String main(@RequestParam(required = false) String studentName,HttpServletRequest request, Model model, Authentication authentication){
@@ -42,7 +43,7 @@ public class PaymentController {
             log.info("⭐ 검색 학생 이름 [{}] || 강좌 수 [{}] ",studentName,enrollments.size());
             model.addAttribute("enrollments", enrollments);
         }
-
+        log.info("🔑 key = {}",key);
         model.addAttribute("tossKey", key);
 
         //회원 이름 표시

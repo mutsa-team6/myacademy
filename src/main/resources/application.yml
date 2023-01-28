@@ -58,6 +58,6 @@ cloud:
 
 payment:
   toss:
-    testSecretApiKey: fake
-    testClientApiKey: fake
+    testSecretApiKey: ${TEST_SECRET_API_KEY}
+    testClientApiKey: ${TEST_CLIENT_API_KEY}
 
