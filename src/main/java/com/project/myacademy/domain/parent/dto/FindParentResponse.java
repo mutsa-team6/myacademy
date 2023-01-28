@@ -10,4 +10,5 @@ import lombok.Getter;
 public class FindParentResponse {
     private Long parentId;
     private String parentName;
+    private String parentPhoneNum;
 }

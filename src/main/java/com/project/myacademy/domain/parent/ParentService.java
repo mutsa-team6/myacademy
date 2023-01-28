@@ -113,7 +113,7 @@ public class ParentService {
         Parent foundParent = parentRepository.findByPhoneNumAndAcademyId(requestPhoneNum, academyId)
                 .orElseThrow(() -> new AppException(ErrorCode.PARENT_NOT_FOUND));
 
-        FindParentResponse response = new FindParentResponse(foundParent.getId(), foundParent.getName());
+        FindParentResponse response = new FindParentResponse(foundParent.getId(), foundParent.getName(),foundParent.getPhoneNum());
 
         return response;
 
