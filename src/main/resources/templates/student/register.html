@@ -118,14 +118,14 @@
 
                             <th:block th:if="${parent !=null}">
                                 <div class="input-group input-group-outline is-valid my-3">
-                                    <label class="form-label"
-                                           th:text="${parent.parentPhoneNum}">Success</label>
-                                    <input type="email" class="form-control" readonly>
+                                    <label class="form-label" th:text="${parent.parentPhoneNum}"></label>
+                                    <input type="text" class="form-control"  readonly>
+                                    <input type="hidden" class="form-control"  th:value="${parent.parentPhoneNum}" id="input-parentPhoneNum" readonly>
                                 </div>
                                 <div class="input-group input-group-outline is-valid my-3">
                                     <label class="form-label"
                                            th:text="${parent.parentName}">Success</label>
-                                    <input type="email" class="form-control" readonly>
+                                    <input type="text" class="form-control" readonly>
                                 </div>
                             </th:block>
                         </div>
@@ -158,9 +158,9 @@
                         <label class="form-label">학교</label>
                         <input type="text" class="form-control" id="input-studentSchool">
                     </div>
-                    <div class="input-group input-group-outline mb-3">
-                        <label class="form-label">생년월일</label>
-                        <input type="text" class="form-control" id="input-studentBirth">
+                    <div class="input-group input-group-static my-3">
+                        <label>생년월일 </label>
+                        <input type="date" class="form-control" id="input-studentBirth">
                     </div>
                     <div class="input-group input-group-outline mb-3">
                         <label class="form-label">전화번호</label>
@@ -172,7 +172,7 @@
                     </div>
 
                     <div class="text-center">
-                        <button th:onclick="|academy.create()|" type="button"
+                        <button th:onclick="|register.registerStudent(${academyId})|" type="button"
                                 class="btn btn-lg bg-gradient-primary btn-lg w-100 mt-4 mb-0">학생 등록
                         </button>
                     </div>
@@ -184,10 +184,10 @@
             </div>
 
         </div>
+    </div>
         <!--footer-->
         <th:block th:replace="layout/footer :: footerFragment"></th:block>
 </main>
-<!--   Core JS Files   -->
 <!--   Core JS Files   -->
 <script src="/assets/js/core/popper.min.js"></script>
 <script src="/assets/js/core/bootstrap.min.js"></script>
@@ -221,7 +221,7 @@
             }).catch((error) => {
                 console.log(error);
                 if (error.response.data.result["errorCode"] == "PARENT_NOT_FOUND") {
-                    alert("등록된 부모가 아닙니다. 부모 정보를 입력해주세요.");
+                    alert("등록된 부모가 아닙니다. 부모 정보를 등록하고 학생 정보를 등록하세요.");
                     window.location.href = window.location;
                 }
 
@@ -256,9 +256,39 @@
             ).then((response) => {
                 alert("부모 정보 등록을 성공했습니다. 학생 정보를 입력해주세요");
             }).catch((error) => {
-                console.log(academyId);
-                console.log(error);
+                if (error.response.data.result["errorCode"] == "INVALID_PERMISSION") {
+                    alert("강사는 접근할 수 없습니다.");
+                }
+            });
 
+        },
+
+        registerStudent: function (academyId) {
+
+            let data = {
+                name: document.querySelector('#input-studentName').value.trim(),
+                school: document.querySelector('#input-studentSchool').value.trim(),
+                phoneNum: document.querySelector('#input-studentPhoneNum').value.trim(),
+                email: document.querySelector('#input-studentEmail').value.trim(),
+                birth: document.querySelector('#input-studentBirth').value.trim(),
+                parentPhoneNum: document.querySelector('#input-parentPhoneNum').value.trim(),
+            };
+            console.log(data);
+
+            axios.post("/api/v1/academies/" + academyId + "/students",
+                JSON.stringify(data), {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                }
+            ).then((response) => {
+                alert("학생 정보 등록을 성공했습니다.");
+                window.location.href = '/academy/student';
+
+            }).catch((error) => {
+                if (error.response.data.result["errorCode"] == "INVALID_PERMISSION") {
+                    alert("강사는 접근할 수 없습니다.");
+                }
             });
 
         }

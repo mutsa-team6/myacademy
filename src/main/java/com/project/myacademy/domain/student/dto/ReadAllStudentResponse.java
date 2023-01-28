@@ -23,6 +23,8 @@ public class ReadAllStudentResponse {
     private String phoneNum;
     //학생 이메일
     private String email;
+    //학생 학교
+    private String school;
     //부모 핸드폰번호
     private String parentPhoneNum;
     //부모 주소
@@ -40,6 +42,7 @@ public class ReadAllStudentResponse {
                 .birth(student.getBirth())
                 .phoneNum(student.getPhoneNum())
                 .email(student.getEmail())
+                .school(student.getSchool())
                 .parentPhoneNum(student.getParent().getPhoneNum())
                 .address(student.getParent().getAddress())
                 .createAt(student.getCreatedAt())
