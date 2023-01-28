@@ -14,7 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
-@Tag(name = "7-2. 강사", description = "강사 사진 등록,수정,조회")
+@Tag(name = "07-2. 강사", description = "강사 사진 등록,수정,조회")
 @RestController
 @RequiredArgsConstructor
 @Slf4j
