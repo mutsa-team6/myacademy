@@ -2,6 +2,7 @@ package com.project.myacademy.domain.announcement;
 
 import com.project.myacademy.domain.announcement.dto.*;
 import com.project.myacademy.global.Response;
+import com.project.myacademy.global.util.AuthenticationUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -28,8 +29,8 @@ public class AnnouncementRestController {
     @Operation(summary = "공지사항 작성", description = "ADMIN,STAFF 회원만 작성이 가능합니다.")
     @PostMapping("/{academyId}/announcements")
     public ResponseEntity<Response<CreateAnnouncementResponse>> create(@PathVariable Long academyId, CreateAnnouncementRequest request, Authentication authentication) {
-        String account = authentication.getName();
-        CreateAnnouncementResponse response = announcementService.createAnnouncement(academyId, account, request);
+        String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
+        CreateAnnouncementResponse response = announcementService.createAnnouncement(academyId, requestAccount, request);
         return ResponseEntity.ok().body(Response.success(response));
     }
 
@@ -39,9 +40,9 @@ public class AnnouncementRestController {
     @Operation(summary = "공지사항 전체 조회", description = "공지사항을 전체 조회합니다.")
     @GetMapping("/{academyId}/announcements")
     public ResponseEntity<Response<Page<ReadAllAnnouncementResponse>>> readAll(@PathVariable Long academyId, Authentication authentication) {
-        String account = authentication.getName();
+        String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
         PageRequest pageable = PageRequest.of(0, 20, Sort.by("id").descending());
-        Page<ReadAllAnnouncementResponse> responses = announcementService.readAllAnnouncement(academyId, pageable, account);
+        Page<ReadAllAnnouncementResponse> responses = announcementService.readAllAnnouncement(academyId, pageable, requestAccount);
         return ResponseEntity.ok().body(Response.success(responses));
     }
 
@@ -51,8 +52,8 @@ public class AnnouncementRestController {
     @Operation(summary = "공지사항 단건 조회", description = "공지사항을 단건 조회합니다.")
     @GetMapping("/{academyId}/announcements/{announcementId}")
     public ResponseEntity<Response<ReadAnnouncementResponse>> read(@PathVariable Long academyId, @PathVariable Long announcementId, Authentication authentication) {
-        String account = authentication.getName();
-        ReadAnnouncementResponse response = announcementService.readAnnouncement(academyId, announcementId, account);
+        String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
+        ReadAnnouncementResponse response = announcementService.readAnnouncement(academyId, announcementId, requestAccount);
         return ResponseEntity.ok().body(Response.success(response));
     }
 
@@ -62,8 +63,8 @@ public class AnnouncementRestController {
     @Operation(summary = "공지사항 수정", description = "ADMIN,STAFF 회원만 수정이 가능합니다.")
     @PutMapping("/{academyId}/announcements/{announcementId}")
     public ResponseEntity<Response<UpdateAnnouncementResponse>> update(@PathVariable Long academyId, @PathVariable Long announcementId, UpdateAnnouncementRequest request, Authentication authentication) {
-        String account = authentication.getName();
-        UpdateAnnouncementResponse response = announcementService.updateAnnouncement(academyId, announcementId, request, account);
+        String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
+        UpdateAnnouncementResponse response = announcementService.updateAnnouncement(academyId, announcementId, request, requestAccount);
         return ResponseEntity.ok().body(Response.success(response));
     }
 
@@ -73,8 +74,8 @@ public class AnnouncementRestController {
     @Operation(summary = "공지사항 수정", description = "ADMIN,STAFF 회원만 삭제가 가능합니다.")
     @DeleteMapping("/{academyId}/announcements/{announcementId}")
     public ResponseEntity<Response<DeleteAnnouncementResponse>> delete(@PathVariable Long academyId, @PathVariable Long announcementId, Authentication authentication) {
-        String account = authentication.getName();
-        DeleteAnnouncementResponse response = announcementService.deleteAnnouncement(academyId, announcementId, account);
+        String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
+        DeleteAnnouncementResponse response = announcementService.deleteAnnouncement(academyId, announcementId, requestAccount);
         return ResponseEntity.ok().body(Response.success(response));
     }
 }

@@ -21,8 +21,6 @@ public class UpdateLectureRequest {
     private Integer maximumCapacity;
     private String lectureDay;
     private String lectureTime;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd")
     private LocalDate startDate;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd")
     private LocalDate finishDate;
 }
