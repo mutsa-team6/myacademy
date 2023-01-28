@@ -58,10 +58,4 @@ cloud:
 
 payment:
   toss:
-    test_client_api_key: fakefake
-    test_secret_api_key: fakefake
-    success_url: fakefake
-    fail_url: fakefake
-    origin_url: fakefake
-
-
+    testSecretApiKey: fake

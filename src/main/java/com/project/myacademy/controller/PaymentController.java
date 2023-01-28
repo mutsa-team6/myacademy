@@ -27,9 +27,7 @@ public class PaymentController {
 
     private final EmployeeService employeeService;
     private final EnrollmentService enrollmentService;
-
-    @Value("${payment.toss.testSecretApiKey}")
-    private final String key;
+    private final String key = "fake";
 
     @GetMapping("/academy/pay")
     public String main(@RequestParam(required = false) String studentName,HttpServletRequest request, Model model, Authentication authentication){
