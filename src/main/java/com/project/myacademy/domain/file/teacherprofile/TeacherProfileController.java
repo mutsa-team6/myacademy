@@ -3,6 +3,7 @@ package com.project.myacademy.domain.file.teacherprofile;
 import com.project.myacademy.domain.file.teacherprofile.dto.CreateTeacherProfileResponse;
 import com.project.myacademy.domain.file.teacherprofile.dto.DeleteTeacherProfileResponse;
 import com.project.myacademy.global.Response;
+import com.project.myacademy.global.util.AuthenticationUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +31,8 @@ public class TeacherProfileController {
                                                                          @PathVariable("teacherId") Long teacherId,
                                                                          @RequestPart List<MultipartFile> multipartFile,
                                                                          Authentication authentication) throws IOException {
-        return ResponseEntity.ok().body(Response.success(teacherProfileS3UploadService.UploadTeacherProfile(academyId, teacherId, multipartFile, authentication.getName())));
+        String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
+        return ResponseEntity.ok().body(Response.success(teacherProfileS3UploadService.UploadTeacherProfile(academyId, teacherId, multipartFile, requestAccount)));
     }
 
 
@@ -42,7 +44,8 @@ public class TeacherProfileController {
                                                                          @PathVariable("teacherProfileId") Long teacherProfileId,
                                                                          @RequestParam String filePath,
                                                                          Authentication authentication) {
-        return ResponseEntity.ok().body(Response.success(teacherProfileS3UploadService.deleteTeacherProfile(academyId, teacherId, teacherProfileId, filePath, authentication.getName())));
+        String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
+        return ResponseEntity.ok().body(Response.success(teacherProfileS3UploadService.deleteTeacherProfile(academyId, teacherId, teacherProfileId, filePath, requestAccount)));
     }
 
     // S3 파일 다운로드
@@ -55,7 +58,8 @@ public class TeacherProfileController {
         // 버킷 폴더 이하 경로
         String filePath = fileUrl.substring(52);
         log.info("filePath : {}", filePath);
-        return teacherProfileS3UploadService.downloadTeacherProfile(academyId, teacherId, filePath, authentication.getName());
+        String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
+        return teacherProfileS3UploadService.downloadTeacherProfile(academyId, teacherId, filePath, requestAccount);
     }
 
 }
