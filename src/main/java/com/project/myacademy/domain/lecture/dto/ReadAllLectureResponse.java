@@ -28,7 +28,7 @@ public class ReadAllLectureResponse {
         return ReadAllLectureResponse.builder()
                 .lectureId(lecture.getId())
                 .lectureName(lecture.getName())
-                .teacherName(lecture.getTeacher().getName())
+                .teacherName(lecture.getEmployee().getName())
                 .lecturePrice(lecture.getPrice())
                 .maximumCapacity(lecture.getMaximumCapacity())
                 .lectureDay(lecture.getLectureDay())

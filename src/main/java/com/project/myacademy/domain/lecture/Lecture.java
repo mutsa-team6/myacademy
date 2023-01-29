@@ -1,11 +1,9 @@
 package com.project.myacademy.domain.lecture;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.project.myacademy.domain.BaseEntity;
 import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.domain.lecture.dto.CreateLectureRequest;
 import com.project.myacademy.domain.lecture.dto.UpdateLectureRequest;
-import com.project.myacademy.domain.teacher.Teacher;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
@@ -49,10 +47,6 @@ public class Lecture extends BaseEntity {
     @Column(name = "finish_date")
     private LocalDate finishDate;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "teacher_id")
-    private Teacher teacher;
-
     @Column(name = "first_register_employee")
     private String registerEmployee;
 
@@ -62,8 +56,12 @@ public class Lecture extends BaseEntity {
     @Column(name = "current_enrollment_number")
     private Integer currentEnrollmentNumber;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "employee_id")
+    private Employee employee;
+
     // 강좌 생성 메서드
-    public static Lecture addLecture(Employee employee, Teacher teacher, CreateLectureRequest request) {
+    public static Lecture addLecture(Employee employee, Employee teacher, CreateLectureRequest request) {
         StringBuilder sb = new StringBuilder();
         return Lecture.builder()
                 .name(request.getLectureName())
@@ -74,7 +72,7 @@ public class Lecture extends BaseEntity {
                 .LectureTime(request.getLectureTime())
                 .startDate(request.getStartDate())
                 .finishDate(request.getFinishDate())
-                .teacher(teacher)
+                .employee(teacher)
                 .registerEmployee(sb.append(employee.getId()).append(" (").append(employee.getName()).append(")").toString())
                 .modifiedEmployee(sb.toString())
                 .currentEnrollmentNumber(request.getCurrentEnrollmentNumber())
@@ -93,6 +91,7 @@ public class Lecture extends BaseEntity {
         this.startDate = request.getStartDate();
         this.finishDate = request.getFinishDate();
         this.modifiedEmployee = sb.append(employee.getId()).append(" (").append(employee.getName()).append(")").toString();
+//        this.employee = teacher;
     }
 
     // 강좌 삭제 전에 마지막 수정 직원 필드 삭제 직원으로 업데이트

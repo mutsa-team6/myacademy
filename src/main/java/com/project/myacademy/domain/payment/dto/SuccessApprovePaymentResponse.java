@@ -4,7 +4,6 @@ import lombok.Data;
 
 @Data
 public class SuccessApprovePaymentResponse {
-    String mId; //가맹점 ID
     String version;
     String paymentKey;
     String orderId;

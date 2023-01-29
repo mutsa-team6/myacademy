@@ -26,7 +26,7 @@ public class EmployeeProfileController {
     private final EmployeeProfileS3UploadService employeeProfileS3UploadService;
 
     // S3에 파일 업로드
-    @Operation(summary = "직원 사진등록", description = "ADMIN,STAFF 회원만 등록이 가능합니다. \n\n AWS S3서버에 저장됩니다.")
+    @Operation(summary = "직원 사진등록", description = "STAFF 회원은 본인만, ADMIN 회원은 모든 STAFF 관련 등록이 가능합니다. \n\n AWS S3서버에 저장됩니다.")
     @PostMapping("/{academyId}/employees/{employeeId}/files/upload")
     public ResponseEntity<Response<CreateEmployeeProfileResponse>> upload(@PathVariable("academyId") Long academyId,
                                                                           @PathVariable("employeeId") Long employeeId,
@@ -39,7 +39,7 @@ public class EmployeeProfileController {
 
 
     // S3 파일 삭제
-    @Operation(summary = "직원 사진삭제", description = "ADMIN,STAFF 회원만 삭제가 가능합니다. \n\n db에는 soft-delete 되고, AWS S3서버에서는 삭제됩니다.")
+    @Operation(summary = "직원 사진삭제", description = "STAFF 회원은 본인 관련만, ADMIN 회원은 모든 STAFF 관련 삭제가 가능합니다. \n\n db에는 soft-delete 되고, AWS S3서버에서는 삭제됩니다.")
     @DeleteMapping("/{academyId}/employees/{employeeId}/employeeProfiles/{employeeProfileId}/files")
     public ResponseEntity<Response<DeleteEmployeeProfileResponse>> delete(@PathVariable("academyId") Long academyId,
                                                                           @PathVariable("employeeId") Long employeeId,
@@ -52,7 +52,7 @@ public class EmployeeProfileController {
     }
 
     // S3 파일 다운로드
-    @Operation(summary = "직원 사진다운로드", description = "ADMIN,STAFF 회원만 다운로드가 가능합니다. \n\n AWS S3서버에 저장된 사진을 다운로드합니다.")
+    @Operation(summary = "직원 사진다운로드", description = "인증된 모든 회원은 다운로드 가능합니다. \n\n AWS S3서버에 저장된 사진을 다운로드합니다.")
     @GetMapping("/{academyId}/employees/{employeeId}/files/download")
     public ResponseEntity<byte[]> download(@PathVariable("academyId") Long academyId,
                                            @PathVariable("employeeId") Long employeeId,
