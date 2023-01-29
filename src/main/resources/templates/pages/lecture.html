@@ -34,244 +34,93 @@
     <th:block th:replace="layout/navbar :: navbarFragment"></th:block>
 
 
-    <div class="container-fluid py-4">
+    <div class="container">
         <div class="row">
-            <div class="col-xl-8 col-lg-5 col-md-7 d-flex flex-column ms-auto me-auto ms-lg-auto me-lg-5">
-                <div class="row">
-                    <div class="card my-4">
-                        <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-                            <div class="row">
-                                <div class="col-8 align-self-center">
+            <div class="col-12">
 
-                                    <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
-                                        <h6 class="text-white text-capitalize ps-3">등록된 강좌 정보</h6>
-                                    </div>
-                                </div>
-                                <div class="col-4  align-self-center">
-                                    <div class="row">
-                                        <div class="col-9 align-self-center">
-                                            <div class="input-group input-group-outline  ">
-
-                                                <input type="text" class="form-control" name="studentName"
-                                                       placeholder="강좌 이름">
-                                            </div>
-                                        </div>
-                                        <div class="col-3  align-self-center">
-
-                                            <button type="submit"
-                                                    class="btn btn-sm bg-gradient-primary btn-lg w-100 mb-0">검색
-                                            </button>
-                                        </div>
-                                    </div>
+                <div class="card my-4">
+                    <div class="row">
+                        <div class="col-8">
+                            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                                <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+                                    <h6 class="text-white text-capitalize ps-3">강좌 신청 전에 강사를 먼저 선택해주세요.</h6>
                                 </div>
                             </div>
                         </div>
-                        <div class="card-body px-0 pb-2">
-                            <div class="table-responsive p-0">
-                                <table class="table align-items-center mb-0">
-                                    <thead>
-                                    <tr>
-                                        <th class="text-center text-uppercase  font-weight-bolder">
-                                            학원 이름
-                                        </th>
-                                        <th class="text-center text-uppercase  font-weight-bolder ">
-                                            학원 대표자명
-                                        </th>
-                                        <th class="text-center text-uppercase font-weight-bolder ">
-                                            학원 주소
-                                        </th>
-                                        <th class="text-center text-uppercase  font-weight-bolder">
-                                            학원 사업자 등록 번호
-                                        </th>
-                                        <th class="text-center text-uppercase font-weight-bolder">
-                                            학원 전화번호
-                                        </th>
-                                        <th class="text-secondary opacity-7"></th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr th:each="academy : ${academies}">
-                                        <th class="align-middle text-center">
-                                                <span class=" text-xs font-weight-bold"
-                                                      th:text="${academy.name}"></span>
-                                        </th>
-                                        <td class="align-middle text-center">
-                                                <span class=" text-xs font-weight-bold"
-                                                      th:text="${academy.owner}"></span>
-                                        </td>
-                                        <td class="align-middle text-center">
-                                                <span class=" text-xs font-weight-bold"
-                                                      th:text="${academy.address}"></span>
-                                        </td>
-                                        <td class="align-middle text-center">
-                                                <span class=" text-xs font-weight-bold"
-                                                      th:text="${academy.businessRegistrationNumber}"></span>
-                                        </td>
-                                        <td class="align-middle text-center">
-                                                <span class=" text-xs font-weight-bold"
-                                                      th:text="${academy.phoneNum}"></span>
-                                        </td>
-                                        <td class="align-middle">
+                        <div class="col-lg-4 col-5 my-auto text-end">
+                            <form class="form-inline w-100 justify-content-center " action="/academy/students/list"
+                                  method="get">
+                                <div class="row mb-4">
+                                    <div class="col-9 align-self-center">
+                                        <div class="input-group input-group-outline  ">
 
-                                            <a href="javascript:;"
-                                               th:onclick="|academy.delete(${academy.academyId})|" type="button"
-                                               class="text-secondary font-weight-bold text-xs"
-                                               data-toggle="tooltip"
-                                               data-original-title="delete-academy">
-                                                delete
-                                            </a>
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                                            <input type="text" class="form-control" name="studentName" placeholder="학생 이름">
+                                        </div>
+                                    </div>
+                                    <div class="col-3  align-self-center">
+                                        <button type="submit"
+                                                class="btn btn-sm bg-gradient-primary btn-lg w-100 mb-0">검색
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
                     </div>
+                    <div class="card-body px-0 pb-2">
+                        <div class="table">
+                            <table class="table align-items-center mb-0">
+                                <thead>
+                                <tr>
+                                    <th class="text-center text-uppercase  font-weight-bolder" style="color: #5A2082">
+                                        강사 사진
+                                    </th>
+                                    <th class="text-center text-uppercase  font-weight-bolder" style="color: #5A2082">
+                                        강사 이름
+                                    </th>
+                                    <th class="text-center text-uppercase  font-weight-bolder " style="color: #5A2082">
+                                        담당 과목
+                                    </th>
 
-
-                    <div class="card my-10">
-
-                        <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-                            <div class="row">
-                                <div class="col-8 align-self-center">
-
-                                    <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
-                                        <h6 class="text-white text-capitalize ps-3">등록된 강사 정보</h6>
-                                    </div>
-                                </div>
-                                <div class="col-4  align-self-center">
-                                    <div class="row">
-                                        <div class="col-9 align-self-center">
-                                            <div class="input-group input-group-outline  ">
-
-                                                <input type="text" class="form-control" name="studentName"
-                                                       placeholder="강사 이름">
-                                            </div>
+                                    <th class="text-secondary opacity-7"></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="teacher : ${teachers}">
+                                    <th class="align-middle text-center">
+                                        <div class="flex">
+                                            <img th:src="${teacher.teacherImage}"
+                                                 class="avatar avatar-xl me-3 border-radius-lg" alt="user1">
                                         </div>
-                                        <div class="col-3  align-self-center">
+                                    </th>
 
-                                            <button type="submit"
-                                                    class="btn btn-sm bg-gradient-primary btn-lg w-100 mb-0">검색
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-body px-0 pb-2">
-                            <div class="table-responsive p-0">
-                                <table class="table align-items-center mb-0">
-                                    <thead>
-                                    <tr>
-                                        <th class="text-center text-uppercase  font-weight-bolder">
-                                            학원 이름
-                                        </th>
-                                        <th class="text-center text-uppercase  font-weight-bolder ">
-                                            학원 대표자명
-                                        </th>
-                                        <th class="text-center text-uppercase font-weight-bolder ">
-                                            학원 주소
-                                        </th>
-                                        <th class="text-center text-uppercase  font-weight-bolder">
-                                            학원 사업자 등록 번호
-                                        </th>
-                                        <th class="text-center text-uppercase font-weight-bolder">
-                                            학원 전화번호
-                                        </th>
-                                        <th class="text-secondary opacity-7"></th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr th:each="academy : ${academies}">
-                                        <th class="align-middle text-center">
-                                                <span class=" text-xs font-weight-bold"
-                                                      th:text="${academy.name}"></span>
-                                        </th>
-                                        <td class="align-middle text-center">
-                                                <span class=" text-xs font-weight-bold"
-                                                      th:text="${academy.owner}"></span>
-                                        </td>
-                                        <td class="align-middle text-center">
-                                                <span class=" text-xs font-weight-bold"
-                                                      th:text="${academy.address}"></span>
-                                        </td>
-                                        <td class="align-middle text-center">
-                                                <span class=" text-xs font-weight-bold"
-                                                      th:text="${academy.businessRegistrationNumber}"></span>
-                                        </td>
-                                        <td class="align-middle text-center">
-                                                <span class=" text-xs font-weight-bold"
-                                                      th:text="${academy.phoneNum}"></span>
-                                        </td>
-                                        <td class="align-middle">
+                                    <th class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold" style="margin-top: 0.65rem;"
+                                                      th:text="${teacher.teacherName}"></span>
+                                    </th>
 
-                                            <a href="javascript:;"
-                                               th:onclick="|academy.delete(${academy.academyId})|" type="button"
-                                               class="text-secondary font-weight-bold text-xs"
-                                               data-toggle="tooltip"
-                                               data-original-title="delete-academy">
-                                                delete
-                                            </a>
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                                    <th class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${teacher.teacherSubject}"></span>
+                                    </th>
+
+
+                                </tr>
+                                </tbody>
+                            </table>
                         </div>
+
+                        <ul class="pagination justify-content-center">
+
+                            <li class="page-item"><a class="page-link"
+                                                     th:href="@{/academy/lecture(page=${previous})}">◀</a></li>
+                            <li class="page-item"><a class="page-link"
+                                                     th:href="@{/academy/lecture(page=${next})}">▶</a></li>
+                        </ul>
                     </div>
                 </div>
             </div>
 
-            <div class="col-xl-3 col-lg-5 col-md-7 d-flex flex-column ms-auto me-auto ms-lg-auto me-lg-5">
-                <div class="card card-plain">
-                    <h4 class="font-weight-bolder">학원 등록</h4>
-                    <p class="mb-0">등록할 강좌 정보를 입력해주세요.</p>
-                </div>
-
-                <div class="card-body">
-                    <div class="input-group input-group-outline mb-3">
-                        <label class="form-label">학원 이름</label>
-                        <input type="text" class="form-control" id="input-academyName">
-                    </div>
-                    <div class="input-group input-group-outline mb-3">
-                        <label class="form-label">학원 대표자명</label>
-                        <input type="text" class="form-control" id="input-academyOwner">
-                    </div>
-                    <div class="input-group input-group-outline mb-3">
-                        <label class="form-label">학원 사업자 등록 번호</label>
-                        <input type="text" class="form-control" id="input-academybusinessNum">
-                    </div>
-                    <div class="input-group input-group-outline mb-3">
-                        <label class="form-label">학원 전화번호</label>
-                        <input type="text" class="form-control" id="input-academyphoneNum">
-                    </div>
-                    <div class="input-group input-group-outline mb-3">
-                        <input type="text" class="form-control" id="address_kakao" readonly
-                               placeholder="학원 주소">
-                    </div>
-                    <div class="input-group input-group-outline mb-3">
-                        <label class="form-label">상세주소</label>
-                        <input type="text" class="form-control" id="address_detail_kakao"
-                               name="address_detail"
-                        >
-                    </div>
-
-                    <div class="text-center">
-                        <button th:onclick="|academy.create()|" type="button"
-                                class="btn btn-lg bg-gradient-primary btn-lg w-100 mt-4 mb-0">학원 등록
-                        </button>
-                    </div>
-                </div>
-                <br>
-                <div class="card-footer text-center pt-0 px-lg-2 px-1">
-                    <p class="mb-2 text-sm mx-auto">
-                        회원 가입 하시겠습니까?
-                        <a th:href="@{/join}" class="text-primary text-gradient font-weight-bold">회원 가입</a>
-                    </p>
-                </div>
-            </div>
         </div>
-
     </div>
     <!--footer-->
     <th:block th:replace="layout/footer :: footerFragment"></th:block>
@@ -282,25 +131,21 @@
 <script src="/assets/js/plugins/perfect-scrollbar.min.js"></script>
 <script src="/assets/js/plugins/smooth-scrollbar.min.js"></script>
 <script src="/assets/js/material-dashboard.min.js?v=3.0.4"></script>
-
+<link id="pagestyle" href="/assets/css/material-dashboard.css?v=3.0.4" rel="stylesheet"/>
 
 <Script>
 
-    let academy = {
+    let register = {
         init: function () {
             var _this = this;
         },
-        create: function () {
+
+        findParent: function (academyId) {
             let data = {
-                name: document.querySelector('#input-academyName').value.trim(),
-                address: document.querySelector("#address_kakao").value.trim() + "  " + document.querySelector("#address_detail_kakao").value.trim(),
-                phoneNum: document.querySelector('#input-academyphoneNum').value.trim(),
-                owner: document.querySelector('#input-academyOwner').value.trim(),
-                businessRegistrationNumber: document.querySelector('#input-academybusinessNum').value.trim()
+                phoneNum: document.querySelector('#input-parentPhoneNum').value.trim(),
             };
             console.log(data);
-
-            axios.post("/api/v1/academies",
+            axios.post("/api/v1/academies/" + academyId + "/parents/find",
                 JSON.stringify(data), {
                     headers: {
                         'Content-Type': 'application/json',
@@ -308,14 +153,13 @@
                 }
             ).then((response) => {
                 console.log(response);
-                alert("학원등록 성공");
-                window.location.href = '/academies';
+                alert("등록된 부모입니다.");
 
             }).catch((error) => {
                 console.log(error);
-                if (error.response.data.result["errorCode"] == "DUPLICATED_ACADEMY") {
-                    alert("학원 이름은 중복될 수 없습니다.");
-                    window.location.href = '/academies';
+                if (error.response.data.result["errorCode"] == "PARENT_NOT_FOUND") {
+                    alert("등록된 부모가 아닙니다. 부모 정보를 입력해주세요.");
+                    window.location.href = window.location;
                 }
 
 
@@ -323,23 +167,67 @@
 
         },
 
-        delete: function (academyId) {
+        registerParent: function (academyId) {
+            const parentTypeNodeList = document.getElementsByName('parentType')
+            let parentRecognizedCode = 0;
+            parentTypeNodeList.forEach((node) => {
+                if (node.checked) {
+                    parentRecognizedCode = node.value;
+                }
+            })
 
-            const con_check = confirm("삭제하시겠습니까?(나중에는 학원 사업자 등록 번호 입력해야 삭제할 수 있게끔 구현)");
+            let data = {
+                name: document.querySelector('#input-parentName').value.trim(),
+                address: document.querySelector("#address_kakao").value.trim() + "  " + document.querySelector("#address_detail_kakao").value.trim(),
+                phoneNum: document.querySelector('#input-parentPhoneNum').value.trim(),
+                parentRecognizedCode: parentRecognizedCode
+            };
+            console.log(data);
 
-            if (con_check === true) {
-                axios.delete("/api/v1/academies/" + academyId + "/delete",
-                    {
-                        headers: {
-                            'Content-Type': 'application/json',
-                        }
+            axios.post("/api/v1/academies/" + academyId + "/parents",
+                JSON.stringify(data), {
+                    headers: {
+                        'Content-Type': 'application/json',
                     }
-                ).then((response) => {
-                    alert("학원삭제 성공");
-                    window.location.href = '/academies';
-                }).catch((error) => {
-                });
-            }
+                }
+            ).then((response) => {
+                alert("부모 정보 등록을 성공했습니다. 학생 정보를 입력해주세요");
+            }).catch((error) => {
+                if (error.response.data.result["errorCode"] == "INVALID_PERMISSION") {
+                    alert("강사는 접근할 수 없습니다.");
+                }
+            });
+
+        },
+
+        registerStudent: function (academyId) {
+
+            let data = {
+                name: document.querySelector('#input-studentName').value.trim(),
+                school: document.querySelector('#input-studentSchool').value.trim(),
+                phoneNum: document.querySelector('#input-studentPhoneNum').value.trim(),
+                email: document.querySelector('#input-studentEmail').value.trim(),
+                birth: document.querySelector('#input-studentBirth').value.trim(),
+                parentPhoneNum: document.querySelector('#input-parentPhoneNum').value.trim(),
+            };
+            console.log(data);
+
+            axios.post("/api/v1/academies/" + academyId + "/students",
+                JSON.stringify(data), {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                }
+            ).then((response) => {
+                alert("학생 정보 등록을 성공했습니다.");
+                window.location.href = '/academy/student';
+
+            }).catch((error) => {
+                if (error.response.data.result["errorCode"] == "INVALID_PERMISSION") {
+                    alert("강사는 접근할 수 없습니다.");
+                }
+            });
+
         }
     };
 

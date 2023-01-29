@@ -1,5 +1,6 @@
 package com.project.myacademy.domain.teacher;
 
+import com.project.myacademy.domain.academy.Academy;
 import com.project.myacademy.domain.employee.Employee;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,4 +17,5 @@ public interface TeacherRepository extends JpaRepository<Teacher, Long> {
 
     Optional<Teacher> findByEmployee(Employee employee);
 
+    Page<Teacher> findAll(Academy academy, Pageable pageable);
 }

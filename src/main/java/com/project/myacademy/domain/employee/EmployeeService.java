@@ -98,7 +98,6 @@ public class EmployeeService {
             Employee saved = employeeRepository.save(employee);
             return new CreateEmployeeResponse(saved, foundAcademy.getName());
         }
-
         //그 외는 일반 USER 등급 && 요청한 아이디로 가입
         Employee employee = Employee.builder()
                 .name(request.getName())

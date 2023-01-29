@@ -44,7 +44,7 @@
                                 <div class="col-8 align-self-center">
 
                                     <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
-                                        <h6 class="text-white text-capitalize ps-3">등록된 강좌 정보</h6>
+                                        <h6 class="text-white text-capitalize ps-3">등록된 강사 정보</h6>
                                     </div>
                                 </div>
                                 <div class="col-4  align-self-center">
@@ -72,137 +72,37 @@
                                     <thead>
                                     <tr>
                                         <th class="text-center text-uppercase  font-weight-bolder">
-                                            학원 이름
-                                        </th>
-                                        <th class="text-center text-uppercase  font-weight-bolder ">
-                                            학원 대표자명
-                                        </th>
-                                        <th class="text-center text-uppercase font-weight-bolder ">
-                                            학원 주소
+                                            강사 사진
                                         </th>
                                         <th class="text-center text-uppercase  font-weight-bolder">
-                                            학원 사업자 등록 번호
+                                            강사 이름
                                         </th>
-                                        <th class="text-center text-uppercase font-weight-bolder">
-                                            학원 전화번호
+                                        <th class="text-center text-uppercase  font-weight-bolder ">
+                                            담당 과목
                                         </th>
+
                                         <th class="text-secondary opacity-7"></th>
                                     </tr>
                                     </thead>
                                     <tbody>
                                     <tr th:each="academy : ${academies}">
                                         <th class="align-middle text-center">
-                                                <span class=" text-xs font-weight-bold"
-                                                      th:text="${academy.name}"></span>
-                                        </th>
-                                        <td class="align-middle text-center">
-                                                <span class=" text-xs font-weight-bold"
-                                                      th:text="${academy.owner}"></span>
-                                        </td>
-                                        <td class="align-middle text-center">
-                                                <span class=" text-xs font-weight-bold"
-                                                      th:text="${academy.address}"></span>
-                                        </td>
-                                        <td class="align-middle text-center">
-                                                <span class=" text-xs font-weight-bold"
-                                                      th:text="${academy.businessRegistrationNumber}"></span>
-                                        </td>
-                                        <td class="align-middle text-center">
-                                                <span class=" text-xs font-weight-bold"
-                                                      th:text="${academy.phoneNum}"></span>
-                                        </td>
-                                        <td class="align-middle">
-
-                                            <a href="javascript:;"
-                                               th:onclick="|academy.delete(${academy.academyId})|" type="button"
-                                               class="text-secondary font-weight-bold text-xs"
-                                               data-toggle="tooltip"
-                                               data-original-title="delete-academy">
-                                                delete
-                                            </a>
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-
-                    <div class="card my-10">
-
-                        <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-                            <div class="row">
-                                <div class="col-8 align-self-center">
-
-                                    <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
-                                        <h6 class="text-white text-capitalize ps-3">등록된 강사 정보</h6>
-                                    </div>
-                                </div>
-                                <div class="col-4  align-self-center">
-                                    <div class="row">
-                                        <div class="col-9 align-self-center">
-                                            <div class="input-group input-group-outline  ">
-
-                                                <input type="text" class="form-control" name="studentName"
-                                                       placeholder="강사 이름">
+                                            <div class="flex">
+                                                <img src="../assets/img/team-2.jpg"
+                                                     class="avatar avatar-xl me-3 border-radius-lg" alt="user1">
                                             </div>
-                                        </div>
-                                        <div class="col-3  align-self-center">
+                                        </th>
 
-                                            <button type="submit"
-                                                    class="btn btn-sm bg-gradient-primary btn-lg w-100 mb-0">검색
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-body px-0 pb-2">
-                            <div class="table-responsive p-0">
-                                <table class="table align-items-center mb-0">
-                                    <thead>
-                                    <tr>
-                                        <th class="text-center text-uppercase  font-weight-bolder">
-                                            학원 이름
+                                        <th class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold" style="margin-top: 0.65rem;"
+                                                      th:text="${academy.name}"></span>
                                         </th>
-                                        <th class="text-center text-uppercase  font-weight-bolder ">
-                                            학원 대표자명
-                                        </th>
-                                        <th class="text-center text-uppercase font-weight-bolder ">
-                                            학원 주소
-                                        </th>
-                                        <th class="text-center text-uppercase  font-weight-bolder">
-                                            학원 사업자 등록 번호
-                                        </th>
-                                        <th class="text-center text-uppercase font-weight-bolder">
-                                            학원 전화번호
-                                        </th>
-                                        <th class="text-secondary opacity-7"></th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr th:each="academy : ${academies}">
+
                                         <th class="align-middle text-center">
                                                 <span class=" text-xs font-weight-bold"
                                                       th:text="${academy.name}"></span>
                                         </th>
-                                        <td class="align-middle text-center">
-                                                <span class=" text-xs font-weight-bold"
-                                                      th:text="${academy.owner}"></span>
-                                        </td>
-                                        <td class="align-middle text-center">
-                                                <span class=" text-xs font-weight-bold"
-                                                      th:text="${academy.address}"></span>
-                                        </td>
-                                        <td class="align-middle text-center">
-                                                <span class=" text-xs font-weight-bold"
-                                                      th:text="${academy.businessRegistrationNumber}"></span>
-                                        </td>
-                                        <td class="align-middle text-center">
-                                                <span class=" text-xs font-weight-bold"
-                                                      th:text="${academy.phoneNum}"></span>
-                                        </td>
+
                                         <td class="align-middle">
 
                                             <a href="javascript:;"
@@ -210,7 +110,7 @@
                                                class="text-secondary font-weight-bold text-xs"
                                                data-toggle="tooltip"
                                                data-original-title="delete-academy">
-                                                delete
+                                                삭제
                                             </a>
                                         </td>
                                     </tr>
@@ -219,56 +119,39 @@
                             </div>
                         </div>
                     </div>
+
+
                 </div>
             </div>
 
             <div class="col-xl-3 col-lg-5 col-md-7 d-flex flex-column ms-auto me-auto ms-lg-auto me-lg-5">
                 <div class="card card-plain">
-                    <h4 class="font-weight-bolder">학원 등록</h4>
-                    <p class="mb-0">등록할 강좌 정보를 입력해주세요.</p>
+                    <h4 class="font-weight-bolder">강사 등록</h4>
+                    <p class="mb-0">등록할 강사 정보를 입력해주세요.</p>
                 </div>
 
                 <div class="card-body">
                     <div class="input-group input-group-outline mb-3">
-                        <label class="form-label">학원 이름</label>
-                        <input type="text" class="form-control" id="input-academyName">
+                        <label class="form-label">강사 이름</label>
+                        <input type="text" class="form-control" id="input-teacherName">
                     </div>
                     <div class="input-group input-group-outline mb-3">
-                        <label class="form-label">학원 대표자명</label>
-                        <input type="text" class="form-control" id="input-academyOwner">
+                        <label class="form-label">과목</label>
+                        <input type="text" class="form-control" id="input-teacherSubject">
                     </div>
-                    <div class="input-group input-group-outline mb-3">
-                        <label class="form-label">학원 사업자 등록 번호</label>
-                        <input type="text" class="form-control" id="input-academybusinessNum">
+                    <hr class="dark horizontal my-0">
+                    <div class="mb-3">
+                        <label for="formFileSm" class="form-label">강사 사진</label>
+                        <input class="form-control form-control-sm" id="formFileSm" type="file">
                     </div>
-                    <div class="input-group input-group-outline mb-3">
-                        <label class="form-label">학원 전화번호</label>
-                        <input type="text" class="form-control" id="input-academyphoneNum">
-                    </div>
-                    <div class="input-group input-group-outline mb-3">
-                        <input type="text" class="form-control" id="address_kakao" readonly
-                               placeholder="학원 주소">
-                    </div>
-                    <div class="input-group input-group-outline mb-3">
-                        <label class="form-label">상세주소</label>
-                        <input type="text" class="form-control" id="address_detail_kakao"
-                               name="address_detail"
-                        >
-                    </div>
-
+                    <hr class="dark horizontal my-0">
                     <div class="text-center">
                         <button th:onclick="|academy.create()|" type="button"
-                                class="btn btn-lg bg-gradient-primary btn-lg w-100 mt-4 mb-0">학원 등록
+                                class="btn btn-lg bg-gradient-primary btn-lg w-100 mt-4 mb-0">강사 등록
                         </button>
                     </div>
                 </div>
-                <br>
-                <div class="card-footer text-center pt-0 px-lg-2 px-1">
-                    <p class="mb-2 text-sm mx-auto">
-                        회원 가입 하시겠습니까?
-                        <a th:href="@{/join}" class="text-primary text-gradient font-weight-bold">회원 가입</a>
-                    </p>
-                </div>
+
             </div>
         </div>
 
@@ -282,6 +165,7 @@
 <script src="/assets/js/plugins/perfect-scrollbar.min.js"></script>
 <script src="/assets/js/plugins/smooth-scrollbar.min.js"></script>
 <script src="/assets/js/material-dashboard.min.js?v=3.0.4"></script>
+
 
 <Script>
 

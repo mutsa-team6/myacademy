@@ -2,6 +2,7 @@ package com.project.myacademy.domain.teacher;
 
 import com.project.myacademy.domain.academy.Academy;
 import com.project.myacademy.domain.academy.AcademyRepository;
+import com.project.myacademy.domain.academy.dto.ReadAcademyResponse;
 import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.domain.employee.EmployeeRepository;
 import com.project.myacademy.domain.teacher.dto.*;
@@ -9,6 +10,8 @@ import com.project.myacademy.global.exception.AppException;
 import com.project.myacademy.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,10 +28,10 @@ public class TeacherService {
     private final EmployeeRepository employeeRepository;
 
     /**
-     * @param academyId 학원 id
+     * @param academyId  학원 id
      * @param employeeId 직원 -> 강사로 등록될 직원의 id
-     * @param request   강사이름, 과목이 들어간 등록 요청 DTO
-     * @param account   등록 진행하는 직원 계정
+     * @param request    강사이름, 과목이 들어간 등록 요청 DTO
+     * @param account    등록 진행하는 직원 계정
      */
     public CreateTeacherResponse createTeacher(Long academyId, Long employeeId, CreateTeacherRequest request, String account) {
 
@@ -39,10 +42,10 @@ public class TeacherService {
         Employee employee = validateAcademyEmployee(account, academy);
 
         // 현 시점에서 직원 -> 강사 테이블로 등록될 직원이 존재하는지 확인
-        Employee employeeToTeacher = validateEmployee(employeeId, academy);
+        Employee employeeToTeacher = validateEmployee(employee.getId(), academy);
 
         // 강사 등록하는 주체인 직원의 권한 확인(당연히 강사는 안됨)
-        if(Employee.isTeacherAuthority(employee)) {
+        if (Employee.isTeacherAuthority(employee)) {
             throw new AppException(ErrorCode.INVALID_PERMISSION);
         }
 
@@ -109,6 +112,20 @@ public class TeacherService {
         // 강사 삭제
         teacherRepository.delete(teacher);
         return DeleteTeacherResponse.of(teacherId);
+    }
+
+    public Page<ReadAllTeacherResponse> readAllTeacher(Long academyId, String account, Pageable pageable) {
+
+        Academy academy = validateAcademy(academyId);
+        Employee employee = validateAcademyEmployee(account, academy);
+
+        if (Employee.isTeacherAuthority(employee)) {
+            throw new AppException(ErrorCode.INVALID_PERMISSION);
+        }
+        Page<Teacher> foundTeachers = teacherRepository.findAllByAcademy(academy, pageable);
+
+        return foundTeachers.map(teacher -> ReadAllTeacherResponse.of(teacher, "imageUrl"));
+
     }
 
     private Academy validateAcademy(Long academyId) {
