@@ -7,6 +7,7 @@ import com.project.myacademy.global.exception.AppException;
 import com.project.myacademy.global.exception.ErrorCode;
 import com.project.myacademy.global.util.EmailUtil;
 import com.project.myacademy.global.util.JwtTokenUtil;
+import com.querydsl.core.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,8 +28,6 @@ public class EmployeeService {
     private final AcademyRepository academyRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final EmailUtil emailUtil;
-
-    private final EmployeeRole DEFAULT_EMPLOYEE_ROLE = EmployeeRole.ROLE_USER;
 
     @Value("${jwt.token.secret}")
     private String secretKey;
@@ -67,7 +66,7 @@ public class EmployeeService {
         // 이미 같은 실명과 이메일이 일치하는 데이터가 존재하는 경우 예외 처리
         employeeRepository.findByNameAndEmail(requestAccount, requestEmail)
                 .ifPresent(employee -> {
-                    throw new AppException(ErrorCode.DUPLICATED_ACCOUNT);
+                    throw new AppException(ErrorCode.DUPLICATED_EMAIL);
                 });
 
         // 계정명이 admin 이고 학원 대표자명과 회원가입을 요청한 실명이 동일하면 admin 계정을 준다.
@@ -82,8 +81,22 @@ public class EmployeeService {
             throw new AppException(ErrorCode.NOT_MATCH_OWNER);
         }
 
+        String requestEmployeeType = request.getEmployeeType();
+        String requestSubject = request.getSubject();
+        log.info("⭐ 회원가입 요청할 때 체크한 직원 유형 [{}] || 과목 명 [{}]", requestEmployeeType, requestSubject);
+
+        if (requestEmployeeType.equals("0")) {
+            throw new AppException(ErrorCode.EMPTY_EMPLOYEE_TYPE);
+
+        }
+
         // 계정 이름도 admin이고 대표자명과 가입 요청한 사용자의 이름이 같은 경우 admin 권한 부여
         if (requestAccount.equals("admin") && requestRealName.equals(ownerName)) {
+
+            // 원장으로 체크했는데, 과목명 입력 안했을 시, 예외 처리
+            if (StringUtils.isNullOrEmpty(requestSubject)) {
+                throw new AppException(ErrorCode.EMPTY_SUBJECT_FORBIDDEN);
+            }
 
             Employee employee = Employee.builder()
                     .name(request.getName())
@@ -94,15 +107,43 @@ public class EmployeeService {
                     .address(request.getAddress())
                     .academy(foundAcademy)
                     .password(encryptedPassword)
+                    .subject(requestSubject)
                     .build();
             Employee saved = employeeRepository.save(employee);
             return new CreateEmployeeResponse(saved, foundAcademy.getName());
         }
         //그 외는 일반 USER 등급 && 요청한 아이디로 가입
+
+
+        // 강사로 체크한 경우 (USER)
+        if (requestEmployeeType.equals("USER")) {
+            // 선생으로 체크했는데, 과목명 입력 안했을 시, 예외 처리
+            if (StringUtils.isNullOrEmpty(requestSubject)) {
+                throw new AppException(ErrorCode.EMPTY_SUBJECT_FORBIDDEN);
+            }
+
+            Employee employee = Employee.builder()
+                    .name(request.getName())
+                    .employeeRole(EmployeeRole.ROLE_USER)
+                    .account(requestAccount)
+                    .subject(requestSubject)
+                    .phoneNum(request.getPhoneNum())
+                    .email(request.getEmail())
+                    .address(request.getAddress())
+                    .academy(foundAcademy)
+                    .password(encryptedPassword)
+                    .build();
+            Employee saved = employeeRepository.save(employee);
+            return new CreateEmployeeResponse(saved, foundAcademy.getName());
+
+        }
+
+        // 직원인 경우 과목칸에 뭘 적거나 적지 않아도 그냥 "직원"으로 데이터가 입력
         Employee employee = Employee.builder()
                 .name(request.getName())
-                .employeeRole(DEFAULT_EMPLOYEE_ROLE)
+                .employeeRole(EmployeeRole.ROLE_STAFF)
                 .account(requestAccount)
+                .subject("직원")
                 .phoneNum(request.getPhoneNum())
                 .email(request.getEmail())
                 .address(request.getAddress())
@@ -111,10 +152,10 @@ public class EmployeeService {
                 .build();
 
         Employee saved = employeeRepository.save(employee);
-
         return new CreateEmployeeResponse(saved, foundAcademy.getName());
 
     }
+
 
     /**
      * 학원이 존재하지 않는 경우 에러 처리
@@ -282,7 +323,7 @@ public class EmployeeService {
      */
     public Employee findByAccountAndEmail(String account, String email) {
         return employeeRepository.findByAccountAndEmail(account, email)
-                .orElseThrow(()->{
+                .orElseThrow(() -> {
                     throw new AppException(ErrorCode.EMPLOYEE_NOT_FOUND);
                 });
     }

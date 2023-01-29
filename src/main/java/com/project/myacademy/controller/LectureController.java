@@ -3,8 +3,6 @@ package com.project.myacademy.controller;
 import com.project.myacademy.domain.academy.Academy;
 import com.project.myacademy.domain.employee.EmployeeService;
 import com.project.myacademy.domain.employee.dto.ReadEmployeeResponse;
-import com.project.myacademy.domain.teacher.TeacherService;
-import com.project.myacademy.domain.teacher.dto.ReadAllTeacherResponse;
 import com.project.myacademy.global.util.AuthenticationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +21,6 @@ import javax.servlet.http.HttpSession;
 @RequiredArgsConstructor
 public class LectureController {
     private final EmployeeService employeeService;
-    private final TeacherService teacherService;
 
     @GetMapping("/academy/lecture")
     public String main(HttpServletRequest request, Model model, Authentication authentication, Pageable pageable) {
@@ -48,8 +45,8 @@ public class LectureController {
             model.addAttribute("name", foundName);
         }
 
-        Page<ReadAllTeacherResponse> foundTeachers = teacherService.readAllTeacher(academyId, requestAccount, pageable);
-        model.addAttribute("teachers", foundTeachers);
+//        Page<ReadAllTeacherResponse> foundTeachers = teacherService.readAllTeacher(academyId, requestAccount, pageable);
+//        model.addAttribute("teachers", foundTeachers);
 
 
 

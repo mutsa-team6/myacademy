@@ -11,6 +11,7 @@ public enum ErrorCode {
     DUPLICATED_ACADEMY(HttpStatus.CONFLICT, "이미 존재하는 학원입니다."),
     DUPLICATED_EMPLOYEE(HttpStatus.CONFLICT, "이미 존재하는 회원입니다."),
     DUPLICATED_ACCOUNT(HttpStatus.CONFLICT, "이미 존재하는 계정명입니다."),
+    DUPLICATED_EMAIL(HttpStatus.CONFLICT, "이미 존재하는 이메일입니다."),
     DUPLICATED_STUDENT(HttpStatus.CONFLICT, "이미 존재하는 학생입니다."),
     DUPLICATED_PARENT(HttpStatus.CONFLICT, "이미 등록된 부모입니다."),
     DUPLICATED_LECTURE(HttpStatus.CONFLICT, "이미 존재하는 수업입니다."),
@@ -56,6 +57,9 @@ public enum ErrorCode {
     FILE_SIZE_EXCEED(HttpStatus.BAD_REQUEST, "파일 업로드 용량을 초과했습니다."),
     WRONG_FILE_FORMAT(HttpStatus.BAD_REQUEST, "잘못된 형식의 파일입니다"),
 
+    BLANK_NOT_ALLOWED(HttpStatus.FORBIDDEN,"NULL 값은 허용되지 않습니다."),
+    EMPTY_SUBJECT_FORBIDDEN(HttpStatus.FORBIDDEN,"원장 · 강사 로 회원가입 시 담당 과목명을 입력해주세요."),
+    EMPTY_EMPLOYEE_TYPE(HttpStatus.FORBIDDEN,"회원가입 시 사용자 유형 선택은 필수 입니다."),
     PAYMENT_ERROR_ORDER_PRICE(HttpStatus.FORBIDDEN,"요청하신 가격이 일치하지 않습니다."),
     PAYMENT_ERROR_ORDER_PAY_TYPE(HttpStatus.FORBIDDEN,"요청하신 지불방식이 일치하지 않습니다."),
     PAYMENT_ERROR_ORDER_NAME(HttpStatus.FORBIDDEN,"요청하신 주문 이름이 일치하지 않습니다."),
