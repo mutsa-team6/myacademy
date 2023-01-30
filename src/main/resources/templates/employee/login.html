@@ -45,19 +45,26 @@
                             </div>
                         </div>
                         <div class="card-body">
-                                <div class="row">
-                                    <div class="col-9 align-self-center">
-                                        <div class=" input-group input-group-outline my-3">
+                            <form role="form">
+                                <div class="row ">
+                                    <div class="col-12 align-self-center">
+
+                                        <div class="input-group input-group-outline  ">
                                             <label class="form-label">학원 이름</label>
-                                            <input type="text" class="form-control" id="input-academyName">
+                                            <input type="text" class="form-control"
+                                                   id="input-academyName" name="academyName"
+                                                   oninput="check_academyExist()">
+                                        </div>
+                                        <div id="academy-pass" class="alert-pass" hidden
+                                             style="color: #5A2082;font-size: small">존재하는 학원입니다. 회원가입을 진행해주세요.
+                                        </div>
+                                        <div id="academy-fail" class="alert-pass" hidden
+                                             style="color: red;font-size: small">존재하지 않는 학원입니다.
+                                            <a href="/academies">학원 등록</a> 먼저 해주세요.
                                         </div>
                                     </div>
-                                    <div class="col-3 align-self-center m-0">
-                                            <button th:onclick="|login.findAcademy()|" type="button"
-                                                    class="btn btn-sm bg-gradient-primary btn-lg w-100 mb-0">검색
-                                            </button>
-                                    </div>
                                 </div>
+                            </form>
                             <form role="form" class="text-start" action="/auth/loginProc" method="post">
                                 <div class="input-group input-group-outline my-3">
                                     <label class="form-label">계정</label>
@@ -123,36 +130,52 @@
 <Script>
     let academyId = 0;
 
+    function check_academyExist() {
+
+        let data = {
+            name: document.querySelector('#input-academyName').value.trim()
+        };
+        console.log(data);
+        axios.post("/academies/check",
+            JSON.stringify(data), {
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            }
+        ).then((response) => {
+            console.log(response);
+            if  (response.data["isExist"] == true) {
+                show('academy-pass');
+                hide('academy-fail');
+
+                academyId = response.data["academyId"];
+            }
+
+        }).catch((error) => {
+            console.log(error);
+            hide('academy-pass');
+            show('academy-fail');
+        });
+    }
+
+
+    function show(id) {
+        if (document.getElementById(id) != null) {
+            document.getElementById(id).removeAttribute("hidden")
+        }
+    }
+
+    function hide(id) {
+        if (document.getElementById(id) != null) {
+            document.getElementById(id).setAttribute("hidden", "true")
+        }
+    }
+
     let login = {
         init: function () {
             var _this = this;
         },
 
-        findAcademy: function () {
-            let data = {
-                name: document.querySelector('#input-academyName').value.trim()
-            };
-            console.log(data);
-
-            axios.post("/api/v1/academies/find",
-                JSON.stringify(data), {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
-                }
-            ).then((response) => {
-                console.log(response);
-                alert("등록된 학원입니다. 로그인을 진행해주세요");
-                academyId=response.data.result;
-                console.log(academyId);
-            }).catch((error) => {
-                console.log(error);
-                if (error.response.data.result["errorCode"] == "ACADEMY_NOT_FOUND") {
-                    alert("등록된 학원이 아닙니다. 등록 후 진행해주세요");
-                }
-            });
-
-        },
 
 
         loginEmployee: function () {

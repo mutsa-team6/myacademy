@@ -13,5 +13,7 @@ public interface AcademyRepository extends JpaRepository<Academy, Long> {
 
     Page<Academy> findAll(Pageable pageable);
 
+    boolean existsByName(String academyName);
+
 
 }
