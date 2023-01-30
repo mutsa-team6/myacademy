@@ -158,4 +158,8 @@ public class AcademyService {
 
         return new CreateAcademyResponse(savedAcademy);
     }
+
+    public boolean checkExistByAcademyName(String academyName) {
+        return academyRepository.existsByName(academyName);
+    }
 }
