@@ -7,15 +7,25 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+import javax.validation.constraints.NotBlank;
+
 @AllArgsConstructor
 @Getter
 @Builder
 public class CreateEmployeeRequest {
+    @NotBlank
     private String name;
+    @NotBlank
     private String address;
+    @NotBlank
     private String phoneNum;
+    @NotBlank
     private String email;
+    @NotBlank
     private String account;
+    @NotBlank
     private String password;
+    private String employeeType;
+    private String subject;
 
 }

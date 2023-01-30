@@ -5,8 +5,6 @@ import com.project.myacademy.domain.academy.AcademyRepository;
 import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.domain.employee.EmployeeRepository;
 import com.project.myacademy.domain.lecture.dto.*;
-import com.project.myacademy.domain.teacher.Teacher;
-import com.project.myacademy.domain.teacher.TeacherRepository;
 import com.project.myacademy.global.exception.AppException;
 import com.project.myacademy.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +22,6 @@ public class LectureService {
 
     private final AcademyRepository academyRepository;
     private final EmployeeRepository employeeRepository;
-    private final TeacherRepository teacherRepository;
     private final LectureRepository lectureRepository;
 
     /**
@@ -46,12 +43,12 @@ public class LectureService {
     }
 
     /**
-     * @param academyId 직원의 소속 학원 id
-     * @param teacherId 강좌에 들어갈 강사의 id
-     * @param request   요청 DTO
-     * @param account   직원 계정
+     * @param academyId     직원의 소속 학원 id
+     * @param employeeId    강좌에 들어갈 강사의 id
+     * @param request       등록 요청 DTO
+     * @param account       직원 계정
      */
-    public CreateLectureResponse createLecture(Long academyId, Long teacherId, CreateLectureRequest request, String account) {
+    public CreateLectureResponse createLecture(Long academyId, Long employeeId, CreateLectureRequest request, String account) {
 
         // 학원 존재 유무 확인
         Academy academy = validateAcademy(academyId);
@@ -65,7 +62,13 @@ public class LectureService {
         }
 
         // 강좌에 등록될 강사의 존재 유무 확인
-        Teacher teacher = validateTeacher(teacherId);
+        Employee teacher = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new AppException(ErrorCode.TEACHER_NOT_FOUND));
+
+        // 강사의 권한이 ROLE_USER 인지 확인
+        if(!Employee.isTeacherAuthority(teacher)) {
+            throw new AppException(ErrorCode.INVALID_PERMISSION);
+        }
 
         // 강좌 중복 확인
         lectureRepository.findByName(request.getLectureName())
@@ -78,18 +81,18 @@ public class LectureService {
     }
 
     /**
-     * @param academyId 직원의 소속 학원 id
-     * @param teacherId 수정될 강좌의 강사 id
-     * @param lectureId 수정될 강좌 id
-     * @param request   요청 DTO
-     * @param account   직원 계정
+     * @param academyId     직원의 소속 학원 id
+     * @param lectureId     수정될 강좌 id
+     * @param request       수정 요청 DTO
+     * @param account       직원 계정
      */
-    public UpdateLectureResponse updateLecture(Long academyId, Long teacherId, Long lectureId, UpdateLectureRequest request, String account) {
+    public UpdateLectureResponse updateLecture(Long academyId, Long lectureId, UpdateLectureRequest request, String account) {
 
-        // 학원 존재 유무 확인, 수정을 진행하는 직원이 해당 학원 소속 직원인지 확인, 강사 존재 유무, 수정할 강좌 존재 유무 유효성 검증
+        // 학원 존재 유무 확인, 수정을 진행하는 직원이 해당 학원 소속 직원인지 확인
         Academy academy = validateAcademy(academyId);
         Employee employee = validateAcademyEmployee(account, academy);
-        validateTeacher(teacherId);
+
+        // 수정할 강좌 존재 유무 확인
         Lecture lecture = validateLecture(lectureId);
 
         // 강좌를 수정할 수 있는 권한인지 확인(강사만 불가능)
@@ -103,20 +106,20 @@ public class LectureService {
     }
 
     /**
-     * @param academyId 직원의 소속 학원 id
-     * @param teacherId 수정될 강좌에서 강사의 id
-     * @param lectureId 삭제 강좌 id
-     * @param account   직원 계정
+     * @param academyId     직원의 소속 학원 id
+     * @param lectureId     삭제 강좌 id
+     * @param account       직원 계정
      */
-    public DeleteLectureResponse deleteLecture(Long academyId, Long teacherId, Long lectureId, String account) {
+    public DeleteLectureResponse deleteLecture(Long academyId, Long lectureId, String account) {
 
-        // 학원 존재 유무, 해당 학원의 소속 직원 존재 유무, 강사 존재 유무, 수정할 강좌 존재 유무 유효성 검증
+        // 학원 존재 유무, 해당 학원의 소속 직원 존재 유무 확인
         Academy academy = validateAcademy(academyId);
         Employee employee = validateAcademyEmployee(account, academy);
-        validateTeacher(teacherId);
+
+        // 강좌 존재 유무 확인
         Lecture lecture = validateLecture(lectureId);
 
-        // 강좌를 수정할 수 있는 권한인지 확인(강사만 불가능)
+        // 강좌를 삭제할 수 있는 권한인지 확인(강사만 불가능)
         if(Employee.isTeacherAuthority(employee)) {
             throw new AppException(ErrorCode.INVALID_PERMISSION);
         }
@@ -142,12 +145,6 @@ public class LectureService {
         Employee employee = employeeRepository.findByAccountAndAcademy(account, academy)
                 .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
         return employee;
-    }
-
-    private Teacher validateTeacher(Long teacherId) {
-        Teacher validatedTeacher = teacherRepository.findById(teacherId)
-                .orElseThrow(() -> new AppException(ErrorCode.TEACHER_NOT_FOUND));
-        return  validatedTeacher;
     }
 
     private Lecture validateLecture(Long lectureId) {

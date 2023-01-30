@@ -52,6 +52,8 @@ public class Employee extends BaseEntity {
     @JoinColumn(name = "academy_id")
     private Academy academy;
 
+    private String subject;
+
     public EmployeeDto toEmployeeDto() {
         return EmployeeDto.builder()
                 .id(this.id)

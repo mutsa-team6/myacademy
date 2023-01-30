@@ -66,7 +66,7 @@ public class EmployeeProfileS3UploadService {
         // 파일 업로드 대상인 직원 존재 유무 확인
         Employee targetEmployee = validateEmployee(employeeId, academy);
 
-        // 1. 직원이 파일 업로드할 권한이 있는지 확인 (강사는 불가능)
+        // 1. 직원이 파일 업로드할 권한이 있는지 확인 (강사 외 모든 직원 가능)
         // 2. 일반 직원은 본인 관련 파일만 등록 가능
         // 3. 원장은 모든 직원 파일 등록 가능
         if(!employee.getEmployeeRole().equals(EmployeeRole.ROLE_ADMIN)) {
@@ -140,7 +140,7 @@ public class EmployeeProfileS3UploadService {
         // 파일 삭제 대상인 직원 존재 유무 확인
         Employee targetEmployee = validateEmployee(employeeId, academy);
 
-        // 1. 직원이 파일 삭제할 권한이 있는지 확인 (강사는 불가능)
+        // 1. 직원이 파일 삭제할 권한이 있는지 확인 (강사 외 모든 직원 가능)
         // 2. 일반 직원은 본인 관련 파일만 삭제 가능
         // 3. 원장은 모든 직원 파일 삭제 가능
         if(!employee.getEmployeeRole().equals(EmployeeRole.ROLE_ADMIN)) {

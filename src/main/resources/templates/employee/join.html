@@ -40,7 +40,7 @@
                     <div class="col-xl-4 col-lg-5 col-md-7 d-flex flex-column ms-auto me-auto ms-lg-auto me-lg-5">
                         <div class="card card-plain">
                             <h4 class="font-weight-bolder">회원가입</h4>
-                            <p class="mb-0">이용하려는 학원 정보를 입력하여, 확인해주세요.</p>
+                            <p class="mb-0" style="font-weight: bold;color: #5A2060">이용하려는 학원 정보를 입력하여, 확인해주세요.</p>
                         </div>
                         <div class="card-body">
                             <form role="form">
@@ -48,7 +48,7 @@
                                     <div class="col-9 align-self-center">
                                         <div class="input-group input-group-outline  ">
                                             <label class="form-label">학원 이름</label>
-                                            <input type="text" class="form-control" id="input-academyName">
+                                            <input type="text" class="form-control" id="input-academyName" name="academyName">
                                         </div>
                                     </div>
                                     <div class="col-3  align-self-center">
@@ -63,23 +63,22 @@
 
                         <br>
                         <br>
-                        <p class="mb-0">사용할 계정명과 비밀번호를 입력해주세요</p>
+                        <p class="mb-0" style="font-weight: bold;color: #5A2060">사용할 계정명과 비밀번호를 입력해주세요</p>
                         <br>
                         <div class="card-body">
                             <div class="input-group input-group-outline mb-3">
                                 <label class="form-label">계정명</label>
-                                <input type="text" class="form-control" id="input-employeeAccount">
+                                <input type="text" class="form-control" id="input-employeeAccount" name ="employeeAccount">
                             </div>
                             <div class="input-group input-group-outline mb-3">
                                 <label class="form-label">비밀번호</label>
-                                <input type="password" class="form-control" id="input-employeePassword">
+                                <input type="password" class="form-control" id="input-employeePassword" name ="employeePassword">
                             </div>
                             <div class="input-group input-group-outline mb-3">
                                 <label class="form-label">비밀번호 2차 입력</label>
-                                <input type="password" class="form-control" id="input-employeePasswordCheck">
+                                <input type="password" class="form-control" id="input-employeePasswordCheck" >
                             </div>
-
-                            <p class="mb-0">사용자 정보를 입력해주세요.</p>
+                            <p class="mb-0" style="font-weight: bold;color: #5A2060">사용자 정보를 입력해주세요.</p>
                             <br>
 
                             <div class="input-group input-group-outline mb-3">
@@ -88,12 +87,12 @@
                             </div>
                             <div class="input-group input-group-outline mb-3">
                                 <label class="form-label">이메일</label>
-                                <input type="text" class="form-control" id="input-employeeEmail">
+                                <input type="email" class="form-control" id="input-employeeEmail" name ="employeeEmail">
                             </div>
 
                             <div class="input-group input-group-outline mb-3">
                                 <label class="form-label">전화번호</label>
-                                <input type="text" class="form-control" id="input-employeePhone">
+                                <input type="tel" class="form-control" id="input-employeePhone">
                             </div>
 
                             <div class="input-group input-group-outline mb-3">
@@ -106,13 +105,30 @@
                                        name="address_detail"
                                 >
                             </div>
-                            <div class="form-check form-check-info text-start ps-0">
-                                <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault"
-                                       checked>
-                                <label class="form-check-label" for="flexCheckDefault">
-                                    I agree the <a href="javascript:;" class="text-dark font-weight-bolder">Terms
-                                    and Conditions</a>
-                                </label>
+                            <p class="mb-0" style="font-weight: bold;color: #5A2060">유형을 선택해주세요. </p>
+                           <p class="text-uppercase text-secondary text-xs font-weight-bolder " style="font-weight: bold;color: #5A2060">(원장 · 강사 체크 시, 담당 과목을 입력해주세요)</p>
+                            <br>
+                            <div>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="radio" name="employeeType"
+                                                       id="customRadio1" value="USER">
+                                                <label class="custom-control-label" for="customRadio1">학원 원장 · 강사</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                            <div class="input-group input-group-outline mb-4">
+                                                <label class="form-label">과목</label>
+                                                <input type="email" class="form-control" id="input-subject">
+                                            </div>
+                                    </div>
+                                </div>
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="radio" name="employeeType"
+                                           id="customRadio2" value="STAFF">
+                                    <label class="custom-control-label" for="customRadio2">일반 직원</label>
+                                </div>
                             </div>
                             <div class="text-center">
                                 <button th:onclick="|signUp.createEmployee()|" type="button"
@@ -135,10 +151,12 @@
     </section>
 </main>
 <!--   Core JS Files   -->
-<script src="../assets/js/core/popper.min.js"></script>
-<script src="../assets/js/core/bootstrap.min.js"></script>
-<script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>
-<script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
+<!--   Core JS Files   -->
+<script src="/assets/js/core/popper.min.js"></script>
+<script src="/assets/js/core/bootstrap.min.js"></script>
+<script src="/assets/js/plugins/perfect-scrollbar.min.js"></script>
+<script src="/assets/js/plugins/smooth-scrollbar.min.js"></script>
+<script src="/assets/js/material-dashboard.min.js?v=3.0.4"></script>
 <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 
 <script>
@@ -180,20 +198,31 @@
             }).catch((error) => {
                 console.log(error);
                 if (error.response.data.result["errorCode"] == "ACADEMY_NOT_FOUND") {
-                    alert("등록된 학원이 아닙니다. 등록 후 진행해주세요");
+                    alert("등록된 학원이 아닙니다. 다시 검색하시거나 등록 후 진행해주세요");
                 }
             });
 
         },
 
         createEmployee: function () {
+
+            const parentTypeNodeList = document.getElementsByName('employeeType')
+            let employeeType = 0;
+            parentTypeNodeList.forEach((node) => {
+                if (node.checked) {
+                    employeeType = node.value;
+                }
+            })
+
             let data = {
                 account: document.querySelector('#input-employeeAccount').value.trim(),
                 password: document.querySelector('#input-employeePassword').value.trim(),
                 name: document.querySelector('#input-employeeName').value.trim(),
                 email: document.querySelector('#input-employeeEmail').value.trim(),
                 address: document.querySelector("#address_kakao").value.trim() + "  " + document.querySelector("#address_detail_kakao").value.trim(),
-                phoneNum: document.querySelector('#input-employeePhone').value.trim()
+                phoneNum: document.querySelector('#input-employeePhone').value.trim(),
+                employeeType : employeeType,
+                subject : document.querySelector('#input-subject').value.trim()
             };
             console.log(data);
 
@@ -201,10 +230,14 @@
 
             if (blank_pattern.test(data.account) == true || data.account == '') {
                 alert('계정명에 공백이 입력되었습니다. 다시 입력해주세요');
+                document.querySelector("input[name=employeeAccount]").focus();
+
                 return;
             }
             if (blank_pattern.test(data.password) == true || data.password == '') {
                 alert('비밀번호에 공백이 입력되었습니다. 다시 입력해주세요');
+                document.querySelector("input[name=employeePassword]").focus();
+
                 return;
             }
 
@@ -213,6 +246,7 @@
 
             if (password != passwordCheck) {
                 alert('비밀번호가 일치하지 않습니다. 다시 입력해주세요');
+                document.querySelector("input[name=employeePassword]").focus();
                 return;
             }
 
@@ -227,8 +261,25 @@
                 window.location.href = '/login';
 
             }).catch((error) => {
-                console.log(academyId);
                 console.log(error);
+                if (error.response.data.result["errorCode"] == "ACADEMY_NOT_FOUND") {
+                    alert("학원 정보를 먼저 검색 후, 회원 가입을 진행해주세요.");
+                    document.querySelector("input[name=academyName]").focus();
+                } else if(error.response.data.result["errorCode"] == "DUPLICATED_ACCOUNT") {
+                    alert("이미 존재하는 계정명입니다. 다른 계정명을 사용해주세요.");
+                    document.querySelector("input[name=employeeAccount]").focus();
+
+                } else if(error.response.data.result["errorCode"] == "DUPLICATED_EMAIL") {
+                    alert("이미 존재하는 이메일입니다. 다른 이메일을 사용해주세요.");
+                    document.querySelector("input[name=employeeEmail]").focus();
+
+                } else if(error.response.data.result["errorCode"] == "EMPTY_EMPLOYEE_TYPE") {
+                    alert("유형 선택은 필수입니다.");
+                    document.querySelector("input[name=employeeType]").focus();
+                }else if(error.response.data.result["errorCode"] == "BLANK_NOT_ALLOWED") {
+                    alert("입력되지 않은 정보가 있습니다! 입력해주세요.");
+                    document.querySelector("input[name=employeeType]").focus();
+                }
 
             });
 

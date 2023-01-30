@@ -36,7 +36,7 @@ public class WaitinglistRestController {
     }
 
     // 대기번호 등록
-    @Operation(summary = "대기번호 등록", description = "대기번호를 등록합니다.")
+    @Operation(summary = "대기번호 등록", description = "ADMIN,STAFF 회원만 대기번호 등록이 가능합니다.")
     @PostMapping("/{academyId}/students/{studentId}/lectures/{lectureId}/waitinglists")
     public ResponseEntity<Response<CreateWaitinglistResponse>> create(@PathVariable("academyId") Long academyId,
                                                                       @PathVariable("studentId") Long studentId,

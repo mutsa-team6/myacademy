@@ -9,7 +9,6 @@ import com.project.myacademy.domain.lecture.Lecture;
 import com.project.myacademy.domain.lecture.LectureRepository;
 import com.project.myacademy.domain.student.Student;
 import com.project.myacademy.domain.student.StudentRepository;
-import com.project.myacademy.domain.teacher.Teacher;
 import com.project.myacademy.domain.waitinglist.Waitinglist;
 import com.project.myacademy.domain.waitinglist.WaitinglistRepository;
 import com.project.myacademy.global.exception.AppException;
@@ -254,7 +253,7 @@ public class EnrollmentService {
         for (Student foundStudent : foundStudents) {
             List<Enrollment> founds = enrollmentRepository.findByStudent(foundStudent);
             for (Enrollment found : founds) {
-                finalEnrollments.add(new FindEnrollmentResponse(foundStudent,found.getLecture(),found.getLecture().getTeacher(),found));
+                finalEnrollments.add(new FindEnrollmentResponse(foundStudent,found.getLecture(),found));
             }
         }
 
