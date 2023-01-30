@@ -65,7 +65,6 @@ public class EmployeeRestController {
         CookieGenerator cookieGenerator = new CookieGenerator();
         cookieGenerator.setCookieName("token");
         cookieGenerator.setCookieHttpOnly(true);
-        cookieGenerator.setCookieDomain(".localhost:8080");
         cookieGenerator.addCookie(httpServletResponse, token);
         cookieGenerator.setCookieMaxAge(60 * 60);//1시간
         log.info("🍪 쿠키에 저장한 토큰 {}", token);
