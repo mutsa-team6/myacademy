@@ -63,7 +63,6 @@ public class EmployeeController {
         CookieGenerator cookieGenerator = new CookieGenerator();
         cookieGenerator.setCookieName("token");
         cookieGenerator.setCookieHttpOnly(true);
-        cookieGenerator.setCookieSecure(true);
         cookieGenerator.addCookie(response, token);
         cookieGenerator.setCookieMaxAge(60 * 60);//1시간
         log.info("🍪 쿠키에 저장한 토큰 {}", token);
