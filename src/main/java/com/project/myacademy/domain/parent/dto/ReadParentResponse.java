@@ -15,8 +15,6 @@ public class ReadParentResponse {
     private Long id;
     //부모 이름
     private String name;
-    //부모 유형
-    private Integer parentRecognizedCode;
     //부모 핸드폰번호
     private String phoneNum;
     //부모 주소
@@ -31,7 +29,6 @@ public class ReadParentResponse {
                 .academyId(parent.getAcademyId())
                 .id(parent.getId())
                 .name(parent.getName())
-                .parentRecognizedCode(parent.getParentRecognizedCode())
                 .phoneNum(parent.getPhoneNum())
                 .address(parent.getAddress())
                 .createAt(parent.getCreatedAt())

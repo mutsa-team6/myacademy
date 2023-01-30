@@ -28,8 +28,6 @@ public class Parent extends BaseEntity {
 
     private String name;
 
-    @Column(name = "parent_recognized_code")
-    private Integer parentRecognizedCode;
 
     @Column(name = "phone_number")
     private String phoneNum;
@@ -38,7 +36,6 @@ public class Parent extends BaseEntity {
 
     public void updateParent(UpdateParentRequest request) {
         this.name = request.getName();
-        this.parentRecognizedCode = request.getParentRecognizedCode();
         this.phoneNum = request.getPhoneNum();
         this.address = request.getAddress();
     }
@@ -47,7 +44,6 @@ public class Parent extends BaseEntity {
         return Parent.builder()
                 .academyId(academyId)
                 .name(request.getName())
-                .parentRecognizedCode(request.getParentRecognizedCode())
                 .phoneNum(request.getPhoneNum())
                 .address(request.getAddress())
                 .build();
