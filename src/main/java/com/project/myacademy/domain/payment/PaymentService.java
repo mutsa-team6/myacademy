@@ -8,10 +8,11 @@ import com.project.myacademy.domain.enrollment.Enrollment;
 import com.project.myacademy.domain.enrollment.EnrollmentRepository;
 import com.project.myacademy.domain.lecture.Lecture;
 import com.project.myacademy.domain.lecture.LectureRepository;
-import com.project.myacademy.domain.payment.dto.CreatePaymentRequest;
-import com.project.myacademy.domain.payment.dto.CreatePaymentResponse;
-import com.project.myacademy.domain.payment.dto.SuccessApprovePaymentResponse;
-import com.project.myacademy.domain.payment.dto.FailApprovePaymentResponse;
+import com.project.myacademy.domain.payment.dto.*;
+import com.project.myacademy.domain.payment.entity.CancelPayment;
+import com.project.myacademy.domain.payment.entity.Payment;
+import com.project.myacademy.domain.payment.repository.CancelPaymentRepository;
+import com.project.myacademy.domain.payment.repository.PaymentRepository;
 import com.project.myacademy.domain.student.Student;
 import com.project.myacademy.domain.student.StudentRepository;
 import com.project.myacademy.global.exception.AppException;
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Collections;
@@ -41,6 +43,7 @@ public class PaymentService {
     private final StudentRepository studentRepository;
     private final EmployeeRepository employeeRepository;
     private final LectureRepository lectureRepository;
+    private final CancelPaymentRepository cancelPaymentRepository;
 
     @Value("${payment.toss.testSecretApiKey}")
     private String testSecretApiKey;
@@ -138,7 +141,7 @@ public class PaymentService {
      * @return
      */
     @Transactional
-    public SuccessApprovePaymentResponse successApprovePayment(String paymentKey, String orderId, Integer amount) {
+    public ApprovePaymentResponse successApprovePayment(String paymentKey, String orderId, Integer amount) {
         //이미 결제되있는지 확인
         Payment selcetedPayment = paymentRepository.findByOrderId(orderId)
                 .orElseThrow(() -> new AppException(ErrorCode.PAYMENT_NOT_FOUND));
@@ -171,7 +174,7 @@ public class PaymentService {
         return rest.postForEntity(
                         "https://api.tosspayments.com/v1/payments/confirm",
                         new HttpEntity<>(param, headers),
-                        SuccessApprovePaymentResponse.class)
+                        ApprovePaymentResponse.class)
                 .getBody();
     }
 
@@ -195,6 +198,60 @@ public class PaymentService {
                 .build();
     }
 
+    /**
+     * 결제 취소
+     *
+     * @param paymentKey 토스측 결제 키
+     * @param cancelReason 결제 취소 사유
+     * @return
+     */
+    public ApprovePaymentResponse cancelPayment(String paymentKey, String cancelReason, String account, Long academyId) {
+        //학원이 존재하는지 여부
+        Academy academy = validateAcademy(academyId);
+
+        //학원에 근무하는 직원이 맞는지 확인
+        Employee foundEmployee = validateAcademyEmployee(account, academy);
+
+        //payment 결제된 내역이 있는지 확인
+        Payment selcetedPayment = paymentRepository.findByPaymentKey(paymentKey)
+                .orElseThrow(() -> new AppException(ErrorCode.PAYMENT_NOT_FOUND));
+
+        RestTemplate rest = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+
+        URI uri = URI.create("https://api.tosspayments.com/v1/payments/" + paymentKey + "/cancel");
+
+        testSecretApiKey = testSecretApiKey + ":";
+        String encodedAuth = new String(Base64.getEncoder().encode(testSecretApiKey.getBytes(StandardCharsets.UTF_8)));
+
+        headers.setBasicAuth(encodedAuth);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+
+        JSONObject param = new JSONObject();
+        param.put("cancelReason", cancelReason);
+
+        //삭제
+        paymentRepository.delete(selcetedPayment);
+
+        //cancelPayment 저장
+        CancelPayment saveCancelPayment = cancelPaymentRepository.save(CancelPayment.builder()
+                .orderId(selcetedPayment.getOrderId())
+                .paymentKey(paymentKey)
+                .cancelReason(cancelReason)
+                .amount(selcetedPayment.getAmount())
+                .orderName(selcetedPayment.getOrderName())
+                .payment(selcetedPayment)
+                .employee(foundEmployee)
+                .build());
+
+        return rest.postForEntity(
+                        uri,
+                        new HttpEntity<>(param, headers),
+                        ApprovePaymentResponse.class)
+                .getBody();
+    }
+
     private Academy validateAcademy(Long academyId) {
         // 학원 존재 유무 확인
         Academy validatedAcademy = academyRepository.findById(academyId)
@@ -208,5 +265,4 @@ public class PaymentService {
                 .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
         return employee;
     }
-
 }
