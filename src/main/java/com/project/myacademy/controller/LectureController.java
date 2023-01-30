@@ -45,10 +45,8 @@ public class LectureController {
             model.addAttribute("name", foundName);
         }
 
-//        Page<ReadAllTeacherResponse> foundTeachers = teacherService.readAllTeacher(academyId, requestAccount, pageable);
-//        model.addAttribute("teachers", foundTeachers);
-
-
+        Page<ReadEmployeeResponse> teachers = employeeService.findAllTeachers(requestAccount, academyId, pageable);
+        model.addAttribute("teachers", teachers);
 
         return "pages/lecture";
     }

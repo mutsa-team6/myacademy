@@ -464,6 +464,19 @@ public class EmployeeService {
         return new UpdateEmployeeResponse(requestEmployee.getId(), requestAccount + "계정 정보를 수정했습니다");
     }
 
+    /**
+     * UI 용 메서드
+     * 회원가입한 사용자 들 중에서, 특정 학원의 강사들만 추출하는 메서드
+     */
+    public Page<ReadEmployeeResponse> findAllTeachers(String requestAccount,Long academyId,Pageable pageable) {
+        //해당 학원이 존재하는지 확인
+        Academy foundAcademy = validateAcademy(academyId);
+
+        // 본인 정보 수정을 요청한 회원이 해당 학원에 존재하는지 확인
+        Employee requestEmployee = validateRequestEmployee(requestAccount, foundAcademy);
+        return employeeRepository.findAllTeacher(foundAcademy, pageable).map(employee -> new ReadEmployeeResponse(employee));
+    }
+
     // 접근하려는 학원이 존재하는지 확인
     private Academy validateAcademy(Long academyId) {
         Academy validateAcademy = academyRepository.findById(academyId)

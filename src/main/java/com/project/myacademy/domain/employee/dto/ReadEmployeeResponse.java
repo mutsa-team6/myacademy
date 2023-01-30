@@ -17,6 +17,8 @@ public class ReadEmployeeResponse {
     private String account;
     private EmployeeRole employeeRole;
     private Academy academy;
+    private String subject;
+    private String phoneNum;
 
     public ReadEmployeeResponse(Employee foundEmployee) {
         this.id = foundEmployee.getId();
@@ -25,5 +27,8 @@ public class ReadEmployeeResponse {
         this.email = foundEmployee.getEmail();
         this.account = foundEmployee.getAccount();
         this.employeeRole = foundEmployee.getEmployeeRole();
+        this.subject = foundEmployee.getSubject();
+        this.academy = foundEmployee.getAcademy();
+        this.phoneNum = foundEmployee.getPhoneNum();
     }
 }
