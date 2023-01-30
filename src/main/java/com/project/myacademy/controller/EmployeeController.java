@@ -38,6 +38,13 @@ public class EmployeeController {
         return "employee/findPassword";
     }
 
+    @GetMapping("/academy/mypage")
+    public String mypage() {
+
+        return "employee/mypage";
+    }
+
+
     @GetMapping("/oauthFail")
     public void oauthFail(HttpServletResponse response) throws IOException {
         response.setContentType("text/html; charset=utf-8");
