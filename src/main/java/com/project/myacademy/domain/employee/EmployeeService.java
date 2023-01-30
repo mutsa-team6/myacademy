@@ -472,9 +472,34 @@ public class EmployeeService {
         //해당 학원이 존재하는지 확인
         Academy foundAcademy = validateAcademy(academyId);
 
-        // 본인 정보 수정을 요청한 회원이 해당 학원에 존재하는지 확인
+        // 조회 요청을한 회원이 해당 학원에 존재하는지 확인
         Employee requestEmployee = validateRequestEmployee(requestAccount, foundAcademy);
         return employeeRepository.findAllTeacher(foundAcademy, pageable).map(employee -> new ReadEmployeeResponse(employee));
+    }
+
+    /**
+     * UI 용 메서드
+     * 강좌 등록 시에 강사 정보를 보여주기 위함
+     */
+    public ReadEmployeeResponse findOneTeacher(String requestAccount,Long academyId,Long teacherId) {
+        //해당 학원이 존재하는지 확인
+        Academy foundAcademy = validateAcademy(academyId);
+
+        // 강좌 등록 신청한 사람이 해당 학원에 존재하는지 확인
+        Employee requestEmployee = validateRequestEmployee(requestAccount, foundAcademy);
+
+        // 해당 강사가 해당 학원에 존재하는지 확인
+        Employee foundTeacher = validateEmployee(teacherId, foundAcademy);
+
+        // 강사가 맞는지 한번더 체크
+        if (!foundTeacher.getEmployeeRole().equals(EmployeeRole.ROLE_USER)) {
+            throw new AppException(ErrorCode.NOT_TEACHER);
+        }
+
+        ReadEmployeeResponse response = new ReadEmployeeResponse(foundTeacher);
+
+        return response;
+
     }
 
     // 접근하려는 학원이 존재하는지 확인

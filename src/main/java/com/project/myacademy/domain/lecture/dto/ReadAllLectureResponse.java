@@ -23,6 +23,7 @@ public class ReadAllLectureResponse {
     private String lectureTime;
     private LocalDate startDate;
     private LocalDate finishDate;
+    private Integer currentEnrollmentNumber;
 
     public static ReadAllLectureResponse of(Lecture lecture) {
         return ReadAllLectureResponse.builder()
@@ -35,6 +36,7 @@ public class ReadAllLectureResponse {
                 .lectureTime(lecture.getLectureTime())
                 .startDate(lecture.getStartDate())
                 .finishDate(lecture.getFinishDate())
+                .currentEnrollmentNumber(lecture.getCurrentEnrollmentNumber())
                 .build();
     }
 }
