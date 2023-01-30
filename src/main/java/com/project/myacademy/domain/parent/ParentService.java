@@ -137,6 +137,10 @@ public class ParentService {
 
     }
 
+    public boolean checkExistByPhoneAndAcademy(String parentPhoneNum, Long academyId) {
+        return parentRepository.existsByPhoneNum(parentPhoneNum);
+    }
+
     private Parent validateParent(Long parentId, Long academyId) {
         // parentId와 academyId에 해당하는 부모 존재 유무 확인
         Parent parent = parentRepository.findByIdAndAcademyId(parentId, academyId)
