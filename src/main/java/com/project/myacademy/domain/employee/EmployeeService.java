@@ -54,6 +54,8 @@ public class EmployeeService {
 
         String requestAccount = request.getAccount();
         String requestEmail = request.getEmail();
+        String requestRealName = request.getName();
+
         log.info("⭐ 회원가입 요청한 사용자의 계정 [{}] || 이메일 [{}]", requestAccount, requestEmail);
 
 
@@ -64,13 +66,12 @@ public class EmployeeService {
                 });
 
         // 이미 같은 실명과 이메일이 일치하는 데이터가 존재하는 경우 예외 처리
-        employeeRepository.findByNameAndEmail(requestAccount, requestEmail)
+        employeeRepository.findByNameAndEmail(requestRealName, requestEmail)
                 .ifPresent(employee -> {
                     throw new AppException(ErrorCode.DUPLICATED_EMAIL);
                 });
 
         // 계정명이 admin 이고 학원 대표자명과 회원가입을 요청한 실명이 동일하면 admin 계정을 준다.
-        String requestRealName = request.getName();
         String ownerName = foundAcademy.getOwner();
         log.info("⭐ 회원가입 요청한 사용자의 실명 [{}] || 학원 대표자명 [{}]", requestRealName, ownerName);
 
