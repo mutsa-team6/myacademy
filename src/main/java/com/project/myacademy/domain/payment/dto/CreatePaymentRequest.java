@@ -2,7 +2,7 @@ package com.project.myacademy.domain.payment.dto;
 import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.domain.enrollment.Enrollment;
 import com.project.myacademy.domain.payment.PayType;
-import com.project.myacademy.domain.payment.Payment;
+import com.project.myacademy.domain.payment.entity.Payment;
 import com.project.myacademy.domain.student.Student;
 import lombok.*;
 

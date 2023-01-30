@@ -45,18 +45,22 @@
                         <div class="card-body">
                             <form role="form">
                                 <div class="row ">
-                                    <div class="col-9 align-self-center">
+                                    <div class="col-12 align-self-center">
+
                                         <div class="input-group input-group-outline  ">
                                             <label class="form-label">학원 이름</label>
-                                            <input type="text" class="form-control" id="input-academyName" name="academyName">
+                                            <input type="text" class="form-control"
+                                                   id="input-academyName" name="academyName"
+                                                   oninput="check_academyExist()">
+                                        </div>
+                                        <div id="academy-pass" class="alert-pass" hidden
+                                             style="color: #5A2082;font-size: small">존재하는 학원입니다. 회원가입을 진행해주세요.
+                                        </div>
+                                        <div id="academy-fail" class="alert-pass" hidden
+                                             style="color: red;font-size: small">존재하지 않는 학원입니다.
+                                            <a href="/academies">학원 등록</a> 먼저 해주세요.
                                         </div>
                                     </div>
-                                    <div class="col-3  align-self-center">
-                                        <button th:onclick="|signUp.findAcademy()|" type="button"
-                                                class="btn btn-sm bg-gradient-primary btn-lg w-100 mb-0">검색
-                                        </button>
-                                    </div>
-
                                 </div>
                             </form>
                         </div>
@@ -68,15 +72,17 @@
                         <div class="card-body">
                             <div class="input-group input-group-outline mb-3">
                                 <label class="form-label">계정명</label>
-                                <input type="text" class="form-control" id="input-employeeAccount" name ="employeeAccount">
+                                <input type="text" class="form-control" id="input-employeeAccount"
+                                       name="employeeAccount">
                             </div>
                             <div class="input-group input-group-outline mb-3">
                                 <label class="form-label">비밀번호</label>
-                                <input type="password" class="form-control" id="input-employeePassword" name ="employeePassword">
+                                <input type="password" class="form-control" id="input-employeePassword"
+                                       name="employeePassword">
                             </div>
                             <div class="input-group input-group-outline mb-3">
                                 <label class="form-label">비밀번호 2차 입력</label>
-                                <input type="password" class="form-control" id="input-employeePasswordCheck" >
+                                <input type="password" class="form-control" id="input-employeePasswordCheck">
                             </div>
                             <p class="mb-0" style="font-weight: bold;color: #5A2060">사용자 정보를 입력해주세요.</p>
                             <br>
@@ -87,7 +93,7 @@
                             </div>
                             <div class="input-group input-group-outline mb-3">
                                 <label class="form-label">이메일</label>
-                                <input type="email" class="form-control" id="input-employeeEmail" name ="employeeEmail">
+                                <input type="email" class="form-control" id="input-employeeEmail" name="employeeEmail">
                             </div>
 
                             <div class="input-group input-group-outline mb-3">
@@ -106,22 +112,23 @@
                                 >
                             </div>
                             <p class="mb-0" style="font-weight: bold;color: #5A2060">유형을 선택해주세요. </p>
-                           <p class="text-uppercase text-secondary text-xs font-weight-bolder " style="font-weight: bold;color: #5A2060">(원장 · 강사 체크 시, 담당 과목을 입력해주세요)</p>
+                            <p class="text-uppercase text-secondary text-xs font-weight-bolder "
+                               style="font-weight: bold;color: #5A2060">(원장 · 강사 체크 시, 담당 과목을 입력해주세요)</p>
                             <br>
                             <div>
                                 <div class="row">
                                     <div class="col-6">
                                         <div class="form-check mb-3">
                                             <input class="form-check-input" type="radio" name="employeeType"
-                                                       id="customRadio1" value="USER">
-                                                <label class="custom-control-label" for="customRadio1">학원 원장 · 강사</label>
+                                                   id="customRadio1" value="USER">
+                                            <label class="custom-control-label" for="customRadio1">학원 원장 · 강사</label>
                                         </div>
                                     </div>
                                     <div class="col-6">
-                                            <div class="input-group input-group-outline mb-4">
-                                                <label class="form-label">과목</label>
-                                                <input type="email" class="form-control" id="input-subject">
-                                            </div>
+                                        <div class="input-group input-group-outline mb-4">
+                                            <label class="form-label">과목</label>
+                                            <input type="email" class="form-control" id="input-subject">
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="form-check mb-3">
@@ -168,40 +175,60 @@
         Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
     }
 </script>
+<script>
+
+
+</script>
 <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
 <script src="../assets/js/material-dashboard.min.js?v=3.0.4"></script>
 <Script>
     let academyId = 0;
 
+    function check_academyExist() {
+
+        let data = {
+            name: document.querySelector('#input-academyName').value.trim()
+        };
+        console.log(data);
+        axios.post("/academies/check",
+            JSON.stringify(data), {
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            }
+        ).then((response) => {
+            console.log(response);
+            if  (response.data["isExist"] == true) {
+                show('academy-pass');
+                hide('academy-fail');
+
+                academyId = response.data["academyId"];
+            }
+
+        }).catch((error) => {
+            console.log(error);
+            hide('academy-pass');
+            show('academy-fail');
+        });
+    }
+
+
+    function show(id) {
+        if (document.getElementById(id) != null) {
+            document.getElementById(id).removeAttribute("hidden")
+        }
+    }
+
+    function hide(id) {
+        if (document.getElementById(id) != null) {
+            document.getElementById(id).setAttribute("hidden", "true")
+        }
+    }
+
+
     let signUp = {
         init: function () {
             var _this = this;
-        },
-
-        findAcademy: function () {
-            let data = {
-                name: document.querySelector('#input-academyName').value.trim()
-            };
-            console.log(data);
-
-            axios.post("/api/v1/academies/find",
-                JSON.stringify(data), {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
-                }
-            ).then((response) => {
-                console.log(response);
-                alert("등록된 학원입니다. 회원가입을 진행해주세요");
-                academyId = response.data.result;
-                console.log(academyId);
-            }).catch((error) => {
-                console.log(error);
-                if (error.response.data.result["errorCode"] == "ACADEMY_NOT_FOUND") {
-                    alert("등록된 학원이 아닙니다. 다시 검색하시거나 등록 후 진행해주세요");
-                }
-            });
-
         },
 
         createEmployee: function () {
@@ -221,8 +248,8 @@
                 email: document.querySelector('#input-employeeEmail').value.trim(),
                 address: document.querySelector("#address_kakao").value.trim() + "  " + document.querySelector("#address_detail_kakao").value.trim(),
                 phoneNum: document.querySelector('#input-employeePhone').value.trim(),
-                employeeType : employeeType,
-                subject : document.querySelector('#input-subject').value.trim()
+                employeeType: employeeType,
+                subject: document.querySelector('#input-subject').value.trim()
             };
             console.log(data);
 
@@ -265,18 +292,18 @@
                 if (error.response.data.result["errorCode"] == "ACADEMY_NOT_FOUND") {
                     alert("학원 정보를 먼저 검색 후, 회원 가입을 진행해주세요.");
                     document.querySelector("input[name=academyName]").focus();
-                } else if(error.response.data.result["errorCode"] == "DUPLICATED_ACCOUNT") {
+                } else if (error.response.data.result["errorCode"] == "DUPLICATED_ACCOUNT") {
                     alert("이미 존재하는 계정명입니다. 다른 계정명을 사용해주세요.");
                     document.querySelector("input[name=employeeAccount]").focus();
 
-                } else if(error.response.data.result["errorCode"] == "DUPLICATED_EMAIL") {
+                } else if (error.response.data.result["errorCode"] == "DUPLICATED_EMAIL") {
                     alert("이미 존재하는 이메일입니다. 다른 이메일을 사용해주세요.");
                     document.querySelector("input[name=employeeEmail]").focus();
 
-                } else if(error.response.data.result["errorCode"] == "EMPTY_EMPLOYEE_TYPE") {
+                } else if (error.response.data.result["errorCode"] == "EMPTY_EMPLOYEE_TYPE") {
                     alert("유형 선택은 필수입니다.");
                     document.querySelector("input[name=employeeType]").focus();
-                }else if(error.response.data.result["errorCode"] == "BLANK_NOT_ALLOWED") {
+                } else if (error.response.data.result["errorCode"] == "BLANK_NOT_ALLOWED") {
                     alert("입력되지 않은 정보가 있습니다! 입력해주세요.");
                     document.querySelector("input[name=employeeType]").focus();
                 }

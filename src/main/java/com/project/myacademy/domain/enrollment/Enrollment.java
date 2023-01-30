@@ -46,6 +46,8 @@ public class Enrollment extends BaseEntity {
     @Column(name = "last_modified_employee")
     private String modifiedEmployee;
 
+    private Long discountId;
+
     // 수강 생성 메서드
     public static Enrollment createEnrollment(Student student, Lecture lecture, Employee employee, CreateEnrollmentRequest request) {
         StringBuilder sb = new StringBuilder();
@@ -75,6 +77,11 @@ public class Enrollment extends BaseEntity {
     // paymentYN 수정
     public void updatePaymentYN() {
         this.paymentYN = true;
+    }
+
+    // 할인정책 id 수정
+    public void updateDiscountId(Long discountId) {
+        this.discountId = discountId;
     }
 }
 
