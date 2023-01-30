@@ -1,8 +1,9 @@
-package com.project.myacademy.domain.payment;
+package com.project.myacademy.domain.payment.entity;
 
 import com.project.myacademy.domain.BaseEntity;
 import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.domain.lecture.Lecture;
+import com.project.myacademy.domain.payment.PayType;
 import com.project.myacademy.domain.student.Student;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;

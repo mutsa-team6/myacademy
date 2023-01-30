@@ -1,9 +1,6 @@
 package com.project.myacademy.domain.payment;
 
-import com.project.myacademy.domain.payment.dto.CreatePaymentRequest;
-import com.project.myacademy.domain.payment.dto.CreatePaymentResponse;
-import com.project.myacademy.domain.payment.dto.SuccessApprovePaymentResponse;
-import com.project.myacademy.domain.payment.dto.FailApprovePaymentResponse;
+import com.project.myacademy.domain.payment.dto.*;
 import com.project.myacademy.global.Response;
 import com.project.myacademy.global.util.AuthenticationUtil;
 import io.swagger.v3.oas.annotations.Operation;
@@ -51,11 +48,11 @@ public class TossPayRestController {
      */
     @Operation(summary = "결제 승인 성공", description = "OpenApi로 부터 결제 성공시 가격 검증과 가격 승인 처리")
     @GetMapping("/success")
-    public ResponseEntity<Response<SuccessApprovePaymentResponse>> SuccessApproveRequest(@RequestParam String paymentKey,
-                                                                        @RequestParam String orderId,
-                                                                        @RequestParam Integer amount) {
+    public ResponseEntity<Response<ApprovePaymentResponse>> SuccessApproveRequest(@RequestParam String paymentKey,
+                                                                                  @RequestParam String orderId,
+                                                                                  @RequestParam Integer amount) {
         paymentService.verifyRequest(paymentKey, orderId, amount);
-        SuccessApprovePaymentResponse result = paymentService.successApprovePayment(paymentKey, orderId, amount);
+        ApprovePaymentResponse result = paymentService.successApprovePayment(paymentKey, orderId, amount);
         return ResponseEntity.ok().body(Response.success(result));
     }
 
@@ -69,5 +66,15 @@ public class TossPayRestController {
                                                             @RequestParam String errorMsg,
                                                             @RequestParam String orderId) {
         return ResponseEntity.ok().body(Response.error(errorCode, paymentService.failApprovePayment(errorCode, errorMsg, orderId)));
+    }
+
+    @Operation(summary = "결제 취소", description = "paymentKey를 사용하여 결제취소 이유 작성")
+    @PostMapping("/cancel")
+    public ResponseEntity<Response<ApprovePaymentResponse>> cancel(@RequestParam String paymentKey,
+                                                                   @RequestParam String cancelReason,
+                                                                   Authentication authentication){
+        String account = AuthenticationUtil.getAccountFromAuth(authentication);
+        Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
+        return ResponseEntity.ok().body(Response.success(paymentService.cancelPayment(paymentKey,cancelReason,account,academyId)));
     }
 }

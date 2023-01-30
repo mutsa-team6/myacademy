@@ -2,7 +2,7 @@ package com.project.myacademy.domain.payment.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.project.myacademy.domain.payment.PayType;
-import com.project.myacademy.domain.payment.Payment;
+import com.project.myacademy.domain.payment.entity.Payment;
 import lombok.*;
 
 import java.time.LocalDateTime;
