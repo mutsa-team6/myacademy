@@ -21,5 +21,4 @@ public class CreateLectureRequest {
     private String lectureTime;
     private LocalDate startDate;
     private LocalDate finishDate;
-    private Integer currentEnrollmentNumber = 0;
 }
