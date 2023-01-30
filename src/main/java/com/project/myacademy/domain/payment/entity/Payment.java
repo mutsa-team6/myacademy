@@ -1,8 +1,10 @@
-package com.project.myacademy.domain.payment;
+package com.project.myacademy.domain.payment.entity;
 
 import com.project.myacademy.domain.BaseEntity;
+import com.project.myacademy.domain.discount.Discount;
 import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.domain.lecture.Lecture;
+import com.project.myacademy.domain.payment.PayType;
 import com.project.myacademy.domain.student.Student;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
@@ -44,6 +46,10 @@ public class Payment extends BaseEntity {
     private PayType payType;
     private Integer amount;
     private String paymentKey;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "discount_id")
+    private Discount discount;
 
     public void setPaymentKey(String paymentKey) {
         this.paymentKey = paymentKey;
