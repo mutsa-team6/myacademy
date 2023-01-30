@@ -2,6 +2,8 @@ package com.project.myacademy.domain.employee;
 
 import com.project.myacademy.domain.employee.dto.*;
 import com.project.myacademy.global.Response;
+import com.project.myacademy.global.exception.ErrorCode;
+import com.project.myacademy.global.exception.ErrorDto;
 import com.project.myacademy.global.util.AuthenticationUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -11,6 +13,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.CookieGenerator;
 
@@ -25,13 +29,18 @@ import javax.servlet.http.HttpSession;
 public class EmployeeRestController {
 
     private final EmployeeService employeeService;
+
     @Tag(name = "02-1. 직원", description = "직원 회원 가입 및 정보 수정,조회")
     @Operation(summary = "직원 회원가입", description = "직원이 회원 가입을 합니다.")
     @PostMapping("/{academyId}/employees/signup")
-    public ResponseEntity create(@PathVariable Long academyId, @RequestBody CreateEmployeeRequest request) {
+    public ResponseEntity create(@PathVariable Long academyId, @Validated @RequestBody CreateEmployeeRequest request, BindingResult br) {
 
         log.info("⭐ 회원가입 요청한 id [{}] 요청한 사용자 계정 [{}]", academyId, request.getAccount());
 
+        if (br.hasErrors()) {
+            ErrorCode e = ErrorCode.BLANK_NOT_ALLOWED;
+            return ResponseEntity.status(e.getHttpStatus()).body(Response.error("ERROR", new ErrorDto(e.toString(), e.getMessage())));
+        }
         CreateEmployeeResponse response = employeeService.createEmployee(request, academyId);
 
 
@@ -56,7 +65,6 @@ public class EmployeeRestController {
         CookieGenerator cookieGenerator = new CookieGenerator();
         cookieGenerator.setCookieName("token");
         cookieGenerator.setCookieHttpOnly(true);
-        cookieGenerator.setCookieSecure(true);
         cookieGenerator.addCookie(httpServletResponse, token);
         cookieGenerator.setCookieMaxAge(60 * 60);//1시간
         log.info("🍪 쿠키에 저장한 토큰 {}", token);
@@ -97,7 +105,7 @@ public class EmployeeRestController {
 
     // 본인 탈퇴 기능
     @Tag(name = "02-1. 직원", description = "직원 회원 가입 및 정보 수정,조회")
-    @Operation(summary = "직원 본인 삭제", description ="ADMIN 회원 및 본인 만 삭제가 가능합니다.\n\n soft-delete 됩니다.")
+    @Operation(summary = "직원 본인 삭제", description = "ADMIN 회원 및 본인 만 삭제가 가능합니다.\n\n soft-delete 됩니다.")
     @DeleteMapping("/{academyId}")
     public ResponseEntity selfDelete(Authentication authentication, @PathVariable Long academyId) {
 

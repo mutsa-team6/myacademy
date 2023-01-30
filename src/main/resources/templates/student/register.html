@@ -81,33 +81,7 @@
                                     >
                                 </div>
                             </form>
-                            <br>
-                            <p class="mb-0"> 해당하는 곳에 체크해주세요. </p>
-                            <br>
-                            <hr>
-                            <br>
-                            <div>
-                                <div class="form-check mb-3">
-                                    <input class="form-check-input" type="radio" name="parentType"
-                                           id="customRadio1" value="0">
-                                    <label class="custom-control-label" for="customRadio1">일반 학부모</label>
-                                </div>
-                                <div class="form-check mb-3">
-                                    <input class="form-check-input" type="radio" name="parentType"
-                                           id="customRadio2" value="1">
-                                    <label class="custom-control-label" for="customRadio2">학원 강사</label>
-                                </div>
-                                <div class="form-check mb-3">
-                                    <input class="form-check-input" type="radio" name="parentType"
-                                           id="customRadio3" value="2">
-                                    <label class="custom-control-label" for="customRadio1">학원 직원</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="parentType"
-                                           id="customRadio4" value="3">
-                                    <label class="custom-control-label" for="customRadio2">학원 원장</label>
-                                </div>
-                            </div>
+
                             <div class="text-center">
                                 <button th:onclick="|register.registerParent(${academyId})|" type="button"
                                         class="btn btn-lg bg-gradient-primary btn-lg w-100 mt-4 mb-0"> 부모 등록
@@ -231,19 +205,12 @@
         },
 
         registerParent: function (academyId) {
-            const parentTypeNodeList = document.getElementsByName('parentType')
-            let parentRecognizedCode = 0;
-            parentTypeNodeList.forEach((node) => {
-                if (node.checked) {
-                    parentRecognizedCode = node.value;
-                }
-            })
+
 
             let data = {
                 name: document.querySelector('#input-parentName').value.trim(),
                 address: document.querySelector("#address_kakao").value.trim() + "  " + document.querySelector("#address_detail_kakao").value.trim(),
                 phoneNum: document.querySelector('#input-parentPhoneNum').value.trim(),
-                parentRecognizedCode: parentRecognizedCode
             };
             console.log(data);
 

@@ -16,7 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "08. 강좌", description = "강좌 등록,수정,조회")
+@Tag(name = "07. 강좌", description = "강좌 등록,수정,조회")
 @RestController
 @RequestMapping("api/v1/academies")
 @RequiredArgsConstructor
@@ -38,39 +38,38 @@ public class LectureRestController {
 
     // 강좌 등록
     @Operation(summary = "강좌 등록", description = "ADMIN,STAFF 회원만 등록이 가능합니다.")
-    @PostMapping("/{academyId}/teachers/{teacherId}/lectures")
+    @PostMapping("/{academyId}/employees/{employeeId}/lectures")
     public ResponseEntity<Response<CreateLectureResponse>> create(@PathVariable("academyId") Long academyId,
-                                                                  @PathVariable("teacherId") Long teacherId,
+                                                                  @PathVariable("employeeId") Long employeeId,
                                                                   @RequestBody CreateLectureRequest request,
                                                                   Authentication authentication) {
         String account = AuthenticationUtil.getAccountFromAuth(authentication);
-        CreateLectureResponse createdLecture = lectureService.createLecture(academyId, teacherId, request, account);
+        CreateLectureResponse createdLecture = lectureService.createLecture(academyId, employeeId, request, account);
         log.info("강좌 정보 생성 성공");
         return ResponseEntity.ok().body(Response.success(createdLecture));
     }
 
     // 강좌 수정
     @Operation(summary = "강좌 수정", description = "ADMIN,STAFF 회원만 수정이 가능합니다.")
-    @PutMapping("/{academyId}/teachers/{teacherId}/lectures/{lectureId}")
+    @PutMapping("/{academyId}/lectures/{lectureId}")
     public ResponseEntity<Response<UpdateLectureResponse>> update(@PathVariable("academyId") Long academyId,
-                                                                  @PathVariable("teacherId") Long teacherId,
                                                                   @PathVariable("lectureId") Long lectureId,
                                                                   @RequestBody UpdateLectureRequest request,
                                                                   Authentication authentication) {
         String account = AuthenticationUtil.getAccountFromAuth(authentication);
-        UpdateLectureResponse updatedLecture = lectureService.updateLecture(academyId, teacherId, lectureId, request, account);
+        UpdateLectureResponse updatedLecture = lectureService.updateLecture(academyId, lectureId, request, account);
         log.info("강좌 정보 수정 성공");
         return ResponseEntity.ok().body(Response.success(updatedLecture));
     }
 
     // 강좌 삭제
     @Operation(summary = "강좌 삭제", description = "ADMIN,STAFF 회원만 삭제가 가능합니다. \n\n soft-delete 됩니다.")
-    @DeleteMapping("/{academyId}/teachers/{teacherId}/lectures/{lectureId}")
+    @DeleteMapping("/{academyId}/lectures/{lectureId}")
     public ResponseEntity<Response<DeleteLectureResponse>> delete(@PathVariable("academyId") Long academyId,
-                                                                  @PathVariable("teacherId") Long teacherId,
                                                                   @PathVariable("lectureId") Long lectureId,
                                                                   Authentication authentication) {
-        DeleteLectureResponse deletedLecture = lectureService.deleteLecture(academyId, teacherId, lectureId, authentication.getName());
+        String account = AuthenticationUtil.getAccountFromAuth(authentication);
+        DeleteLectureResponse deletedLecture = lectureService.deleteLecture(academyId, lectureId, account);
         log.info("강좌 정보 삭제 성공");
         return ResponseEntity.ok(Response.success(deletedLecture));
     }

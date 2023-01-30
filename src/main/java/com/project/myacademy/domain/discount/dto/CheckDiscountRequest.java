@@ -1,4 +1,4 @@
-package com.project.myacademy.domain.teacher.dto;
+package com.project.myacademy.domain.discount.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 @Builder
-public class UpdateTeacherRequest {
+public class CheckDiscountRequest {
 
-    private String name;
-    private String subject;
+    private String discountName;
+    private Long enrollmentId;
 }
