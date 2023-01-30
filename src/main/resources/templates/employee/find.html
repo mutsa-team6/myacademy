@@ -1,0 +1,132 @@
+<!--
+=========================================================
+* Material Dashboard 2 - v3.0.4
+=========================================================
+
+* Product Page: https://www.creative-tim.com/product/material-dashboard
+* Copyright 2022 Creative Tim (https://www.creative-tim.com)
+* Licensed under MIT (https://www.creative-tim.com/license)
+* Coded by Creative Tim
+
+=========================================================
+
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<th:block th:replace="layout/header :: headerFragment"></th:block>
+
+<body class="bg-gray-200">
+<div class="container position-sticky z-index-sticky top-0">
+    <div class="row">
+        <div class="col-12">
+
+        </div>
+    </div>
+</div>
+<main class="main-content  mt-0">
+    <div class="page-header align-items-start min-vh-100"
+         style="background-image: url('https://images.unsplash.com/photo-1497294815431-9365093b7331?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1950&q=80');"
+    >
+        <span class="mask bg-gradient-dark opacity-6"></span>
+        <div class="container my-auto">
+            <div class="row">
+                <div class="col-lg-4 col-md-8 col-12 mx-auto">
+                    <div class="card z-index-0 fadeIn3 fadeInBottom">
+                        <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                            <div class="bg-gradient-primary shadow-primary border-radius-lg py-3 pe-1">
+                                <h4 class="text-white font-weight-bolder text-center mt-2 mb-0">
+                                    아이디 찾기
+                                </h4>
+
+                            </div>
+                        </div>
+                        <div class="card-body">
+
+                            <form role="form" class="text-start">
+                                <div class="input-group input-group-outline my-3">
+                                    <label class="form-label">사용자 실명</label>
+                                    <input type="name" class="form-control" id="input-employeeName">
+                                </div>
+                                <div class="input-group input-group-outline mb-3">
+                                    <label class="form-label">이메일</label>
+                                    <input type="email" class="form-control" id="input-employeeEmail">
+                                </div>
+                                <!--                                <div class="form-check form-switch d-flex align-items-center mb-3">-->
+                                <!--                                    <input class="form-check-input" type="checkbox" id="remember-me" name = "remember-me" checked>-->
+                                <!--                                    <label class="form-check-label mb-0 ms-3" for="remember-me">Remember me</label>-->
+                                <!--                                </div>-->
+                                <div class="text-center">
+                                    <button th:onclick="|find.findEmployeeAccount()|" type="button"
+                                            class="btn bg-gradient-primary w-100 my-4 mb-2">아이디 찾기
+                                    </button>
+                                </div>
+                                <p class="mt-4 text-sm text-end">
+                                    <a th:href="@{/login}" class="text-info text-gradient font-weight-bold opacity-5">로그인</a> |
+                                    <a th:href="@{/find/password}" class="text-info text-gradient font-weight-bold opacity-5">비밀번호 찾기</a>
+                                </p>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</main>
+<!--   Core JS Files   -->
+<script src="/assets/js/core/popper.min.js"></script>
+<script src="/assets/js/core/bootstrap.min.js"></script>
+<script src="/assets/js/plugins/perfect-scrollbar.min.js"></script>
+<script src="/assets/js/plugins/smooth-scrollbar.min.js"></script>
+<script src="/assets/js/material-dashboard.min.js?v=3.0.4"></script>
+</body>
+<Script>
+
+    let find = {
+        init: function () {
+            var _this = this;
+        },
+
+
+        findEmployeeAccount: function () {
+            let data = {
+
+                name: document.querySelector('#input-employeeName').value.trim(),
+                email: document.querySelector('#input-employeeEmail').value.trim(),
+            };
+            console.log(data);
+
+            axios.post("/api/v1/academies/employee/findAccount",
+                JSON.stringify(data), {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                }
+            ).then((response) => {
+                console.log(response.data.result.account);
+                let account = response.data.result.account;
+                let name = document.querySelector('#input-employeeName').value.trim();
+                alert(name + "님의 계정은 " + "[" + account + "] 입니다.");
+                window.location.href = '/login';
+
+            }).catch((error) => {
+                if (error.response.data.result["errorCode"] == "ACADEMY_NOT_FOUND") {
+                    alert("등록된 학원이 아닙니다. 등록 후 진행해주세요");
+                } else if (error.response.data.result["errorCode"] == "EMPLOYEE_NOT_FOUND") {
+                    alert("가입되어있지 않은 회원입니다.");
+                }
+                console.log(error);
+
+            });
+
+        }
+
+    };
+
+    find.init();
+
+</script>
+</html>

@@ -23,18 +23,20 @@ public class ReadAllLectureResponse {
     private String lectureTime;
     private LocalDate startDate;
     private LocalDate finishDate;
+    private Integer currentEnrollmentNumber;
 
     public static ReadAllLectureResponse of(Lecture lecture) {
         return ReadAllLectureResponse.builder()
                 .lectureId(lecture.getId())
                 .lectureName(lecture.getName())
-                .teacherName(lecture.getTeacher().getName())
+                .teacherName(lecture.getEmployee().getName())
                 .lecturePrice(lecture.getPrice())
                 .maximumCapacity(lecture.getMaximumCapacity())
                 .lectureDay(lecture.getLectureDay())
                 .lectureTime(lecture.getLectureTime())
                 .startDate(lecture.getStartDate())
                 .finishDate(lecture.getFinishDate())
+                .currentEnrollmentNumber(lecture.getCurrentEnrollmentNumber())
                 .build();
     }
 }

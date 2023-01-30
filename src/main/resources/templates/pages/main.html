@@ -1,0 +1,182 @@
+<!--
+=========================================================
+* Material Dashboard 2 - v3.0.4
+=========================================================
+
+* Product Page: https://www.creative-tim.com/product/material-dashboard
+* Copyright 2022 Creative Tim (https://www.creative-tim.com)
+* Licensed under MIT (https://www.creative-tim.com/license)
+* Coded by Creative Tim
+
+=========================================================
+
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+-->
+
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<!-- header -->
+<th:block th:replace="layout/header :: headerFragment"></th:block>
+
+
+<body class="g-sidenav-show  bg-gray-100">
+
+<!-- side bar -->
+<th:block th:replace="layout/aside :: asideFragment"></th:block>
+
+
+<main class="main-content border-radius-lg ">
+
+
+    <!-- Navbar -->
+    <th:block th:replace="layout/navbar :: navbarFragment"></th:block>
+
+
+    <div class="container-fluid py-4">
+
+
+        <div class="row mb-4">
+            <div class="col-lg-6 col-md-6 mb-md-0 mb-4">
+                <div class="card">
+                    <div class="card-header pb-0">
+                        <div class="row">
+                            <div class="col-lg-6 col-7">
+                                <h4>공지 사항</h4>
+                            </div>
+                            <div class="col-lg-6 col-5 my-auto text-end">
+                                <div class="dropdown float-lg-end pe-4">
+                                    <a th:href="@{/announcements}"
+                                       class="text-info text-xs text-gradient font-weight-bold opacity-5">전체 보기</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body px-0 pb-2">
+                        <div class="table-responsive">
+                            <table class="table align-items-center mb-0">
+                                <thead>
+                                <tr>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                        제목
+                                    </th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                        작성자
+                                    </th>
+                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                        작성 날짜
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="announcement : ${announcements}">
+                                    <th class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${announcement.title}"></span>
+                                    </th>
+                                    <td class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${announcement.writer}"></span>
+                                    </td>
+                                    <td class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${announcement.createdAt}"></span>
+                                    </td>
+
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 mb-md-0 mb-4">
+                <div class="card">
+                    <div class="card-header pb-0">
+                        <div class="row">
+                            <div class="col-lg-6 col-7">
+                                <h4>입시 정보</h4>
+                            </div>
+                            <div class="col-lg-6 col-5 my-auto text-end">
+                                <div class="dropdown float-lg-end pe-4">
+                                    <a th:href="@{/announcements}"
+                                       class="text-info text-xs text-gradient font-weight-bold opacity-5">전체 보기</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body px-0 pb-2">
+                        <div class="table-responsive">
+                            <table class="table align-items-center mb-0">
+                                <thead>
+                                <tr>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                        제목
+                                    </th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                        작성자
+                                    </th>
+                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                        작성 날짜
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="announcement : ${announcements}">
+                                    <th class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${announcement.title}"></span>
+                                    </th>
+                                    <td class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${announcement.writer}"></span>
+                                    </td>
+                                    <td class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${announcement.createdAt}"></span>
+                                    </td>
+
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card card-plain mb-4">
+            <div class="card-body p-3">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="d-flex flex-column h-100">
+                            <h1 th:text="${name} + '님 환영합니다!!'"></h1>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!--footer-->
+    <th:block th:replace="layout/footer :: footerFragment"></th:block>
+
+
+    </div>
+
+
+</main>
+
+<!--   Core JS Files   -->
+<script src="/assets/js/core/popper.min.js"></script>
+<script src="/assets/js/core/bootstrap.min.js"></script>
+<script src="/assets/js/plugins/perfect-scrollbar.min.js"></script>
+<script src="/assets/js/plugins/smooth-scrollbar.min.js"></script>
+<script src="/assets/js/material-dashboard.min.js?v=3.0.4"></script>
+
+</body>
+
+</html>
