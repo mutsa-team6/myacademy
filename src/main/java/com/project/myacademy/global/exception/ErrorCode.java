@@ -22,6 +22,7 @@ public enum ErrorCode {
     DUPLICATED_WAITINGLIST(HttpStatus.CONFLICT, "이미 대기번호에 등록되어 있습니다."),
     DUPLICATED_DISCOUNT(HttpStatus.CONFLICT, "이미 할인 정책에 등록되어 있습니다."),
     ALREADY_PAYMENT(HttpStatus.CONFLICT,"이미 결제된 수업입니다."),
+    NOT_TEACHER(HttpStatus.CONFLICT,"해당 사용자는 강사가 아닙니다."),
 
 
     ACCOUNT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 계정명을 찾을 수 없습니다."),

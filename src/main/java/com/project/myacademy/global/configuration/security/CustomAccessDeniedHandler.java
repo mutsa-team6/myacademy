@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 
 @Component
@@ -26,6 +27,12 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
         ErrorCode errorCode = ErrorCode.NOT_ALLOWED_ROLE;
 
+        response.setContentType("text/html; charset=utf-8");
+        PrintWriter writer = response.getWriter();
+        writer.println("<script>alert('특정 권한의 회원만 접근할 수 있습니다.');  location.href='/academy/main'</script>");
+        writer.flush();
+
         ExceptionManager.setErrorResponse(response, errorCode);
+
     }
 }
