@@ -48,6 +48,7 @@ public class SecurityConfig {
                 .antMatchers(HttpMethod.DELETE, "/api/v1/academies/**/employees/**").hasAnyRole("ADMIN","STAFF")
                 .antMatchers(HttpMethod.PUT, "/api/v1/academies/**/changeRole/**").hasAnyRole("ADMIN","STAFF")
                 .antMatchers(HttpMethod.GET, "/api/v1/academies/**/employees").hasAnyRole("ADMIN")
+                .antMatchers( "/academy/students/list").hasAnyRole("ADMIN","STAFF")
                 .antMatchers("api/v1/academies/**").authenticated()
                 .antMatchers("/academy/**").authenticated()
                 .and()

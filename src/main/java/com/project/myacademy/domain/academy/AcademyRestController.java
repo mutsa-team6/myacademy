@@ -19,24 +19,6 @@ public class AcademyRestController {
 
     private final AcademyService academyService;
 
-    /**
-     * 학원 이름과 사업자 등록 번호를 받아서
-     * 학원 찾기
-     *
-     * @param request
-     * @return ResponseEntity
-     */
-    @Operation(summary = "학원 찾기", description = "하나의 학원을 찾습니다.")
-    @PostMapping("/find")
-    public ResponseEntity find(@RequestBody FindAcademyRequest request) {
-
-        FindAcademyResponse response = academyService.findAcademy(request);
-
-        log.info("🔎 검색하려는 학원이 존재함");
-
-        return ResponseEntity.ok(Response.success(response.getAcademyId()));
-    }
-
     @Operation(summary = "학원 등록", description = "학원을 등록합니다.")
     @PostMapping("")
     public ResponseEntity create(@RequestBody CreateAcademyRequest request) {
