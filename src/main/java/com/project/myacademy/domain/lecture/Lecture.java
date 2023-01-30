@@ -75,7 +75,7 @@ public class Lecture extends BaseEntity {
                 .employee(teacher)
                 .registerEmployee(sb.append(employee.getId()).append(" (").append(employee.getName()).append(")").toString())
                 .modifiedEmployee(sb.toString())
-                .currentEnrollmentNumber(request.getCurrentEnrollmentNumber())
+                .currentEnrollmentNumber(0)
                 .build();
     }
 
