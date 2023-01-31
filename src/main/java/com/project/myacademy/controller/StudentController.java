@@ -1,6 +1,7 @@
 package com.project.myacademy.controller;
 
 import com.project.myacademy.domain.academy.AcademyService;
+import com.project.myacademy.domain.academy.dto.FindAcademyRequest;
 import com.project.myacademy.domain.academy.dto.ReadAcademyResponse;
 import com.project.myacademy.domain.enrollment.dto.FindEnrollmentResponse;
 import com.project.myacademy.domain.parent.ParentService;
