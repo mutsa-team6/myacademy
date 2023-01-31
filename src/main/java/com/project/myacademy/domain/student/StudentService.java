@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -45,16 +46,21 @@ public class StudentService {
         //account 유효검사
         Employee employee = validateAcademyEmployee(account, academy);
         // 학생을 관리 할 수 있는 권한인지 확인(강사만 불가능)
-        if(Employee.isTeacherAuthority(employee)) {
+        if (Employee.isTeacherAuthority(employee)) {
             throw new AppException(ErrorCode.INVALID_PERMISSION);
         }
         //학원 id에 부모 존재 유무 확인
-        Parent parent = validateParent(academyId,request.getParentPhoneNum());
+        Parent parent = validateParent(academyId, request.getParentPhoneNum());
 
         //학생 PhoneNum 과 academyId로 학생 중복 체크
-        studentRepository.findByPhoneNumAndAcademyId(request.getPhoneNum(),academyId)
+        studentRepository.findByPhoneNumAndAcademyId(request.getPhoneNum(), academyId)
                 .ifPresent(user -> {
                     throw new AppException(ErrorCode.DUPLICATED_STUDENT);
+                });
+        //학생 Email 중복 체크
+        studentRepository.findByEmailAndAcademyId(request.getEmail(), academyId)
+                .ifPresent(user -> {
+                    throw new AppException(ErrorCode.DUPLICATED_EMAIL);
                 });
 
 
@@ -66,7 +72,7 @@ public class StudentService {
     /**
      * @param studentId PathVariable로 받아온 조회할 학생 id
      * @param academyId 학원 id
-     * @param account    jwt로 받아온 사용자(Employee) 계정
+     * @param account   jwt로 받아온 사용자(Employee) 계정
      */
     public ReadStudentResponse readStudent(Long academyId, Long studentId, String account) {
 
@@ -75,7 +81,7 @@ public class StudentService {
         //account 유효검사
         Employee employee = validateAcademyEmployee(account, academy);
         // 학생을 관리 할 수 있는 권한인지 확인(강사만 불가능)
-        if(Employee.isTeacherAuthority(employee)) {
+        if (Employee.isTeacherAuthority(employee)) {
             throw new AppException(ErrorCode.INVALID_PERMISSION);
         }
         //student Id에 해당하는 학생이 존재하는지 확인
@@ -96,7 +102,7 @@ public class StudentService {
         //account 유효검사
         Employee employee = validateAcademyEmployee(account, academy);
         // 학생을 관리 할 수 있는 권한인지 확인(강사만 불가능)
-        if(Employee.isTeacherAuthority(employee)) {
+        if (Employee.isTeacherAuthority(employee)) {
             throw new AppException(ErrorCode.INVALID_PERMISSION);
         }
 
@@ -117,15 +123,29 @@ public class StudentService {
         //account 유효검사
         Employee employee = validateAcademyEmployee(account, academy);
         // 학생을 관리 할 수 있는 권한인지 확인(강사만 불가능)
-        if(Employee.isTeacherAuthority(employee)) {
+        if (Employee.isTeacherAuthority(employee)) {
             throw new AppException(ErrorCode.INVALID_PERMISSION);
         }
         //student Id에 해당하는 학생이 존재하는지 확인
-        Student student = validateStudent(academyId, studentId);
+        Student existStudent = validateStudent(academyId, studentId);
 
-        student.updateStudent(request);
+        //변경될 Email이 기존에 있으면 에러처리;
+        Optional<Student> sameEmailStudent = Optional.of(studentRepository.findByEmailAndAcademyId(request.getEmail(), academyId)
+                .orElseGet(() -> existStudent));
+        if (sameEmailStudent.get() != existStudent) {
+            throw new AppException(ErrorCode.DUPLICATED_EMAIL);
+        }
 
-        return UpdateStudentResponse.of(student);
+        //변경될 PhonNum이 기존에 있으면 에러처리
+        Optional<Student> samePhoneNumStudent = Optional.of(studentRepository.findByPhoneNumAndAcademyId(request.getPhoneNum(), academyId)
+                .orElseGet(() -> existStudent));
+        if (samePhoneNumStudent.get() != existStudent) {
+            throw new AppException(ErrorCode.DUPLICATED_PHONENUM);
+        }
+
+        existStudent.updateStudent(request);
+
+        return UpdateStudentResponse.of(existStudent);
     }
 
     /**
@@ -141,11 +161,11 @@ public class StudentService {
         //account 유효검사
         Employee employee = validateAcademyEmployee(account, academy);
         // 학생을 관리 할 수 있는 권한인지 확인(강사만 불가능)
-        if(Employee.isTeacherAuthority(employee)) {
+        if (Employee.isTeacherAuthority(employee)) {
             throw new AppException(ErrorCode.INVALID_PERMISSION);
         }
         //student Id에 해당하는 학생이 존재하는지 확인
-        Student student = validateStudent(academyId,studentId);
+        Student student = validateStudent(academyId, studentId);
 
         studentRepository.delete(student);
 
@@ -162,6 +182,7 @@ public class StudentService {
         return foundStudents.stream().map(student -> ReadAllStudentResponse.of(student)).collect(Collectors.toList());
 
     }
+
     private Student validateStudent(Long academyId, Long studentId) {
         // 학생 존재 유무 확인
         Student student = studentRepository.findByAcademyIdAndId(academyId, studentId)
@@ -178,7 +199,7 @@ public class StudentService {
 
     private Parent validateParent(Long academyId, String phoneNum) {
         //부모 존재 유무 확인
-        Parent parent = parentRepository.findByPhoneNumAndAcademyId(phoneNum,academyId)
+        Parent parent = parentRepository.findByPhoneNumAndAcademyId(phoneNum, academyId)
                 .orElseThrow(() -> new AppException(ErrorCode.PARENT_NOT_FOUND));
         return parent;
     }

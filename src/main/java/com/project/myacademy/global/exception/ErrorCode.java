@@ -12,6 +12,7 @@ public enum ErrorCode {
     DUPLICATED_EMPLOYEE(HttpStatus.CONFLICT, "이미 존재하는 회원입니다."),
     DUPLICATED_ACCOUNT(HttpStatus.CONFLICT, "이미 존재하는 계정명입니다."),
     DUPLICATED_EMAIL(HttpStatus.CONFLICT, "이미 존재하는 이메일입니다."),
+    DUPLICATED_PHONENUM(HttpStatus.CONFLICT,"이미 존재하는 핸드폰번호입니다." ),
     DUPLICATED_STUDENT(HttpStatus.CONFLICT, "이미 존재하는 학생입니다."),
     DUPLICATED_PARENT(HttpStatus.CONFLICT, "이미 등록된 부모입니다."),
     DUPLICATED_LECTURE(HttpStatus.CONFLICT, "이미 존재하는 수업입니다."),
