@@ -68,18 +68,4 @@ public class ParentRestController {
         return ResponseEntity.ok().body(Response.success(response));
     }
 
-    /**
-     * 부모 전화번호로 검색
-     */
-    @PostMapping("/{academyId}/parents/find")
-    public ResponseEntity find(@RequestBody FindParentRequest request, Authentication authentication) {
-        String requestPhoneNum = request.getPhoneNum();
-        Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
-        log.info("🔎 검색하려는 부모 전화번호 [{}] || 학원 id [{}]", requestPhoneNum, academyId);
-
-        FindParentResponse response = parentService.findParent(requestPhoneNum, academyId);
-
-        return ResponseEntity.ok(Response.success(response));
-    }
-
 }
