@@ -34,9 +34,9 @@ class StudentServiceTest {
     ParentRepository parentRepository = Mockito.mock(ParentRepository.class);
     @InjectMocks
     private Academy academy;
-    private Employee employeeSTAFF,employeeUSER;
+    private Employee employeeSTAFF, employeeUSER;
     private Parent parent;
-    private Student student1,student2,student3;
+    private Student student1, student2, student3;
     private StudentService studentService;
     private Pageable pageable;
 
@@ -255,9 +255,9 @@ class StudentServiceTest {
         @Test
         @DisplayName("학생 이름으로 전체 조회")
         void read_by_name_students_success() {
-            List<Student> studentList = List.of(student1,student2);
+            List<Student> studentList = List.of(student1, student2);
 
-            given(studentRepository.findByAcademyIdAndName(any(),any())).willReturn(studentList);
+            given(studentRepository.findByAcademyIdAndName(any(), any())).willReturn(studentList);
 
             List<ReadAllStudentResponse> studentListResponse = studentService.findStudentForStudentList(academy.getId(), student1.getName());
 
@@ -266,21 +266,23 @@ class StudentServiceTest {
             assertThat(studentListResponse.get(1).equals(student3));
         }
     }
+
     @Nested
     @DisplayName("학생 수정")
     class updateStudent {
-        UpdateStudentRequest request = new UpdateStudentRequest("바뀐이름", "바뀐학교", "010-9999-9999","changeEmail@gmail.com","980525");
+        UpdateStudentRequest request = new UpdateStudentRequest("바뀐이름", "바뀐학교", "010-9999-9999", "changeEmail@gmail.com", "980525");
+
         @Test
         @DisplayName("학생 수정 성공")
         void update_student_success() {
 
             given(academyRepository.findById(any())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeSTAFF));
-            given(studentRepository.findByAcademyIdAndId(any(),any())).willReturn(Optional.of(student1));
-            given(studentRepository.findByEmailAndAcademyId(any(),any())).willReturn(Optional.of(student1));
-            given(studentRepository.findByPhoneNumAndAcademyId(any(),any())).willReturn(Optional.of(student1));
+            given(studentRepository.findByAcademyIdAndId(any(), any())).willReturn(Optional.of(student1));
+            given(studentRepository.findByEmailAndAcademyId(any(), any())).willReturn(Optional.of(student1));
+            given(studentRepository.findByPhoneNumAndAcademyId(any(), any())).willReturn(Optional.of(student1));
 
-            UpdateStudentResponse response = studentService.updateStudent(academy.getId(),student1.getId(),request,employeeSTAFF.getAccount());
+            UpdateStudentResponse response = studentService.updateStudent(academy.getId(), student1.getId(), request, employeeSTAFF.getAccount());
 
             assertThat(response.getId().equals(1L));
             assertThat(response.getName().equals("바뀐이름"));
@@ -296,7 +298,7 @@ class StudentServiceTest {
             given(academyRepository.findById(any())).willReturn(Optional.empty());
 
             AppException appException = assertThrows(AppException.class,
-                    () -> studentService.updateStudent(academy.getId(),student1.getId(),request,employeeSTAFF.getAccount()));
+                    () -> studentService.updateStudent(academy.getId(), student1.getId(), request, employeeSTAFF.getAccount()));
 
             assertThat(appException.getErrorCode().equals(ErrorCode.ACADEMY_NOT_FOUND));
         }
@@ -309,7 +311,7 @@ class StudentServiceTest {
             given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.empty());
 
             AppException appException = assertThrows(AppException.class,
-                    () -> studentService.updateStudent(academy.getId(),student1.getId(),request,employeeSTAFF.getAccount()));
+                    () -> studentService.updateStudent(academy.getId(), student1.getId(), request, employeeSTAFF.getAccount()));
 
             assertThat(appException.getErrorCode().equals(ErrorCode.EMPLOYEE_NOT_FOUND));
         }
@@ -320,10 +322,10 @@ class StudentServiceTest {
 
             given(academyRepository.findById(any())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeSTAFF));
-            given(studentRepository.findByAcademyIdAndId(any(),any())).willReturn(Optional.empty());
+            given(studentRepository.findByAcademyIdAndId(any(), any())).willReturn(Optional.empty());
 
             AppException appException = assertThrows(AppException.class,
-                    () -> studentService.updateStudent(academy.getId(),student1.getId(),request,employeeSTAFF.getAccount()));
+                    () -> studentService.updateStudent(academy.getId(), student1.getId(), request, employeeSTAFF.getAccount()));
 
             assertThat(appException.getErrorCode().equals(ErrorCode.STUDENT_NOT_FOUND));
         }
@@ -332,32 +334,33 @@ class StudentServiceTest {
         @DisplayName("학생 수정 실패4 - 이메일 중복")
         void update_student_fail4() {
 
-            UpdateStudentRequest sameEmailRequest = new UpdateStudentRequest("바뀐이름", "바뀐학교", "010-1111-1111","student2@gmail.com","980525");
+            UpdateStudentRequest sameEmailRequest = new UpdateStudentRequest("바뀐이름", "바뀐학교", "010-1111-1111", "student2@gmail.com", "980525");
 
             given(academyRepository.findById(any())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeSTAFF));
-            given(studentRepository.findByAcademyIdAndId(any(),any())).willReturn(Optional.of(student1));
-            given(studentRepository.findByEmailAndAcademyId(any(),any())).willReturn(Optional.of(student2));
+            given(studentRepository.findByAcademyIdAndId(any(), any())).willReturn(Optional.of(student1));
+            given(studentRepository.findByEmailAndAcademyId(any(), any())).willReturn(Optional.of(student2));
 
             AppException appException = assertThrows(AppException.class,
-                    () -> studentService.updateStudent(academy.getId(),student1.getId(),sameEmailRequest,employeeSTAFF.getAccount()));
+                    () -> studentService.updateStudent(academy.getId(), student1.getId(), sameEmailRequest, employeeSTAFF.getAccount()));
 
             assertThat(appException.getErrorCode().equals(ErrorCode.DUPLICATED_EMAIL));
         }
+
         @Test
         @DisplayName("학생 수정 실패5 - 핸드폰 번호 중복")
         void update_student_fail5() {
 
-            UpdateStudentRequest samePhoneNumRequest = new UpdateStudentRequest("바뀐이름", "바뀐학교", "010-1111-1112","changeEmail@gmail.com","980525");
+            UpdateStudentRequest samePhoneNumRequest = new UpdateStudentRequest("바뀐이름", "바뀐학교", "010-1111-1112", "changeEmail@gmail.com", "980525");
 
             given(academyRepository.findById(any())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeSTAFF));
-            given(studentRepository.findByAcademyIdAndId(any(),any())).willReturn(Optional.of(student1));
-            given(studentRepository.findByEmailAndAcademyId(any(),any())).willReturn(Optional.of(student1));
-            given(studentRepository.findByPhoneNumAndAcademyId(any(),any())).willReturn(Optional.of(student2));
+            given(studentRepository.findByAcademyIdAndId(any(), any())).willReturn(Optional.of(student1));
+            given(studentRepository.findByEmailAndAcademyId(any(), any())).willReturn(Optional.of(student1));
+            given(studentRepository.findByPhoneNumAndAcademyId(any(), any())).willReturn(Optional.of(student2));
 
             AppException appException = assertThrows(AppException.class,
-                    () -> studentService.updateStudent(academy.getId(),student1.getId(),samePhoneNumRequest,employeeSTAFF.getAccount()));
+                    () -> studentService.updateStudent(academy.getId(), student1.getId(), samePhoneNumRequest, employeeSTAFF.getAccount()));
 
             assertThat(appException.getErrorCode().equals(ErrorCode.DUPLICATED_PHONENUM));
         }
@@ -370,7 +373,73 @@ class StudentServiceTest {
             given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeUSER));
 
             AppException appException = assertThrows(AppException.class,
-                    () -> studentService.updateStudent(academy.getId(),student1.getId(),request,employeeUSER.getAccount()));
+                    () -> studentService.updateStudent(academy.getId(), student1.getId(), request, employeeUSER.getAccount()));
+
+            assertThat(appException.getErrorCode().equals(ErrorCode.INVALID_PERMISSION));
+        }
+    }
+
+    @Nested
+    @DisplayName("학생 삭제")
+    class deleteStudent {
+
+        @Test
+        @DisplayName("학생 삭제 성공")
+        void delete_student_success() {
+            given(academyRepository.findById(any())).willReturn(Optional.of(academy));
+            given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeSTAFF));
+            given(studentRepository.findByAcademyIdAndId(any(), any())).willReturn(Optional.of(student1));
+
+            DeleteStudentResponse response = studentService.deleteStudent(academy.getId(), student1.getId(), employeeSTAFF.getAccount());
+
+            assertThat(response.getId().equals(student1.getId()));
+            assertThat(response.getName().equals(student1.getName()));
+        }
+
+        @Test
+        @DisplayName("학생 삭제 실패1 - 일치하는 학원 정보 없음")
+        void delete_student_fail1() {
+            given(academyRepository.findById(any())).willReturn(Optional.empty());
+
+            AppException appException = assertThrows(AppException.class,
+                    () -> studentService.deleteStudent(academy.getId(), student1.getId(), employeeSTAFF.getAccount()));
+
+            assertThat(appException.getErrorCode().equals(ErrorCode.ACADEMY_NOT_FOUND));
+        }
+
+        @Test
+        @DisplayName("학생 삭제 실패2 - 일치하는 직원 정보 없음")
+        void delete_student_fail2() {
+            given(academyRepository.findById(any())).willReturn(Optional.of(academy));
+            given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.empty());
+
+            AppException appException = assertThrows(AppException.class,
+                    () -> studentService.deleteStudent(academy.getId(), student1.getId(), employeeSTAFF.getAccount()));
+
+            assertThat(appException.getErrorCode().equals(ErrorCode.EMPLOYEE_NOT_FOUND));
+        }
+
+        @Test
+        @DisplayName("학생 삭제 실패3 - 일치하는 학생 정보 없음")
+        void delete_student_fail3() {
+            given(academyRepository.findById(any())).willReturn(Optional.of(academy));
+            given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeSTAFF));
+            given(studentRepository.findByAcademyIdAndId(any(), any())).willReturn(Optional.empty());
+
+            AppException appException = assertThrows(AppException.class,
+                    () -> studentService.deleteStudent(academy.getId(), student1.getId(), employeeSTAFF.getAccount()));
+
+            assertThat(appException.getErrorCode().equals(ErrorCode.STUDENT_NOT_FOUND));
+        }
+
+        @Test
+        @DisplayName("학생 삭제 실패4 - 삭제할 권한 없음")
+        void delete_student_fail4() {
+            given(academyRepository.findById(any())).willReturn(Optional.of(academy));
+            given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeUSER));
+
+            AppException appException = assertThrows(AppException.class,
+                    () -> studentService.deleteStudent(academy.getId(), student1.getId(), employeeUSER.getAccount()));
 
             assertThat(appException.getErrorCode().equals(ErrorCode.INVALID_PERMISSION));
         }
