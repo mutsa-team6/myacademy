@@ -1,4 +1,5 @@
 package com.project.myacademy.domain.payment.dto;
+import com.project.myacademy.domain.discount.Discount;
 import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.domain.enrollment.Enrollment;
 import com.project.myacademy.domain.payment.PayType;
@@ -22,6 +23,8 @@ public class CreatePaymentRequest {
     private String orderName;
 
     private Long lectureId;
+
+    private Long discountId;
     public Payment toEntity(Employee employee, Student student, Enrollment enrollment){
         return Payment.builder()
                 .orderId(UUID.randomUUID().toString())
@@ -31,6 +34,7 @@ public class CreatePaymentRequest {
                 .employee(employee)
                 .student(student)
                 .lecture(enrollment.getLecture())
+                .DiscountId(discountId)
                 .build();
     }
 }

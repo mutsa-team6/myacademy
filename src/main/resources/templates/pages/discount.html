@@ -40,18 +40,23 @@
                 <div class="row">
                     <div class="row">
                         <div class="card my-4">
+                            <div class="card-header pb-0">
+                                <div class="row">
+                                    <div class="col-lg-9 col-7">
+                                        <h3 style="font-family: 'Black Han Sans', sans-serif; font-size: 3.5rem; font-weight: lighter;color: #5A2082">할인 정책</h3>
+                                        <p class="mb-0" style="font-weight: bold;color: #5A2060">학원에 등록되어 있는 할인 정책 정보입니다.</p>
 
-                            <div class="col-9">
-                                <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-                                    <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
-                                        <h6 class="text-white text-capitalize ps-3">등록된 할인 정책 정보입니다.</h6>
                                     </div>
                                 </div>
                             </div>
+                            <div>
+                                <hr style="color: #5A2082; height: 1.5px;background-color: #5A2082">
+                            </div>
 
 
-                            <div class="card-body px-0 pb-2">
-                                <div class="table">
+
+                            <div class="card-body pb-0 mb-4">
+                                <div class="table-responsive">
                                     <table class="table align-items-center mb-0">
                                         <thead>
                                         <tr>
@@ -74,6 +79,7 @@
                                                 <span class=" text font-weight-bold" style="font-size: small"
                                                       th:text="${discount.discountName}"></span>
                                                 </th>
+
                                                 <th class="align-middle text-center">
                                                 <span class=" text font-weight-bold" style="font-size: small"
                                                       th:text="${discount.discountRate}"></span>
@@ -101,7 +107,7 @@
             </div>
             <div class="col-1">
             </div>
-            <div class="col-3 ">
+            <div class="col-3 mt-7">
 
                 <div class="card card-plain">
                     <h4 class="font-weight-bolder"> 할인 정책 등록</h4>
@@ -111,12 +117,12 @@
 
                 <div class="card-body">
                     <div class="input-group input-group-outline mb-3">
-                        <label class="form-label">정책 이름</label>
+                        <label class="form-label">할인 정책 이름</label>
                         <input type="text" class="form-control" id="input-discountName">
                     </div>
                     <div class="input-group input-group-outline mb-3">
-                        <label class="form-label">할인율</label>
-                        <input type="text" class="form-control" id="input-discountRate">
+                        <label class="form-label">할인율 (%)</label>
+                        <input type="number" class="form-control" id="input-discountRate">
                     </div>
                     <div class="text-center">
                         <button
@@ -157,6 +163,11 @@
                 discountRate: document.querySelector('#input-discountRate').value.trim()
             };
             console.log(data);
+
+            if((document.querySelector('#input-discountRate').value.trim() >=100)||(document.querySelector('#input-discountRate').value.trim() <=0)){
+                alert("할인율은 1~99 의 숫자만 설정 가능합니다.");
+                return;
+            }
 
             axios.post("/api/v1/academies/" + academyId + "/discounts",
                 JSON.stringify(data), {
