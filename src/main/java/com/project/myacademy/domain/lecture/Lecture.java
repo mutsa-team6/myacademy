@@ -60,8 +60,11 @@ public class Lecture extends BaseEntity {
     @JoinColumn(name = "employee_id")
     private Employee employee;
 
+    //학원 Id
+    private Long academyId;
+
     // 강좌 생성 메서드
-    public static Lecture addLecture(Employee employee, Employee teacher, CreateLectureRequest request) {
+    public static Lecture addLecture(Employee employee, Employee teacher, CreateLectureRequest request,Long academyId) {
         StringBuilder sb = new StringBuilder();
         return Lecture.builder()
                 .name(request.getLectureName())
@@ -73,9 +76,10 @@ public class Lecture extends BaseEntity {
                 .startDate(request.getStartDate())
                 .finishDate(request.getFinishDate())
                 .employee(teacher)
+                .academyId(academyId)
                 .registerEmployee(sb.append(employee.getId()).append(" (").append(employee.getName()).append(")").toString())
                 .modifiedEmployee(sb.toString())
-                .currentEnrollmentNumber(request.getCurrentEnrollmentNumber())
+                .currentEnrollmentNumber(0)
                 .build();
     }
 

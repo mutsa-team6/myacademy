@@ -17,6 +17,8 @@ public class ReadStudentResponse {
     private String birth;
     //학생 핸드폰번호
     private String phoneNum;
+    //학생 학교
+    private String school;
     //학생 이메일
     private String email;
     //부모 핸드폰번호
@@ -36,7 +38,8 @@ public class ReadStudentResponse {
                 .birth(student.getBirth())
                 .phoneNum(student.getPhoneNum())
                 .email(student.getEmail())
-                //.parentPhoneNum(student.getParent().getPhoneNum()) NPE 제거해야함
+                .parentPhoneNum(student.getParent().getPhoneNum())
+                .school(student.getSchool())
                 .createAt(student.getCreatedAt())
                 .lastModifiedAt(student.getLastModifiedAt())
                 .build();

@@ -35,11 +35,11 @@ public class Waitinglist extends BaseEntity {
 
     private String memo;
 
-    public static Waitinglist makeWaitinglist(Lecture lecture, Student student, CreateWaitinglistRequest request) {
+    public static Waitinglist makeWaitinglist(Lecture lecture, Student student) {
         return Waitinglist.builder()
                 .lecture(lecture)
                 .student(student)
-                .memo(request.getMemo())
+                .memo("")
                 .build();
     }
 }

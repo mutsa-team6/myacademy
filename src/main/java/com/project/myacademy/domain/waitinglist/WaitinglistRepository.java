@@ -12,4 +12,6 @@ public interface WaitinglistRepository extends JpaRepository<Waitinglist, Long> 
 
     // 해당 강좌에서 제일 먼저 등록된 대기번호 추출 메서드
     Optional<Waitinglist> findTopByLectureOrderByCreatedAtAsc(Lecture lecture);
+
+    Long countWaitinglistByLecture(Lecture lecture);
 }
