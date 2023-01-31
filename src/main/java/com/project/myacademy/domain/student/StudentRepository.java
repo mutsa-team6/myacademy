@@ -11,6 +11,7 @@ import java.util.Optional;
 public interface StudentRepository extends JpaRepository<Student, Long> {
 
     Optional<Student> findByPhoneNumAndAcademyId(String phoneNum, Long academyId);
+    Optional<Student> findByEmailAndAcademyId(String Email, Long academyId);
 
     Page<Student> findAllByAcademyId(Pageable pageable, Long academyId);
 

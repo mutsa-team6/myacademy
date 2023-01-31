@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 @Builder
 public class FindEnrollmentResponse {
 
+    private Long enrollmentId;
     private Long studentId;
     private Long lectureId;
     private String studentName;
@@ -30,6 +31,7 @@ public class FindEnrollmentResponse {
     private Boolean paymentYN;
     private String createdAt;
     public FindEnrollmentResponse(Enrollment enrollment) {
+        this.enrollmentId = enrollment.getId();
         this.studentId = enrollment.getStudent().getId();
         this.lectureId = enrollment.getLecture().getId();
         this.studentName = enrollment.getStudent().getName();

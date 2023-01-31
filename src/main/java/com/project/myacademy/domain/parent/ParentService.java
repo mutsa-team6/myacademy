@@ -122,21 +122,6 @@ public class ParentService {
         return DeleteParentResponse.of(parent);
     }
 
-    /**
-     * 전화번호와 학원 id로 부모 잧는 메서드 ( UI 용)
-     */
-    public FindParentResponse findParent(String requestPhoneNum, Long academyId) {
-
-        Parent foundParent = parentRepository.findByPhoneNumAndAcademyId(requestPhoneNum, academyId)
-                .orElseThrow(() -> new AppException(ErrorCode.PARENT_NOT_FOUND));
-
-        FindParentResponse response = new FindParentResponse(foundParent.getId(), foundParent.getName(),foundParent.getPhoneNum());
-
-        return response;
-
-
-    }
-
     public boolean checkExistByPhoneAndAcademy(String parentPhoneNum, Long academyId) {
         return parentRepository.existsByPhoneNum(parentPhoneNum);
     }
