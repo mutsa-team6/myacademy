@@ -24,9 +24,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @Transactional(readOnly = true)
 public class StudentService {
-    /**
-     * 학생이 2개의 학원을 다닐경우 처리가 필요함 (회의필요)
-     */
     private final StudentRepository studentRepository;
     private final ParentRepository parentRepository;
     private final EmployeeRepository employeeRepository;
@@ -74,10 +71,7 @@ public class StudentService {
         Academy academy = validateAcademy(academyId);
         //account 유효검사
         Employee employee = validateAcademyEmployee(account, academy);
-        // 학생을 관리 할 수 있는 권한인지 확인(강사만 불가능)
-        if(Employee.isTeacherAuthority(employee)) {
-            throw new AppException(ErrorCode.INVALID_PERMISSION);
-        }
+
         //student Id에 해당하는 학생이 존재하는지 확인
         Student student = validateStudent(academyId, studentId);
 
@@ -95,10 +89,7 @@ public class StudentService {
         Academy academy = validateAcademy(academyId);
         //account 유효검사
         Employee employee = validateAcademyEmployee(account, academy);
-        // 학생을 관리 할 수 있는 권한인지 확인(강사만 불가능)
-        if(Employee.isTeacherAuthority(employee)) {
-            throw new AppException(ErrorCode.INVALID_PERMISSION);
-        }
+
 
         return studentRepository.findAllByAcademyId(pageable, academyId).map(ReadAllStudentResponse::of);
     }
