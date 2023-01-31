@@ -43,7 +43,7 @@ public class EnrollmentService {
      * @param request   수강 등록 요청 DTO
      * @param account   직원 계정
      */
-    public CreateEnrollmentResponse createEnrollment(Long academyId, Long studentId, Long lectureId, CreateEnrollmentRequest request, String account) {
+    public CreateEnrollmentResponse createEnrollment(Long academyId, Long studentId, Long lectureId, String account) {
 
         // 등록하는 직원 존재 유무 확인(학원 존재 유무, 해당 학원 직원인지 확인)
         Academy academy = validateAcademy(academyId);
@@ -73,7 +73,7 @@ public class EnrollmentService {
         // (해당 강좌에 등록할 인원 + 이미 등록되어 있는 인원)이 최대 수강정원을 넘지 않으면 수강 내역 저장
         if(currentEnrollmentNumber + 1 <= lecture.getMaximumCapacity()) {
             lecture.plusCurrentEnrollmentNumber();
-            savedEnrollment = enrollmentRepository.save(Enrollment.createEnrollment(student, lecture, employee, request));
+            savedEnrollment = enrollmentRepository.save(Enrollment.createEnrollment(student, lecture, employee));
         }
         // 그렇지 않으면 수강정원 초과 에러처리
         else {
@@ -228,7 +228,7 @@ public class EnrollmentService {
 
         // 수강 내역 생성
         lecture.plusCurrentEnrollmentNumber();
-        Enrollment enrollment = Enrollment.createEnrollment(student, lecture, employee, request);
+        Enrollment enrollment = Enrollment.createEnrollment(student, lecture, employee);
 
         // 수강 내역 저장 즉시 DB 반영 -> 반환 DTO에 새롭게 생성된 수강 내역의 enrollmentId 추출하기 위함
 //        Enrollment newEnrollment = enrollmentRepository.saveAndFlush(enrollment);

@@ -206,21 +206,29 @@
                                                 <span class=" text font-weight-bold" style="font-size: small"
                                                       th:text="${lecture.waitingNum}"></span>
                                             </th>
-                                            <th:block th:if="${lecture.currentEnrollmentNumber <lecture.maximumCapacity}">
-                                            <th class="align-middle text-center">
-                                                <button th:data-parameter1="${academyId}" th:data-parameter2="${student.id}"  th:data-parameter3="${lecture.lectureId}"
-                                                        th:onclick="|register.registerEnrollment(this.getAttribute('data-parameter1'),this.getAttribute('data-parameter2'),this.getAttribute('data-parameter3'))|"
-                                                        type="button"
-                                                        class="btn btn-lg bg-gradient-primary btn-lg w-100  mb-0">수강 신청
-                                                </button>
-                                            </th>
-                                            </th:block>
-                                            <th:block th:if="${lecture.currentEnrollmentNumber >= lecture.maximumCapacity}">
+                                            <th:block
+                                                    th:if="${lecture.currentEnrollmentNumber <lecture.maximumCapacity}">
                                                 <th class="align-middle text-center">
-                                                    <button
-                                                            th:onclick="|register.registerLecture()|"
+                                                    <button th:data-parameter1="${academyId}"
+                                                            th:data-parameter2="${student.id}"
+                                                            th:data-parameter3="${lecture.lectureId}"
+                                                            th:onclick="|register.registerEnrollment(this.getAttribute('data-parameter1'),this.getAttribute('data-parameter2'),this.getAttribute('data-parameter3'))|"
                                                             type="button"
-                                                            class="btn btn-lg bg-gradient-secondary btn-lg w-100  mb-0">강좌
+                                                            class="btn btn-lg bg-gradient-primary btn-lg w-100  mb-0">수강
+                                                        신청
+                                                    </button>
+                                                </th>
+                                            </th:block>
+                                            <th:block
+                                                    th:if="${lecture.currentEnrollmentNumber >= lecture.maximumCapacity}">
+                                                <th class="align-middle text-center">
+                                                    <button th:data-parameter1="${academyId}"
+                                                            th:data-parameter2="${student.id}"
+                                                            th:data-parameter3="${lecture.lectureId}"
+                                                            th:onclick="|register.registerWaiting(this.getAttribute('data-parameter1'),this.getAttribute('data-parameter2'),this.getAttribute('data-parameter3'))|"
+                                                            type="button"
+                                                            class="btn btn-lg bg-gradient-secondary btn-lg w-100  mb-0">
+                                                        강좌
                                                         대기
                                                     </button>
                                                 </th>
@@ -258,32 +266,45 @@
 
         registerEnrollment: function (academyId, studentId, lectureId) {
 
-            let data = {
-                lectureName: document.querySelector('#input-lectureName').value.trim(),
-                lecturePrice: document.querySelector('#input-lecturePrice').value.trim(),
-                lectureDay: document.querySelector('#input-lectureDay').value.trim(),
-                lectureTime: document.querySelector('#input-lectureStartTime').value + " ~ " + document.querySelector('#input-lectureEndTime').value,
-                startDate: document.querySelector('#input-lectureStartDate').value.trim(),
-                finishDate: document.querySelector('#input-lectureEndDate').value.trim(),
-                minimumCapacity: document.querySelector('#input-minimumCapacity').value.trim(),
-                maximumCapacity: document.querySelector('#input-maximumCapacity').value.trim(),
-                currentEnrollmentNumber: 0
-            };
-            console.log(data);
-
-            axios.post("/api/v1/academies/" + academyId + "/employees/" + teacherEmployeeId + "/lectures",
+            const data = null;
+            axios.post("/api/v1/academies/" + academyId + "/students/" + studentId + "/lectures/" + lectureId + "/enrollments",
                 JSON.stringify(data), {
                     headers: {
                         'Content-Type': 'application/json',
                     }
                 }
             ).then((response) => {
-                alert("강좌 정보 등록을 성공했습니다.");
+                alert("수강 신청을 성공했습니다.");
                 window.location.reload();
 
             }).catch((error) => {
                 if (error.response.data.result["errorCode"] == "INVALID_PERMISSION") {
                     alert("강사는 접근할 수 없습니다.");
+                }else if (error.response.data.result["errorCode"] == "DUPLICATED_ENROLLMENT") {
+                    alert("해당 학생은 해당 강의를 이미 수강 신청한 상태입니다.");
+                }
+            });
+
+        },
+
+        registerWaiting: function (academyId, studentId, lectureId) {
+
+            const data = null;
+            axios.post("/api/v1/academies/" + academyId + "/students/" + studentId + "/lectures/" + lectureId + "/waitinglists",
+                JSON.stringify(data), {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                }
+            ).then((response) => {
+                alert("수강 대기 신청을 성공했습니다.");
+                window.location.reload();
+
+            }).catch((error) => {
+                if (error.response.data.result["errorCode"] == "INVALID_PERMISSION") {
+                    alert("강사는 접근할 수 없습니다.");
+                }else if (error.response.data.result["errorCode"] == "DUPLICATED_WAITINGLIST") {
+                    alert("해당 학생은 해당 강의를 이미 대기 신청한 상태입니다.");
                 }
             });
 

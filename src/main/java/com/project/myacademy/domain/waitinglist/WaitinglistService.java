@@ -44,7 +44,7 @@ public class WaitinglistService {
         return waitinglists.map(ReadAllWaitinglistResponse::of);
     }
 
-    public CreateWaitinglistResponse createWaitinglist(Long academyId, Long studentId, Long lectureId, CreateWaitinglistRequest request, String account) {
+    public CreateWaitinglistResponse createWaitinglist(Long academyId, Long studentId, Long lectureId, String account) {
 
         // 등록하는 직원 존재 유무 확인(학원 존재 유무, 해당 학원 직원인지 확인)
         Academy academy = validateAcademy(academyId);
@@ -66,7 +66,7 @@ public class WaitinglistService {
                 }));
 
         // 대기번호 저장
-        Waitinglist savedWaitinglist = waitinglistRepository.saveAndFlush(Waitinglist.makeWaitinglist(lecture, student, request));
+        Waitinglist savedWaitinglist = waitinglistRepository.saveAndFlush(Waitinglist.makeWaitinglist(lecture, student));
 
         return CreateWaitinglistResponse.of(savedWaitinglist.getId());
     }
