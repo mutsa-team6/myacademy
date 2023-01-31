@@ -13,12 +13,12 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 -->
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 
 <th:block th:replace="layout/header :: headerFragment"></th:block>
 
 
-<body class="">
+<body class="bg-gray-200">
 <div class="container position-sticky z-index-sticky top-0">
     <div class="row">
         <div class="col-12">
@@ -27,160 +27,175 @@
     </div>
 </div>
 <main class="main-content  mt-0">
-    <section>
-        <div class="page-header min-vh-100">
-            <div class="container">
-                <div class="row">
-                    <div class="col-6 d-lg-flex d-none h-100 my-auto pe-0 position-absolute top-0 start-0 text-center justify-content-center flex-column">
-                        <div class="position-relative bg-gradient-primary h-100 m-3 px-7 border-radius-lg d-flex flex-column justify-content-center"
-                             style="background-image: url('https://raw.githubusercontent.com/buinq/imageServer/main/img/image-20230121201357931.png'); background-size: contain;">
-                        </div>
-                    </div>
+    <div class="page-header align-items-start min-vh-100"
+         style="background-image: url('https://images.unsplash.com/photo-1497294815431-9365093b7331?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1950&q=80');"
+    >
+        <span class="mask bg-gradient-dark opacity-6"></span>
+        <div class="container my-auto">
+            <div class="row">
+                <div class="col-9 mx-auto">
+                    <div class="card z-index-0 fadeIn3 fadeInBottom">
+                        <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                            <div class="bg-gradient-primary shadow-primary border-radius-lg py-3 pe-1">
+                                <h4 class="text-white font-weight-bolder text-center mt-2 mb-0">
+                                    <img src="https://raw.githubusercontent.com/buinq/imageServer/main/img/image-20230120001920792.png"
+                                         alt="image-20230120001920792" style="zoom: 40%;"/>
+                                </h4>
 
-                    <div class="col-xl-4 col-lg-5 col-md-7 d-flex flex-column ms-auto me-auto ms-lg-auto me-lg-5">
-                        <div class="card card-plain">
-                            <h4 class="font-weight-bolder">회원가입</h4>
-                            <p class="mb-0" style="font-weight: bold;color: #5A2060">이용하려는 학원 정보를 입력하여, 확인해주세요.</p>
+                            </div>
                         </div>
                         <div class="card-body">
-                            <form role="form">
-                                <div class="row ">
-                                    <div class="col-12 align-self-center">
+                            <div class="row">
+                                <div class="text-center">
+                                    <h5 style="color: #5A2082">회원가입</h5>
+                                </div>
+                                <div>
+                                    <hr style="color: #5A2082; height: 1.5px;background-color: #5A2082">
+                                </div>
+                                <div class="col-5">
+                                    <div class="card card-plain">
+                                        <p class="mb-0" style="font-weight: bold;color: #5A2060"> ① 이용하려는 학원 정보를 입력하여,
+                                            확인해주세요.</p>
+                                    </div>
+                                    <div class="card-body">
+                                        <form role="form">
+                                            <div class="row ">
+                                                <div class="col-12 align-self-center">
 
-                                        <div class="input-group input-group-outline  ">
-                                            <label class="form-label">학원 이름</label>
-                                            <input type="text" class="form-control"
-                                                   id="input-academyName" name="academyName"
-                                                   oninput="check_academyExist()">
+                                                    <div class="input-group input-group-outline  ">
+                                                        <label class="form-label">학원 이름</label>
+                                                        <input type="text" class="form-control"
+                                                               id="input-academyName" name="academyName"
+                                                               oninput="check_academyExist()">
+                                                    </div>
+                                                    <div id="academy-pass" class="alert-pass" hidden
+                                                         style="color: #5A2082;font-size: small">존재하는 학원입니다. 회원가입을 진행해주세요.
+                                                    </div>
+                                                    <div id="academy-fail" class="alert-pass" hidden
+                                                         style="color: red;font-size: small">존재하지 않는 학원입니다.
+                                                        <a href="/academies">학원 등록</a> 먼저 해주세요.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+
+                                    <br>
+                                    <br>
+                                    <p class="mb-0" style="font-weight: bold;color: #5A2060">② 사용할 계정명과 비밀번호를 입력해주세요</p>
+                                    <br>
+                                    <div class="card-body">
+                                        <div class="input-group input-group-outline mb-3">
+                                            <label class="form-label">계정명</label>
+                                            <input type="text" class="form-control" id="input-employeeAccount"
+                                                   name="employeeAccount">
                                         </div>
-                                        <div id="academy-pass" class="alert-pass" hidden
-                                             style="color: #5A2082;font-size: small">존재하는 학원입니다. 회원가입을 진행해주세요.
+                                        <div class="input-group input-group-outline mb-3">
+                                            <label class="form-label">비밀번호</label>
+                                            <input type="password" class="form-control" id="input-employeePassword"
+                                                   name="employeePassword">
                                         </div>
-                                        <div id="academy-fail" class="alert-pass" hidden
-                                             style="color: red;font-size: small">존재하지 않는 학원입니다.
-                                            <a href="/academies">학원 등록</a> 먼저 해주세요.
+                                        <div class="input-group input-group-outline mb-3">
+                                            <label class="form-label">비밀번호 2차 입력</label>
+                                            <input type="password" class="form-control" id="input-employeePasswordCheck">
                                         </div>
                                     </div>
                                 </div>
-                            </form>
-                        </div>
+                                <div class="col-2">
+                                </div>
+                                <div class="col-5">
 
-                        <br>
-                        <br>
-                        <p class="mb-0" style="font-weight: bold;color: #5A2060">사용할 계정명과 비밀번호를 입력해주세요</p>
-                        <br>
-                        <div class="card-body">
-                            <div class="input-group input-group-outline mb-3">
-                                <label class="form-label">계정명</label>
-                                <input type="text" class="form-control" id="input-employeeAccount"
-                                       name="employeeAccount">
-                            </div>
-                            <div class="input-group input-group-outline mb-3">
-                                <label class="form-label">비밀번호</label>
-                                <input type="password" class="form-control" id="input-employeePassword"
-                                       name="employeePassword">
-                            </div>
-                            <div class="input-group input-group-outline mb-3">
-                                <label class="form-label">비밀번호 2차 입력</label>
-                                <input type="password" class="form-control" id="input-employeePasswordCheck">
-                            </div>
-                            <p class="mb-0" style="font-weight: bold;color: #5A2060">사용자 정보를 입력해주세요.</p>
-                            <br>
+                                    <p class="mb-0" style="font-weight: bold;color: #5A2060">③ 사용자 정보를 입력해주세요.</p>
+                                    <br>
 
-                            <div class="input-group input-group-outline mb-3">
-                                <label class="form-label">이름</label>
-                                <input type="text" class="form-control" id="input-employeeName">
-                            </div>
-                            <div class="input-group input-group-outline mb-3">
-                                <label class="form-label">이메일</label>
-                                <input type="email" class="form-control" id="input-employeeEmail" name="employeeEmail">
-                            </div>
+                                    <div class="input-group input-group-outline mb-3">
+                                        <label class="form-label">이름</label>
+                                        <input type="text" class="form-control" id="input-employeeName">
+                                    </div>
+                                    <div class="input-group input-group-outline mb-3">
+                                        <label class="form-label">이메일</label>
+                                        <input type="email" class="form-control" id="input-employeeEmail"
+                                               name="employeeEmail">
+                                    </div>
 
-                            <div class="input-group input-group-outline mb-3">
-                                <label class="form-label">전화번호</label>
-                                <input type="tel" class="form-control" id="input-employeePhone">
-                            </div>
+                                    <div class="input-group input-group-outline mb-3">
+                                        <label class="form-label">전화번호</label>
+                                        <input type="tel" class="form-control" id="input-employeePhone">
+                                    </div>
 
-                            <div class="input-group input-group-outline mb-3">
-                                <input type="text" class="form-control" id="address_kakao" readonly
-                                       placeholder="주소">
-                            </div>
-                            <div class="input-group input-group-outline mb-3">
-                                <label class="form-label">상세주소</label>
-                                <input type="text" class="form-control" id="address_detail_kakao"
-                                       name="address_detail"
-                                >
-                            </div>
-                            <p class="mb-0" style="font-weight: bold;color: #5A2060">유형을 선택해주세요. </p>
-                            <p class="text-uppercase text-secondary text-xs font-weight-bolder "
-                               style="font-weight: bold;color: #5A2060">(원장 · 강사 체크 시, 담당 과목을 입력해주세요)</p>
-                            <br>
-                            <div>
-                                <div class="row">
-                                    <div class="col-6">
+                                    <div class="input-group input-group-outline mb-3">
+                                        <input type="text" class="form-control" id="address_kakao" readonly
+                                               placeholder="주소">
+                                    </div>
+                                    <div class="input-group input-group-outline mb-3">
+                                        <label class="form-label">상세주소</label>
+                                        <input type="text" class="form-control" id="address_detail_kakao"
+                                               name="address_detail"
+                                        >
+                                    </div>
+                                    <p class="mb-0" style="font-weight: bold;color: #5A2060">④ 유형을 선택해주세요. </p>
+                                    <p class="text-uppercase text-secondary text-xs font-weight-bolder "
+                                       style="font-weight: bold;color: #5A2060">(원장 · 강사 체크 시, 담당 과목을 입력해주세요)</p>
+                                    <br>
+                                    <div>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <div class="form-check mb-3">
+                                                    <input class="form-check-input" type="radio" name="employeeType"
+                                                           id="customRadio1" value="USER">
+                                                    <label class="custom-control-label" for="customRadio1">학원 원장 ·
+                                                        강사</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="input-group input-group-outline mb-4">
+                                                    <label class="form-label">과목</label>
+                                                    <input type="email" class="form-control" id="input-subject">
+                                                </div>
+                                            </div>
+                                        </div>
                                         <div class="form-check mb-3">
                                             <input class="form-check-input" type="radio" name="employeeType"
-                                                   id="customRadio1" value="USER">
-                                            <label class="custom-control-label" for="customRadio1">학원 원장 · 강사</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="input-group input-group-outline mb-4">
-                                            <label class="form-label">과목</label>
-                                            <input type="email" class="form-control" id="input-subject">
+                                                   id="customRadio2" value="STAFF">
+                                            <label class="custom-control-label" for="customRadio2">일반 직원</label>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="form-check mb-3">
-                                    <input class="form-check-input" type="radio" name="employeeType"
-                                           id="customRadio2" value="STAFF">
-                                    <label class="custom-control-label" for="customRadio2">일반 직원</label>
+                                <div>
+                                    <hr style="color: #5A2082; height: 1.5px;background-color: #5A2082">
+                                </div>
+                                <div class="col-4 mx-auto">
+                                    <div class="text-center">
+                                        <button th:onclick="|signUp.createEmployee()|" type="button"
+                                                class="btn btn-lg bg-gradient-primary btn-lg w-100 mt-4 mb-0">회원 가입
+                                        </button>
+                                    </div>
+                                    <br>
+                                    <div class="card-footer text-center pt-0 px-lg-2 px-1">
+                                        <p class="mb-2 text-sm mx-auto">
+                                            이미 가입하셨습니까?
+                                            <a th:href="@{/login}"
+                                               class="text-primary text-gradient font-weight-bold">로그인</a>
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="text-center">
-                                <button th:onclick="|signUp.createEmployee()|" type="button"
-                                        class="btn btn-lg bg-gradient-primary btn-lg w-100 mt-4 mb-0">회원 가입
-                                </button>
-                            </div>
-                        </div>
-                        <br>
-                        <div class="card-footer text-center pt-0 px-lg-2 px-1">
-                            <p class="mb-2 text-sm mx-auto">
-                                이미 가입하셨습니까?
-                                <a th:href="@{/login}" class="text-primary text-gradient font-weight-bold">로그인</a>
-                            </p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        </div>
-    </section>
+
+    </div>
 </main>
-<!--   Core JS Files   -->
 <!--   Core JS Files   -->
 <script src="/assets/js/core/popper.min.js"></script>
 <script src="/assets/js/core/bootstrap.min.js"></script>
 <script src="/assets/js/plugins/perfect-scrollbar.min.js"></script>
 <script src="/assets/js/plugins/smooth-scrollbar.min.js"></script>
 <script src="/assets/js/material-dashboard.min.js?v=3.0.4"></script>
-<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 
-<script>
-    var win = navigator.platform.indexOf('Win') > -1;
-    if (win && document.querySelector('#sidenav-scrollbar')) {
-        var options = {
-            damping: '0.5'
-        }
-        Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
-    }
-</script>
-<script>
-
-
-</script>
-<!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
-<script src="../assets/js/material-dashboard.min.js?v=3.0.4"></script>
+</body>
 <Script>
     let academyId = 0;
 
@@ -225,88 +240,40 @@
         }
     }
 
-
-    let signUp = {
+    let login = {
         init: function () {
             var _this = this;
         },
 
-        createEmployee: function () {
 
-            const parentTypeNodeList = document.getElementsByName('employeeType')
-            let employeeType = 0;
-            parentTypeNodeList.forEach((node) => {
-                if (node.checked) {
-                    employeeType = node.value;
-                }
-            })
 
+        loginEmployee: function () {
             let data = {
                 account: document.querySelector('#input-employeeAccount').value.trim(),
                 password: document.querySelector('#input-employeePassword').value.trim(),
-                name: document.querySelector('#input-employeeName').value.trim(),
-                email: document.querySelector('#input-employeeEmail').value.trim(),
-                address: document.querySelector("#address_kakao").value.trim() + "  " + document.querySelector("#address_detail_kakao").value.trim(),
-                phoneNum: document.querySelector('#input-employeePhone').value.trim(),
-                employeeType: employeeType,
-                subject: document.querySelector('#input-subject').value.trim()
             };
             console.log(data);
 
-            var blank_pattern = /[\s]/g;
-
-            if (blank_pattern.test(data.account) == true || data.account == '') {
-                alert('계정명에 공백이 입력되었습니다. 다시 입력해주세요');
-                document.querySelector("input[name=employeeAccount]").focus();
-
-                return;
-            }
-            if (blank_pattern.test(data.password) == true || data.password == '') {
-                alert('비밀번호에 공백이 입력되었습니다. 다시 입력해주세요');
-                document.querySelector("input[name=employeePassword]").focus();
-
-                return;
-            }
-
-            const password = document.querySelector('#input-employeePassword').value.trim();
-            const passwordCheck = document.querySelector('#input-employeePasswordCheck').value.trim();
-
-            if (password != passwordCheck) {
-                alert('비밀번호가 일치하지 않습니다. 다시 입력해주세요');
-                document.querySelector("input[name=employeePassword]").focus();
-                return;
-            }
-
-            axios.post("/api/v1/academies/" + academyId + "/employees/signup",
+            axios.post("/api/v1/academies/" + academyId + "/employees/login",
                 JSON.stringify(data), {
                     headers: {
                         'Content-Type': 'application/json',
                     }
                 }
             ).then((response) => {
-                alert("회원가입에 성공하였습니다! 로그인해주세요!");
-                window.location.href = '/login';
+                alert("로그인에 성공하였습니다!");
+                window.location.href = '/academy/main';
 
             }).catch((error) => {
-                console.log(error);
                 if (error.response.data.result["errorCode"] == "ACADEMY_NOT_FOUND") {
-                    alert("학원 정보를 먼저 검색 후, 회원 가입을 진행해주세요.");
-                    document.querySelector("input[name=academyName]").focus();
-                } else if (error.response.data.result["errorCode"] == "DUPLICATED_ACCOUNT") {
-                    alert("이미 존재하는 계정명입니다. 다른 계정명을 사용해주세요.");
-                    document.querySelector("input[name=employeeAccount]").focus();
-
-                } else if (error.response.data.result["errorCode"] == "DUPLICATED_EMAIL") {
-                    alert("이미 존재하는 이메일입니다. 다른 이메일을 사용해주세요.");
-                    document.querySelector("input[name=employeeEmail]").focus();
-
-                } else if (error.response.data.result["errorCode"] == "EMPTY_EMPLOYEE_TYPE") {
-                    alert("유형 선택은 필수입니다.");
-                    document.querySelector("input[name=employeeType]").focus();
-                } else if (error.response.data.result["errorCode"] == "BLANK_NOT_ALLOWED") {
-                    alert("입력되지 않은 정보가 있습니다! 입력해주세요.");
-                    document.querySelector("input[name=employeeType]").focus();
+                    alert("등록된 학원이 아닙니다. 등록 후 진행해주세요");
+                } else if(error.response.data.result["errorCode"] == "EMPLOYEE_NOT_FOUND"){
+                    alert("가입되어있지 않은 회원입니다.");
+                }else if(error.response.data.result["errorCode"] == "INVALID_PASSWORD"){
+                    alert("비밀번호가 일치하지 않습니다.");
                 }
+                console.log(academyId);
+                console.log(error);
 
             });
 
@@ -314,24 +281,7 @@
 
     };
 
-    signUp.init();
+    login.init();
 
 </script>
-
-<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-<script>
-    $(document).ready(function () {
-        document.getElementById("address_kakao").addEventListener("click", function () { //주소입력칸을 클릭하면
-            //카카오 지도 발생
-            new daum.Postcode({
-                oncomplete: function (data) { //선택시 입력값 세팅
-                    document.getElementById("address_kakao").value = data.address; // 주소 넣기
-                    document.querySelector("input[name=address_detail]").focus(); //상세입력 포커싱
-                }
-            }).open();
-        });
-    });
-</script>
-</body>
-
 </html>
