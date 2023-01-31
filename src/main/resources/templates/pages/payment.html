@@ -43,20 +43,22 @@
                         <div class="row">
                             <div class="col-lg-9 col-7">
                                 <h4>결제</h4>
+                                <p class="mb-0" style="font-weight: bold;color: #5A2060">결제를 진행할 수강신청 내역을 선택해주세요.</p>
+
                             </div>
                             <div class="col-lg-3 col-5 my-auto text-end">
                                 <form class="form-inline w-100 justify-content-center " action="/academy/pay"
                                       method="get">
                                     <div class="row mb-4">
-                                        <div class="col-9 align-self-center">
-                                            <div class="input-group input-group-outline  ">
+                                        <div class="col-8 align-self-center">
+                                            <div class="input-group input-group-outline">
 
                                                 <input type="text" class="form-control" name="studentName" placeholder="학생 이름">
                                             </div>
                                         </div>
-                                        <div class="col-3  align-self-center">
+                                        <div class="col-4  align-self-center">
                                             <button type="submit"
-                                                    class="btn btn-sm bg-gradient-primary btn-lg w-100 mb-0">검색
+                                                    class="btn btn-sm bg-gradient-primary btn-lg mb-0">검색
                                             </button>
                                         </div>
                                     </div>
@@ -90,6 +92,9 @@
                                     <th class="text-center text-uppercase  font-weight-bolder">
                                         결제 여부
                                     </th>
+                                    <th class="text-center text-uppercase  font-weight-bolder">
+                                        수강신청 일시
+                                    </th>
 
                                 </tr>
                                 </thead>
@@ -122,6 +127,10 @@
                                     <td class="align-middle text-center">
                                                 <span class=" text-xs font-weight-bold"
                                                       th:text="${enrollment.paymentYN}"></span>
+                                    </td>
+                                    <td class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${enrollment.createdAt}"></span>
                                     </td>
                                     <td class="align-middle text-center">
 

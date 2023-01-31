@@ -10,6 +10,8 @@ import com.project.myacademy.global.util.AuthenticationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,7 +33,7 @@ public class PaymentController {
     private String key;
 
     @GetMapping("/academy/pay")
-    public String main(@RequestParam(required = false) String studentName,HttpServletRequest request, Model model, Authentication authentication){
+    public String main(@RequestParam(required = false) String studentName, HttpServletRequest request, Model model, Authentication authentication, Pageable pageable){
 
         Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
@@ -39,9 +41,17 @@ public class PaymentController {
 
         if (studentName != null) {
 
-            List<FindEnrollmentResponse> enrollments = enrollmentService.findEnrollmentForPay(academyId, studentName);
-            log.info("⭐ 검색 학생 이름 [{}] || 강좌 수 [{}] ",studentName,enrollments.size());
+            Page<FindEnrollmentResponse> enrollments = enrollmentService.findEnrollmentForPay(academyId, studentName);
+            log.info("⭐ 검색 학생 이름 [{}] ", studentName);
             model.addAttribute("enrollments", enrollments);
+            model.addAttribute("previous", pageable.previousOrFirst().getPageNumber());
+            model.addAttribute("next", pageable.next().getPageNumber());
+
+        } else {
+            Page<FindEnrollmentResponse> enrollments = enrollmentService.findAllEnrollmentForPay(academyId, pageable);
+            model.addAttribute("enrollments", enrollments);
+            model.addAttribute("previous", pageable.previousOrFirst().getPageNumber());
+            model.addAttribute("next", pageable.next().getPageNumber());
         }
         log.info("🔑 key = {}",key);
         model.addAttribute("tossKey", key);
