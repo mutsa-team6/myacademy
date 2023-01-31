@@ -16,9 +16,9 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
     // 현재 강좌 등록인원
     Long countByLecture_Id(Long lectureId);
 
-    List<Enrollment> findByStudent(Student student);
+    List<Enrollment> findByStudentOrderByCreatedAtDesc(Student student);
 
     Optional<Enrollment> findByStudentId(Long studentId);
 
-    Page<Enrollment> findAllByAcademyId(Long academyId, Pageable pageable);
+    Page<Enrollment> findAllByAcademyIdOrderByCreatedAtDesc(Long academyId, Pageable pageable);
 }

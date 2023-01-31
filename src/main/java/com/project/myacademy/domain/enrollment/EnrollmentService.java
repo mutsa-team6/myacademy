@@ -251,7 +251,7 @@ public class EnrollmentService {
 
         // student 객체로 수강등록 데이터를 찾아온다 ( 근데 여러개일 수 있다.)
         for (Student foundStudent : foundStudents) {
-            List<Enrollment> founds = enrollmentRepository.findByStudent(foundStudent);
+            List<Enrollment> founds = enrollmentRepository.findByStudentOrderByCreatedAtDesc(foundStudent);
             for (Enrollment found : founds) {
                 finalEnrollments.add(new FindEnrollmentResponse(found));
             }
@@ -265,7 +265,7 @@ public class EnrollmentService {
     public Page<FindEnrollmentResponse> findAllEnrollmentForPay(Long academyId,Pageable pageable) {
 
         //해당 학원의 모든 수강 신청 내역을 page 로 가져온다.
-        Page<Enrollment> foundAllEnrollments = enrollmentRepository.findAllByAcademyId(academyId,pageable);
+        Page<Enrollment> foundAllEnrollments = enrollmentRepository.findAllByAcademyIdOrderByCreatedAtDesc(academyId,pageable);
 
         return foundAllEnrollments.map(enrollment -> new FindEnrollmentResponse(enrollment));
     }

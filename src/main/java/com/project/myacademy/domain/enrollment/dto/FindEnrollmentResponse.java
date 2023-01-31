@@ -8,6 +8,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -24,6 +28,7 @@ public class FindEnrollmentResponse {
     private Integer discount;
 
     private Boolean paymentYN;
+    private String createdAt;
     public FindEnrollmentResponse(Enrollment enrollment) {
         this.studentId = enrollment.getStudent().getId();
         this.lectureId = enrollment.getLecture().getId();
@@ -34,5 +39,6 @@ public class FindEnrollmentResponse {
         this.discount = enrollment.getLecture().getPrice();
         this.paymentYN = enrollment.getPaymentYN();
         this.teacherName = enrollment.getLecture().getEmployee().getName();
+        this.createdAt = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(Timestamp.valueOf(enrollment.getCreatedAt()));
     }
 }
