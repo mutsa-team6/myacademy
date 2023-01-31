@@ -55,9 +55,10 @@ public class Enrollment extends BaseEntity {
                 .student(student)
                 .lecture(lecture)
                 .memo(request.getMemo())
-                .paymentYN(request.getPaymentYN())
+                .paymentYN(false)
                 .registerEmployee(sb.append(employee.getId()).append(" (").append(employee.getName()).append(")").toString())
                 .modifiedEmployee(sb.toString())
+                .discountId(0L)
                 .build();
     }
 

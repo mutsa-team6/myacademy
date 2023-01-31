@@ -15,6 +15,10 @@ public interface LectureRepository extends JpaRepository<Lecture, Long> {
     // 강좌 이름 키워드 검색 페이징
     Page<Lecture> findByNameContaining(String keyword, Pageable pageable);
 
+    Page<Lecture> findByEmployee(Employee employee, Pageable pageable);
+
+
+
     Page<Lecture> findByEmployeeAndFinishDateGreaterThanOrderByStartDate(Employee employee, LocalDate finishDate, Pageable pageable);
 
     Page<Lecture> findByAcademyIdAndFinishDateGreaterThanOrderByCreatedAtDesc(Long academyId, LocalDate finishDate, Pageable pageable);

@@ -47,10 +47,10 @@ public class LectureService {
     }
 
     /**
-     * @param academyId  직원의 소속 학원 id
-     * @param employeeId 강좌에 들어갈 강사의 id
-     * @param request    등록 요청 DTO
-     * @param account    직원 계정
+     * @param academyId     직원의 소속 학원 id
+     * @param employeeId    강좌에 들어갈 강사의 id
+     * @param request       등록 요청 DTO
+     * @param account       직원 계정
      */
     public CreateLectureResponse createLecture(Long academyId, Long employeeId, CreateLectureRequest request, String account) {
 
@@ -61,7 +61,7 @@ public class LectureService {
         Employee employee = validateAcademyEmployee(account, academy);
 
         // 직원이 강좌를 개설할 권한이 있는지 확인(강사만 불가능)
-        if (Employee.isTeacherAuthority(employee)) {
+        if(Employee.isTeacherAuthority(employee)) {
             throw new AppException(ErrorCode.INVALID_PERMISSION);
         }
 
@@ -85,10 +85,10 @@ public class LectureService {
     }
 
     /**
-     * @param academyId 직원의 소속 학원 id
-     * @param lectureId 수정될 강좌 id
-     * @param request   수정 요청 DTO
-     * @param account   직원 계정
+     * @param academyId     직원의 소속 학원 id
+     * @param lectureId     수정될 강좌 id
+     * @param request       수정 요청 DTO
+     * @param account       직원 계정
      */
     public UpdateLectureResponse updateLecture(Long academyId, Long lectureId, UpdateLectureRequest request, String account) {
 
@@ -100,7 +100,7 @@ public class LectureService {
         Lecture lecture = validateLecture(lectureId);
 
         // 강좌를 수정할 수 있는 권한인지 확인(강사만 불가능)
-        if (Employee.isTeacherAuthority(employee)) {
+        if(Employee.isTeacherAuthority(employee)) {
             throw new AppException(ErrorCode.INVALID_PERMISSION);
         }
 
@@ -110,9 +110,9 @@ public class LectureService {
     }
 
     /**
-     * @param academyId 직원의 소속 학원 id
-     * @param lectureId 삭제 강좌 id
-     * @param account   직원 계정
+     * @param academyId     직원의 소속 학원 id
+     * @param lectureId     삭제 강좌 id
+     * @param account       직원 계정
      */
     public DeleteLectureResponse deleteLecture(Long academyId, Long lectureId, String account) {
 
@@ -124,7 +124,7 @@ public class LectureService {
         Lecture lecture = validateLecture(lectureId);
 
         // 강좌를 삭제할 수 있는 권한인지 확인(강사만 불가능)
-        if (Employee.isTeacherAuthority(employee)) {
+        if(Employee.isTeacherAuthority(employee)) {
             throw new AppException(ErrorCode.INVALID_PERMISSION);
         }
 
