@@ -1,6 +1,8 @@
 package com.project.myacademy.controller;
 
 import com.project.myacademy.domain.academy.Academy;
+import com.project.myacademy.domain.discount.DiscountService;
+import com.project.myacademy.domain.discount.dto.GetDiscountResponse;
 import com.project.myacademy.domain.employee.EmployeeService;
 import com.project.myacademy.domain.employee.dto.ReadEmployeeResponse;
 
@@ -29,6 +31,7 @@ public class PaymentController {
 
     private final EmployeeService employeeService;
     private final EnrollmentService enrollmentService;
+    private final DiscountService discountService;
     @Value("${payment.toss.testClientApiKey}")
     private String key;
 
@@ -55,6 +58,10 @@ public class PaymentController {
         }
         log.info("🔑 key = {}",key);
         model.addAttribute("tossKey", key);
+
+        Page<GetDiscountResponse> discounts = discountService.getAllDiscounts(academyId, requestAccount, pageable);
+        model.addAttribute("discounts", discounts);
+
 
         //회원 이름 표시
         HttpSession session = request.getSession(true);
