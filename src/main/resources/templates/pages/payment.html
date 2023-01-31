@@ -34,7 +34,6 @@
     <th:block th:replace="layout/navbar :: navbarFragment"></th:block>
 
 
-
     <div class="container-fluid py-4">
         <div class="row mb-4">
             <div class="col-lg-10 col-md-6 mb-md-0 mb-4">
@@ -43,20 +42,23 @@
                         <div class="row">
                             <div class="col-lg-9 col-7">
                                 <h4>결제</h4>
+                                <p class="mb-0" style="font-weight: bold;color: #5A2060">결제를 진행할 수강신청 내역을 선택해주세요.</p>
+
                             </div>
                             <div class="col-lg-3 col-5 my-auto text-end">
                                 <form class="form-inline w-100 justify-content-center " action="/academy/pay"
                                       method="get">
                                     <div class="row mb-4">
-                                        <div class="col-9 align-self-center">
-                                            <div class="input-group input-group-outline  ">
+                                        <div class="col-8 align-self-center">
+                                            <div class="input-group input-group-outline">
 
-                                                <input type="text" class="form-control" name="studentName" placeholder="학생 이름">
+                                                <input type="text" class="form-control" name="studentName"
+                                                       placeholder="학생 이름">
                                             </div>
                                         </div>
-                                        <div class="col-3  align-self-center">
+                                        <div class="col-4  align-self-center">
                                             <button type="submit"
-                                                    class="btn btn-sm bg-gradient-primary btn-lg w-100 mb-0">검색
+                                                    class="btn btn-sm bg-gradient-primary btn-lg mb-0">검색
                                             </button>
                                         </div>
                                     </div>
@@ -85,10 +87,16 @@
                                         가격
                                     </th>
                                     <th class="text-center text-uppercase  font-weight-bolder">
-                                        할인 가격
+                                        할인 정책
+                                    </th>
+                                    <th class="text-center text-uppercase  font-weight-bolder">
+                                        할인된 가격
                                     </th>
                                     <th class="text-center text-uppercase  font-weight-bolder">
                                         결제 여부
+                                    </th>
+                                    <th class="text-center text-uppercase  font-weight-bolder">
+                                        수강신청 일시
                                     </th>
 
                                 </tr>
@@ -113,20 +121,47 @@
                                     </th>
                                     <td class="align-middle text-center">
                                                 <span class=" text-xs font-weight-bold"
-                                                      th:text="${enrollment.price}"></span>
+                                                      th:text="|${enrollment.price} 원|"></span>
                                     </td>
+
                                     <td class="align-middle text-center">
-                                                <span class=" text-xs font-weight-bold"
-                                                      th:text="${enrollment.discount}"></span>
+                                        <div class="input-group input-group-static text-xs font-weight-bold  text-center">
+                                            <select class="form-control text-xs font-weight-bold  text-center" th:id="'exampleFormControlSelect1'+${enrollment.enrollmentId}"
+                                            th:onchange="|pay.show(${enrollment.enrollmentId},${enrollment.price},this.value)|">
+                                                <option value="0" selected>할인정책을 선택해주세요.</option>
+                                                <option value="0">할인정책을 선택 안함.</option>
+                                                <div th:each="discount : ${discounts}">
+                                                    <option th:value="${discount.discountRate}" class=" text-xs font-weight-bold mt-2"
+                                                            th:text="|${discount.discountName} (${discount.discountRate} % 할인)|"
+                                                           ></option>
+                                                </div>
+                                            </select>
+                                        </div>
+                                    </td>
+
+                                    <td class="align-middle text-center">
+                                        <div class="input-group input-group-sm input-group-outline my-3">
+                                            <input type="text" class="form-control form-control-sm text-xs font-weight-bold"
+                                                   style="border-color: white; width: 5px;text-align: center;color: red"
+                                                   th:text="원" th:id="'discount'+${enrollment.enrollmentId}" readonly>
+                                        </div>
                                     </td>
                                     <td class="align-middle text-center">
                                                 <span class=" text-xs font-weight-bold"
                                                       th:text="${enrollment.paymentYN}"></span>
                                     </td>
                                     <td class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${enrollment.createdAt}"></span>
+                                    </td>
+                                    <td class="align-middle text-center">
 
-                                        <button  type="button"  th:data-parameter1="${enrollment.studentId}"  th:data-parameter2="${enrollment.price}" th:data-parameter3="${enrollment.lectureName}" th:data-parameter4="${enrollment.lectureId}" th:data-parameter5="${tossKey}"
-                                                 th:onclick="|pay.createOrder(this.getAttribute('data-parameter1'),this.getAttribute('data-parameter2'),this.getAttribute('data-parameter3'),this.getAttribute('data-parameter4'),this.getAttribute('data-parameter5'))|"
+                                        <button type="button" th:data-parameter1="${enrollment.studentId}"
+                                                th:data-parameter2="${enrollment.enrollmentId}"
+                                                th:data-parameter3="${enrollment.lectureName}"
+                                                th:data-parameter4="${enrollment.lectureId}"
+                                                th:data-parameter5="${tossKey}"
+                                                th:onclick="|pay.createOrder(this.getAttribute('data-parameter1'),this.getAttribute('data-parameter2'),this.getAttribute('data-parameter3'),this.getAttribute('data-parameter4'),this.getAttribute('data-parameter5'))|"
                                                 class="btn btn-sm bg-gradient-danger btn-lg w-100 mb-0">결제
                                         </button>
                                     </td>
@@ -158,8 +193,10 @@
 <!-- Toss -->
 <script src="https://js.tosspayments.com/v1/payment"></script>
 <Script>
-    let orderId =null;
-    let orderName =null;
+
+
+    let orderId = null;
+    let orderName = null;
     let amount = null;
 
     let pay = {
@@ -167,17 +204,34 @@
             var _this = this;
         },
 
-        createOrder: function (studentId,amount,orderName,lectureId,tossKey) {
+        show : function(enrollmentId,price,rate){
+            console.log(enrollmentId);
+            console.log(price);
+            console.log(rate);
+            console.log('discount'+enrollmentId);
+            document.getElementById('discount'+enrollmentId).text=((100-rate)*price/100);
+            document.getElementById('discount'+enrollmentId).value=((100-rate)*price/100);
+
+        },
+
+        createOrder: function (studentId, enrollmentId, orderName, lectureId, tossKey) {
+            let amount = document.getElementById('discount' + enrollmentId).value;
+            console.log(amount);
+
+            if(amount ==""){
+                alert("할인 정책을 선택해주세요.")
+                return;
+            }
             let data = {
                 payType: "CARD",
                 amount: amount,
                 orderName: orderName,
-                lectureId : lectureId
+                lectureId: lectureId
             };
             console.log(data);
 
             let key = tossKey
-            axios.post("/api/v1/payments/students/"+studentId,
+            axios.post("/api/v1/payments/students/" + studentId,
                 JSON.stringify(data), {
                     headers: {
                         'Content-Type': 'application/json',

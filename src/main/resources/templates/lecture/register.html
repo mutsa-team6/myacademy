@@ -137,6 +137,10 @@
                                         </th>
                                         <th class="text-center text-uppercase  font-weight-bolder"
                                             style="color: #5A2082;font-size: small">
+                                            강사 이름
+                                        </th>
+                                        <th class="text-center text-uppercase  font-weight-bolder"
+                                            style="color: #5A2082;font-size: small">
                                             강의 시간
                                         </th>
                                         <th class="text-center text-uppercase  font-weight-bolder "
@@ -163,6 +167,10 @@
                                             <th class="align-middle text-center">
                                                 <span class=" text font-weight-bold" style="font-size: small"
                                                       th:text="${lecture.lectureName}"></span>
+                                            </th>
+                                            <th class="align-middle text-center">
+                                                <span class=" text font-weight-bold" style="font-size: small"
+                                                      th:text="${lecture.teacherName}"></span>
                                             </th>
 
                                             <th class="align-middle text-center">
@@ -194,7 +202,7 @@
             </div>
             <div class="col-1">
             </div>
-            <div class="col-2 ">
+            <div class="col-3 ">
 
                 <div class="card card-plain">
                     <h4 class="font-weight-bolder"> 강좌 등록</h4>

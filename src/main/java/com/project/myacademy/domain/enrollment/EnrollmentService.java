@@ -16,6 +16,7 @@ import com.project.myacademy.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,10 +41,9 @@ public class EnrollmentService {
      * @param academyId 직원의 소속 학원 id
      * @param studentId 학생 id
      * @param lectureId 강좌 id
-     * @param request   수강 등록 요청 DTO
      * @param account   직원 계정
      */
-    public CreateEnrollmentResponse createEnrollment(Long academyId, Long studentId, Long lectureId, CreateEnrollmentRequest request, String account) {
+    public CreateEnrollmentResponse createEnrollment(Long academyId, Long studentId, Long lectureId, String account) {
 
         // 등록하는 직원 존재 유무 확인(학원 존재 유무, 해당 학원 직원인지 확인)
         Academy academy = validateAcademy(academyId);
@@ -73,7 +73,7 @@ public class EnrollmentService {
         // (해당 강좌에 등록할 인원 + 이미 등록되어 있는 인원)이 최대 수강정원을 넘지 않으면 수강 내역 저장
         if(currentEnrollmentNumber + 1 <= lecture.getMaximumCapacity()) {
             lecture.plusCurrentEnrollmentNumber();
-            savedEnrollment = enrollmentRepository.save(Enrollment.createEnrollment(student, lecture, employee, request));
+            savedEnrollment = enrollmentRepository.save(Enrollment.createEnrollment(student, lecture, employee,academyId));
         }
         // 그렇지 않으면 수강정원 초과 에러처리
         else {
@@ -228,7 +228,7 @@ public class EnrollmentService {
 
         // 수강 내역 생성
         lecture.plusCurrentEnrollmentNumber();
-        Enrollment enrollment = Enrollment.createEnrollment(student, lecture, employee, request);
+        Enrollment enrollment = Enrollment.createEnrollment(student, lecture, employee,academyId);
 
         // 수강 내역 저장 즉시 DB 반영 -> 반환 DTO에 새롭게 생성된 수강 내역의 enrollmentId 추출하기 위함
 //        Enrollment newEnrollment = enrollmentRepository.saveAndFlush(enrollment);
@@ -241,7 +241,7 @@ public class EnrollmentService {
      * 결제 UI용 메서드
      */
 
-    public List<FindEnrollmentResponse> findEnrollmentForPay(Long academyId, String studentName) {
+    public Page<FindEnrollmentResponse> findEnrollmentForPay(Long academyId, String studentName) {
 
         // 학원과 학생 이름으로 student 객체를 찾아온다.
         List<Student> foundStudents = studentRepository.findByAcademyIdAndName(academyId, studentName);
@@ -251,12 +251,22 @@ public class EnrollmentService {
 
         // student 객체로 수강등록 데이터를 찾아온다 ( 근데 여러개일 수 있다.)
         for (Student foundStudent : foundStudents) {
-            List<Enrollment> founds = enrollmentRepository.findByStudent(foundStudent);
+            List<Enrollment> founds = enrollmentRepository.findByStudentOrderByCreatedAtDesc(foundStudent);
             for (Enrollment found : founds) {
-                finalEnrollments.add(new FindEnrollmentResponse(foundStudent,found.getLecture(),found));
+                finalEnrollments.add(new FindEnrollmentResponse(found));
             }
         }
+        return new PageImpl<>(finalEnrollments);
+    }
 
-        return finalEnrollments;
+    /**
+     * UI용 메서드, 해당 학원의 모든 수강신청내역 가져오기
+     */
+    public Page<FindEnrollmentResponse> findAllEnrollmentForPay(Long academyId,Pageable pageable) {
+
+        //해당 학원의 모든 수강 신청 내역을 page 로 가져온다.
+        Page<Enrollment> foundAllEnrollments = enrollmentRepository.findAllByAcademyIdOrderByCreatedAtDesc(academyId,pageable);
+
+        return foundAllEnrollments.map(enrollment -> new FindEnrollmentResponse(enrollment));
     }
 }

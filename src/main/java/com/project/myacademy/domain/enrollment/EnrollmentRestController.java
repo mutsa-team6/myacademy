@@ -31,10 +31,9 @@ public class EnrollmentRestController {
     public ResponseEntity<Response<CreateEnrollmentResponse>> create(@PathVariable("academyId") Long academyId,
                                                                      @PathVariable("studentId") Long studentId,
                                                                      @PathVariable("lectureId") Long lectureId,
-                                                                     @RequestBody CreateEnrollmentRequest request,
                                                                      Authentication authentication) {
         String account = AuthenticationUtil.getAccountFromAuth(authentication);
-        CreateEnrollmentResponse createdEnrollment = enrollmentService.createEnrollment(academyId, studentId, lectureId, request, account);
+        CreateEnrollmentResponse createdEnrollment = enrollmentService.createEnrollment(academyId, studentId, lectureId, account);
         log.info("수강 등록 성공");
         return ResponseEntity.ok().body(Response.success(createdEnrollment));
     }

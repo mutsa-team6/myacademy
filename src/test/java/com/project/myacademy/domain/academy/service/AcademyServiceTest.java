@@ -1,112 +1,160 @@
 package com.project.myacademy.domain.academy.service;
 
-import com.project.myacademy.domain.academy.AcademyService;
-import com.project.myacademy.domain.academy.dto.LoginAcademyRequest;
-import com.project.myacademy.domain.academy.dto.UpdateAcademyReqeust;
-import com.project.myacademy.domain.academy.util.AcademyFixtureUtil;
-import com.project.myacademy.domain.academy.dto.CreateAcademyRequest;
 import com.project.myacademy.domain.academy.Academy;
 import com.project.myacademy.domain.academy.AcademyRepository;
-import com.project.myacademy.domain.academy.util.EmployeeFixtureUtil;
-import com.project.myacademy.domain.employee.Employee;
-import com.project.myacademy.domain.employee.EmployeeRepository;
+import com.project.myacademy.domain.academy.AcademyService;
+import com.project.myacademy.domain.academy.dto.*;
+import com.project.myacademy.global.exception.AppException;
+import com.project.myacademy.global.exception.ErrorCode;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.mockito.InjectMocks;
+import org.mockito.Mockito;
+import org.springframework.data.domain.*;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.BDDMockito.given;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
 class AcademyServiceTest {
+    private AcademyService academyService;
+    AcademyRepository academyRepository = Mockito.mock(AcademyRepository.class);
+    @InjectMocks
+    private Academy academy1;
+    private Academy academy2;
 
-    AcademyRepository academyRepository = mock(AcademyRepository.class);
-    EmployeeRepository employeeRepository = mock(EmployeeRepository.class);
-    BCryptPasswordEncoder bCryptPasswordEncoder = mock(BCryptPasswordEncoder.class);
-    AcademyService academyService = new AcademyService(academyRepository, employeeRepository, bCryptPasswordEncoder);
 
-//    @Test
-//    @DisplayName("학원 생성 : 성공")
-//    void createAcademy() {
-//        final CreateAcademyRequest request = new CreateAcademyRequest(
-//                "name",
-//                "address",
-//                "phoneNum",
-//                "admin",
-//                "businessRegistrationNumber",
-//                "password"
-//        );
-//        final Academy academy = AcademyFixtureUtil.ACADEMY_ADMIN.init();
-//
-//        when(academyRepository.findByBusinessRegistrationNumber(request.getBusinessRegistrationNumber())).thenReturn(Optional.empty());
-//        when(academyRepository.save(any(Academy.class))).thenReturn(academy);
-//
-//        assertDoesNotThrow(() -> academyService.createAcademy(request));
-//        assertEquals("name", academyService.createAcademy(request).getName());
-//        assertEquals("admin", academyService.createAcademy(request).getOwner());
-//
-//        verify(academyRepository, atLeastOnce()).findByBusinessRegistrationNumber(request.getBusinessRegistrationNumber());
-//        verify(academyRepository, atLeastOnce()).save(any(Academy.class));
-//    }
-//
-//    @Test
-//    @DisplayName("학원 정보 수정 : 성공")
-//    void updateAcademy() {
-//        final Employee employee = EmployeeFixtureUtil.ROLE_ADMIN.init();
-//        final UpdateAcademyReqeust request = new UpdateAcademyReqeust(
-//                "name",
-//                "address",
-//                "phoneNum",
-//                "admin",
-//                "businessRegistrationNumber",
-//                "password"
-//        );
-//        final Academy academy = AcademyFixtureUtil.ACADEMY_ADMIN.init();
-//
-//        when(employeeRepository.findByName(anyString())).thenReturn(Optional.of(employee));
-//        when(academyRepository.findById(anyLong())).thenReturn(Optional.of(academy));
-//        when(academyRepository.save(any(Academy.class))).thenReturn(academy);
-//
-//        assertDoesNotThrow(() -> academyService.updateAcademy(1L, request, "admin"));
-//        assertEquals("admin", academyService.updateAcademy(1L, request, "admin").getOwner());
-//
-//        verify(employeeRepository, atLeastOnce()).findByName(anyString());
-//        verify(academyRepository, atLeastOnce()).findById(anyLong());
-//        verify(academyRepository, atLeastOnce()).save(any(Academy.class));
-//    }
-//
-//    @Test
-//    @DisplayName("학원 정보 삭제 : 성공")
-//    void deleteAcademy() {
-//        final Employee employee = EmployeeFixtureUtil.ROLE_ADMIN.init();
-//        final Academy academy = AcademyFixtureUtil.ACADEMY_ADMIN.init();
-//
-//        when(employeeRepository.findByName(anyString())).thenReturn(Optional.of(employee));
-//        when(academyRepository.findById(anyLong())).thenReturn(Optional.of(academy));
-//
-//        assertDoesNotThrow(() -> academyService.deleteAcademy(1L, "admin"));
-//        assertEquals(1L, academyService.deleteAcademy(1L, "admin"));
-//
-//        verify(employeeRepository, atLeastOnce()).findByName(anyString());
-//        verify(academyRepository, atLeastOnce()).findById(anyLong());
-//    }
-//
-//    @Test
-//    @DisplayName("학원 로그인 : 성공")
-//    void loginAcademy() {
-//        final LoginAcademyRequest request = new LoginAcademyRequest("businessRegistrationNumber", "password");
-//        final Academy academy = AcademyFixtureUtil.ACADEMY_ADMIN.init();
-//
-//        when(academyRepository.findByBusinessRegistrationNumber(anyString())).thenReturn(Optional.of(academy));
-//        when(bCryptPasswordEncoder.matches(anyString(), anyString())).thenReturn(true);
-//        ReflectionTestUtils.setField(academyService, "secretKey", "mockSecretKey");
-//
-//        assertDoesNotThrow(() -> academyService.loginAcademy(request));
-//        assertEquals(1L, academyService.loginAcademy(request).getAcademyId());
-//
-//        verify(academyRepository, atLeastOnce()).findByBusinessRegistrationNumber(anyString());
-//    }
+    @BeforeEach
+    void setUp() {
+        academyService = new AcademyService(academyRepository);
+        academy1 = Academy.builder().id(1L).name("학원1`").build();
+        academy2 = Academy.builder().id(1L).name("학원2`").build();
+    }
+
+    @Nested
+    @DisplayName("학원 등록")
+    class CreateAcademy {
+        CreateAcademyRequest request = new CreateAcademyRequest("학원이름", "학원주소", "010-0000-0000", "원장이름", "0000");
+
+        @Test
+        @DisplayName("학원 등록 성공")
+        void create_academy_success() {
+
+            Academy savedAcademy = Academy.createAcademy(request);
+            given(academyRepository.save(any())).willReturn(savedAcademy);
+
+            CreateAcademyResponse response = academyService.createAcademy(request);
+
+            assertEquals("학원이름", response.getName());
+
+        }
+
+        @Test
+        @DisplayName("학원 등록 실패 - 학원 이름 중복")
+        void create_academy_fail() {
+
+            given(academyRepository.findByName(request.getName())).willReturn(Optional.of(academy1));
+
+            AppException appException = assertThrows(AppException.class,
+                    () -> academyService.createAcademy(request));
+
+            assertThat(appException.getErrorCode().equals(ErrorCode.DUPLICATED_ACADEMY));
+        }
+    }
+
+    @Nested
+    @DisplayName("학원 삭제")
+    class DeleteAcademy {
+        private final Long deleteAcademyId = 1L;
+
+        @Test
+        @DisplayName("학원 삭제 성공")
+        void delete_academy_success() {
+
+            given(academyRepository.findById(deleteAcademyId)).willReturn(Optional.of(academy1));
+
+            Long deletedId = academyService.deleteAcademy(deleteAcademyId);
+
+            assertEquals(1, deletedId);
+        }
+
+        @Test
+        @DisplayName("학원 삭제 실패 - 일치하는 학원 정보 없음")
+        void delete_academy_fail() {
+
+            given(academyRepository.findById(deleteAcademyId)).willReturn(Optional.empty());
+
+            AppException appException = assertThrows(AppException.class,
+                    () -> academyService.deleteAcademy(deleteAcademyId));
+
+            assertThat(appException.getErrorCode().equals(ErrorCode.ACADEMY_NOT_FOUND));
+        }
+    }
+
+    @Nested
+    @DisplayName("학원 조회")
+    class FindAcademy {
+        private final FindAcademyRequest request = new FindAcademyRequest("학원1");
+
+        @Test
+        @DisplayName("학원 조회 성공")
+        void find_academy_success() {
+
+            given(academyRepository.findByName(request.getName())).willReturn(Optional.of(academy1));
+
+            FindAcademyResponse response = academyService.findAcademy(request);
+
+            assertEquals(1L, response.getAcademyId());
+        }
+
+        @Test
+        @DisplayName("학원 조회 실패")
+        void find_academy_fail() {
+
+            given(academyRepository.findByName(request.getName())).willReturn(Optional.empty());
+
+            AppException appException = assertThrows(AppException.class,
+                    () -> academyService.findAcademy(request));
+
+            assertEquals(ErrorCode.ACADEMY_NOT_FOUND, appException.getErrorCode());
+        }
+
+        @Test
+        @DisplayName("학원 존재 확인")
+        void check_academy_success() {
+
+            given(academyRepository.existsByName(any())).willReturn(true);
+
+            boolean checkAcademyExist = academyService.checkExistByAcademyName(academy1.getName());
+
+            assertTrue(checkAcademyExist);
+        }
+
+
+        @Test
+        @DisplayName("학원 전체 조회 성공")
+        void find_All_academy_success() {
+        ReadAcademyResponse response1 = new ReadAcademyResponse(academy1);
+        ReadAcademyResponse response2 = new ReadAcademyResponse(academy2);
+
+            Pageable pageable = PageRequest.of(0, 20, Sort.Direction.DESC,"id");
+            Page<Academy> academyList = new PageImpl<>(List.of(academy1, academy2));
+
+            given(academyRepository.findAll(pageable)).willReturn(academyList);
+
+            Page<ReadAcademyResponse> responses = academyService.readAllAcademies(pageable);
+
+            assertThat(responses.getTotalPages()).isEqualTo(1);
+            assertThat(responses.getTotalElements()).isEqualTo(2);
+
+        }
+
+    }
 }

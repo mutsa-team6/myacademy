@@ -1,10 +1,7 @@
 package com.project.myacademy.domain.lecture.dto;
 
 import com.project.myacademy.domain.lecture.Lecture;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 
@@ -12,6 +9,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Getter
 @Builder
+@Setter
 public class ReadAllLectureResponse {
 
     private Long lectureId;
@@ -24,6 +22,7 @@ public class ReadAllLectureResponse {
     private LocalDate startDate;
     private LocalDate finishDate;
     private Integer currentEnrollmentNumber;
+    private Long waitingNum;
 
     public static ReadAllLectureResponse of(Lecture lecture) {
         return ReadAllLectureResponse.builder()

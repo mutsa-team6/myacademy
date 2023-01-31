@@ -8,12 +8,17 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Builder
 public class FindEnrollmentResponse {
 
+    private Long enrollmentId;
     private Long studentId;
     private Long lectureId;
     private String studentName;
@@ -24,14 +29,18 @@ public class FindEnrollmentResponse {
     private Integer discount;
 
     private Boolean paymentYN;
-    public FindEnrollmentResponse(Student student, Lecture lecture, Enrollment enrollment) {
-        this.studentId = student.getId();
-        this.lectureId = lecture.getId();
-        this.studentName = student.getName();
-        this.studentPhoneNum = student.getPhoneNum();
-        this.lectureName = lecture.getName();
-        this.price = lecture.getPrice();
-        this.discount = lecture.getPrice();
+    private String createdAt;
+    public FindEnrollmentResponse(Enrollment enrollment) {
+        this.enrollmentId = enrollment.getId();
+        this.studentId = enrollment.getStudent().getId();
+        this.lectureId = enrollment.getLecture().getId();
+        this.studentName = enrollment.getStudent().getName();
+        this.studentPhoneNum = enrollment.getStudent().getPhoneNum();
+        this.lectureName = enrollment.getLecture().getName();
+        this.price = enrollment.getLecture().getPrice();
+        this.discount = enrollment.getLecture().getPrice();
         this.paymentYN = enrollment.getPaymentYN();
+        this.teacherName = enrollment.getLecture().getEmployee().getName();
+        this.createdAt = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(Timestamp.valueOf(enrollment.getCreatedAt()));
     }
 }
