@@ -56,6 +56,11 @@ public class StudentService {
                 .ifPresent(user -> {
                     throw new AppException(ErrorCode.DUPLICATED_STUDENT);
                 });
+        //학생 Email 중복 체크
+        studentRepository.findByEmailAndAcademyId(request.getEmail(), academyId)
+                .ifPresent(user -> {
+                    throw new AppException(ErrorCode.DUPLICATED_EMAIL);
+                });
 
 
         Student savedStudent = studentRepository.save(Student.toStudent(request, parent, academyId));
