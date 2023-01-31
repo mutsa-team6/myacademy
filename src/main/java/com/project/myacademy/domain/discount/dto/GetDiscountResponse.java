@@ -12,11 +12,13 @@ import lombok.NoArgsConstructor;
 @Builder
 public class GetDiscountResponse {
 
+    private Long discountId;
     private String discountName;
     private Integer discountRate;
 
     public static GetDiscountResponse of(Discount discount) {
         return GetDiscountResponse.builder()
+                .discountId(discount.getId())
                 .discountName(discount.getDiscountName())
                 .discountRate(discount.getDiscountRate())
                 .build();
