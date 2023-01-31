@@ -369,7 +369,7 @@ class EnrollmentServiceTest {
         }
 
         @Test
-        @DisplayName("수정 실패(2) - 등록 진행하는 직원이 해당 학원 소속이 아닐 때")
+        @DisplayName("수정 실패(2) - 수정 진행하는 직원이 해당 학원 소속이 아닐 때")
         public void updateEnrollment_fail2() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
@@ -386,7 +386,7 @@ class EnrollmentServiceTest {
         }
 
         @Test
-        @DisplayName("수정 실패(3) - 수강에 등록될 학생이 존재하지 않을 때")
+        @DisplayName("수정 실패(3) - 수강에 등록된 학생이 존재하지 않을 때")
         public void updateEnrollment_fail3() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
@@ -405,7 +405,7 @@ class EnrollmentServiceTest {
         }
 
         @Test
-        @DisplayName("수정 실패(4) - 수강에 등록될 강좌가 존재하지 않을 때")
+        @DisplayName("수정 실패(4) - 수강에 등록된 강좌가 존재하지 않을 때")
         public void updateEnrollment_fail4() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
@@ -449,7 +449,7 @@ class EnrollmentServiceTest {
         }
 
         @Test
-        @DisplayName("수정 실패(6) - 직원이 수강을 개설할 권한이 아닐 때")
+        @DisplayName("수정 실패(6) - 직원이 수강을 수정할 권한이 아닐 때")
         public void updateEnrollment_fail6() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
@@ -545,7 +545,7 @@ class EnrollmentServiceTest {
         }
 
         @Test
-        @DisplayName("삭제 실패(3) - 수강에 등록될 학생이 존재하지 않을 때")
+        @DisplayName("삭제 실패(3) - 수강에 등록된 학생이 존재하지 않을 때")
         public void deleteEnrollment_fail3() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
@@ -564,7 +564,7 @@ class EnrollmentServiceTest {
         }
 
         @Test
-        @DisplayName("삭제 실패(4) - 수강에 등록될 강좌가 존재하지 않을 때")
+        @DisplayName("삭제 실패(4) - 수강에 등록된 강좌가 존재하지 않을 때")
         public void deleteEnrollment_fail4() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
@@ -607,7 +607,7 @@ class EnrollmentServiceTest {
         }
 
         @Test
-        @DisplayName("삭제 실패(6) - 직원이 수강을 개설할 권한이 아닐 때")
+        @DisplayName("삭제 실패(6) - 직원이 수강을 삭제할 권한이 아닐 때")
         public void deleteEnrollment_fail6() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
