@@ -44,12 +44,11 @@ public class Payment extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private PayType payType;
+
     private Integer amount;
     private String paymentKey;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "discount_id")
-    private Discount discount;
+    private Long DiscountId;
 
     public void setPaymentKey(String paymentKey) {
         this.paymentKey = paymentKey;

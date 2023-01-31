@@ -18,6 +18,8 @@ public class CreatePaymentResponse {
     private String orderName; //주문 상품 이름
     private String studentEmail; //학생이메일
     private String studentName; //학생 이름
+    private Long discountId; //할인 정책 ID
+
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime createdAt; //결제 날짜
@@ -34,6 +36,7 @@ public class CreatePaymentResponse {
                 .studentName(payment.getStudent().getName())
                 .studentEmail(payment.getStudent().getEmail())
                 .createdAt(payment.getCreatedAt())
+                .discountId(payment.getDiscountId())
                 .build();
     }
 }
