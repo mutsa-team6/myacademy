@@ -2,6 +2,8 @@ package com.project.myacademy.domain.enrollment;
 
 import com.project.myacademy.domain.lecture.Lecture;
 import com.project.myacademy.domain.student.Student;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -18,4 +20,5 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
 
     Optional<Enrollment> findByStudentId(Long studentId);
 
+    Page<Enrollment> findAllByAcademyId(Long academyId, Pageable pageable);
 }
