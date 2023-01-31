@@ -1,9 +1,7 @@
 package com.project.myacademy.domain.academy;
 
 import com.project.myacademy.domain.academy.dto.*;
-import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.domain.employee.EmployeeRepository;
-import com.project.myacademy.domain.employee.EmployeeRole;
 import com.project.myacademy.global.exception.AppException;
 import com.project.myacademy.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -22,12 +20,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class AcademyService {
 
     private final AcademyRepository academyRepository;
-    private final EmployeeRepository employeeRepository;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
-
-    @Value("${jwt.token.secret}")
-    private String secretKey;
-    private long expiredTimeMs = 1000 * 60 * 60;
+//    private final EmployeeRepository employeeRepository;
+//    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+//
+//    @Value("${jwt.token.secret}")
+//    private String secretKey;
+//    private long expiredTimeMs = 1000 * 60 * 60;
 
     /**
      * 학원 등록

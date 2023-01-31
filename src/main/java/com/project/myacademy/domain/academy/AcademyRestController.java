@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 @Tag(name = "01. 학원", description = "학원 등록, 조회, 삭제")
 @RestController
 @RequestMapping("/api/v1/academies")
@@ -25,17 +26,17 @@ public class AcademyRestController {
 
         CreateAcademyResponse response = academyService.createAcademy(request);
 
-        return ResponseEntity.ok(Response.success(response));
+        return ResponseEntity.ok().body(Response.success(response));
     }
 
-        /**
+    /**
      * 학원 삭제
      *
      * @param academyId
      * @return ResponseEntity
      */
-        @Operation(summary = "학원 삭제", description = "학원을 soft-delete 합니다.")
-        @DeleteMapping("/{academyId}/delete")
+    @Operation(summary = "학원 삭제", description = "학원을 soft-delete 합니다.")
+    @DeleteMapping("/{academyId}/delete")
     public ResponseEntity delete(@PathVariable Long academyId) {
 
         Long deletedAcademyId = academyService.deleteAcademy(academyId);
