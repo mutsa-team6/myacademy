@@ -47,16 +47,16 @@ class StudentServiceTest {
         employeeSTAFF = Employee.builder().id(1L).name("직원").account("employeeSTAFF@gmail.com").employeeRole(EmployeeRole.ROLE_STAFF).build();
         employeeUSER = Employee.builder().id(2L).name("강사").account("employeeUSER@gmail.com").employeeRole(EmployeeRole.ROLE_USER).build();
         parent = Parent.builder().id(1L).name("부모").phoneNum("010-0000-0000").academyId(1L).build();
-        student = Student.builder().id(1L).name("학생").phoneNum("010-1111-1111").academyId(1L).parent(parent).build();
-        student2 = Student.builder().id(2L).name("학생2").phoneNum("010-1111-1112").academyId(1L).parent(parent).build();
-        student3 = Student.builder().id(3L).name("학생").phoneNum("010-1111-1113").academyId(1L).build(); // 동명이인
+        student = Student.builder().id(1L).name("학생").phoneNum("010-1111-1111").email("student@gmail.com").academyId(1L).parent(parent).build();
+        student2 = Student.builder().id(2L).name("학생2").phoneNum("010-1111-1112").email("student2@gmail.com").academyId(1L).parent(parent).build();
+        student3 = Student.builder().id(3L).name("학생").phoneNum("010-1111-1113").email("student3@gmail.com").academyId(1L).build(); // 동명이인
         pageable = PageRequest.of(0, 20, Sort.Direction.DESC, "id");
     }
 
     @Nested
     @DisplayName("학생 등록")
     class CreateStudent {
-        CreateStudentRequest request = CreateStudentRequest.builder().name("학생").phoneNum("010-1111-1111").parentPhoneNum("010-0000-0000").email("example@gmail.com").build();
+        CreateStudentRequest request = CreateStudentRequest.builder().name("학생").phoneNum("010-1111-1111").parentPhoneNum("010-0000-0000").email("student@gmail.com").build();
 
         @Test
         @DisplayName("학생 등록 성공")
@@ -65,6 +65,7 @@ class StudentServiceTest {
             given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeSTAFF));
             given(parentRepository.findByPhoneNumAndAcademyId(any(), any())).willReturn(Optional.of(parent));
             given(studentRepository.findByPhoneNumAndAcademyId(any(), any())).willReturn(Optional.empty());
+            given(studentRepository.findByEmailAndAcademyId(any(), any())).willReturn(Optional.empty());
 
             Student savedStudent = Student.toStudent(request, parent, academy.getId());
             given(studentRepository.save(any())).willReturn(savedStudent);
@@ -112,7 +113,7 @@ class StudentServiceTest {
         }
 
         @Test
-        @DisplayName("학생 등록 실패4 - 학생 정보 중복")
+        @DisplayName("학생 등록 실패4 - 학생 핸드폰번호 중복")
         void create_student_fail4() {
             given(academyRepository.findById(any())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeSTAFF));
@@ -122,12 +123,28 @@ class StudentServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> studentService.createStudent(academy.getId(), request, employeeSTAFF.getAccount()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.DUPLICATED_STUDENT));
+            assertThat(appException.getErrorCode().equals(ErrorCode.DUPLICATED_PHONENUM));
         }
 
         @Test
-        @DisplayName("학생 등록 실패5 - 직원 권한이 USER 일 때")
+        @DisplayName("학생 등록 실패5 - 학생 이메일 중복")
         void create_student_fail5() {
+            given(academyRepository.findById(any())).willReturn(Optional.of(academy));
+            given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeSTAFF));
+            given(parentRepository.findByPhoneNumAndAcademyId(any(), any())).willReturn(Optional.of(parent));
+            given(studentRepository.findByPhoneNumAndAcademyId(any(), any())).willReturn(Optional.empty());
+            given(studentRepository.findByPhoneNumAndAcademyId(any(), any())).willReturn(Optional.of(student));
+
+
+            AppException appException = assertThrows(AppException.class,
+                    () -> studentService.createStudent(academy.getId(), request, employeeSTAFF.getAccount()));
+
+            assertThat(appException.getErrorCode().equals(ErrorCode.DUPLICATED_EMAIL));
+        }
+
+        @Test
+        @DisplayName("학생 등록 실패6 - 직원 권한이 USER 일 때")
+        void create_student_fail6() {
             given(academyRepository.findById(any())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeUSER));
 
