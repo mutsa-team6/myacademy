@@ -232,8 +232,8 @@
         createOrder: function (studentId, enrollmentId, orderName, lectureId, tossKey) {
             let amount = document.getElementById('discount' + enrollmentId).value;
             let discountId = document.getElementById('discountInfo' + enrollmentId).value;
-            console.log(amount);
-            console.log(discountId);
+            console.log('할인된 가격 : ' + amount);
+            console.log('전달한 discountId : ' + discountId);
 
             if(amount ==""){
                 alert("할인 정책을 선택해주세요.")
