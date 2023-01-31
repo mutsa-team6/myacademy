@@ -48,8 +48,10 @@ public class Enrollment extends BaseEntity {
 
     private Long discountId;
 
+    private Long academyId;
+
     // 수강 생성 메서드
-    public static Enrollment createEnrollment(Student student, Lecture lecture, Employee employee) {
+    public static Enrollment createEnrollment(Student student, Lecture lecture, Employee employee,Long academyId) {
         StringBuilder sb = new StringBuilder();
         return Enrollment.builder()
                 .student(student)
@@ -59,6 +61,7 @@ public class Enrollment extends BaseEntity {
                 .registerEmployee(sb.append(employee.getId()).append(" (").append(employee.getName()).append(")").toString())
                 .modifiedEmployee(sb.toString())
                 .discountId(0L)
+                .academyId(academyId)
                 .build();
     }
 
