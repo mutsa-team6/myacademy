@@ -60,4 +60,7 @@ payment:
   toss:
     testSecretApiKey: ${TEST_SECRET_API_KEY}
     testClientApiKey: ${TEST_CLIENT_API_KEY}
+    originUrl: ${ORIGIN_URL}
+    successCallbackUrl: ${SUCCESS_CALLBACK_URL}
+    failCallbackUrl: ${FAIL_CALLBACK_URL}
 

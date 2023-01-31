@@ -48,6 +48,15 @@ public class PaymentService {
     @Value("${payment.toss.testSecretApiKey}")
     private String testSecretApiKey;
 
+    @Value("${payment.toss.originUrl}")
+    private String tossOriginUrl;
+
+    @Value("${payment.toss.successCallbackUrl}")
+    private String successCallbackUrl;
+
+    @Value("${payment.toss.failCallbackUrl}")
+    private String failCallbackUrl;
+
     /**
      * 결제할 상품 가격,지불 방법, 수업 이름 체크
      *
@@ -103,8 +112,8 @@ public class PaymentService {
         Payment savedPayment = paymentRepository.save(request.toEntity(foundEmployee, foundStudent, studentEnrollment));
 
         CreatePaymentResponse response = CreatePaymentResponse.of(savedPayment);
-        response.setSuccessUrl("http://localhost:8080/payment/success");
-        response.setFailUrl("http://localhost:8080/payment/fail");
+        response.setSuccessUrl(successCallbackUrl);
+        response.setFailUrl(failCallbackUrl);
 
         return response;
     }
@@ -172,7 +181,7 @@ public class PaymentService {
 
         //url로 요청
         return rest.postForEntity(
-                        "https://api.tosspayments.com/v1/payments/confirm",
+                        tossOriginUrl + "confirm",
                         new HttpEntity<>(param, headers),
                         ApprovePaymentResponse.class)
                 .getBody();
@@ -201,7 +210,7 @@ public class PaymentService {
     /**
      * 결제 취소
      *
-     * @param paymentKey 토스측 결제 키
+     * @param paymentKey   토스측 결제 키
      * @param cancelReason 결제 취소 사유
      * @return
      */
@@ -219,7 +228,7 @@ public class PaymentService {
         RestTemplate rest = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
 
-        URI uri = URI.create("https://api.tosspayments.com/v1/payments/" + paymentKey + "/cancel");
+        URI uri = URI.create(tossOriginUrl + paymentKey + "/cancel");
 
         testSecretApiKey = testSecretApiKey + ":";
         String encodedAuth = new String(Base64.getEncoder().encode(testSecretApiKey.getBytes(StandardCharsets.UTF_8)));
@@ -235,7 +244,7 @@ public class PaymentService {
         paymentRepository.delete(selcetedPayment);
 
         //cancelPayment 저장
-        CancelPayment saveCancelPayment = cancelPaymentRepository.save(CancelPayment.builder()
+        cancelPaymentRepository.save(CancelPayment.builder()
                 .orderId(selcetedPayment.getOrderId())
                 .paymentKey(paymentKey)
                 .cancelReason(cancelReason)
