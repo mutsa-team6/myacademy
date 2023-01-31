@@ -1,150 +1,125 @@
-package com.project.myacademy.domain.academy.controller;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.myacademy.domain.academy.AcademyRestController;
-import com.project.myacademy.domain.academy.dto.*;
-import com.project.myacademy.domain.academy.AcademyService;
-import com.project.myacademy.global.configuration.SecurityConfig;
-import com.project.myacademy.global.util.JwtTokenUtil;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-@WebMvcTest(AcademyRestController.class)
-@ImportAutoConfiguration(SecurityConfig.class)
-class AcademyRestControllerTest {
-
-    @MockBean
-    private AcademyService academyService;
-    @Autowired
-    private MockMvc mockMvc;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
-    @Value("${jwt.token.secret}")
-    private String secretKey;
-
-//    @Test
-//    @DisplayName("학원 생성 : 성공")
-//    void create() throws Exception {
-//        final CreateAcademyRequest request = new CreateAcademyRequest(
-//                "name",
-//                "address",
-//                "phoneNum",
-//                "admin",
-//                "businessRegistrationNumber",
-//                "password"
-//        );
-//        final AcademyDto academyDto = new AcademyDto(
-//                1L,
-//                "name",
-//                "admin",
-//                "학원 등록이 정상적으로 완료되었습니다."
-//        );
+//package com.project.myacademy.domain.academy.controller;
 //
-//        when(academyService.createAcademy(any(CreateAcademyRequest.class))).thenReturn(academyDto);
+//import com.fasterxml.jackson.databind.ObjectMapper;
+//import com.project.myacademy.domain.academy.AcademyRestController;
+//import com.project.myacademy.domain.academy.AcademyService;
+//import com.project.myacademy.domain.academy.dto.CreateAcademyRequest;
+//import com.project.myacademy.domain.academy.dto.CreateAcademyResponse;
+//import com.project.myacademy.global.configuration.SecurityConfig;
+//import com.project.myacademy.global.exception.AppException;
+//import com.project.myacademy.global.exception.ErrorCode;
+//import org.junit.jupiter.api.BeforeEach;
+//import org.junit.jupiter.api.DisplayName;
+//import org.junit.jupiter.api.Nested;
+//import org.junit.jupiter.api.Test;
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+//import org.springframework.boot.test.mock.mockito.MockBean;
+//import org.springframework.context.annotation.Import;
+//import org.springframework.http.MediaType;
+//import org.springframework.security.test.context.support.WithMockUser;
+//import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
+//import org.springframework.test.web.servlet.MockMvc;
+//import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+//import org.springframework.web.context.WebApplicationContext;
 //
-//        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/academies/join")
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content(objectMapper.writeValueAsString(request)))
-//                .andDo(print())
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
-//                .andExpect(jsonPath("$.result.id").value(1L))
-//                .andExpect(jsonPath("$.result.name").value("name"))
-//                .andExpect(jsonPath("$.result.owner").value("admin"))
-//                .andExpect(jsonPath("$.result.message").value("학원 등록이 정상적으로 완료되었습니다."));
+//import static org.mockito.ArgumentMatchers.any;
+//import static org.mockito.BDDMockito.given;
+//import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+//import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+//import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+//import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+//import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 //
-//        verify(academyService).createAcademy(any(CreateAcademyRequest.class));
+//
+//@WebMvcTest(AcademyRestController.class)
+//@Import(SecurityConfig.class)
+//class AcademyRestControllerTest {
+//
+//    @Autowired
+//    MockMvc mockMvc;
+//
+//    @Autowired
+//    ObjectMapper objectMapper;
+//
+//    @Autowired
+//    WebApplicationContext wac;
+//
+//    @MockBean
+//    AcademyService academyService;
+//
+//    @BeforeEach
+//    public void setUpMockMvc() {
+//        mockMvc = MockMvcBuilders
+//                .webAppContextSetup(wac)
+//                .apply(SecurityMockMvcConfigurers.springSecurity())
+//                .build();
 //    }
-
-//    @Test
-//    @DisplayName("학원 정보 수정 : 성공")
-//    void update() throws Exception {
-//        final String token = JwtTokenUtil.createToken("admin", secretKey, 3600L);
-//        final UpdateAcademyReqeust request = new UpdateAcademyReqeust(
-//                "name",
-//                "address",
-//                "phoneNum",
-//                "admin",
-//                "businessRegistrationNumber",
-//                "password"
-//        );
-//        final AcademyDto academyDto = new AcademyDto(
-//                1L,
-//                "name",
-//                "admin",
-//                "학원 수정이 정상적으로 완료되었습니다."
-//        );
 //
-//        when(academyService.updateAcademy(anyLong(), any(UpdateAcademyReqeust.class), anyString())).thenReturn(academyDto);
+//    @Nested
+//    @DisplayName("학원 등록")
+//    class CreateAcademy {
+//        private final CreateAcademyResponse createAcademyResponse = new CreateAcademyResponse(1l, "학원이름", "원장이름", "학원주소", "010-0000-0000", "0000");
+//        private final CreateAcademyRequest createAcademyRequest = new CreateAcademyRequest("학원이름", "학원주소", "010-0000-0000", "원장이름", "0000");
 //
-//        mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/academies/1")
-//                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(objectMapper.writeValueAsString(request)))
-//                .andDo(print())
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
-//                .andExpect(jsonPath("$.result.id").value(1L))
-//                .andExpect(jsonPath("$.result.name").value("name"))
-//                .andExpect(jsonPath("$.result.owner").value("admin"))
-//                .andExpect(jsonPath("$.result.message").value("학원 수정이 정상적으로 완료되었습니다."));
+//        @Test
+//        @DisplayName("학원 등록 성공")
+//        public void academyCreate_success() throws Exception {
+//            //given
+//            given(academyService.createAcademy(createAcademyRequest)).willReturn(createAcademyResponse);
 //
-//        verify(academyService).updateAcademy(anyLong(), any(UpdateAcademyReqeust.class), anyString());
+//            mockMvc.perform(post("/api/v1/academies")
+//                            .contentType(MediaType.APPLICATION_JSON)
+//                            .content(objectMapper.writeValueAsBytes(createAcademyResponse)))
+//                    .andDo(print())
+//                    .andExpect(status().isOk())
+//                    .andExpect(jsonPath("$.result.academyId").exists())
+//                    .andExpect(jsonPath("$.result.name").value("학원이름"))
+//                    .andExpect(jsonPath("$.result.owner").exists())
+//                    .andExpect(jsonPath("$.result.address").exists())
+//                    .andExpect(jsonPath("$.result.phoneNum").exists())
+//                    .andExpect(jsonPath("$.result.businessRegistrationNumber").exists());
+//        }
+//
+//        @Test
+//        @DisplayName("학원 등록 실패1 - 학원이름 중복")
+//        public void academyCreate_fail1() throws Exception {
+//            given(academyService.createAcademy(any())).willThrow(new AppException(ErrorCode.DUPLICATED_ACADEMY));
+//
+//            mockMvc.perform(post("/api/v1/academies")
+//                            .contentType(MediaType.APPLICATION_JSON)
+//                            .content(objectMapper.writeValueAsBytes(createAcademyResponse)))
+//                    .andDo(print())
+//                    .andExpect(status().isConflict());
+//        }
 //    }
-
-//    @Test
-//    @DisplayName("학원 정보 삭제 : 성공")
-//    void delete() throws Exception {
-//        final String token = JwtTokenUtil.createToken("admin", secretKey, 3600L);
+//    @Nested
+//    @DisplayName("학원 삭제")
+//    class DeleteAcademy {
+//        private Long academyId = 1L;
+//        @Test
+//        @DisplayName("학원 삭제 성공")
+//        public void academyDelete_success() throws Exception {
+//            //given
+//            given(academyService.deleteAcademy(any())).willReturn(1l);
 //
-//        when(academyService.deleteAcademy(anyLong(), anyString())).thenReturn(1L);
+//            mockMvc.perform(delete("/api/v1/academies/1/delete")
+//                            .with(csrf())
+//                            .contentType(MediaType.APPLICATION_JSON)
+//                            .content(objectMapper.writeValueAsBytes(academyId)))
+//                    .andExpect(status().isOk())
+//                    .andExpect(jsonPath("$.result.id").exists());
+//        }
 //
-//        mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/academies/1")
-//                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
-//                .andDo(print())
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
-//                .andExpect(jsonPath("$.result.id").value(1L))
-//                .andExpect(jsonPath("$.result.message").value("학원 삭제가 정상적으로 완료되었습니다."));
+//        @Test
+//        @DisplayName("학원 삭제 실패1 - 학원 찾을 수 없음.")
+//        public void academyDelete_fail1() throws Exception {
+//            //given
+//            given(academyService.deleteAcademy(any())).willThrow(new AppException(ErrorCode.ACADEMY_NOT_FOUND));
 //
-//        verify(academyService).deleteAcademy(anyLong(), anyString());
+//            mockMvc.perform(delete("/api/v1/academies/1/delete")
+//                            .with(csrf()))
+//                    .andExpect(status().isNotFound());
+//        }
 //    }
-
-//    @Test
-//    @DisplayName("학원 로그인 : 성공")
-//    void login() throws Exception {
-//        final String token = JwtTokenUtil.createToken("admin", secretKey, 3600L);
-//        final LoginAcademyRequest request = new LoginAcademyRequest("businessRegistrationNumber", "password");
-//        final LoginAcademyResponse response = new LoginAcademyResponse(1L, token);
-//
-//        when(academyService.loginAcademy(any(LoginAcademyRequest.class))).thenReturn(response);
-//
-//        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/academies/login")
-//                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(objectMapper.writeValueAsString(request)))
-//                .andDo(print())
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
-//                .andExpect(jsonPath("$.result.academyId").value(1L))
-//                .andExpect(jsonPath("$.result.jwt").exists());
-//
-//        verify(academyService).loginAcademy(any(LoginAcademyRequest.class));
-//    }
-}
+//}

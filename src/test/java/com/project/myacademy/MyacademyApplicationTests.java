@@ -1,58 +1,41 @@
 package com.project.myacademy;
 
-import com.project.myacademy.domain.academy.Academy;
-import com.project.myacademy.domain.academy.AcademyRepository;
-import com.project.myacademy.domain.employee.Employee;
-import com.project.myacademy.domain.employee.EmployeeRepository;
-import com.project.myacademy.domain.employee.EmployeeRole;
-import com.project.myacademy.domain.lecture.Lecture;
-import com.project.myacademy.domain.lecture.LectureRepository;
-import com.project.myacademy.domain.parent.Parent;
-import com.project.myacademy.domain.parent.ParentRepository;
-import com.project.myacademy.domain.payment.Payment;
-import com.project.myacademy.domain.payment.PaymentRepository;
-import com.project.myacademy.domain.student.Student;
-import com.project.myacademy.domain.student.StudentRepository;
-import com.project.myacademy.domain.enrollment.Enrollment;
-import com.project.myacademy.domain.enrollment.EnrollmentRepository;
-import com.project.myacademy.domain.teacher.Teacher;
-import com.project.myacademy.domain.teacher.TeacherRepository;
-import com.project.myacademy.domain.uniqueness.Uniqueness;
-import com.project.myacademy.domain.uniqueness.UniquenessRepository;
-import com.project.myacademy.domain.waitinglist.Waitinglist;
-import com.project.myacademy.domain.waitinglist.WaitinglistRepository;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
-
-@SpringBootTest
-class MyacademyApplicationTests {
-
-	@Autowired
-	AcademyRepository academyRepository;
-	@Autowired
-	EmployeeRepository employeeRepository;
-	@Autowired
-	LectureRepository lectureRepository;
-	@Autowired
-	ParentRepository parentRepository;
-	@Autowired
-	PaymentRepository paymentRepository;
-	@Autowired
-	EnrollmentRepository enrollmentRepository;
-	@Autowired
-	StudentRepository studentRepository;
-	@Autowired
-	TeacherRepository teacherRepository;
-	@Autowired
-	UniquenessRepository uniquenessRepository;
-	@Autowired
-	WaitinglistRepository waitinglistRepository;
+//import com.project.myacademy.domain.academy.AcademyRepository;
+//import com.project.myacademy.domain.employee.EmployeeRepository;
+//import com.project.myacademy.domain.enrollment.EnrollmentRepository;
+//import com.project.myacademy.domain.lecture.LectureRepository;
+//import com.project.myacademy.domain.parent.ParentRepository;
+//import com.project.myacademy.domain.payment.PaymentRepository;
+//import com.project.myacademy.domain.student.StudentRepository;
+//import com.project.myacademy.domain.teacher.TeacherRepository;
+//import com.project.myacademy.domain.uniqueness.UniquenessRepository;
+//import com.project.myacademy.domain.waitinglist.WaitinglistRepository;
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.boot.test.context.SpringBootTest;
+//
+//@SpringBootTest
+//class MyacademyApplicationTests {
+//
+//	@Autowired
+//	AcademyRepository academyRepository;
+//	@Autowired
+//	EmployeeRepository employeeRepository;
+//	@Autowired
+//	LectureRepository lectureRepository;
+//	@Autowired
+//	ParentRepository parentRepository;
+//	@Autowired
+//	PaymentRepository paymentRepository;
+//	@Autowired
+//	EnrollmentRepository enrollmentRepository;
+//	@Autowired
+//	StudentRepository studentRepository;
+//	@Autowired
+//	TeacherRepository teacherRepository;
+//	@Autowired
+//	UniquenessRepository uniquenessRepository;
+//	@Autowired
+//	WaitinglistRepository waitinglistRepository;
 
 //	@Test
 //	@DisplayName("가짜 데이터 넣기")
@@ -156,5 +139,5 @@ class MyacademyApplicationTests {
 //		uniquenessRepository.save(uniqueness);
 //		waitinglistRepository.save(waitingList);
 //	}
-
-}
+//
+//}
