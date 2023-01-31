@@ -15,6 +15,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -77,7 +80,7 @@ public class LectureService {
                     throw new AppException(ErrorCode.DUPLICATED_LECTURE);
                 }));
 
-        Lecture savedLecture = lectureRepository.save(Lecture.addLecture(employee, teacher, request));
+        Lecture savedLecture = lectureRepository.save(Lecture.addLecture(employee, teacher, request, academyId));
         return CreateLectureResponse.of(savedLecture);
     }
 
@@ -147,7 +150,7 @@ public class LectureService {
         Employee foundTeacher = validateAcademyEmployeeId(teacherId, academy);
 
         // 해당 강사의 모든 강의를 가져온다.
-        Page<Lecture> foundLectures = lectureRepository.findByEmployee(foundTeacher, pageable);
+        Page<Lecture> foundLectures = lectureRepository.findByEmployeeAndFinishDateGreaterThanOrderByStartDate(foundTeacher, LocalDate.now(), pageable);
 
         return foundLectures.map(ReadAllLectureResponse::of);
     }
@@ -180,4 +183,21 @@ public class LectureService {
                 .orElseThrow(() -> new AppException(ErrorCode.LECTURE_NOT_FOUND));
         return validatedLecture;
     }
+
+    @Transactional(readOnly = true)
+    public Page<ReadAllLectureResponse> readAllLecturesForEnrollment(Long academyId, String account, Pageable pageable) {
+
+        // 조회될 학원 존재 유무 확인
+        Academy academy = validateAcademy(academyId);
+
+        // 조회 작업을 진행하는 직원이 해당 학원 소속 직원인지 확인
+        validateAcademyEmployee(account, academy);
+
+
+        // 강의가 종료되지 않은 모든 강의를 최신순으로 가져온다.
+        Page<Lecture> foundLectures = lectureRepository.findByAcademyIdAndFinishDateGreaterThanOrderByCreatedAtDesc(academyId, LocalDate.now(), pageable);
+
+        return foundLectures.map(ReadAllLectureResponse::of);
+    }
+
 }

@@ -36,15 +36,15 @@
 
     <div class="container">
         <div class="row">
-            <div class="col-7">
+            <div class="col-10">
                 <div class="row">
                     <div class="row">
                         <div class="card my-4">
 
-                            <div class="col-9">
+                            <div class="col-4">
                                 <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
                                     <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
-                                        <h6 class="text-white text-capitalize ps-3">선택한 강사 정보입니다.</h6>
+                                        <h6 class="text-white text-capitalize ps-3">선택한 학생 정보입니다.</h6>
                                     </div>
                                 </div>
                             </div>
@@ -56,20 +56,24 @@
                                         <thead>
                                         <tr>
                                             <th class="text-center text-uppercase  font-weight-bolder"
-                                                style="color: #5A2082;font-size: small">
-                                                강사 사진
+                                                style="color: #5A2082">
+                                                학생 이름
+                                            </th>
+                                            <th class="text-center text-uppercase font-weight-bolder "
+                                                style="color: #5A2082">
+                                                학생 학교
+                                            </th>
+                                            <th class="text-center text-uppercase  font-weight-bolder "
+                                                style="color: #5A2082">
+                                                학생 생년월일
                                             </th>
                                             <th class="text-center text-uppercase  font-weight-bolder"
-                                                style="color: #5A2082;font-size: small">
-                                                강사 이름
+                                                style="color: #5A2082">
+                                                학생 전화번호
                                             </th>
-                                            <th class="text-center text-uppercase  font-weight-bolder "
-                                                style="color: #5A2082;font-size: small">
-                                                담당 과목
-                                            </th>
-                                            <th class="text-center text-uppercase  font-weight-bolder "
-                                                style="color: #5A2082;font-size: small">
-                                                전화번호
+                                            <th class="text-center text-uppercase font-weight-bolder"
+                                                style="color: #5A2082">
+                                                학생 이메일
                                             </th>
 
                                             <th class="text-secondary opacity-7"></th>
@@ -78,30 +82,31 @@
                                         <tbody>
                                         <div>
 
-                                            <th:block th:if="${teacher !=null}">
+                                            <th:block th:if="${student !=null}">
 
                                                 <th class="align-middle text-center">
-                                                    <div class="flex">
-                                                        <img src="/assets/img/team-2.jpg"
-                                                             class="avatar avatar-xl me-3 border-radius-lg" alt="user1">
-                                                    </div>
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${student.name}"></span>
                                                 </th>
+                                                <td class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${student.school}"></span>
+                                                </td>
+                                                <td class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${student.birth}"></span>
+                                                </td>
 
-                                                <th class="align-middle text-center">
-                                                <span class=" text font-weight-bold" style="font-size: small"
-                                                      th:text="${teacher.name}"></span>
-                                                </th>
-                                                <th class="align-middle text-center">
-                                                <span class=" text font-weight-bold" style="font-size: small"
-                                                      th:text="${teacher.subject}"></span>
-                                                </th>
-                                                <th class="align-middle text-center">
-                                                <span class=" text font-weight-bold" style="font-size: small"
-                                                      th:text="${teacher.phoneNum}"></span>
-                                                </th>
-                                                <input type="text" class="form-control" name="teacherId"
-                                                       placeholder="강좌 이름" th:value="${teacher.id}" hidden>
-
+                                                <td class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${student.phoneNum}"></span>
+                                                </td>
+                                                <td class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${student.email}"></span>
+                                                </td>
+                                                <input type="text" class="form-control" name="studentId"
+                                                       placeholder="강좌 이름" th:value="${student.id}" hidden>
                                             </th:block>
                                         </div>
                                         </tbody>
@@ -112,15 +117,19 @@
                         </div>
                     </div>
                 </div>
-                <br>
+                <div class="col-2" style="margin: auto">
+                    <div class="card card-plain text-center">
+                        <i class='fas fa-arrow-circle-down' style='font-size:48px;color:#5A2060'></i>
+                    </div>
+                </div>
                 <br>
                 <div class="row">
                     <div class="card my-4">
 
-                        <div class="col-8">
+                        <div class="col-4">
                             <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
                                 <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
-                                    <h6 class="text-white text-capitalize ps-3"> 해당 강사가 맡은 강의 정보입니다.</h6>
+                                    <h6 class="text-white text-capitalize ps-3"> 수강 신청할 강의를 선택하세요.</h6>
                                 </div>
                             </div>
                         </div>
@@ -137,10 +146,6 @@
                                         </th>
                                         <th class="text-center text-uppercase  font-weight-bolder"
                                             style="color: #5A2082;font-size: small">
-                                            강사 이름
-                                        </th>
-                                        <th class="text-center text-uppercase  font-weight-bolder"
-                                            style="color: #5A2082;font-size: small">
                                             강의 시간
                                         </th>
                                         <th class="text-center text-uppercase  font-weight-bolder "
@@ -153,7 +158,15 @@
                                         </th>
                                         <th class="text-center text-uppercase  font-weight-bolder "
                                             style="color: #5A2082;font-size: small">
-                                            현재 수강 인원
+                                            현재 수강 인원 현황
+                                        </th>
+                                        <th class="text-center text-uppercase  font-weight-bolder "
+                                            style="color: #5A2082;font-size: small">
+                                            최대 수강 인원
+                                        </th>
+                                        <th class="text-center text-uppercase  font-weight-bolder "
+                                            style="color: #5A2082;font-size: small">
+                                            현재 대기 인원
                                         </th>
 
                                         <th class="text-secondary opacity-7"></th>
@@ -167,10 +180,6 @@
                                             <th class="align-middle text-center">
                                                 <span class=" text font-weight-bold" style="font-size: small"
                                                       th:text="${lecture.lectureName}"></span>
-                                            </th>
-                                            <th class="align-middle text-center">
-                                                <span class=" text font-weight-bold" style="font-size: small"
-                                                      th:text="${lecture.teacherName}"></span>
                                             </th>
 
                                             <th class="align-middle text-center">
@@ -189,7 +198,33 @@
                                                 <span class=" text font-weight-bold" style="font-size: small"
                                                       th:text="${lecture.currentEnrollmentNumber}"></span>
                                             </th>
-
+                                            <th class="align-middle text-center">
+                                                <span class=" text font-weight-bold" style="font-size: small"
+                                                      th:text="${lecture.maximumCapacity}"></span>
+                                            </th>
+                                            <th class="align-middle text-center">
+                                                <span class=" text font-weight-bold" style="font-size: small"
+                                                      th:text="${lecture.waitingNum}"></span>
+                                            </th>
+                                            <th:block th:if="${lecture.currentEnrollmentNumber <lecture.maximumCapacity}">
+                                            <th class="align-middle text-center">
+                                                <button th:data-parameter1="${academyId}" th:data-parameter2="${student.id}"  th:data-parameter3="${lecture.lectureId}"
+                                                        th:onclick="|register.registerEnrollment(this.getAttribute('data-parameter1'),this.getAttribute('data-parameter2'),this.getAttribute('data-parameter3'))|"
+                                                        type="button"
+                                                        class="btn btn-lg bg-gradient-primary btn-lg w-100  mb-0">수강 신청
+                                                </button>
+                                            </th>
+                                            </th:block>
+                                            <th:block th:if="${lecture.currentEnrollmentNumber >= lecture.maximumCapacity}">
+                                                <th class="align-middle text-center">
+                                                    <button
+                                                            th:onclick="|register.registerLecture()|"
+                                                            type="button"
+                                                            class="btn btn-lg bg-gradient-secondary btn-lg w-100  mb-0">강좌
+                                                        대기
+                                                    </button>
+                                                </th>
+                                            </th:block>
                                         </tr>
                                     </div>
                                     </tbody>
@@ -199,66 +234,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-1">
-            </div>
-            <div class="col-3 ">
-
-                <div class="card card-plain">
-                    <h4 class="font-weight-bolder"> 강좌 등록</h4>
-                    <p class="mb-0">등록할 강좌 정보를 입력해주세요.</p>
-                </div>
-                <br>
-
-                <div class="card-body">
-                    <div class="input-group input-group-outline mb-3">
-                        <label class="form-label">강좌 이름</label>
-                        <input type="text" class="form-control" id="input-lectureName">
-                    </div>
-                    <div class="input-group input-group-outline mb-3">
-                        <label class="form-label">강좌 가격</label>
-                        <input type="text" class="form-control" id="input-lecturePrice">
-                    </div>
-                    <div class="input-group input-group-static my-3">
-                        <label>강좌 요일 (ex. 월, 수)</label>
-                        <input type="text" class="form-control" id="input-lectureDay">
-                    </div>
-                    <div class="input-group input-group-static my-3">
-                        <label>강좌 시작 시간</label>
-                        <input type="time" class="form-control" id="input-lectureStartTime">
-                    </div>
-                    <div class="input-group input-group-static my-3">
-                        <label>강좌 종료 시간</label>
-                        <input type="time" class="form-control" id="input-lectureEndTime">
-                    </div>
-                    <div class="input-group input-group-static my-3">
-                        <label>강좌 시작일 </label>
-                        <input type="date" class="form-control" id="input-lectureStartDate">
-                    </div>
-                    <div class="input-group input-group-static my-3">
-                        <label>강좌 종료일</label>
-                        <input type="date" class="form-control" id="input-lectureEndDate">
-                    </div>
-                    <div class="input-group input-group-outline mb-3">
-                        <label class="form-label">최소 수강정원</label>
-                        <input type="text" class="form-control" id="input-minimumCapacity">
-                    </div>
-                    <div class="input-group input-group-outline mb-3">
-                        <label class="form-label">최대 수강정원</label>
-                        <input type="email" class="form-control" id="input-maximumCapacity">
-                    </div>
-                    <!--                    <button th:data-parameter1="${academyId}"  th:data-parameter2="${employeeId}"-->
-                    <!--                            th:onclick="|register.registerLecture(this.getAttribute('data-parameter1'),this.getAttribute('data-parameter2'))|" type="button"-->
-                    <div class="text-center">
-                        <button
-                                th:onclick="|register.registerLecture(${academyId},${teacherEmployeeId})|" type="button"
-                                class="btn btn-lg bg-gradient-primary btn-lg w-100 mt-4 mb-0">강좌 등록
-                        </button>
-                    </div>
-                </div>
-                <br>
-            </div>
-            <div class="col-1">
             </div>
         </div>
     </div>
@@ -281,7 +256,7 @@
         },
 
 
-        registerLecture: function (academyId, teacherEmployeeId) {
+        registerEnrollment: function (academyId, studentId, lectureId) {
 
             let data = {
                 lectureName: document.querySelector('#input-lectureName').value.trim(),

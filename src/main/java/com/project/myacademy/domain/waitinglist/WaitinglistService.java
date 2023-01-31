@@ -71,6 +71,16 @@ public class WaitinglistService {
         return CreateWaitinglistResponse.of(savedWaitinglist.getId());
     }
 
+    public Long countWaitingListByLecture(Long academyId, Long lectureId,String requestAccount) {
+        Academy academy = validateAcademy(academyId);
+
+        Employee employee = validateAcademyEmployee(requestAccount, academy);
+
+        Lecture lecture = validateLecture(lectureId);
+
+        return waitinglistRepository.countWaitinglistByLecture(lecture);
+    }
+
     private Academy validateAcademy(Long academyId) {
         // 학원 존재 유무 확인
         Academy validatedAcademy = academyRepository.findById(academyId)
