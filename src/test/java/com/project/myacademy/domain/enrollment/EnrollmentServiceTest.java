@@ -90,12 +90,13 @@ class EnrollmentServiceTest {
     @DisplayName("조회")
     class EnrollmentRead{
 
+        PageRequest pageable = PageRequest.of(0, 20, Sort.Direction.DESC,"createdAt");
+
         @Test
         @DisplayName("수강 리스트 조회 성공")
         public void readAllEnrollments_success() {
 
             PageImpl<Enrollment> enrollmentList = new PageImpl<>(List.of(enrollment, enrollment2));
-            PageRequest pageable = PageRequest.of(0, 20, Sort.Direction.DESC,"createdAt");
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(employee));
@@ -106,14 +107,14 @@ class EnrollmentServiceTest {
             assertThat(responseEnrollments.getTotalPages()).isEqualTo(1);
             assertThat(responseEnrollments.getTotalElements()).isEqualTo(2);
 
+            then(academyRepository).should(times(1)).findById(anyLong());
+            then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
             then(enrollmentRepository).should(times(1)).findAll(pageable);
         }
 
         @Test
         @DisplayName("수강 리스트 조회 실패(1) - 학원이 존재하지 않을 때")
         public void readAllEnrollments_fail1() {
-
-            PageRequest pageable = PageRequest.of(0, 20, Sort.Direction.DESC,"createdAt");
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.empty());
 
@@ -129,8 +130,6 @@ class EnrollmentServiceTest {
         @Test
         @DisplayName("수강 리스트 조회 실패(2) - 조회 진행하는 직원이 해당 학원 소속이 아닐 때")
         public void readAllEnrollments_fail2() {
-
-            PageRequest pageable = PageRequest.of(0, 20, Sort.Direction.DESC,"createdAt");
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.empty());
