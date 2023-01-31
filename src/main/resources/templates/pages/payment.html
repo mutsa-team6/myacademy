@@ -36,12 +36,14 @@
 
     <div class="container-fluid py-4">
         <div class="row mb-4">
+            <div class="col-lg-1 col-md-6 mb-md-0 mb-4">
+            </div>
             <div class="col-lg-10 col-md-6 mb-md-0 mb-4">
                 <div class="card">
                     <div class="card-header pb-0">
                         <div class="row">
                             <div class="col-lg-9 col-7">
-                                <h4>결제</h4>
+                                <h3 style="font-family: 'Black Han Sans', sans-serif; font-size: 3.5rem; font-weight: lighter;color: #5A2082">결제</h3>
                                 <p class="mb-0" style="font-weight: bold;color: #5A2060">결제를 진행할 수강신청 내역을 선택해주세요.</p>
 
                             </div>
@@ -66,7 +68,11 @@
                             </div>
                         </div>
                     </div>
-                    <div class="card-body px-0 pb-2">
+                    <div>
+                        <hr style="color: #5A2082; height: 1.5px;background-color: #5A2082">
+                    </div>
+
+                    <div class="card-body pb-0 mb-4">
                         <div class="table-responsive">
                             <table class="table align-items-center mb-0">
                                 <thead>
@@ -131,7 +137,7 @@
                                                 <option value="0" selected>할인정책을 선택해주세요.</option>
                                                 <option value="0">할인정책을 선택 안함.</option>
                                                 <div th:each="discount : ${discounts}">
-                                                    <option th:value="${discount.discountRate}" class=" text-xs font-weight-bold mt-2"
+                                                    <option th:value="|${discount.discountId}(split)${discount.discountRate}|" class=" text-xs font-weight-bold mt-2"
                                                             th:text="|${discount.discountName} (${discount.discountRate} % 할인)|"
                                                            ></option>
                                                 </div>
@@ -154,6 +160,7 @@
                                                 <span class=" text-xs font-weight-bold"
                                                       th:text="${enrollment.createdAt}"></span>
                                     </td>
+                                    <input type="text" text="원" th:id="'discountInfo'+${enrollment.enrollmentId}" hidden>
                                     <td class="align-middle text-center">
 
                                         <button type="button" th:data-parameter1="${enrollment.studentId}"
@@ -204,19 +211,29 @@
             var _this = this;
         },
 
-        show : function(enrollmentId,price,rate){
-            console.log(enrollmentId);
-            console.log(price);
-            console.log(rate);
-            console.log('discount'+enrollmentId);
-            document.getElementById('discount'+enrollmentId).text=((100-rate)*price/100);
-            document.getElementById('discount'+enrollmentId).value=((100-rate)*price/100);
-
+        show : function(enrollmentId,price,discountInfo){
+            console.log('enrollmentId : ' + enrollmentId);
+            console.log('강의 가격 : ' + price);
+            console.log('할인정보 (할인 id+ 할인율) : ' + discountInfo);
+            var info = discountInfo.split('(split)')
+            if (info.length == 2) {
+                let rate = info[1];
+                console.log(rate);
+                console.log('discount' + enrollmentId);
+                document.getElementById('discount' + enrollmentId).text = ((100 - rate) * price / 100);
+                document.getElementById('discount' + enrollmentId).value = ((100 - rate) * price / 100);
+                document.getElementById('discountInfo' + enrollmentId).value = info[0];
+            } else {
+                document.getElementById('discount' + enrollmentId).value = price;
+                document.getElementById('discountInfo' + enrollmentId).value = 0;
+            }
         },
 
         createOrder: function (studentId, enrollmentId, orderName, lectureId, tossKey) {
             let amount = document.getElementById('discount' + enrollmentId).value;
+            let discountId = document.getElementById('discountInfo' + enrollmentId).value;
             console.log(amount);
+            console.log(discountId);
 
             if(amount ==""){
                 alert("할인 정책을 선택해주세요.")
@@ -226,7 +243,8 @@
                 payType: "CARD",
                 amount: amount,
                 orderName: orderName,
-                lectureId: lectureId
+                lectureId: lectureId,
+                discountId : discountId
             };
             console.log(data);
 

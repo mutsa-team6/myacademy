@@ -84,11 +84,11 @@ public class PaymentService {
         String payType = request.getPayType().getName();
         String orderName = request.getOrderName();
 
-        //가격 검증
-        log.info("💰 가격 {}", studentEnrollment.getLecture().getPrice());
-        if (!amount.equals(studentEnrollment.getLecture().getPrice())) {
-            throw new AppException(ErrorCode.PAYMENT_ERROR_ORDER_PRICE);
-        }
+//        //가격 검증
+//        log.info("💰 가격 {}", studentEnrollment.getLecture().getPrice());
+//        if (!amount.equals(studentEnrollment.getLecture().getPrice())) {
+//            throw new AppException(ErrorCode.PAYMENT_ERROR_ORDER_PRICE);
+//        }
 
         //결제 방법 검증
         if (!payType.equals("카드") && !payType.equals("CARD")) {
