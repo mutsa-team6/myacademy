@@ -2,6 +2,8 @@ package com.project.myacademy.domain.payment;
 
 import com.project.myacademy.domain.academy.Academy;
 import com.project.myacademy.domain.academy.AcademyRepository;
+import com.project.myacademy.domain.discount.Discount;
+import com.project.myacademy.domain.discount.DiscountRepository;
 import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.domain.employee.EmployeeRepository;
 import com.project.myacademy.domain.enrollment.Enrollment;
@@ -44,6 +46,7 @@ public class PaymentService {
     private final EmployeeRepository employeeRepository;
     private final LectureRepository lectureRepository;
     private final CancelPaymentRepository cancelPaymentRepository;
+    private final DiscountRepository discountRepository;
 
     @Value("${payment.toss.testSecretApiKey}")
     private String testSecretApiKey;
@@ -93,11 +96,6 @@ public class PaymentService {
         String payType = request.getPayType().getName();
         String orderName = request.getOrderName();
 
-        //가격 검증
-        log.info("💰 가격 {}", studentEnrollment.getLecture().getPrice());
-        if (!amount.equals(studentEnrollment.getLecture().getPrice())) {
-            throw new AppException(ErrorCode.PAYMENT_ERROR_ORDER_PRICE);
-        }
 
         //결제 방법 검증
         if (!payType.equals("카드") && !payType.equals("CARD")) {
@@ -109,6 +107,30 @@ public class PaymentService {
             throw new AppException(ErrorCode.PAYMENT_ERROR_ORDER_NAME);
         }
 
+        //가격 검증
+        if (request.getDiscountId() != 0) {
+            Discount foundDiscount = discountRepository.findById(request.getDiscountId())
+                    .orElseThrow(() -> new AppException(ErrorCode.DISCOUNT_NOT_FOUND));
+
+            Float discountRate = (100 - foundDiscount.getDiscountRate()) / 100f;
+            Integer discountAmount = Math.round(studentEnrollment.getLecture().getPrice() * discountRate);
+
+            log.info("💰 수업 정가 = {}", studentEnrollment.getLecture().getPrice());
+            log.info("💰 할인률 = {}", discountRate);
+            log.info("💰 할인된 수업 가격 = {}", discountAmount);
+            log.info("💰 요청 가격 = {}", amount);
+
+            if (!amount.equals(discountAmount)) {
+                throw new AppException(ErrorCode.PAYMENT_ERROR_ORDER_PRICE);
+            }
+
+        } else {
+            if (!amount.equals(studentEnrollment.getLecture().getPrice())) {
+                throw new AppException(ErrorCode.PAYMENT_ERROR_ORDER_PRICE);
+            }
+        }
+
+        //저장
         Payment savedPayment = paymentRepository.save(request.toEntity(foundEmployee, foundStudent, studentEnrollment));
 
         CreatePaymentResponse response = CreatePaymentResponse.of(savedPayment);
