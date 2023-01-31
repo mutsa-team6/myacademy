@@ -15,6 +15,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -44,10 +47,10 @@ public class LectureService {
     }
 
     /**
-     * @param academyId  직원의 소속 학원 id
-     * @param employeeId 강좌에 들어갈 강사의 id
-     * @param request    등록 요청 DTO
-     * @param account    직원 계정
+     * @param academyId     직원의 소속 학원 id
+     * @param employeeId    강좌에 들어갈 강사의 id
+     * @param request       등록 요청 DTO
+     * @param account       직원 계정
      */
     public CreateLectureResponse createLecture(Long academyId, Long employeeId, CreateLectureRequest request, String account) {
 
@@ -58,7 +61,7 @@ public class LectureService {
         Employee employee = validateAcademyEmployee(account, academy);
 
         // 직원이 강좌를 개설할 권한이 있는지 확인(강사만 불가능)
-        if (Employee.isTeacherAuthority(employee)) {
+        if(Employee.isTeacherAuthority(employee)) {
             throw new AppException(ErrorCode.INVALID_PERMISSION);
         }
 
@@ -77,15 +80,15 @@ public class LectureService {
                     throw new AppException(ErrorCode.DUPLICATED_LECTURE);
                 }));
 
-        Lecture savedLecture = lectureRepository.save(Lecture.addLecture(employee, teacher, request));
+        Lecture savedLecture = lectureRepository.save(Lecture.addLecture(employee, teacher, request, academyId));
         return CreateLectureResponse.of(savedLecture);
     }
 
     /**
-     * @param academyId 직원의 소속 학원 id
-     * @param lectureId 수정될 강좌 id
-     * @param request   수정 요청 DTO
-     * @param account   직원 계정
+     * @param academyId     직원의 소속 학원 id
+     * @param lectureId     수정될 강좌 id
+     * @param request       수정 요청 DTO
+     * @param account       직원 계정
      */
     public UpdateLectureResponse updateLecture(Long academyId, Long lectureId, UpdateLectureRequest request, String account) {
 
@@ -97,7 +100,7 @@ public class LectureService {
         Lecture lecture = validateLecture(lectureId);
 
         // 강좌를 수정할 수 있는 권한인지 확인(강사만 불가능)
-        if (Employee.isTeacherAuthority(employee)) {
+        if(Employee.isTeacherAuthority(employee)) {
             throw new AppException(ErrorCode.INVALID_PERMISSION);
         }
 
@@ -107,9 +110,9 @@ public class LectureService {
     }
 
     /**
-     * @param academyId 직원의 소속 학원 id
-     * @param lectureId 삭제 강좌 id
-     * @param account   직원 계정
+     * @param academyId     직원의 소속 학원 id
+     * @param lectureId     삭제 강좌 id
+     * @param account       직원 계정
      */
     public DeleteLectureResponse deleteLecture(Long academyId, Long lectureId, String account) {
 
@@ -121,7 +124,7 @@ public class LectureService {
         Lecture lecture = validateLecture(lectureId);
 
         // 강좌를 삭제할 수 있는 권한인지 확인(강사만 불가능)
-        if (Employee.isTeacherAuthority(employee)) {
+        if(Employee.isTeacherAuthority(employee)) {
             throw new AppException(ErrorCode.INVALID_PERMISSION);
         }
 
@@ -147,7 +150,7 @@ public class LectureService {
         Employee foundTeacher = validateAcademyEmployeeId(teacherId, academy);
 
         // 해당 강사의 모든 강의를 가져온다.
-        Page<Lecture> foundLectures = lectureRepository.findByEmployee(foundTeacher, pageable);
+        Page<Lecture> foundLectures = lectureRepository.findByEmployeeAndFinishDateGreaterThanOrderByStartDate(foundTeacher, LocalDate.now(), pageable);
 
         return foundLectures.map(ReadAllLectureResponse::of);
     }
@@ -180,4 +183,21 @@ public class LectureService {
                 .orElseThrow(() -> new AppException(ErrorCode.LECTURE_NOT_FOUND));
         return validatedLecture;
     }
+
+    @Transactional(readOnly = true)
+    public Page<ReadAllLectureResponse> readAllLecturesForEnrollment(Long academyId, String account, Pageable pageable) {
+
+        // 조회될 학원 존재 유무 확인
+        Academy academy = validateAcademy(academyId);
+
+        // 조회 작업을 진행하는 직원이 해당 학원 소속 직원인지 확인
+        validateAcademyEmployee(account, academy);
+
+
+        // 강의가 종료되지 않은 모든 강의를 최신순으로 가져온다.
+        Page<Lecture> foundLectures = lectureRepository.findByAcademyIdAndFinishDateGreaterThanOrderByCreatedAtDesc(academyId, LocalDate.now(), pageable);
+
+        return foundLectures.map(ReadAllLectureResponse::of);
+    }
+
 }
