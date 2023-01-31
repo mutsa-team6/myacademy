@@ -492,7 +492,7 @@ public class EmployeeService {
         Employee foundTeacher = validateEmployee(teacherId, foundAcademy);
 
         // 강사가 맞는지 한번더 체크
-        if (!foundTeacher.getEmployeeRole().equals(EmployeeRole.ROLE_USER)) {
+        if (foundTeacher.getEmployeeRole().equals(EmployeeRole.ROLE_STAFF)) {
             throw new AppException(ErrorCode.NOT_TEACHER);
         }
 

@@ -36,6 +36,7 @@ public class DiscountService {
 
     /**
      * 이미 할인정책은 등록되어 있고, 할인정책 적용 가능한지 확인
+     *
      * @param academyId
      * @param request
      * @param account
@@ -59,11 +60,11 @@ public class DiscountService {
         validateLecture(enrollment.getLecture().getId());
 
         // 적용 요청한 할인 정책 존재 유무 확인
-        Discount discount = discountRepository.findByDiscountName(request.getDiscountName())
+        Discount discount = discountRepository.findByDiscountNameAndAcademy(request.getDiscountName(), academy)
                 .orElseThrow(() -> new AppException(ErrorCode.DISCOUNT_NOT_FOUND));
 
         // 요청 DTO에 해당하는 수강 내역이 이미 결제된 수강 이력인지 확인
-        if(enrollment.getPaymentYN().equals(true)) {
+        if (enrollment.getPaymentYN().equals(true)) {
             throw new AppException(ErrorCode.ALREADY_PAYMENT);
         }
 
@@ -84,7 +85,7 @@ public class DiscountService {
         }
 
         // 할인 정책 중복 확인
-        discountRepository.findByDiscountName(request.getDiscountName())
+        discountRepository.findByDiscountNameAndAcademy(request.getDiscountName(), academy)
                 .ifPresent((discount -> {
                     throw new AppException(ErrorCode.DUPLICATED_DISCOUNT);
                 }));
@@ -99,7 +100,8 @@ public class DiscountService {
         Academy academy = validateAcademy(academyId);
         validateAcademyEmployee(account, academy);
 
-        Page<Discount> discounts = discountRepository.findAll(pageable);
+        //해당 학원에 존재하는 정책들 가져옴
+        Page<Discount> discounts = discountRepository.findAllByAcademy(academy, pageable);
 
         return discounts.map(GetDiscountResponse::of);
     }
@@ -164,7 +166,7 @@ public class DiscountService {
     private Lecture validateLecture(Long lectureId) {
         Lecture validatedLecture = lectureRepository.findById(lectureId)
                 .orElseThrow(() -> new AppException(ErrorCode.LECTURE_NOT_FOUND));
-        return  validatedLecture;
+        return validatedLecture;
     }
 
     private Enrollment validateEnrollment(Long enrollmentId) {

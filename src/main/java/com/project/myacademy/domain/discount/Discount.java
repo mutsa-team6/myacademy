@@ -26,13 +26,19 @@ public class Discount extends BaseEntity {
 
     private String discountName;
     private Integer discountRate;
-    private Long academyId;
+
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "academy_id")
+    private Academy academy;
+
+
 
     public static Discount makeDiscount(CreateDiscountRequest request, Academy academy) {
         return Discount.builder()
                 .discountName(request.getDiscountName())
                 .discountRate(request.getDiscountRate())
-                .academyId(academy.getId())
+                .academy(academy)
                 .build();
     }
 }
