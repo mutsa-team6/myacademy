@@ -1,0 +1,205 @@
+<!--
+=========================================================
+* Material Dashboard 2 - v3.0.4
+=========================================================
+
+* Product Page: https://www.creative-tim.com/product/material-dashboard
+* Copyright 2022 Creative Tim (https://www.creative-tim.com)
+* Licensed under MIT (https://www.creative-tim.com/license)
+* Coded by Creative Tim
+
+=========================================================
+
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+-->
+
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<!-- header -->
+<th:block th:replace="layout/header :: headerFragment"></th:block>
+
+
+<body class="g-sidenav-show  bg-gray-100">
+
+<!-- side bar -->
+<th:block th:replace="layout/aside :: asideFragment"></th:block>
+
+
+<main class="main-content border-radius-lg ">
+
+
+    <!-- Navbar -->
+    <th:block th:replace="layout/navbar :: navbarFragment"></th:block>
+
+
+    <div class="container">
+        <div class="row">
+            <div class="col-7">
+                <div class="row">
+                    <div class="row">
+                        <div class="card my-4">
+
+                            <div class="col-9">
+                                <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                                    <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+                                        <h6 class="text-white text-capitalize ps-3">등록된 할인 정책 정보입니다.</h6>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="card-body px-0 pb-2">
+                                <div class="table">
+                                    <table class="table align-items-center mb-0">
+                                        <thead>
+                                        <tr>
+                                            <th class="text-center text-uppercase  font-weight-bolder"
+                                                style="color: #5A2082;font-size: small">
+                                                할인 정책 이름
+                                            </th>
+                                            <th class="text-center text-uppercase  font-weight-bolder"
+                                                style="color: #5A2082;font-size: small">
+                                                할인율 (%)
+                                            </th>
+
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <div>
+                                            <tr th:each="discount : ${discounts}">
+
+                                            <th class="align-middle text-center">
+                                                <span class=" text font-weight-bold" style="font-size: small"
+                                                      th:text="${discount.discountName}"></span>
+                                                </th>
+                                                <th class="align-middle text-center">
+                                                <span class=" text font-weight-bold" style="font-size: small"
+                                                      th:text="${discount.discountRate}"></span>
+                                                </th>
+                                                <th class="align-middle text-center">
+
+                                                <a href="javascript:;"
+                                                   th:onclick="|discount.deleteDiscount(${academyId},${discount.discountId})|" type="button"
+                                                   class="text-secondary font-weight-bold text-xs">
+                                                    delete
+                                                </a>
+                                                </th>
+
+                                            </tr>
+
+                                        </div>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-1">
+            </div>
+            <div class="col-3 ">
+
+                <div class="card card-plain">
+                    <h4 class="font-weight-bolder"> 할인 정책 등록</h4>
+                    <p class="mb-0">등록할 할인 정보를 입력해주세요.</p>
+                </div>
+                <br>
+
+                <div class="card-body">
+                    <div class="input-group input-group-outline mb-3">
+                        <label class="form-label">정책 이름</label>
+                        <input type="text" class="form-control" id="input-discountName">
+                    </div>
+                    <div class="input-group input-group-outline mb-3">
+                        <label class="form-label">할인율</label>
+                        <input type="text" class="form-control" id="input-discountRate">
+                    </div>
+                    <div class="text-center">
+                        <button
+                                th:onclick="|discount.registerDiscount(${academyId})|" type="button"
+                                class="btn btn-lg bg-gradient-primary btn-lg w-100 mt-4 mb-0">할인 정책 등록
+                        </button>
+                    </div>
+                </div>
+                <br>
+            </div>
+            <div class="col-1">
+            </div>
+        </div>
+    </div>
+    <!--footer-->
+    <th:block th:replace="layout/footer :: footerFragment"></th:block>
+</main>
+<!--   Core JS Files   -->
+<script src="/assets/js/core/popper.min.js"></script>
+<script src="/assets/js/core/bootstrap.min.js"></script>
+<script src="/assets/js/plugins/perfect-scrollbar.min.js"></script>
+<script src="/assets/js/plugins/smooth-scrollbar.min.js"></script>
+<script src="/assets/js/material-dashboard.min.js?v=3.0.4"></script>
+<link id="pagestyle" href="/assets/css/material-dashboard.css?v=3.0.4" rel="stylesheet"/>
+
+<Script>
+
+    let discount = {
+        init: function () {
+            var _this = this;
+        },
+
+
+        registerDiscount: function (academyId) {
+
+            let data = {
+                discountName: document.querySelector('#input-discountName').value.trim(),
+                discountRate: document.querySelector('#input-discountRate').value.trim()
+            };
+            console.log(data);
+
+            axios.post("/api/v1/academies/" + academyId + "/discounts",
+                JSON.stringify(data), {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                }
+            ).then((response) => {
+                alert("할인 정책 등록을 성공했습니다.");
+                window.location.reload();
+
+            }).catch((error) => {
+                if (error.response.data.result["errorCode"] == "INVALID_PERMISSION") {
+                    alert("강사는 접근할 수 없습니다.");
+                }
+            });
+
+        },
+
+        deleteDiscount: function (academyId,discountId) {
+
+            const con_check = confirm("삭제하시겠습니까?");
+
+            if (con_check === true) {
+                axios.delete("/api/v1/academies/" + academyId + "/discounts/"+discountId,
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    }
+                ).then((response) => {
+                    alert("할인 정책 삭제 성공");
+                    window.location.reload();
+                }).catch((error) => {
+                });
+            }
+        }
+    };
+
+    discount.init();
+
+</script>
+
+</body>
+
+</html>
