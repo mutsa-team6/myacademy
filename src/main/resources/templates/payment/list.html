@@ -182,22 +182,19 @@
                                         <div class="modal-dialog">
                                             <div class="modal-content">
                                                 <div class="modal-header">
-                                                    <h1 class="modal-title fs-5" id="exampleModalLabel">취소하시겠습니까?</h1>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                            aria-label="Close"></button>
+
+                                                    <h6 th:text="|${payment.studentName} 학생의 ${payment.orderName} 결제를 취소하시겠습니까? |"></h6>
+
+                                                    <div class="row"></div>
                                                 </div>
-                                                <div class="modal-body"
-                                                     th:text="|${payment.studentName} 학생의 ${payment.orderName} 결제를 취소하시겠습니까? |">
-                                                    ...
+                                                <div class="modal-body">
+                                                    <div class="input-group input-group-outline mb-3">
+                                                        <label class="form-label">취소 사유를 적어주세요</label>
+                                                        <input type="text" class="form-control" id="input-employeePassword"
+                                                               name="employeePassword" th:id="|cancelReason${payment.paymentId}|">
+                                                    </div>
                                                 </div>
-                                                <div>
-                                                    <hr style="color: #5A2082; height: 1.5px;background-color: #5A2082">
-                                                </div>
-                                                <div class="input-group  input-group-dynamic mx-auto"
-                                                     style="width: 400px">
-                                                    <textarea class="form-control" rows="5" placeholder="취소 사유를 적어주세요"
-                                                              th:id="|cancelReason${payment.paymentId}|"></textarea>
-                                                </div>
+
                                                 <div class="modal-footer mx-auto">
                                                     <button type="button" class="btn btn-secondary"
                                                             data-bs-dismiss="modal">닫기
