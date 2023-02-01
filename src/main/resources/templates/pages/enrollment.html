@@ -39,33 +39,36 @@
             <div class="col-12">
 
                 <div class="card my-4">
-                    <div class="row">
-                        <div class="col-8">
-                            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-                                <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
-                                    <h6 class="text-white text-capitalize ps-3">수강 신청할 학생을 선택하세요.</h6>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4 col-5 my-auto text-end">
-                            <form class="form-inline w-100 justify-content-center " action="/academy/enrollment"
-                                  method="get">
-                                <div class="row mb-4">
-                                    <div class="col-9 align-self-center">
-                                        <div class="input-group input-group-outline  ">
+                    <div class="card-header pb-0">
+                        <div class="row">
+                            <div class="col-lg-9 col-7">
+                                <h3 style="font-family: 'Black Han Sans', sans-serif; font-size: 3.5rem; font-weight: lighter;color: #5A2082">수강 신청</h3>
+                                <p class="mb-0" style="font-weight: bold;color: #5A2060">수강 신청을 진행할 학생을 선택해주세요.</p>
 
-                                            <input type="text" class="form-control" name="studentName"
-                                                   placeholder="학생 이름">
+                            </div>
+                            <div class="col-lg-3 col-5 my-auto text-end">
+                                <form class="form-inline w-100 justify-content-center " action="/academy/enrollment"
+                                      method="get">
+                                    <div class="row mb-4">
+                                        <div class="col-8 align-self-center">
+                                            <div class="input-group input-group-outline">
+
+                                                <input type="text" class="form-control" name="studentName"
+                                                       placeholder="학생 이름">
+                                            </div>
+                                        </div>
+                                        <div class="col-4  align-self-center">
+                                            <button type="submit"
+                                                    class="btn btn-sm bg-gradient-primary btn-lg mb-0">검색
+                                            </button>
                                         </div>
                                     </div>
-                                    <div class="col-3  align-self-center">
-                                        <button type="submit"
-                                                class="btn btn-sm bg-gradient-primary btn-lg w-100 mb-0">검색
-                                        </button>
-                                    </div>
-                                </div>
-                            </form>
+                                </form>
+                            </div>
                         </div>
+                    </div>
+                    <div>
+                        <hr style="color: #5A2082; height: 1.5px;background-color: #5A2082">
                     </div>
                     <div class="card-body px-0 pb-2">
                         <div class="table-responsive p-0">

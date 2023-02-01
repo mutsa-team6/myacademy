@@ -1,6 +1,7 @@
 package com.project.myacademy.controller;
 
 import com.project.myacademy.domain.academy.AcademyService;
+import com.project.myacademy.domain.academy.dto.FindAcademyRequest;
 import com.project.myacademy.domain.academy.dto.ReadAcademyResponse;
 import com.project.myacademy.domain.enrollment.dto.FindEnrollmentResponse;
 import com.project.myacademy.domain.parent.ParentService;
@@ -37,14 +38,9 @@ public class StudentController {
     }
 
     @GetMapping("/academy/student/register")
-    public String studentRegister(@RequestParam(required = false) String parentPhoneNum, Model model, Authentication authentication) {
+    public String studentRegister( Model model, Authentication authentication) {
 
         Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
-
-        if (parentPhoneNum != null) {
-            FindParentResponse parent = parentService.findParent(parentPhoneNum, academyId);
-            model.addAttribute("parent", parent);
-        }
 
         model.addAttribute("academyId", academyId);
 

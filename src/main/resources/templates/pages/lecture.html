@@ -39,31 +39,34 @@
             <div class="col-12">
 
                 <div class="card my-4">
+                    <div class="card-header pb-0">
+                        <div class="row">
+                            <div class="col-lg-9 col-7">
+                                <h3 style="font-family: 'Black Han Sans', sans-serif; font-size: 3.5rem; font-weight: lighter;color: #5A2082">강사 정보</h3>
+                                <p class="mb-0" style="font-weight: bold;color: #5A2060">강좌 등록 전에 강좌를 맡을 강사를 먼저 선택해주세요.</p>
 
-                    <div class="col-12">
-                        <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-                            <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
-                                <h6 class="text-white text-capitalize ps-3">강좌 등록 전에 강사를 먼저 선택해주세요.</h6>
                             </div>
                         </div>
                     </div>
-
+                    <div>
+                        <hr style="color: #5A2082; height: 1.5px;background-color: #5A2082">
+                    </div>
 
                     <div class="card-body px-0 pb-2">
-                        <div class="table">
-                            <table class="table align-items-center mb-0">
+                        <div class="table-responsive">
+                        <table class="table align-items-center mb-0">
                                 <thead>
                                 <tr>
-                                    <th class="text-center text-uppercase  font-weight-bolder" style="color: #5A2082;font-size: large">
+                                    <th class="text-center text-uppercase  font-weight-bolder" style="color: #5A2082;">
                                         강사 사진
                                     </th>
-                                    <th class="text-center text-uppercase  font-weight-bolder"  style="color: #5A2082;font-size: large">
+                                    <th class="text-center text-uppercase  font-weight-bolder"  style="color: #5A2082;">
                                         강사 이름
                                     </th>
-                                    <th class="text-center text-uppercase  font-weight-bolder " style="color: #5A2082;font-size: large">
+                                    <th class="text-center text-uppercase  font-weight-bolder " style="color: #5A2082;">
                                         담당 과목
                                     </th>
-                                    <th class="text-center text-uppercase  font-weight-bolder " style="color: #5A2082;font-size: large">
+                                    <th class="text-center text-uppercase  font-weight-bolder " style="color: #5A2082;">
                                         전화번호
                                     </th>
 
@@ -127,107 +130,6 @@
 <script src="/assets/js/material-dashboard.min.js?v=3.0.4"></script>
 <link id="pagestyle" href="/assets/css/material-dashboard.css?v=3.0.4" rel="stylesheet"/>
 
-<Script>
-
-    let register = {
-        init: function () {
-            var _this = this;
-        },
-
-        findParent: function (academyId) {
-            let data = {
-                phoneNum: document.querySelector('#input-parentPhoneNum').value.trim(),
-            };
-            console.log(data);
-            axios.post("/api/v1/academies/" + academyId + "/parents/find",
-                JSON.stringify(data), {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
-                }
-            ).then((response) => {
-                console.log(response);
-                alert("등록된 부모입니다.");
-
-            }).catch((error) => {
-                console.log(error);
-                if (error.response.data.result["errorCode"] == "PARENT_NOT_FOUND") {
-                    alert("등록된 부모가 아닙니다. 부모 정보를 입력해주세요.");
-                    window.location.href = window.location;
-                }
-
-
-            });
-
-        },
-
-        registerParent: function (academyId) {
-            const parentTypeNodeList = document.getElementsByName('parentType')
-            let parentRecognizedCode = 0;
-            parentTypeNodeList.forEach((node) => {
-                if (node.checked) {
-                    parentRecognizedCode = node.value;
-                }
-            })
-
-            let data = {
-                name: document.querySelector('#input-parentName').value.trim(),
-                address: document.querySelector("#address_kakao").value.trim() + "  " + document.querySelector("#address_detail_kakao").value.trim(),
-                phoneNum: document.querySelector('#input-parentPhoneNum').value.trim(),
-                parentRecognizedCode: parentRecognizedCode
-            };
-            console.log(data);
-
-            axios.post("/api/v1/academies/" + academyId + "/parents",
-                JSON.stringify(data), {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
-                }
-            ).then((response) => {
-                alert("부모 정보 등록을 성공했습니다. 학생 정보를 입력해주세요");
-            }).catch((error) => {
-                if (error.response.data.result["errorCode"] == "INVALID_PERMISSION") {
-                    alert("강사는 접근할 수 없습니다.");
-                }
-            });
-
-        },
-
-        registerStudent: function (academyId) {
-
-            let data = {
-                name: document.querySelector('#input-studentName').value.trim(),
-                school: document.querySelector('#input-studentSchool').value.trim(),
-                phoneNum: document.querySelector('#input-studentPhoneNum').value.trim(),
-                email: document.querySelector('#input-studentEmail').value.trim(),
-                birth: document.querySelector('#input-studentBirth').value.trim(),
-                parentPhoneNum: document.querySelector('#input-parentPhoneNum').value.trim(),
-            };
-            console.log(data);
-
-            axios.post("/api/v1/academies/" + academyId + "/students",
-                JSON.stringify(data), {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
-                }
-            ).then((response) => {
-                alert("학생 정보 등록을 성공했습니다.");
-                window.location.href = '/academy/student';
-
-            }).catch((error) => {
-                if (error.response.data.result["errorCode"] == "INVALID_PERMISSION") {
-                    alert("강사는 접근할 수 없습니다.");
-                }
-            });
-
-        }
-    };
-
-    academy.init();
-
-</script>
 
 </body>
 
