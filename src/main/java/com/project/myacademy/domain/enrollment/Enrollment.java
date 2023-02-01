@@ -2,7 +2,6 @@ package com.project.myacademy.domain.enrollment;
 
 import com.project.myacademy.domain.BaseEntity;
 import com.project.myacademy.domain.employee.Employee;
-import com.project.myacademy.domain.enrollment.dto.CreateEnrollmentRequest;
 import com.project.myacademy.domain.enrollment.dto.UpdateEnrollmentRequest;
 import com.project.myacademy.domain.lecture.Lecture;
 import com.project.myacademy.domain.student.Student;
@@ -78,9 +77,14 @@ public class Enrollment extends BaseEntity {
         this.modifiedEmployee = sb.append(employee.getId()).append(" (").append(employee.getName()).append(")").toString();
     }
 
-    // paymentYN 수정
-    public void updatePaymentYN() {
+    // paymentYN true로 수정
+    public void updatePaymentTrue() {
         this.paymentYN = true;
+    }
+
+    // paymentYN false로 수정
+    public void updatePaymentFalse() {
+        this.paymentYN = false;
     }
 
     // 할인정책 id 수정
