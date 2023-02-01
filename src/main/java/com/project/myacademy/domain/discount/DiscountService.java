@@ -29,7 +29,6 @@ public class DiscountService {
     private final AcademyRepository academyRepository;
     private final EnrollmentRepository enrollmentRepository;
     private final EmployeeRepository employeeRepository;
-
     private final LectureRepository lectureRepository;
     private final StudentRepository studentRepository;
     private final DiscountRepository discountRepository;
@@ -52,16 +51,16 @@ public class DiscountService {
             throw new AppException(ErrorCode.INVALID_PERMISSION);
         }
 
+        // 적용 요청한 할인 정책 존재 유무 확인
+        Discount discount = discountRepository.findByDiscountNameAndAcademy(request.getDiscountName(), academy)
+                .orElseThrow(() -> new AppException(ErrorCode.DISCOUNT_NOT_FOUND));
+
         // 요청 DTO의 수강 id로 수강이력 존재 유무 확인
         Enrollment enrollment = validateEnrollment(request.getEnrollmentId());
 
         // 요청 DTO의 수강이력의 학생 id로 학생, 강좌 존재 유무 확인
-        validateStudent(enrollment.getStudent().getId());
-        validateLecture(enrollment.getLecture().getId());
-
-        // 적용 요청한 할인 정책 존재 유무 확인
-        Discount discount = discountRepository.findByDiscountNameAndAcademy(request.getDiscountName(), academy)
-                .orElseThrow(() -> new AppException(ErrorCode.DISCOUNT_NOT_FOUND));
+//        validateStudent(enrollment.getStudent().getId());
+//        validateLecture(enrollment.getLecture().getId());
 
         // 요청 DTO에 해당하는 수강 내역이 이미 결제된 수강 이력인지 확인
         if (enrollment.getPaymentYN().equals(true)) {
@@ -69,7 +68,6 @@ public class DiscountService {
         }
 
         enrollment.updateDiscountId(discount.getId());
-
         return CheckDiscountResponse.of(request);
     }
 
@@ -157,17 +155,17 @@ public class DiscountService {
         return employee;
     }
 
-    private Student validateStudent(Long studentId) {
-        Student validatedStudent = studentRepository.findById(studentId)
-                .orElseThrow(() -> new AppException(ErrorCode.STUDENT_NOT_FOUND));
-        return validatedStudent;
-    }
-
-    private Lecture validateLecture(Long lectureId) {
-        Lecture validatedLecture = lectureRepository.findById(lectureId)
-                .orElseThrow(() -> new AppException(ErrorCode.LECTURE_NOT_FOUND));
-        return validatedLecture;
-    }
+//    private Student validateStudent(Long studentId) {
+//        Student validatedStudent = studentRepository.findById(studentId)
+//                .orElseThrow(() -> new AppException(ErrorCode.STUDENT_NOT_FOUND));
+//        return validatedStudent;
+//    }
+//
+//    private Lecture validateLecture(Long lectureId) {
+//        Lecture validatedLecture = lectureRepository.findById(lectureId)
+//                .orElseThrow(() -> new AppException(ErrorCode.LECTURE_NOT_FOUND));
+//        return validatedLecture;
+//    }
 
     private Enrollment validateEnrollment(Long enrollmentId) {
         Enrollment validatedEnrollment = enrollmentRepository.findById(enrollmentId)

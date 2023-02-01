@@ -15,7 +15,7 @@ public class CheckDiscountResponse {
 
     public static CheckDiscountResponse of(CheckDiscountRequest request) {
         return CheckDiscountResponse.builder()
-                .message(request.getDiscountName() + " 을 적용했습니다.")
+                .message(request.getDiscountName() + "을 적용했습니다.")
                 .build();
     }
 }
