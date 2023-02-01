@@ -65,13 +65,13 @@ public class StudentController {
 
         Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
-        Page<ReadAllStudentResponse> studentList = studentService.readAllStudent(academyId, pageable, requestAccount);
 
         if (studentName != null) {
-            List<ReadAllStudentResponse> searchStudents = studentService.findStudentForStudentList(academyId, studentName);
+            Page<ReadAllStudentResponse> searchStudents = studentService.findStudentForStudentList(academyId, studentName,pageable);
             model.addAttribute("students", searchStudents);
 
         } else {
+            Page<ReadAllStudentResponse> studentList = studentService.readAllStudent(academyId, pageable, requestAccount);
             model.addAttribute("students", studentList);
         }
         model.addAttribute("previous", pageable.previousOrFirst().getPageNumber());

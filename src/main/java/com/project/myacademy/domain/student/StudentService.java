@@ -167,11 +167,11 @@ public class StudentService {
     /**
      * 이름으로 학생 가져오는 UI용 메서드
      */
-    public List<ReadAllStudentResponse> findStudentForStudentList(Long academyId, String studentName) {
+    public Page<ReadAllStudentResponse> findStudentForStudentList(Long academyId, String studentName,Pageable pageable) {
 
-        List<Student> foundStudents = studentRepository.findByAcademyIdAndName(academyId, studentName);
+        Page<Student> foundStudents = studentRepository.findByAcademyIdAndName(academyId, studentName,pageable);
 
-        return foundStudents.stream().map(student -> ReadAllStudentResponse.of(student)).collect(Collectors.toList());
+        return foundStudents.map(student -> ReadAllStudentResponse.of(student));
 
     }
 
