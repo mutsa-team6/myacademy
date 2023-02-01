@@ -4,6 +4,7 @@ import com.project.myacademy.domain.academy.Academy;
 import com.project.myacademy.domain.academy.AcademyRepository;
 import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.domain.employee.EmployeeRepository;
+import com.project.myacademy.domain.enrollment.EnrollmentRepository;
 import com.project.myacademy.domain.lecture.Lecture;
 import com.project.myacademy.domain.lecture.LectureRepository;
 import com.project.myacademy.domain.student.Student;
@@ -30,6 +31,7 @@ public class WaitinglistService {
     private final EmployeeRepository employeeRepository;
     private final StudentRepository studentRepository;
     private final LectureRepository lectureRepository;
+    private final EnrollmentRepository enrollmentRepository;
     private final WaitinglistRepository waitinglistRepository;
 
 
@@ -59,9 +61,15 @@ public class WaitinglistService {
             throw new AppException(ErrorCode.INVALID_PERMISSION);
         }
 
+        // 이미 수강등록되어 있는지 확인
+        enrollmentRepository.findByStudentAndLecture(student,lecture)
+                        .ifPresent((enrollment -> {
+                            throw new AppException(ErrorCode.DUPLICATED_ENROLLMENT);
+                        }));
+
         // 대기번호 이력 중복 확인
         waitinglistRepository.findByStudentAndLecture(student,lecture)
-                .ifPresent((enrollment -> {
+                .ifPresent((waitinglist -> {
                     throw new AppException(ErrorCode.DUPLICATED_WAITINGLIST);
                 }));
 

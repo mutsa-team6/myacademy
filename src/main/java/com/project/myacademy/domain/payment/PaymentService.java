@@ -23,6 +23,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -32,8 +35,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.Collections;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -131,7 +133,7 @@ public class PaymentService {
         }
 
         //저장
-        Payment savedPayment = paymentRepository.save(request.toEntity(foundEmployee, foundStudent, studentEnrollment));
+        Payment savedPayment = paymentRepository.save(request.toEntity(foundEmployee, foundStudent, studentEnrollment, academy));
 
         CreatePaymentResponse response = CreatePaymentResponse.of(savedPayment);
         response.setSuccessUrl(successCallbackUrl);
@@ -262,9 +264,6 @@ public class PaymentService {
         JSONObject param = new JSONObject();
         param.put("cancelReason", cancelReason);
 
-        //삭제
-        paymentRepository.delete(selcetedPayment);
-
         //cancelPayment 저장
         cancelPaymentRepository.save(CancelPayment.builder()
                 .orderId(selcetedPayment.getOrderId())
@@ -281,6 +280,93 @@ public class PaymentService {
                         new HttpEntity<>(param, headers),
                         ApprovePaymentResponse.class)
                 .getBody();
+    }
+
+    /**
+     * 결제 성공 후, 결제 정보를 보여주기 위해 만든 메서드 (UI 용)
+     */
+    public SuccessPaymentResponse findPayment(String orderId) {
+        Payment foundPayment = paymentRepository.findByOrderId(orderId)
+                .orElseThrow(() -> new AppException(ErrorCode.PAYMENT_NOT_FOUND));
+
+        Long discountId = foundPayment.getDiscountId();
+        log.info("💲 결제 완료 후 discountId [{}]", discountId);
+
+        String discountName = null;
+
+        if (discountId == 0) {
+            discountName = "할인 정책 선택 안함";
+        } else {
+            Discount foundDiscount = discountRepository.findById(discountId)
+                    .orElseThrow(() -> new AppException(ErrorCode.DISCOUNT_NOT_FOUND));
+            discountName = foundDiscount.getDiscountName();
+        }
+
+        return new SuccessPaymentResponse(foundPayment, discountName);
+
+    }
+
+    /**
+     * 해당 학원의 결제 완료한 내역들을 가져오기 위해 만든 메서드 (UI 용)
+     */
+    public Page<CompletePaymentResponse> findAllCompletePayment(Long academyId, String requestAccount, Pageable pageable) {
+
+        //학원 체크
+        Academy foundAcademy = validateAcademy(academyId);
+        //요청한 직원 체크
+        validateAcademyEmployee(requestAccount, foundAcademy);
+
+        List<CompletePaymentResponse> foundPayments = new ArrayList<>();
+
+        // paymentkey 값이 존재하는(결제가 완료된것) payment 가져오기
+        Page<Payment> payments = paymentRepository.findByAcademy_IdAndPaymentKeyIsNotNullOrderByCreatedAtDesc(academyId, pageable);
+        for (Payment payment : payments) {
+            CompletePaymentResponse completePayment = new CompletePaymentResponse(payment,
+                    discountRepository.findById(payment.getDiscountId())
+                            .orElseThrow(() -> new AppException(ErrorCode.DISCOUNT_NOT_FOUND)).getDiscountName()
+            );
+            Optional<CancelPayment> foundCancelPayment = cancelPaymentRepository.findByPayment(payment);
+            foundCancelPayment.ifPresent(cancelPayment -> completePayment.setDeletedAt(cancelPayment));
+
+            foundPayments.add(completePayment);
+        }
+
+
+        return new PageImpl<>(foundPayments);
+    }
+
+    /**
+     * 해당 학원에 특정 학생의 결제 완료 내역을 가져오기 위해 만든 메서드 (UI 용)
+     */
+    public Page<CompletePaymentResponse> findAllCompletePaymentByStudent(Long academyId, String requestAccount, String studentName, Pageable pageable) {
+
+        //학원 체크
+        Academy foundAcademy = validateAcademy(academyId);
+        //요청한 직원 체크
+        validateAcademyEmployee(requestAccount, foundAcademy);
+
+        Page<Student> foundStudents = studentRepository.findByAcademyIdAndName(academyId, studentName,pageable);
+
+        // 아래 컬렉션에 정보를 담을 것임
+        List<CompletePaymentResponse> foundPayments = new ArrayList<>();
+
+        // 동명이인 학생이 있을 수 있어서..
+        for (Student foundStudent : foundStudents) {
+            List<Payment> foundPaymentsByStudent = paymentRepository.findByAcademy_IdAndPaymentKeyIsNotNullAndStudentOrderByCreatedAtDesc(academyId, foundStudent);
+            for (Payment payment : foundPaymentsByStudent) {
+                CompletePaymentResponse completePayment = new CompletePaymentResponse(payment,
+                        discountRepository.findById(payment.getDiscountId())
+                                .orElseThrow(() -> new AppException(ErrorCode.DISCOUNT_NOT_FOUND)).getDiscountName()
+                );
+                Optional<CancelPayment> foundCancelPayment = cancelPaymentRepository.findByPayment(payment);
+                foundCancelPayment.ifPresent(cancelPayment -> completePayment.setDeletedAt(cancelPayment));
+
+                foundPayments.add(completePayment);
+            }
+        }
+
+
+        return new PageImpl<>(foundPayments);
     }
 
     private Academy validateAcademy(Long academyId) {

@@ -117,7 +117,9 @@ jacocoTestReport {
 							'**/*Response*',
 							'**/Swagger*',
 							'**/JpaAuditingConfig*',
-							'**/controller'
+							'**/controller',
+							'**/*RestController*',
+							'**/*ExceptionManager*'
 					] + Qdomains)
 				})
 		)
@@ -168,7 +170,9 @@ jacocoTestCoverageVerification {
 					'**.*Swagger*',
 					'**.*PasswordEncoder*',
 					'**.*JpaAuditing*',
-					'**.controller'
+					'**.controller',
+					'**.*RestController*',
+					'**.*ExceptionManager*'
 			] + Qdomains
 		}
 	}

@@ -1,11 +1,15 @@
-package com.project.myacademy.domain.lecture;
+package com.project.myacademy.domain.discount;
 
 import com.project.myacademy.domain.academy.Academy;
 import com.project.myacademy.domain.academy.AcademyRepository;
+import com.project.myacademy.domain.discount.dto.*;
 import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.domain.employee.EmployeeRepository;
 import com.project.myacademy.domain.employee.EmployeeRole;
-import com.project.myacademy.domain.lecture.dto.*;
+import com.project.myacademy.domain.enrollment.Enrollment;
+import com.project.myacademy.domain.enrollment.EnrollmentRepository;
+import com.project.myacademy.domain.lecture.Lecture;
+import com.project.myacademy.domain.student.Student;
 import com.project.myacademy.global.exception.AppException;
 import com.project.myacademy.global.exception.ErrorCode;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,35 +25,39 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
-class LectureServiceTest {
+class DiscountServiceTest {
 
     @Mock
-    private LectureRepository lectureRepository;
+    private AcademyRepository academyRepository;
     @Mock
     private EmployeeRepository employeeRepository;
     @Mock
-    private AcademyRepository academyRepository;
+    private EnrollmentRepository enrollmentRepository;
+    @Mock
+    private DiscountRepository discountRepository;
     @InjectMocks
-    private LectureService lectureService;
+    private DiscountService discountService;
 
     private Academy academy;
     private Employee employee;
     private Employee teacher;
     private Lecture lecture;
+    private Student student;
+    private Enrollment enrollment;
+    private Discount discount;
+    private Discount discount2;
     private Employee mockEmployee;
-    private Employee mockTeacher;
+    private Enrollment mockEnrollment;
 
     @BeforeEach
     void setup() {
@@ -57,46 +65,48 @@ class LectureServiceTest {
         employee = Employee.builder().id(1L).name("staff").email("email").account("account").password("password").employeeRole(EmployeeRole.ROLE_STAFF).academy(academy).build();
         teacher = Employee.builder().id(2L).name("teacher").email("email1").account("account1").employeeRole(EmployeeRole.ROLE_USER).academy(academy).build();
         lecture = Lecture.builder().id(1L).name("lecture").price(10000).employee(teacher).build();
+        student = Student.builder().id(1L).name("student").academyId(academy.getId()).build();
+        discount = Discount.builder().id(1L).discountName("discountName").discountRate(50).academy(academy).build();
+        discount2 = Discount.builder().id(2L).discountName("discountName2").discountRate(40).academy(academy).build();
+        enrollment = Enrollment.builder().id(1L).student(student).lecture(lecture).discountId(discount.getId()).build();
         mockEmployee = mock(Employee.class);
-        mockTeacher = mock(Employee.class);
+        mockEnrollment = mock(Enrollment.class);
     }
 
     @Nested
     @DisplayName("조회")
-    class LectureRead {
+    class DiscountRead{
 
         PageRequest pageable = PageRequest.of(0, 20, Sort.Direction.DESC,"createdAt");
 
         @Test
-        @DisplayName("강좌 리스트 조회 성공")
-        public void readAllLectures_success() {
+        @DisplayName("할인정책 전체 조회 성공")
+        public void getAllDiscounts_success() {
 
-            Employee teacher2 = Employee.builder().id(3L).name("teacher2").email("email2").account("account2").employeeRole(EmployeeRole.ROLE_USER).academy(academy).build();
-            Lecture lecture2 = Lecture.builder().id(2L).name("lecture2").price(10000).employee(teacher2).build();
-            PageImpl<Lecture> lectureList = new PageImpl<>(List.of(lecture, lecture2));
+            PageImpl<Discount> discountList = new PageImpl<>(List.of(discount, discount2));
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(employee));
-            given(lectureRepository.findAll(pageable)).willReturn(lectureList);
+            given(discountRepository.findAllByAcademy(academy, pageable)).willReturn(discountList);
 
-            Page<ReadAllLectureResponse> responseLectures = lectureService.readAllLectures(academy.getId(), employee.getAccount(), pageable);
+            Page<GetDiscountResponse> allDiscounts = discountService.getAllDiscounts(academy.getId(), employee.getAccount(), pageable);
 
-            assertThat(responseLectures.getTotalPages()).isEqualTo(1);
-            assertThat(responseLectures.getTotalElements()).isEqualTo(2);
+            assertThat(allDiscounts.getTotalPages()).isEqualTo(1);
+            assertThat(allDiscounts.getTotalElements()).isEqualTo(2);
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
-            then(lectureRepository).should(times(1)).findAll(pageable);
+            then(discountRepository).should(times(1)).findAllByAcademy(academy, pageable);
         }
 
         @Test
-        @DisplayName("강좌 리스트 조회 실패(1) - 학원이 존재하지 않을 때")
-        public void readAllLectures_fail1() {
+        @DisplayName("할인정책 전체 조회 실패(1) = 학원이 존재하지 않을 때")
+        public void getAllDiscounts_fail1() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.empty());
 
             AppException appException = assertThrows(AppException.class,
-                    () -> lectureService.readAllLectures(academy.getId(), employee.getAccount(), pageable));
+                    () -> discountService.getAllDiscounts(academy.getId(), employee.getAccount(), pageable));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACADEMY_NOT_FOUND);
             assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 학원을 찾을 수 없습니다.");
@@ -105,14 +115,14 @@ class LectureServiceTest {
         }
 
         @Test
-        @DisplayName("강좌 리스트 조회 실패(2) - 조회 진행하는 직원이 해당 학원 소속이 아닐 때")
-        public void readAllLectures_fail2() {
+        @DisplayName("할인정책 전체 조회 실패(2) - 조회 진행하는 직원이 해당 학원 소속이 아닐 때")
+        public void getAllDiscounts_fail2() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.empty());
 
             AppException appException = assertThrows(AppException.class,
-                    () -> lectureService.readAllLectures(academy.getId(), employee.getAccount(), pageable));
+                    () -> discountService.getAllDiscounts(academy.getId(), employee.getAccount(), pageable));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACCOUNT_NOT_FOUND);
             assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 계정명을 찾을 수 없습니다.");
@@ -122,38 +132,32 @@ class LectureServiceTest {
         }
 
         @Test
-        @DisplayName("강사의 강좌 리스트 조회 성공")
-        public void readAllLectures_ByTeacher_success() {
-
-            Lecture lecture2 = Lecture.builder().id(2L).name("lecture2").price(10000).employee(teacher).build();
-            Lecture lecture3 = Lecture.builder().id(3L).name("lecture3").price(10000).employee(teacher).build();
-
-            PageImpl<Lecture> lectureList = new PageImpl<>(List.of(lecture, lecture2, lecture3));
+        @DisplayName("수강이력에 적용된 할인정책 조회 성공")
+        public void getAppliedDiscount_success() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(employee));
-            given(employeeRepository.findByIdAndAcademy(anyLong(), any(Academy.class))).willReturn(Optional.of(teacher));
-            given(lectureRepository.findByEmployeeAndFinishDateGreaterThanOrderByStartDate(teacher, LocalDate.now(), pageable)).willReturn(lectureList);
+            given(enrollmentRepository.findById(anyLong())).willReturn(Optional.of(enrollment));
+            given(discountRepository.findById(anyLong())).willReturn(Optional.of(discount));
 
-            Page<ReadAllLectureResponse> responsePage = lectureService.readAllLecturesByTeacherId(academy.getId(), employee.getAccount(), teacher.getId(), pageable);
-
-            assertThat(responsePage.getTotalPages()).isEqualTo(1);
-            assertThat(responsePage.getTotalElements()).isEqualTo(3);
+            GetAppliedDiscountResponse appliedDiscount = discountService.getAppliedDiscount(academy.getId(), enrollment.getId(), employee.getAccount());
+            assertThat(appliedDiscount.getDiscountName()).isEqualTo("discountName");
+            assertThat(appliedDiscount.getDiscountRate()).isEqualTo(50);
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
-            then(employeeRepository).should(times(1)).findByIdAndAcademy(anyLong(), any(Academy.class));
-            then(lectureRepository).should(times(1)).findByEmployeeAndFinishDateGreaterThanOrderByStartDate(teacher, LocalDate.now(), pageable);
+            then(enrollmentRepository).should(times(1)).findById(anyLong());
+            then(discountRepository).should(times(1)).findById(anyLong());
         }
 
         @Test
-        @DisplayName("강사의 강좌 리스트 조회 실패(1) - 학원이 존재하지 않을 때")
-        public void readAllLectures_ByTeacher_fail1() {
+        @DisplayName("수강이력에 적용된 할인정책 조회 실패(1) - 학원이 존재하지 않을 때")
+        public void getAppliedDiscount_fail1() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.empty());
 
             AppException appException = assertThrows(AppException.class,
-                    () -> lectureService.readAllLecturesByTeacherId(academy.getId(), employee.getAccount(), teacher.getId(), pageable));
+                    () -> discountService.getAppliedDiscount(academy.getId(), enrollment.getId(), employee.getAccount()));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACADEMY_NOT_FOUND);
             assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 학원을 찾을 수 없습니다.");
@@ -162,14 +166,14 @@ class LectureServiceTest {
         }
 
         @Test
-        @DisplayName("강사의 강좌 리스트 조회 실패(2) - 조회 진행하는 직원이 해당 학원 소속이 아닐 때")
-        public void readAllLectures_ByTeacher_fail2() {
+        @DisplayName("수강이력에 적용된 할인정책 조회 실패(2) - 조회 진행하는 직원이 해당 학원 소속이 아닐 때")
+        public void getAppliedDiscount_fail2() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.empty());
 
             AppException appException = assertThrows(AppException.class,
-                    () -> lectureService.readAllLecturesByTeacherId(academy.getId(), employee.getAccount(), teacher.getId(), pageable));
+                    () -> discountService.getAppliedDiscount(academy.getId(), enrollment.getId(), employee.getAccount()));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACCOUNT_NOT_FOUND);
             assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 계정명을 찾을 수 없습니다.");
@@ -179,113 +183,249 @@ class LectureServiceTest {
         }
 
         @Test
-        @DisplayName("강사의 강좌 리스트 조회 실패(3) - 강사가 해당 학원 소속이 아닐 때")
-        public void readAllLectures_ByTeacher_fail3() {
+        @DisplayName("수강이력에 적용된 할인정책 조회 실패(3) - 할인이 적용된 수강 이력이 존재하지 않을 때")
+        public void getAppliedDiscount_fail3() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(employee));
-            given(employeeRepository.findByIdAndAcademy(anyLong(), any(Academy.class))).willReturn(Optional.empty());
+            given(enrollmentRepository.findById(anyLong())).willReturn(Optional.empty());
 
             AppException appException = assertThrows(AppException.class,
-                    () -> lectureService.readAllLecturesByTeacherId(academy.getId(), employee.getAccount(), teacher.getId(), pageable));
+                    () -> discountService.getAppliedDiscount(academy.getId(), enrollment.getId(), employee.getAccount()));
 
-            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.EMPLOYEE_NOT_FOUND);
-            assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 직원을 찾을 수 없습니다.");
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ENROLLMENT_NOT_FOUND);
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 수강 이력을 찾을 수 없습니다.");
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
-            then(employeeRepository).should(times(1)).findByIdAndAcademy(anyLong(), any(Academy.class));
+            then(enrollmentRepository).should(times(1)).findById(anyLong());
         }
 
         @Test
-        @DisplayName("수강 목록에 보여질 강좌 리스트 조회 성공")
-        public void readAllLectures_ForEnrollment_success() {
-
-            Lecture lecture2 = Lecture.builder().id(2L).name("lecture2").price(10000).employee(teacher).finishDate(LocalDate.now().plusDays(10)).build();
-            Lecture lecture3 = Lecture.builder().id(3L).name("lecture3").price(10000).employee(teacher).finishDate(LocalDate.now().plusDays(10)).build();
-
-            PageImpl<Lecture> lectureList = new PageImpl<>(List.of(lecture2, lecture3));
+        @DisplayName("수강이력에 적용된 할인정책 조회 실패(4) - 수강 이력에 적용된 할인 정책이 존재하지 않을 때")
+        public void getAppliedDiscount_fail4() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(employee));
-            given(lectureRepository.findByAcademyIdAndFinishDateGreaterThanOrderByCreatedAtDesc(academy.getId(), LocalDate.now(), pageable)).willReturn(lectureList);
+            given(enrollmentRepository.findById(anyLong())).willReturn(Optional.of(enrollment));
+            given(discountRepository.findById(anyLong())).willReturn(Optional.empty());
 
-            Page<ReadAllLectureResponse> responsePage = lectureService.readAllLecturesForEnrollment(academy.getId(), employee.getAccount(), pageable);
+            AppException appException = assertThrows(AppException.class,
+                    () -> discountService.getAppliedDiscount(academy.getId(), enrollment.getId(), employee.getAccount()));
 
-            assertThat(responsePage.getTotalPages()).isEqualTo(1);
-            assertThat(responsePage.getTotalElements()).isEqualTo(2);
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.DISCOUNT_NOT_FOUND);
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 할인정책을 찾을 수 없습니다.");
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
-            then(lectureRepository).should(times(1)).findByAcademyIdAndFinishDateGreaterThanOrderByCreatedAtDesc(academy.getId(), LocalDate.now(), pageable);
-        }
-
-        @Test
-        @DisplayName("수강 목록에 보여질 강좌 리스트 조회 실패(1) - 학원이 존재하지 않을 때")
-        public void readAllLectures_ForEnrollment_fail1() {
-
-            given(academyRepository.findById(anyLong())).willReturn(Optional.empty());
-
-            AppException appException = assertThrows(AppException.class,
-                    () -> lectureService.readAllLecturesForEnrollment(academy.getId(), employee.getAccount(), pageable));
-
-            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACADEMY_NOT_FOUND);
-            assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 학원을 찾을 수 없습니다.");
-
-            then(academyRepository).should(times(1)).findById(anyLong());
-        }
-
-        @Test
-        @DisplayName("수강 목록에 보여질 강좌 리스트 조회 실패(2) - 조회 진행하는 직원이 해당 학원 소속이 아닐 때")
-        public void readAllLectures_ForEnrollment_fail2() {
-
-            given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
-            given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.empty());
-
-            AppException appException = assertThrows(AppException.class,
-                    () -> lectureService.readAllLecturesForEnrollment(academy.getId(), employee.getAccount(), pageable));
-
-            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACCOUNT_NOT_FOUND);
-            assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 계정명을 찾을 수 없습니다.");
-
-            then(academyRepository).should(times(1)).findById(anyLong());
-            then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
+            then(enrollmentRepository).should(times(1)).findById(anyLong());
+            then(discountRepository).should(times(1)).findById(anyLong());
         }
     }
 
     @Nested
-    @DisplayName("강좌 등록")
-    class LectureCreate {
+    @DisplayName("적용")
+    class DiscountCheck{
 
-        CreateLectureRequest createLectureRequest = CreateLectureRequest.builder().lectureName("lecture").lecturePrice(10000).build();
+        CheckDiscountRequest checkDiscountRequest = new CheckDiscountRequest("discountName", 1L);
 
         @Test
-        @DisplayName("등록 성공")
-        public void createLecture_success() {
+        @DisplayName("할인정책 적용 성공")
+        public void checkDiscount_success() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
-            given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(employee));
-            given(employeeRepository.findById(anyLong())).willReturn(Optional.of(teacher));
-            given(lectureRepository.save(any(Lecture.class))).willReturn(lecture);
+            given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
+            given(mockEmployee.getEmployeeRole()).willReturn(EmployeeRole.ROLE_STAFF);
+            given(discountRepository.findByDiscountNameAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(discount));
+            given(enrollmentRepository.findById(anyLong())).willReturn(Optional.of(mockEnrollment));
 
-            CreateLectureResponse savedLecture = lectureService.createLecture(academy.getId(), employee.getId(), createLectureRequest, employee.getAccount());
-            assertThat(savedLecture.getLectureId()).isEqualTo(1L);
-            assertThat(savedLecture.getMessage()).isEqualTo("강좌 등록 완료");
+//            given(studentRepository.findById(enrollment.getStudent().getId())).willReturn(Optional.of(student));
+//            given(lectureRepository.findById(enrollment.getLecture().getId())).willReturn(Optional.of(lecture));
+//            given(enrollmentRepository.findById(enrollment.getId())).willReturn(Optional.of(mockEnrollment));
+
+            given(mockEnrollment.getPaymentYN()).willReturn(false);
+
+            CheckDiscountResponse checkDiscountResponse = discountService.checkDiscount(academy.getId(), checkDiscountRequest, employee.getAccount());
+            assertThat(checkDiscountResponse.getMessage()).isEqualTo("discountName을 적용했습니다.");
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
-            then(employeeRepository).should(times(1)).findById(anyLong());
-            then(lectureRepository).should(times(1)).save(any(Lecture.class));
+            then(mockEmployee).should(times(1)).getEmployeeRole();
+            then(discountRepository).should(times(1)).findByDiscountNameAndAcademy(anyString(), any(Academy.class));
+            then(enrollmentRepository).should(times(1)).findById(anyLong());
+//            then(studentRepository).should(times(1)).findById(anyLong());
+//            then(lectureRepository).should(times(1)).findById(anyLong());
+            then(mockEnrollment).should(times(1)).getPaymentYN();
         }
 
         @Test
-        @DisplayName("등록 실패(1) - 학원이 존재하지 않을 때")
-        public void createLecture_fail1() {
+        @DisplayName("할인정책 적용 실패(1) - 학원이 존재하지 않을 때")
+        public void checkDiscount_fail1() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.empty());
 
             AppException appException = assertThrows(AppException.class,
-                    () -> lectureService.createLecture(academy.getId(), employee.getId(), createLectureRequest, employee.getAccount()));
+                    () -> discountService.checkDiscount(academy.getId(), checkDiscountRequest, employee.getAccount()));
+
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACADEMY_NOT_FOUND);
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 학원을 찾을 수 없습니다.");
+
+            then(academyRepository).should(times(1)).findById(anyLong());
+        }
+
+        @Test
+        @DisplayName("할인정책 적용 실패(2) - 적용 진행하는 직원이 해당 학원 소속이 아닐 때")
+        public void checkDiscount_fail2() {
+
+            given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
+            given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.empty());
+
+            AppException appException = assertThrows(AppException.class,
+                    () -> discountService.checkDiscount(academy.getId(), checkDiscountRequest, employee.getAccount()));
+
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACCOUNT_NOT_FOUND);
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 계정명을 찾을 수 없습니다.");
+
+            then(academyRepository).should(times(1)).findById(anyLong());
+            then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
+        }
+
+        @Test
+        @DisplayName("할인정책 적용 실패(3) - 직원이 적용을 진행할 권한이 아닐 때")
+        public void checkDiscount_fail3() {
+
+            given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
+            given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
+            given(mockEmployee.getEmployeeRole()).willReturn(EmployeeRole.ROLE_USER);
+
+            AppException appException = assertThrows(AppException.class,
+                    () -> discountService.checkDiscount(academy.getId(), checkDiscountRequest, employee.getAccount()));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.INVALID_PERMISSION);
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("사용자가 권한이 없습니다.");
+
+            then(academyRepository).should(times(1)).findById(anyLong());
+            then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
+            then(mockEmployee).should(times(1)).getEmployeeRole();
+        }
+
+        @Test
+        @DisplayName("할인정책 적용 실패(4) - 적용 요청할 할인 정책이 존재하지 않을 때")
+        public void checkDiscount_fail4() {
+
+            given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
+            given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
+            given(mockEmployee.getEmployeeRole()).willReturn(EmployeeRole.ROLE_STAFF);
+            given(discountRepository.findByDiscountNameAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.empty());
+
+            AppException appException = assertThrows(AppException.class,
+                    () -> discountService.checkDiscount(academy.getId(), checkDiscountRequest, employee.getAccount()));
+
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.DISCOUNT_NOT_FOUND);
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 할인정책을 찾을 수 없습니다.");
+
+            then(academyRepository).should(times(1)).findById(anyLong());
+            then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
+            then(mockEmployee).should(times(1)).getEmployeeRole();
+            then(discountRepository).should(times(1)).findByDiscountNameAndAcademy(anyString(), any(Academy.class));
+        }
+
+        @Test
+        @DisplayName("할인정책 적용 실패(5) - 할인정책에 적용할 수강 내역이 존재하지 않을 때")
+        public void checkDiscount_fail5() {
+
+            given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
+            given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
+            given(mockEmployee.getEmployeeRole()).willReturn(EmployeeRole.ROLE_STAFF);
+            given(discountRepository.findByDiscountNameAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(discount));
+            given(enrollmentRepository.findById(checkDiscountRequest.getEnrollmentId())).willReturn(Optional.empty());
+
+            AppException appException = assertThrows(AppException.class,
+                    () -> discountService.checkDiscount(academy.getId(), checkDiscountRequest, employee.getAccount()));
+
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ENROLLMENT_NOT_FOUND);
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 수강 이력을 찾을 수 없습니다.");
+
+            then(academyRepository).should(times(1)).findById(anyLong());
+            then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
+            then(mockEmployee).should(times(1)).getEmployeeRole();
+            then(discountRepository).should(times(1)).findByDiscountNameAndAcademy(anyString(), any(Academy.class));
+            then(enrollmentRepository).should(times(1)).findById(checkDiscountRequest.getEnrollmentId());
+        }
+
+//        @Test
+//        @DisplayName("할인정책 적용 실패(6) - 할인정책에 적용할 수강 내역에 학생이 존재하지 않을 때")
+//        public void checkDiscount_fail6() {
+//
+//        }
+//
+//        @Test
+//        @DisplayName("할인정책 적용 실패(7) - 할인정책에 적용할 수강 내역에 강좌가 존재하지 않을 때")
+//        public void checkDiscount_fail7() {
+//
+//        }
+
+        @Test
+        @DisplayName("할인정책 적용 실패(6) - 할인정책을 적용할 수강 내역이 이미 결제된 상태일 때")
+        public void checkDiscount_fail6() {
+
+            given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
+            given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
+            given(mockEmployee.getEmployeeRole()).willReturn(EmployeeRole.ROLE_STAFF);
+            given(discountRepository.findByDiscountNameAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(discount));
+            given(enrollmentRepository.findById(anyLong())).willReturn(Optional.of(mockEnrollment));
+            given(mockEnrollment.getPaymentYN()).willReturn(true);
+
+            AppException appException = assertThrows(AppException.class,
+                    () -> discountService.checkDiscount(academy.getId(), checkDiscountRequest, employee.getAccount()));
+
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ALREADY_PAYMENT);
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("이미 결제된 수업입니다.");
+
+            then(academyRepository).should(times(1)).findById(anyLong());
+            then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
+            then(mockEmployee).should(times(1)).getEmployeeRole();
+            then(discountRepository).should(times(1)).findByDiscountNameAndAcademy(anyString(), any(Academy.class));
+            then(enrollmentRepository).should(times(1)).findById(anyLong());
+            then(mockEnrollment).should(times(1)).getPaymentYN();
+        }
+
+    }
+
+    @Nested
+    @DisplayName("등록")
+    class DiscountCreate{
+
+        CreateDiscountRequest createDiscountRequest = new CreateDiscountRequest("discountName", 50);
+
+        @Test
+        @DisplayName("등록 성공")
+        public void createDiscount_success() {
+
+            given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
+            given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
+            given(mockEmployee.getEmployeeRole()).willReturn(EmployeeRole.ROLE_STAFF);
+            given(discountRepository.findByDiscountNameAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.empty());
+            given(discountRepository.save(any(Discount.class))).willReturn(discount);
+
+            CreateDiscountResponse createdDiscount = discountService.createDiscount(academy.getId(), createDiscountRequest, employee.getAccount());
+            assertThat(createdDiscount.getDiscountId()).isEqualTo(1L);
+            assertThat(createdDiscount.getMessage()).isEqualTo("할인정책 등록 성공");
+
+            then(academyRepository).should(times(1)).findById(anyLong());
+            then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
+            then(mockEmployee).should(times(1)).getEmployeeRole();
+            then(discountRepository).should(times(1)).findByDiscountNameAndAcademy(anyString(), any(Academy.class));
+            then(discountRepository).should(times(1)).save(any(Discount.class));
+        }
+
+        @Test
+        @DisplayName("등록 실패(1) - 학원이 존재하지 않을 때")
+        public void createDiscount_fail1() {
+
+            given(academyRepository.findById(anyLong())).willReturn(Optional.empty());
+
+            AppException appException = assertThrows(AppException.class,
+                    () -> discountService.createDiscount(academy.getId(), createDiscountRequest, employee.getAccount()));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACADEMY_NOT_FOUND);
             assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 학원을 찾을 수 없습니다.");
@@ -295,13 +435,13 @@ class LectureServiceTest {
 
         @Test
         @DisplayName("등록 실패(2) - 등록 진행하는 직원이 해당 학원 소속이 아닐 때")
-        public void createLecture_fail2() {
+        public void createDiscount_fail2() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.empty());
 
             AppException appException = assertThrows(AppException.class,
-                    () -> lectureService.createLecture(academy.getId(), employee.getId(), createLectureRequest, employee.getAccount()));
+                    () -> discountService.createDiscount(academy.getId(), createDiscountRequest, employee.getAccount()));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACCOUNT_NOT_FOUND);
             assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 계정명을 찾을 수 없습니다.");
@@ -311,15 +451,15 @@ class LectureServiceTest {
         }
 
         @Test
-        @DisplayName("등록 실패(3) - 직원이 강좌를 개설할 권한이 아닐 때")
-        public void createLecture_fail3() {
+        @DisplayName("등록 실패(3) - 직원이 할인정책을 등록할 권한이 아닐 때")
+        public void createDiscount_fail3() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
             given(mockEmployee.getEmployeeRole()).willReturn(EmployeeRole.ROLE_USER);
 
             AppException appException = assertThrows(AppException.class,
-                    () -> lectureService.createLecture(academy.getId(), employee.getId(), createLectureRequest, employee.getAccount()));
+                    () -> discountService.createDiscount(academy.getId(), createDiscountRequest, employee.getAccount()));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.INVALID_PERMISSION);
             assertThat(appException.getErrorCode().getMessage()).isEqualTo("사용자가 권한이 없습니다.");
@@ -330,206 +470,59 @@ class LectureServiceTest {
         }
 
         @Test
-        @DisplayName("등록 실패(4) - 강좌에 등록될 강사가 존재하지 않을 때")
-        public void createLecture_fail4() {
+        @DisplayName("등록 실패(4) - 할인정책이 중복 등록되어 있는 경우")
+        public void createDiscount_fail4() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
             given(mockEmployee.getEmployeeRole()).willReturn(EmployeeRole.ROLE_STAFF);
-            given(employeeRepository.findById(anyLong())).willReturn(Optional.empty());
+            given(discountRepository.findByDiscountNameAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(discount));
 
             AppException appException = assertThrows(AppException.class,
-                    () -> lectureService.createLecture(academy.getId(), employee.getId(), createLectureRequest, employee.getAccount()));
+                    () -> discountService.createDiscount(academy.getId(), createDiscountRequest, employee.getAccount()));
 
-            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.TEACHER_NOT_FOUND);
-            assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 강사를 찾을 수 없습니다.");
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.DUPLICATED_DISCOUNT);
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("이미 할인 정책에 등록되어 있습니다.");
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
             then(mockEmployee).should(times(1)).getEmployeeRole();
-            then(employeeRepository).should(times(1)).findById(anyLong());
+            then(discountRepository).should(times(1)).findByDiscountNameAndAcademy(anyString(), any(Academy.class));
         }
 
-        @Test
-        @DisplayName("등록 실패(5) - 강좌에 등록될 강사의 권한이 STAFF인 경우")
-        public void createLecture_fail5() {
-
-            given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
-            given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
-            given(mockEmployee.getEmployeeRole()).willReturn(EmployeeRole.ROLE_STAFF);
-            given(employeeRepository.findById(anyLong())).willReturn(Optional.of(mockTeacher));
-            given(mockTeacher.getEmployeeRole()).willReturn(EmployeeRole.ROLE_STAFF);
-
-            AppException appException = assertThrows(AppException.class,
-                    () -> lectureService.createLecture(academy.getId(), employee.getId(), createLectureRequest, employee.getAccount()));
-
-            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.INVALID_PERMISSION);
-            assertThat(appException.getErrorCode().getMessage()).isEqualTo("사용자가 권한이 없습니다.");
-
-            then(academyRepository).should(times(1)).findById(anyLong());
-            then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
-            then(mockEmployee).should(times(1)).getEmployeeRole();
-            then(employeeRepository).should(times(1)).findById(anyLong());
-            then(mockTeacher).should(times(1)).getEmployeeRole();
-        }
-
-        @Test
-        @DisplayName("등록 실패(6) - 강좌가 중복 등록되어 있는 경우")
-        public void createLecture_fail6() {
-
-            given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
-            given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
-            given(mockEmployee.getEmployeeRole()).willReturn(EmployeeRole.ROLE_STAFF);
-            given(employeeRepository.findById(anyLong())).willReturn(Optional.of(mockTeacher));
-            given(mockTeacher.getEmployeeRole()).willReturn(EmployeeRole.ROLE_USER);
-            given(lectureRepository.findByName(anyString())).willReturn(Optional.of(lecture));
-
-            AppException appException = assertThrows(AppException.class,
-                    () -> lectureService.createLecture(academy.getId(), employee.getId(), createLectureRequest, employee.getAccount()));
-
-            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.DUPLICATED_LECTURE);
-            assertThat(appException.getErrorCode().getMessage()).isEqualTo("이미 존재하는 수업입니다.");
-
-            then(academyRepository).should(times(1)).findById(anyLong());
-            then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
-            then(mockEmployee).should(times(1)).getEmployeeRole();
-            then(employeeRepository).should(times(1)).findById(anyLong());
-            then(mockTeacher).should(times(1)).getEmployeeRole();
-            then(lectureRepository).should(times(1)).findByName(anyString());
-        }
     }
 
     @Nested
-    @DisplayName("강좌 수정")
-    class LectureUpdate {
-
-        UpdateLectureRequest updateLectureRequest = UpdateLectureRequest.builder().lectureName("lecture").lecturePrice(10000).build();
-
-        @Test
-        @DisplayName("수정 성공")
-        public void updateLecture_success() {
-
-            given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
-            given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
-            given(lectureRepository.findById(anyLong())).willReturn(Optional.of(lecture));
-            given(mockEmployee.getEmployeeRole()).willReturn(EmployeeRole.ROLE_STAFF);
-
-            UpdateLectureResponse updatedLecture = lectureService.updateLecture(academy.getId(), lecture.getId(), updateLectureRequest, employee.getAccount());
-            assertThat(updatedLecture.getLectureId()).isEqualTo(1L);
-            assertThat(updatedLecture.getMessage()).isEqualTo("강좌 정보 변경 완료");
-
-            then(academyRepository).should(times(1)).findById(anyLong());
-            then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
-            then(lectureRepository).should(times(1)).findById(anyLong());
-            then(mockEmployee).should(times(1)).getEmployeeRole();
-
-        }
-
-        @Test
-        @DisplayName("수정 실패(1) - 학원이 존재하지 않을 때")
-        public void updateLecture_fail1() {
-
-            given(academyRepository.findById(anyLong())).willReturn(Optional.empty());
-
-            AppException appException = assertThrows(AppException.class,
-                    () -> lectureService.updateLecture(academy.getId(), lecture.getId(), updateLectureRequest, employee.getAccount()));
-
-            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACADEMY_NOT_FOUND);
-            assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 학원을 찾을 수 없습니다.");
-
-            then(academyRepository).should(times(1)).findById(anyLong());
-        }
-
-        @Test
-        @DisplayName("수정 실패(2) - 수정 진행하는 직원이 해당 학원 소속이 아닐 때")
-        public void updateLecture_fail2() {
-
-            given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
-            given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.empty());
-
-            AppException appException = assertThrows(AppException.class,
-                    () -> lectureService.updateLecture(academy.getId(), lecture.getId(), updateLectureRequest, employee.getAccount()));
-
-            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACCOUNT_NOT_FOUND);
-            assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 계정명을 찾을 수 없습니다.");
-
-            then(academyRepository).should(times(1)).findById(anyLong());
-            then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
-        }
-
-        @Test
-        @DisplayName("수정 실패(3) - 수정할 강좌가 존재하지 않을 때")
-        public void updateLecture_fail3() {
-
-            given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
-            given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(employee));
-            given(lectureRepository.findById(anyLong())).willReturn(Optional.empty());
-
-            AppException appException = assertThrows(AppException.class,
-                    () -> lectureService.updateLecture(academy.getId(), lecture.getId(), updateLectureRequest, employee.getAccount()));
-
-            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.LECTURE_NOT_FOUND);
-            assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 수업을 찾을 수 없습니다.");
-
-            then(academyRepository).should(times(1)).findById(anyLong());
-            then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
-            then(lectureRepository).should(times(1)).findById(anyLong());
-        }
-
-        @Test
-        @DisplayName("수정 실패(4) - 직원이 강좌를 수정할 권한이 아닐 때")
-        public void updateLecture_fail4() {
-
-            given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
-            given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
-            given(lectureRepository.findById(anyLong())).willReturn(Optional.of(lecture));
-            given(mockEmployee.getEmployeeRole()).willReturn(EmployeeRole.ROLE_USER);
-
-            AppException appException = assertThrows(AppException.class,
-                    () -> lectureService.updateLecture(academy.getId(), lecture.getId(), updateLectureRequest, employee.getAccount()));
-
-            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.INVALID_PERMISSION);
-            assertThat(appException.getErrorCode().getMessage()).isEqualTo("사용자가 권한이 없습니다.");
-
-            then(academyRepository).should(times(1)).findById(anyLong());
-            then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
-            then(lectureRepository).should(times(1)).findById(anyLong());
-            then(mockEmployee).should(times(1)).getEmployeeRole();
-        }
-    }
-
-    @Nested
-    @DisplayName("강좌 삭제")
-    class LectureDelete {
+    @DisplayName("삭제")
+    class DiscountDelete{
 
         @Test
         @DisplayName("삭제 성공")
-        public void deleteLecture_success() {
+        public void deleteDiscount_success() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
-            given(lectureRepository.findById(anyLong())).willReturn(Optional.of(lecture));
+            given(discountRepository.findById(anyLong())).willReturn(Optional.of(discount));
             given(mockEmployee.getEmployeeRole()).willReturn(EmployeeRole.ROLE_STAFF);
 
-            DeleteLectureResponse deletedLecture = lectureService.deleteLecture(academy.getId(), lecture.getId(), employee.getAccount());
-            assertThat(deletedLecture.getLectureId()).isEqualTo(1L);
-            assertThat(deletedLecture.getMessage()).isEqualTo("강좌 정보 삭제 완료");
+            DeleteDiscountResponse deletedDiscount = discountService.deleteDiscount(academy.getId(), discount.getId(), employee.getAccount());
+            assertThat(deletedDiscount.getDiscountId()).isEqualTo(1L);
+            assertThat(deletedDiscount.getMessage()).isEqualTo("할인정책 삭제 성공");
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
-            then(lectureRepository).should(times(1)).findById(anyLong());
+            then(discountRepository).should(times(1)).findById(anyLong());
             then(mockEmployee).should(times(1)).getEmployeeRole();
-
         }
 
         @Test
-        @DisplayName("삭제 실패(1) - 학원이 존재하지 않을 때 ")
-        public void deleteLecture_fail1() {
+        @DisplayName("삭제 실패(1) - 학원이 존재하지 않을 때")
+        public void deleteDiscount_fail1() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.empty());
 
             AppException appException = assertThrows(AppException.class,
-                    () -> lectureService.deleteLecture(academy.getId(), lecture.getId(), employee.getAccount()));
+                    () -> discountService.deleteDiscount(academy.getId(), discount.getId(), employee.getAccount()));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACADEMY_NOT_FOUND);
             assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 학원을 찾을 수 없습니다.");
@@ -539,14 +532,13 @@ class LectureServiceTest {
 
         @Test
         @DisplayName("삭제 실패(2) - 삭제 진행하는 직원이 해당 학원 소속이 아닐 때")
-        public void deleteLecture_fail2() {
+        public void deleteDiscount_fail2() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.empty());
 
             AppException appException = assertThrows(AppException.class,
-                    () -> lectureService.deleteLecture(academy.getId(), lecture.getId(), employee.getAccount()));
-
+                    () -> discountService.deleteDiscount(academy.getId(), discount.getId(), employee.getAccount()));
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACCOUNT_NOT_FOUND);
             assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 계정명을 찾을 수 없습니다.");
 
@@ -555,42 +547,42 @@ class LectureServiceTest {
         }
 
         @Test
-        @DisplayName("삭제 실패(3) - 삭제할 강좌가 존재하지 않을 때")
-        public void deleteLecture_fail3() {
-
-            given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
-            given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(employee));
-            given(lectureRepository.findById(anyLong())).willReturn(Optional.empty());
-
-            AppException appException = assertThrows(AppException.class,
-                    () -> lectureService.deleteLecture(academy.getId(), lecture.getId(), employee.getAccount()));
-
-            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.LECTURE_NOT_FOUND);
-            assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 수업을 찾을 수 없습니다.");
-
-            then(academyRepository).should(times(1)).findById(anyLong());
-            then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
-            then(lectureRepository).should(times(1)).findById(anyLong());
-        }
-
-        @Test
-        @DisplayName("삭제 실패(4) - 직원이 강좌를 삭제할 권한이 아닐 때")
-        public void deleteLecture_fail4() {
+        @DisplayName("삭제 실패(3) - 삭제할 할인정책이 존재하지 않을 때")
+        public void deleteDiscount_fail3() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
-            given(lectureRepository.findById(anyLong())).willReturn(Optional.of(lecture));
+            given(discountRepository.findById(anyLong())).willReturn(Optional.empty());
+
+            AppException appException = assertThrows(AppException.class,
+                    () -> discountService.deleteDiscount(academy.getId(), discount.getId(), employee.getAccount()));
+
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.DISCOUNT_NOT_FOUND);
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 할인정책을 찾을 수 없습니다.");
+
+            then(academyRepository).should(times(1)).findById(anyLong());
+            then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
+            then(discountRepository).should(times(1)).findById(anyLong());
+        }
+
+        @Test
+        @DisplayName("삭제 실패(4) - 직원이 할인정책을 삭제할 권한이 아닐 때")
+        public void deleteDiscount_fail4() {
+
+            given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
+            given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
+            given(discountRepository.findById(anyLong())).willReturn(Optional.of(discount));
             given(mockEmployee.getEmployeeRole()).willReturn(EmployeeRole.ROLE_USER);
 
             AppException appException = assertThrows(AppException.class,
-                    () -> lectureService.deleteLecture(academy.getId(), lecture.getId(), employee.getAccount()));
+                    () -> discountService.deleteDiscount(academy.getId(), discount.getId(), employee.getAccount()));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.INVALID_PERMISSION);
             assertThat(appException.getErrorCode().getMessage()).isEqualTo("사용자가 권한이 없습니다.");
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
-            then(lectureRepository).should(times(1)).findById(anyLong());
+            then(discountRepository).should(times(1)).findById(anyLong());
             then(mockEmployee).should(times(1)).getEmployeeRole();
         }
     }
