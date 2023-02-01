@@ -65,10 +65,9 @@ class EnrollmentServiceTest {
     private Student student2;
     private Enrollment enrollment;
     private Enrollment enrollment2;
+    private Waitinglist waitinglist;
     private Employee mockEmployee;
     private Lecture mockLecture;
-    private Enrollment mockEnrollment;
-    private Waitinglist waitinglist;
 
     @BeforeEach
     void setup() {
@@ -83,7 +82,6 @@ class EnrollmentServiceTest {
         waitinglist = Waitinglist.builder().student(student2).lecture(lecture).build();
         mockEmployee = mock(Employee.class);
         mockLecture = mock(Lecture.class);
-        mockEnrollment = mock(Enrollment.class);
     }
 
     @Nested
@@ -386,7 +384,7 @@ class EnrollmentServiceTest {
         }
 
         @Test
-        @DisplayName("수정 실패(3) - 수강에 등록된 학생이 존재하지 않을 때")
+        @DisplayName("수정 실패(3) - 수정할 수강에 학생이 존재하지 않을 때")
         public void updateEnrollment_fail3() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
@@ -405,7 +403,7 @@ class EnrollmentServiceTest {
         }
 
         @Test
-        @DisplayName("수정 실패(4) - 수강에 등록된 강좌가 존재하지 않을 때")
+        @DisplayName("수정 실패(4) - 수정할 수강에 강좌가 존재하지 않을 때")
         public void updateEnrollment_fail4() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
@@ -528,7 +526,7 @@ class EnrollmentServiceTest {
         }
 
         @Test
-        @DisplayName("삭제 실패(2) - 등록 진행하는 직원이 해당 학원 소속이 아닐 때")
+        @DisplayName("삭제 실패(2) - 삭제 진행하는 직원이 해당 학원 소속이 아닐 때")
         public void deleteEnrollment_fail2() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
@@ -545,7 +543,7 @@ class EnrollmentServiceTest {
         }
 
         @Test
-        @DisplayName("삭제 실패(3) - 수강에 등록된 학생이 존재하지 않을 때")
+        @DisplayName("삭제 실패(3) - 삭제할 수강에 학생이 존재하지 않을 때")
         public void deleteEnrollment_fail3() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
@@ -564,7 +562,7 @@ class EnrollmentServiceTest {
         }
 
         @Test
-        @DisplayName("삭제 실패(4) - 수강에 등록된 강좌가 존재하지 않을 때")
+        @DisplayName("삭제 실패(4) - 삭제할 수강에 강좌가 존재하지 않을 때")
         public void deleteEnrollment_fail4() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
@@ -695,7 +693,7 @@ class EnrollmentServiceTest {
     class UI{
 
 //        @Test
-//        @DisplayName("결제를 위한 수강 조회")
+//        @DisplayName("결제를 위한 수강 조회 성공")
 //        public void findEnrollment_ForPay() {
 //
 //            List<Student> students = new ArrayList<>();
@@ -709,22 +707,31 @@ class EnrollmentServiceTest {
 //            PageImpl<Enrollment> enrollmentList = new PageImpl<>(List.of(enrollment, enrollment2));
 //            PageRequest pageable = PageRequest.of(0, 20, Sort.Direction.DESC,"createdAt");
 //
-//            given(studentRepository.findByAcademyIdAndName(anyLong(),anyString())).willReturn(students);
+//            given(studentRepository.findByAcademyIdAndName(academy.getId(),student.getName(),pageable)).willReturn(new PageImpl<>(students));
 //            given(enrollmentRepository.findByStudentOrderByCreatedAtDesc(student)).willReturn(enrollments);
 //            given(enrollmentRepository.findByStudentOrderByCreatedAtDesc(student2)).willReturn(enrollments);
 //
 //            given(enrollmentRepository.findAll(pageable)).willReturn(enrollmentList);
 //
-//            Page<FindEnrollmentResponse> enrollmentForPay = enrollmentService.findEnrollmentForPay(academy.getId(), student.getName());
+//            Page<FindEnrollmentResponse> enrollmentForPay = enrollmentService.findEnrollmentForPay(academy.getId(), student.getName(),pageable);
 //
 //            assertThat(enrollmentForPay.getTotalPages()).isEqualTo(1);
 //            assertThat(enrollmentForPay.getTotalElements()).isEqualTo(2);
 //        }
 
         @Test
-        @DisplayName("해당 학원의 모든 수강내역 조회")
-        public void findAllEnrollment_ForPay() {
+        @DisplayName("해당 학원의 특정 학생의 수강 내역 조회 실패 - 수강 내역 없음")
+        public void findEnrollment_ForPaySuccess_fai11() {
 
+            given(enrollmentRepository.findByLecture_IdAndStudent_Id(anyLong(), anyLong())).willReturn(Optional.empty());
+
+            AppException appException = assertThrows(AppException.class,
+                    () -> enrollmentService.findEnrollmentForPaySuccess(student.getId(), lecture.getId()));
+
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ENROLLMENT_NOT_FOUND);
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 수강 이력을 찾을 수 없습니다.");
+
+            then(enrollmentRepository).should(times(1)).findByLecture_IdAndStudent_Id(anyLong(), anyLong());
         }
 
     }

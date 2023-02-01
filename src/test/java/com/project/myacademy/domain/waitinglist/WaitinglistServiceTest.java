@@ -72,7 +72,6 @@ class WaitinglistServiceTest {
     private Employee mockEmployee;
     private Lecture mockLecture;
 
-
     @BeforeEach
     void setup() {
         academy = Academy.builder().id(1L).name("academy").owner("owner").build();
@@ -343,7 +342,7 @@ class WaitinglistServiceTest {
         }
 
         @Test
-        @DisplayName("등록 실패(6) - 이미 수강등록되어 있는 경우")
+        @DisplayName("등록 실패(6) - 이미 수강 등록되어 있는 경우")
         public void createWaitingList_fail6() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
