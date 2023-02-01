@@ -641,7 +641,7 @@ class EmployeeServiceTest {
     @DisplayName("직원 수정")
     class UpdateEmployee {
 
-        UpdateEmployeeRequest request = new UpdateEmployeeRequest("바뀐이름", "바뀐주소", "바뀐이메일", "바뀐비밀번호", "바뀐폰번호");
+        UpdateEmployeeRequest request = new UpdateEmployeeRequest("바뀐주소", "바뀐번호", "바뀐과목");
 
         @Test
         @DisplayName("직원 수정 성공")
