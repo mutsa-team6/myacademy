@@ -1,0 +1,283 @@
+<!--
+=========================================================
+* Material Dashboard 2 - v3.0.4
+=========================================================
+
+* Product Page: https://www.creative-tim.com/product/material-dashboard
+* Copyright 2022 Creative Tim (https://www.creative-tim.com)
+* Licensed under MIT (https://www.creative-tim.com/license)
+* Coded by Creative Tim
+
+=========================================================
+
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+-->
+
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<!-- header -->
+<th:block th:replace="layout/header :: headerFragment"></th:block>
+
+
+<body class="g-sidenav-show  bg-gray-100">
+
+<!-- side bar -->
+<th:block th:replace="layout/aside :: asideFragment"></th:block>
+
+
+<main class="main-content border-radius-lg ">
+
+
+    <!-- Navbar -->
+    <th:block th:replace="layout/navbar :: navbarFragment"></th:block>
+
+
+    <div class="container-fluid py-4">
+        <div class="row mb-4">
+            <div class="col-lg-12 col-md-6 mb-md-0 mb-4">
+
+                <div class="card">
+                    <div class="card-header pb-0">
+                        <div class="row">
+                            <div class="col-lg-9 col-7">
+                                <h3 style="font-family: 'Black Han Sans', sans-serif; font-size: 3.5rem; font-weight: lighter;color: #5A2082">
+                                    결제 내역</h3>
+
+                            </div>
+                            <div class="col-lg-3 col-5 my-auto text-end">
+                                <form class="form-inline w-100 justify-content-center " action="/academy/payment/list"
+                                      method="get">
+                                    <div class="row mb-4">
+                                        <div class="col-8 align-self-center">
+                                            <div class="input-group input-group-outline">
+
+                                                <input type="text" class="form-control" name="studentName"
+                                                       placeholder="학생 이름">
+                                            </div>
+                                        </div>
+                                        <div class="col-4  align-self-center">
+                                            <button type="submit"
+                                                    class="btn btn-sm bg-gradient-primary btn-lg mb-0">검색
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <hr style="color: #5A2082; height: 1.5px;background-color: #5A2082">
+                    </div>
+
+                    <div class="card-body px-0 pb-2 ">
+                        <div class="table-responsive p-0 mb-4">
+                            <table class="table align-items-center mb-0">
+                                <thead>
+                                <tr>
+                                    <th class="text-center text-uppercase  font-weight-bolder">
+                                        학생 이름
+                                    </th>
+                                    <th class="text-center text-uppercase  font-weight-bolder">
+                                        학생 이메일
+                                    </th>
+                                    <th class="text-center text-uppercase  font-weight-bolder">
+                                        학생 전화번호
+                                    </th>
+                                    <th class="text-center text-uppercase  font-weight-bolder">
+                                        주문 상품 이름
+                                    </th>
+                                    <th class="text-center text-uppercase  font-weight-bolder">
+                                        할인 정책 이름
+                                    </th>
+                                    <th class="text-center text-uppercase  font-weight-bolder">
+                                        결제 금액
+                                    </th>
+                                    <th class="text-center text-uppercase  font-weight-bolder">
+                                        주문 번호
+                                    </th>
+                                    <th class="text-center text-uppercase  font-weight-bolder">
+                                        결제한 직원 이름
+                                    </th>
+                                    <th class="text-center text-uppercase  font-weight-bolder">
+                                        결제 일시
+                                    </th>
+                                    <th class="text-center text-uppercase  font-weight-bolder">
+                                        결제 취소 일시
+                                    </th>
+
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="payment : ${payments}">
+
+                                    <th class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${payment.studentName}"></span>
+                                    </th>
+                                    <td class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${payment.studentEmail}"></span>
+                                    </td>
+                                    <td class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${payment.studentPhoneNum}"></span>
+                                    </td>
+                                    <td class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${payment.orderName}"></span>
+                                    </td>
+                                    <th class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${payment.discountName}"></span>
+                                    </th>
+                                    <th class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${payment.amount}"></span>
+                                    </th>
+
+                                    <th class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${payment.orderId}"></span>
+                                    </th>
+                                    <th class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${payment.employeeName}"></span>
+                                    </th>
+                                    <th class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${payment.createdAt}"></span>
+                                    </th>
+                                    <th class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${payment.deletedAt}"></span>
+                                    </th>
+
+                                    <th:block
+                                            th:if="${payment.deletedAt == ''}">
+                                        <th class="align-middle text-center">
+                                            <button type="button"
+                                                    class="btn btn-lg bg-gradient-danger btn-lg w-100  mb-0"
+                                                    data-bs-toggle="modal"
+                                                    th:attr="data-bs-target='#customerModel'+${payment.paymentId}"
+                                            >결제 취소
+                                            </button>
+                                        </th>
+                                    </th:block>
+                                    <th:block
+                                            th:if="${payment.deletedAt != ''}">
+                                        <th class="align-middle text-center">
+                                            <button type="button" class="btn btn-lg  btn-secondary btn-lg w-100  mb-0"
+                                                    disabled>결제 취소
+                                            </button>
+
+                                        </th>
+                                    </th:block>
+
+
+                                    <!-- Modal -->
+                                    <div class="modal fade" th:id="'customerModel'+${payment.paymentId}" tabindex="-1"
+                                         aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h1 class="modal-title fs-5" id="exampleModalLabel">취소하시겠습니까?</h1>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                            aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body"
+                                                     th:text="|${payment.studentName} 학생의 ${payment.orderName} 결제를 취소하시겠습니까? |">
+                                                    ...
+                                                </div>
+                                                <div>
+                                                    <hr style="color: #5A2082; height: 1.5px;background-color: #5A2082">
+                                                </div>
+                                                <div class="input-group  input-group-dynamic mx-auto"
+                                                     style="width: 400px">
+                                                    <textarea class="form-control" rows="5" placeholder="취소 사유를 적어주세요"
+                                                              th:id="|cancelReason${payment.paymentId}|"></textarea>
+                                                </div>
+                                                <div class="modal-footer mx-auto">
+                                                    <button type="button" class="btn btn-secondary"
+                                                            data-bs-dismiss="modal">닫기
+                                                    </button>
+                                                    <button type="button" class="btn btn-primary"
+                                                            th:data-parameter1="${payment.paymentKey}"
+                                                            th:data-parameter2="${payment.paymentId}"
+                                                            th:onclick="|payment.delete(this.getAttribute('data-parameter1'),this.getAttribute('data-parameter2'))|"
+                                                    >결제 취소
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                </tr>
+
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <ul class="pagination justify-content-center">
+
+                            <li class="page-item"><a class="page-link"
+                                                     th:href="@{/academy/payment/list(page=${previous})}">◀</a></li>
+                            <li class="page-item"><a class="page-link"
+                                                     th:href="@{/academy/payment/list(page=${next})}">▶</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!--footer-->
+    <th:block th:replace="layout/footer :: footerFragment"></th:block>
+</main>
+<!--   Core JS Files   -->
+<script src="/assets/js/core/popper.min.js"></script>
+<script src="/assets/js/core/bootstrap.min.js"></script>
+<script src="/assets/js/plugins/perfect-scrollbar.min.js"></script>
+<script src="/assets/js/plugins/smooth-scrollbar.min.js"></script>
+<script src="/assets/js/material-dashboard.min.js?v=3.0.4"></script>
+<link id="pagestyle" href="/assets/css/material-dashboard.css?v=3.0.4" rel="stylesheet"/>
+
+
+</body>
+<Script>
+
+    let payment = {
+        init: function () {
+            var _this = this;
+        },
+
+        delete: function (paymentKey, paymentId) {
+
+            console.log("paymentId " + paymentId);
+            let cancelReason = document.querySelector("#cancelReason" + paymentId).value.trim();
+            console.log("cancelReason " + cancelReason);
+            var params = new URLSearchParams();
+            params.append('paymentKey', paymentKey);
+            params.append('cancelReason', cancelReason);
+
+            axios.post("/api/v1/payments/cancel",
+                params
+            ).then((response) => {
+                console.log(response);
+                alert("결제 취소 성공");
+                window.location.href = '/academy/payment/list';
+            }).catch((error) => {
+                console.log(error);
+
+            });
+
+        }
+    };
+
+    academy.init();
+
+</script>
+
+</html>

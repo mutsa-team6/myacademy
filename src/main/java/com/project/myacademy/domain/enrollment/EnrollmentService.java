@@ -241,10 +241,10 @@ public class EnrollmentService {
      * 결제 UI용 메서드
      */
 
-    public Page<FindEnrollmentResponse> findEnrollmentForPay(Long academyId, String studentName) {
+    public Page<FindEnrollmentResponse> findEnrollmentForPay(Long academyId, String studentName,Pageable pageable) {
 
         // 학원과 학생 이름으로 student 객체를 찾아온다.
-        List<Student> foundStudents = studentRepository.findByAcademyIdAndName(academyId, studentName);
+        Page<Student> foundStudents = studentRepository.findByAcademyIdAndName(academyId, studentName,pageable);
 
         // 모두 이 컬렉션에 저장할 것이다.
         List<FindEnrollmentResponse> finalEnrollments = new ArrayList<>();
@@ -260,13 +260,28 @@ public class EnrollmentService {
     }
 
     /**
-     * UI용 메서드, 해당 학원의 모든 수강신청내역 가져오기
+     * UI용 메서드, 해당 학원의 모든 수강신청내역 가져오기 ( 최신순으로, 결제 내역이 false인 데이터만)
      */
     public Page<FindEnrollmentResponse> findAllEnrollmentForPay(Long academyId,Pageable pageable) {
 
         //해당 학원의 모든 수강 신청 내역을 page 로 가져온다.
-        Page<Enrollment> foundAllEnrollments = enrollmentRepository.findAllByAcademyIdOrderByCreatedAtDesc(academyId,pageable);
+        Page<Enrollment> foundAllEnrollments = enrollmentRepository.findAllByAcademyIdAndPaymentYNIsFalseOrderByCreatedAtDesc(academyId,pageable);
 
         return foundAllEnrollments.map(enrollment -> new FindEnrollmentResponse(enrollment));
     }
+
+    /**
+     * UI용 메서드, 해당 학원의 특정 학생의 수강신청 내역
+     * 결제 완료되면 보여주기 위해 존재
+     */
+    public FindEnrollmentResponse findEnrollmentForPaySuccess(Long studentId, Long lectureId) {
+
+        //해당 학원의 특정 학생의 특정 과목 수강신청 내역을 가져온다.
+        Enrollment foundEnrollment = enrollmentRepository.findByLecture_IdAndStudent_Id(lectureId, studentId)
+                .orElseThrow(() -> new AppException(ErrorCode.ENROLLMENT_NOT_FOUND));
+
+        return new FindEnrollmentResponse(foundEnrollment);
+    }
+
+
 }

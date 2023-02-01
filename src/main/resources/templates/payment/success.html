@@ -1,0 +1,159 @@
+<!--
+=========================================================
+* Material Dashboard 2 - v3.0.4
+=========================================================
+
+* Product Page: https://www.creative-tim.com/product/material-dashboard
+* Copyright 2022 Creative Tim (https://www.creative-tim.com)
+* Licensed under MIT (https://www.creative-tim.com/license)
+* Coded by Creative Tim
+
+=========================================================
+
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+-->
+
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<!-- header -->
+<th:block th:replace="layout/header :: headerFragment"></th:block>
+
+
+<body class="g-sidenav-show  bg-gray-100">
+
+<!-- side bar -->
+<th:block th:replace="layout/aside :: asideFragment"></th:block>
+
+
+<main class="main-content border-radius-lg ">
+
+
+    <!-- Navbar -->
+    <th:block th:replace="layout/navbar :: navbarFragment"></th:block>
+
+
+    <div class="container-fluid py-4">
+        <div class="row mb-4">
+            <div class="col-lg-1 col-md-6 mb-md-0 mb-4">
+            </div>
+            <div class="col-lg-10 col-md-6 mb-md-0 mb-4">
+                <div class="card">
+                    <div class="card-header pb-0">
+                        <div class="row">
+                            <div class="col-lg-9 col-7">
+                                <h3 style="font-family: 'Black Han Sans', sans-serif; font-size: 3.5rem; font-weight: lighter;color: #5A2082">결제 완료</h3>
+                                <p class="mb-0" style="font-weight: bold;color: #5A2060">완료된 결제 내역입니다.</p>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <hr style="color: #5A2082; height: 1.5px;background-color: #5A2082">
+                    </div>
+
+                    <div class="card-body pb-0 mb-4">
+                        <div class="table-responsive">
+                            <table class="table align-items-center mb-0">
+                                <thead>
+                                <tr>
+                                    <th class="text-center text-uppercase  font-weight-bolder">
+                                        학생 이름
+                                    </th>
+                                    <th class="text-center text-uppercase  font-weight-bolder">
+                                        학생 이메일
+                                    </th>
+                                    <th class="text-center text-uppercase  font-weight-bolder">
+                                        학생 전화번호
+                                    </th>
+                                    <th class="text-center text-uppercase  font-weight-bolder">
+                                        주문 상품 이름
+                                    </th>
+                                    <th class="text-center text-uppercase  font-weight-bolder">
+                                        할인 정책 이름
+                                    </th>
+                                    <th class="text-center text-uppercase  font-weight-bolder">
+                                        결제 금액
+                                    </th>
+                                    <th class="text-center text-uppercase  font-weight-bolder">
+                                        주문 번호
+                                    </th>
+                                    <th class="text-center text-uppercase  font-weight-bolder">
+                                        결제한 직원 이름
+                                    </th>
+                                    <th class="text-center text-uppercase  font-weight-bolder">
+                                        결제 일시
+                                    </th>
+
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    <th class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${payment.studentName}"></span>
+                                    </th>
+                                    <td class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${payment.studentEmail}"></span>
+                                    </td>
+                                    <td class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${payment.studentPhoneNum}"></span>
+                                    </td>
+                                    <td class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${payment.orderName}"></span>
+                                    </td>
+                                    <th class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${payment.discountName}"></span>
+                                    </th>
+                                    <th class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${payment.amount}"></span>
+                                    </th>
+
+                                    <th class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${payment.orderId}"></span>
+                                    </th>
+                                    <th class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${payment.employeeName}"></span>
+                                    </th>
+                                    <th class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${payment.createdAt}"></span>
+                                    </th>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--footer-->
+        <th:block th:replace="layout/footer :: footerFragment"></th:block>
+
+    </div>
+
+
+</main>
+
+
+<!--   Core JS Files   -->
+<script src="/assets/js/core/popper.min.js"></script>
+<script src="/assets/js/core/bootstrap.min.js"></script>
+<script src="/assets/js/plugins/perfect-scrollbar.min.js"></script>
+<script src="/assets/js/plugins/smooth-scrollbar.min.js"></script>
+<script src="/assets/js/material-dashboard.min.js?v=3.0.4"></script>
+<link id="pagestyle" href="/assets/css/material-dashboard.css?v=3.0.4" rel="stylesheet"/>
+
+<!-- Toss -->
+<script src="https://js.tosspayments.com/v1/payment"></script>
+
+</body>
+
+</html>

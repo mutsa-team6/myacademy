@@ -35,264 +35,50 @@
 
 
     <div class="container-fluid py-4">
-        <div class="row mb-4">
-            <div class="col-lg-1 col-md-6 mb-md-0 mb-4">
+        <div class="row">
+            <div class="card col-6" data-animation="true" >
+                <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                    <a class="d-block blur-shadow-image">
+                        <img src="https://raw.githubusercontent.com/buinq/imageServer/main/img/image-20230121201357931.png" alt="img-blur-shadow" class="img-fluid shadow border-radius-lg">
+                    </a>
+                    <div class="colored-shadow" style="background-image: url(&quot;https://demos.creative-tim.com/test/material-dashboard-pro/assets/img/products/product-1-min.jpg&quot;);"></div>
+                </div>
+                <div class="card-body text-center " style="margin: 0 auto; vertical-align: middle;">
+
+                <h1 class="font-weight-normal">
+                        <a href="/academy/payment/register" style="font-family: 'Black Han Sans', sans-serif; font-size: 4.5rem">결제</a>
+
+                    </h1>
+                </div>
             </div>
-            <div class="col-lg-10 col-md-6 mb-md-0 mb-4">
-                <div class="card">
-                    <div class="card-header pb-0">
-                        <div class="row">
-                            <div class="col-lg-9 col-7">
-                                <h3 style="font-family: 'Black Han Sans', sans-serif; font-size: 3.5rem; font-weight: lighter;color: #5A2082">결제</h3>
-                                <p class="mb-0" style="font-weight: bold;color: #5A2060">결제를 진행할 수강신청 내역을 선택해주세요.</p>
 
-                            </div>
-                            <div class="col-lg-3 col-5 my-auto text-end">
-                                <form class="form-inline w-100 justify-content-center " action="/academy/pay"
-                                      method="get">
-                                    <div class="row mb-4">
-                                        <div class="col-8 align-self-center">
-                                            <div class="input-group input-group-outline">
+            <div class="card col-6" data-animation="true" >
+                <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                    <a class="d-block blur-shadow-image">
+                        <img src="https://raw.githubusercontent.com/buinq/imageServer/main/img/image-20230121201357931.png" alt="img-blur-shadow" class="img-fluid shadow border-radius-lg">
+                    </a>
+                    <div class="colored-shadow" style="background-image: url(&quot;https://demos.creative-tim.com/test/material-dashboard-pro/assets/img/products/product-1-min.jpg&quot;);"></div>
+                </div>
+                <div class="card-body text-center " style="margin: 0 auto; vertical-align: middle;">
 
-                                                <input type="text" class="form-control" name="studentName"
-                                                       placeholder="학생 이름">
-                                            </div>
-                                        </div>
-                                        <div class="col-4  align-self-center">
-                                            <button type="submit"
-                                                    class="btn btn-sm bg-gradient-primary btn-lg mb-0">검색
-                                            </button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                    <div>
-                        <hr style="color: #5A2082; height: 1.5px;background-color: #5A2082">
-                    </div>
+                    <h1 class="font-weight-normal">
+                        <a href="/academy/payment/list" style="font-family: 'Black Han Sans', sans-serif; font-size: 4.5rem">결제 내역 조회</a>
 
-                    <div class="card-body pb-0 mb-4">
-                        <div class="table-responsive">
-                            <table class="table align-items-center mb-0">
-                                <thead>
-                                <tr>
-                                    <th class="text-center text-uppercase  font-weight-bolder">
-                                        학생 이름
-                                    </th>
-                                    <th class="text-center text-uppercase  font-weight-bolder">
-                                        학생 전화번호
-                                    </th>
-                                    <th class="text-center text-uppercase  font-weight-bolder">
-                                        강좌 이름
-                                    </th>
-                                    <th class="text-center text-uppercase  font-weight-bolder">
-                                        강사 이름
-                                    </th>
-                                    <th class="text-center text-uppercase  font-weight-bolder">
-                                        가격
-                                    </th>
-                                    <th class="text-center text-uppercase  font-weight-bolder">
-                                        할인 정책
-                                    </th>
-                                    <th class="text-center text-uppercase  font-weight-bolder">
-                                        할인된 가격
-                                    </th>
-                                    <th class="text-center text-uppercase  font-weight-bolder">
-                                        결제 여부
-                                    </th>
-                                    <th class="text-center text-uppercase  font-weight-bolder">
-                                        수강신청 일시
-                                    </th>
-
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr th:each="enrollment : ${enrollments}">
-                                    <th class="align-middle text-center">
-                                                <span class=" text-xs font-weight-bold"
-                                                      th:text="${enrollment.studentName}"></span>
-                                    </th>
-                                    <td class="align-middle text-center">
-                                                <span class=" text-xs font-weight-bold"
-                                                      th:text="${enrollment.studentPhoneNum}"></span>
-                                    </td>
-                                    <td class="align-middle text-center">
-                                                <span class=" text-xs font-weight-bold"
-                                                      th:text="${enrollment.lectureName}"></span>
-                                    </td>
-                                    <th class="align-middle text-center">
-                                                <span class=" text-xs font-weight-bold"
-                                                      th:text="${enrollment.teacherName}"></span>
-                                    </th>
-                                    <td class="align-middle text-center">
-                                                <span class=" text-xs font-weight-bold"
-                                                      th:text="|${enrollment.price} 원|"></span>
-                                    </td>
-
-                                    <td class="align-middle text-center">
-                                        <div class="input-group input-group-static text-xs font-weight-bold  text-center">
-                                            <select class="form-control text-xs font-weight-bold  text-center" th:id="'exampleFormControlSelect1'+${enrollment.enrollmentId}"
-                                            th:onchange="|pay.show(${enrollment.enrollmentId},${enrollment.price},this.value)|">
-                                                <option value="0" selected>할인정책을 선택해주세요.</option>
-                                                <option value="0">할인정책을 선택 안함.</option>
-                                                <div th:each="discount : ${discounts}">
-                                                    <option th:value="|${discount.discountId}(split)${discount.discountRate}|" class=" text-xs font-weight-bold mt-2"
-                                                            th:text="|${discount.discountName} (${discount.discountRate} % 할인)|"
-                                                           ></option>
-                                                </div>
-                                            </select>
-                                        </div>
-                                    </td>
-
-                                    <td class="align-middle text-center">
-                                        <div class="input-group input-group-sm input-group-outline my-3">
-                                            <input type="text" class="form-control form-control-sm text-xs font-weight-bold"
-                                                   style="border-color: white; width: 5px;text-align: center;color: red"
-                                                   th:text="원" th:id="'discount'+${enrollment.enrollmentId}" readonly>
-                                        </div>
-                                    </td>
-                                    <td class="align-middle text-center">
-                                                <span class=" text-xs font-weight-bold"
-                                                      th:text="${enrollment.paymentYN}"></span>
-                                    </td>
-                                    <td class="align-middle text-center">
-                                                <span class=" text-xs font-weight-bold"
-                                                      th:text="${enrollment.createdAt}"></span>
-                                    </td>
-                                    <input type="text" text="원" th:id="'discountInfo'+${enrollment.enrollmentId}" hidden>
-                                    <td class="align-middle text-center">
-
-                                        <button type="button" th:data-parameter1="${enrollment.studentId}"
-                                                th:data-parameter2="${enrollment.enrollmentId}"
-                                                th:data-parameter3="${enrollment.lectureName}"
-                                                th:data-parameter4="${enrollment.lectureId}"
-                                                th:data-parameter5="${tossKey}"
-                                                th:onclick="|pay.createOrder(this.getAttribute('data-parameter1'),this.getAttribute('data-parameter2'),this.getAttribute('data-parameter3'),this.getAttribute('data-parameter4'),this.getAttribute('data-parameter5'))|"
-                                                class="btn btn-sm bg-gradient-danger btn-lg w-100 mb-0">결제
-                                        </button>
-                                    </td>
-
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                    </h1>
                 </div>
             </div>
         </div>
 
-        <!--footer-->
-        <th:block th:replace="layout/footer :: footerFragment"></th:block>
-
     </div>
-
-
+    <!--footer-->
+    <th:block th:replace="layout/footer :: footerFragment"></th:block>
 </main>
-
-
 <!--   Core JS Files   -->
 <script src="/assets/js/core/popper.min.js"></script>
 <script src="/assets/js/core/bootstrap.min.js"></script>
 <script src="/assets/js/plugins/perfect-scrollbar.min.js"></script>
 <script src="/assets/js/plugins/smooth-scrollbar.min.js"></script>
 <script src="/assets/js/material-dashboard.min.js?v=3.0.4"></script>
-<!-- Toss -->
-<script src="https://js.tosspayments.com/v1/payment"></script>
-<Script>
-
-
-    let orderId = null;
-    let orderName = null;
-    let amount = null;
-
-    let pay = {
-        init: function () {
-            var _this = this;
-        },
-
-        show : function(enrollmentId,price,discountInfo){
-            console.log('enrollmentId : ' + enrollmentId);
-            console.log('강의 가격 : ' + price);
-            console.log('할인정보 (할인 id+ 할인율) : ' + discountInfo);
-            var info = discountInfo.split('(split)')
-            if (info.length == 2) {
-                let rate = info[1];
-                console.log(rate);
-                console.log('discount' + enrollmentId);
-                document.getElementById('discount' + enrollmentId).text = ((100 - rate) * price / 100);
-                document.getElementById('discount' + enrollmentId).value = ((100 - rate) * price / 100);
-                document.getElementById('discountInfo' + enrollmentId).value = info[0];
-            } else {
-                document.getElementById('discount' + enrollmentId).value = price;
-                document.getElementById('discountInfo' + enrollmentId).value = 0;
-            }
-        },
-
-        createOrder: function (studentId, enrollmentId, orderName, lectureId, tossKey) {
-            let amount = document.getElementById('discount' + enrollmentId).value;
-            let discountId = document.getElementById('discountInfo' + enrollmentId).value;
-            console.log('할인된 가격 : ' + amount);
-            console.log('전달한 discountId : ' + discountId);
-
-            if(amount ==""){
-                alert("할인 정책을 선택해주세요.")
-                return;
-            }
-            let data = {
-                payType: "CARD",
-                amount: amount,
-                orderName: orderName,
-                lectureId: lectureId,
-                discountId : discountId
-            };
-            console.log(data);
-
-            let key = tossKey
-            axios.post("/api/v1/payments/students/" + studentId,
-                JSON.stringify(data), {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
-                }
-            ).then((response) => {
-                console.log(response);
-                orderId = response.data.result.orderId;
-                orderName = response.data.result.orderName;
-                amount = response.data.result.amount;
-                var method = "카드";
-
-                console.log(orderId);
-                console.log(orderName);
-                console.log(amount);
-                console.log(key);
-
-                const tossPayments = TossPayments(key);
-
-                var paymentData = {
-                    amount: amount,
-                    orderId: orderId,
-                    orderName: orderName,
-                    successUrl: "http://localhost:8080/payment/success",
-                    failUrl: "http://localhost:8080/payment/fail"
-                };
-
-                tossPayments.requestPayment(method, paymentData);
-
-                alert("결제를 진행해주세요!");
-            }).catch((error) => {
-                console.log(error);
-                if (error.response.data.result["errorCode"] == "ACADEMY_NOT_FOUND") {
-                    alert("등록된 학원이 아닙니다. 등록 후 진행해주세요");
-                }
-            });
-
-        }
-    };
-
-    pay.init();
-
-</script>
 
 </body>
 
