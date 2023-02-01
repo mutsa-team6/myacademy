@@ -42,6 +42,7 @@ public enum ErrorCode {
     EMPLOYEE_PROFILE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 직원 파일을 찾을 수 없습니다."),
     ANNOUNCEMENT_FILE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 공지사항 파일을 찾을 수 없습니다."),
     DISCOUNT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 할인정책을 찾을 수 없습니다."),
+    CANCLE_PAYMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 결제 취소 내역을 찾을 수 없습니다."),
 
     INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "패스워드가 잘못되었습니다."),
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "잘못된 토큰입니다."),
