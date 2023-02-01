@@ -344,7 +344,7 @@ class WaitinglistServiceTest {
 
         @Test
         @DisplayName("등록 실패(6) - 이미 수강등록되어 있는 경우")
-       public void createWaitingList_fail6() {
+        public void createWaitingList_fail6() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
