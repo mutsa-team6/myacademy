@@ -2,6 +2,8 @@ package com.project.myacademy.domain.payment;
 
 import com.project.myacademy.domain.academy.Academy;
 import com.project.myacademy.domain.academy.AcademyRepository;
+import com.project.myacademy.domain.discount.Discount;
+import com.project.myacademy.domain.discount.DiscountRepository;
 import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.domain.employee.EmployeeRepository;
 import com.project.myacademy.domain.enrollment.Enrollment;
@@ -44,9 +46,19 @@ public class PaymentService {
     private final EmployeeRepository employeeRepository;
     private final LectureRepository lectureRepository;
     private final CancelPaymentRepository cancelPaymentRepository;
+    private final DiscountRepository discountRepository;
 
     @Value("${payment.toss.testSecretApiKey}")
     private String testSecretApiKey;
+
+    @Value("${payment.toss.originUrl}")
+    private String tossOriginUrl;
+
+    @Value("${payment.toss.successCallbackUrl}")
+    private String successCallbackUrl;
+
+    @Value("${payment.toss.failCallbackUrl}")
+    private String failCallbackUrl;
 
     /**
      * 결제할 상품 가격,지불 방법, 수업 이름 체크
@@ -84,11 +96,6 @@ public class PaymentService {
         String payType = request.getPayType().getName();
         String orderName = request.getOrderName();
 
-//        //가격 검증
-//        log.info("💰 가격 {}", studentEnrollment.getLecture().getPrice());
-//        if (!amount.equals(studentEnrollment.getLecture().getPrice())) {
-//            throw new AppException(ErrorCode.PAYMENT_ERROR_ORDER_PRICE);
-//        }
 
         //결제 방법 검증
         if (!payType.equals("카드") && !payType.equals("CARD")) {
@@ -100,11 +107,35 @@ public class PaymentService {
             throw new AppException(ErrorCode.PAYMENT_ERROR_ORDER_NAME);
         }
 
+        //가격 검증
+        if (request.getDiscountId() != 0) {
+            Discount foundDiscount = discountRepository.findById(request.getDiscountId())
+                    .orElseThrow(() -> new AppException(ErrorCode.DISCOUNT_NOT_FOUND));
+
+            Float discountRate = (100 - foundDiscount.getDiscountRate()) / 100f;
+            Integer discountAmount = Math.round(studentEnrollment.getLecture().getPrice() * discountRate);
+
+            log.info("💰 수업 정가 = {}", studentEnrollment.getLecture().getPrice());
+            log.info("💰 할인률 = {}", discountRate);
+            log.info("💰 할인된 수업 가격 = {}", discountAmount);
+            log.info("💰 요청 가격 = {}", amount);
+
+            if (!amount.equals(discountAmount)) {
+                throw new AppException(ErrorCode.PAYMENT_ERROR_ORDER_PRICE);
+            }
+
+        } else {
+            if (!amount.equals(studentEnrollment.getLecture().getPrice())) {
+                throw new AppException(ErrorCode.PAYMENT_ERROR_ORDER_PRICE);
+            }
+        }
+
+        //저장
         Payment savedPayment = paymentRepository.save(request.toEntity(foundEmployee, foundStudent, studentEnrollment));
 
         CreatePaymentResponse response = CreatePaymentResponse.of(savedPayment);
-        response.setSuccessUrl("http://localhost:8080/payment/success");
-        response.setFailUrl("http://localhost:8080/payment/fail");
+        response.setSuccessUrl(successCallbackUrl);
+        response.setFailUrl(failCallbackUrl);
 
         return response;
     }
@@ -172,7 +203,7 @@ public class PaymentService {
 
         //url로 요청
         return rest.postForEntity(
-                        "https://api.tosspayments.com/v1/payments/confirm",
+                        tossOriginUrl + "confirm",
                         new HttpEntity<>(param, headers),
                         ApprovePaymentResponse.class)
                 .getBody();
@@ -201,7 +232,7 @@ public class PaymentService {
     /**
      * 결제 취소
      *
-     * @param paymentKey 토스측 결제 키
+     * @param paymentKey   토스측 결제 키
      * @param cancelReason 결제 취소 사유
      * @return
      */
@@ -219,7 +250,7 @@ public class PaymentService {
         RestTemplate rest = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
 
-        URI uri = URI.create("https://api.tosspayments.com/v1/payments/" + paymentKey + "/cancel");
+        URI uri = URI.create(tossOriginUrl + paymentKey + "/cancel");
 
         testSecretApiKey = testSecretApiKey + ":";
         String encodedAuth = new String(Base64.getEncoder().encode(testSecretApiKey.getBytes(StandardCharsets.UTF_8)));
@@ -235,7 +266,7 @@ public class PaymentService {
         paymentRepository.delete(selcetedPayment);
 
         //cancelPayment 저장
-        CancelPayment saveCancelPayment = cancelPaymentRepository.save(CancelPayment.builder()
+        cancelPaymentRepository.save(CancelPayment.builder()
                 .orderId(selcetedPayment.getOrderId())
                 .paymentKey(paymentKey)
                 .cancelReason(cancelReason)
