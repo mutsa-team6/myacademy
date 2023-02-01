@@ -202,7 +202,7 @@ class DiscountServiceTest {
         }
 
         @Test
-        @DisplayName("수강이력에 적용된 할인정책 조회 실패(3) - 수강 이력에 적용된 할인 정책이 존재하지 않을 때")
+        @DisplayName("수강이력에 적용된 할인정책 조회 실패(4) - 수강 이력에 적용된 할인 정책이 존재하지 않을 때")
         public void getAppliedDiscount_fail4() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
@@ -365,8 +365,8 @@ class DiscountServiceTest {
 //        }
 
         @Test
-        @DisplayName("할인정책 적용 실패(8) - 할인정책을 적용할 수강 내역이 이미 결제된 상태일 때")
-        public void checkDiscount_fail8() {
+        @DisplayName("할인정책 적용 실패(6) - 할인정책을 적용할 수강 내역이 이미 결제된 상태일 때")
+        public void checkDiscount_fail6() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
@@ -387,7 +387,6 @@ class DiscountServiceTest {
             then(discountRepository).should(times(1)).findByDiscountNameAndAcademy(anyString(), any(Academy.class));
             then(enrollmentRepository).should(times(1)).findById(anyLong());
             then(mockEnrollment).should(times(1)).getPaymentYN();
-
         }
 
     }

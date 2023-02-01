@@ -48,7 +48,6 @@ class LectureServiceTest {
     private Employee employee;
     private Employee teacher;
     private Lecture lecture;
-    private Lecture mockLecture;
     private Employee mockEmployee;
     private Employee mockTeacher;
 
@@ -60,7 +59,6 @@ class LectureServiceTest {
         lecture = Lecture.builder().id(1L).name("lecture").price(10000).employee(teacher).build();
         mockEmployee = mock(Employee.class);
         mockTeacher = mock(Employee.class);
-        mockLecture = mock(Lecture.class);
     }
 
     @Nested
