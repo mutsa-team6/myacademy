@@ -45,6 +45,13 @@
                             </div>
                         </div>
                         <div class="card-body">
+                            <div class="text-center">
+                                <h5 style="color: #5A2082">로그인</h5>
+                            </div>
+                            <div>
+                                <hr style="color: #5A2082; height: 1.5px;background-color: #5A2082">
+                            </div>
+                            <br>
                             <form role="form">
                                 <div class="row ">
                                     <div class="col-12 align-self-center">
@@ -60,7 +67,8 @@
                                         </div>
                                         <div id="academy-fail" class="alert-pass" hidden
                                              style="color: red;font-size: small">존재하지 않는 학원입니다.
-                                            <a href="/academies">학원 등록</a> 먼저 해주세요.
+                                            <a th:href="@{/academies}"
+                                               class="text-info text-gradient font-weight-bold">학원 등록</a> 먼저 해주세요.
                                         </div>
                                     </div>
                                 </div>
@@ -106,7 +114,7 @@
                                 </div>
                                 <p class="mt-4 text-sm text-center">
                                     계정이 없으십니까?
-                                    <a th:href="@{/join}" class="text-info text-gradient font-weight-bold">회원가입</a>
+                                    <a th:href="@{/join}" class="text-primary text-gradient font-weight-bold">회원가입</a>
                                 </p>
 
                             </form>
@@ -155,6 +163,7 @@
             console.log(error);
             hide('academy-pass');
             show('academy-fail');
+
         });
     }
 
@@ -198,7 +207,7 @@
             }).catch((error) => {
                 if (error.response.data.result["errorCode"] == "ACADEMY_NOT_FOUND") {
                     alert("등록된 학원이 아닙니다. 등록 후 진행해주세요");
-                } else if(error.response.data.result["errorCode"] == "EMPLOYEE_NOT_FOUND"){
+                } else if(error.response.data.result["errorCode"] == "REQUEST_EMPLOYEE_NOT_FOUND"){
                     alert("가입되어있지 않은 회원입니다.");
                 }else if(error.response.data.result["errorCode"] == "INVALID_PASSWORD"){
                     alert("비밀번호가 일치하지 않습니다.");

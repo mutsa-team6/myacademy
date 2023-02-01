@@ -27,12 +27,15 @@
     </div>
 </div>
 <main class="main-content  mt-0">
-
+<!--    <div-->
+<!--         style="background-image: url('https://images.unsplash.com/photo-1497294815431-9365093b7331?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1950&q=80');"-->
+<!--    >-->
+<!--        <span class="mask bg-gradient-dark opacity-8"></span>-->
     <section>
         <div class="page-header min-vh-100">
             <div class="container" style="height: 50%;">
                 <div class="row">
-                    <div class="col-xl-8 col-lg-5 col-md-7 d-flex flex-column ms-auto me-auto ms-lg-auto me-lg-5">
+                    <div class="col-xl-8 col-lg-5 col-md-7 d-flex flex-column ms-auto me-auto ms-lg-auto me-lg-5 my-5">
 
                         <div class="card my-4">
                             <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
@@ -99,56 +102,60 @@
                                         </tbody>
                                     </table>
                                 </div>
+
                             </div>
                         </div>
                     </div>
 
                     <div class="col-xl-3 col-lg-5 col-md-7 d-flex flex-column ms-auto me-auto ms-lg-auto me-lg-5">
-                        <div class="card card-plain">
-                            <h4 class="font-weight-bolder">학원 등록</h4>
-                            <p class="mb-0">등록할 학원 정보를 입력해주세요.</p>
-                        </div>
+                        <div class="card my-5">
 
-                        <div class="card-body">
-                            <div class="input-group input-group-outline mb-3">
-                                <label class="form-label">학원 이름</label>
-                                <input type="text" class="form-control" id="input-academyName">
-                            </div>
-                            <div class="input-group input-group-outline mb-3">
-                                <label class="form-label">학원 대표자명</label>
-                                <input type="text" class="form-control" id="input-academyOwner">
-                            </div>
-                            <div class="input-group input-group-outline mb-3">
-                                <label class="form-label">학원 사업자 등록 번호</label>
-                                <input type="text" class="form-control" id="input-academybusinessNum">
-                            </div>
-                            <div class="input-group input-group-outline mb-3">
-                                <label class="form-label">학원 전화번호</label>
-                                <input type="text" class="form-control"  id="input-academyphoneNum">
-                            </div>
-                            <div class="input-group input-group-outline mb-3">
-                                <input type="text" class="form-control" id="address_kakao" readonly
-                                       placeholder="학원 주소">
-                            </div>
-                            <div class="input-group input-group-outline mb-3">
-                                <label class="form-label">상세주소</label>
-                                <input type="text" class="form-control" id="address_detail_kakao"
-                                       name="address_detail"
-                                >
+                            <div class="card card-plain mt-3 mx-3">
+                                <h4 class="font-weight-bolder">학원 등록</h4>
+                                <p class="mb-0">등록할 학원 정보를 입력해주세요.</p>
                             </div>
 
-                            <div class="text-center">
-                                <button th:onclick="|academy.create()|" type="button"
-                                        class="btn btn-lg bg-gradient-primary btn-lg w-100 mt-4 mb-0">학원 등록
-                                </button>
+                            <div class="card-body">
+                                <div class="input-group input-group-outline mb-3">
+                                    <label class="form-label">학원 이름</label>
+                                    <input type="text" class="form-control" id="input-academyName">
+                                </div>
+                                <div class="input-group input-group-outline mb-3">
+                                    <label class="form-label">학원 대표자명</label>
+                                    <input type="text" class="form-control" id="input-academyOwner">
+                                </div>
+                                <div class="input-group input-group-outline mb-3">
+                                    <label class="form-label">학원 사업자 등록 번호</label>
+                                    <input type="text" class="form-control" id="input-academybusinessNum">
+                                </div>
+                                <div class="input-group input-group-outline mb-3">
+                                    <label class="form-label">학원 전화번호</label>
+                                    <input type="text" class="form-control" id="input-academyphoneNum">
+                                </div>
+                                <div class="input-group input-group-outline mb-3">
+                                    <input type="text" class="form-control" id="address_kakao" readonly
+                                           placeholder="학원 주소">
+                                </div>
+                                <div class="input-group input-group-outline mb-3">
+                                    <label class="form-label">상세주소</label>
+                                    <input type="text" class="form-control" id="address_detail_kakao"
+                                           name="address_detail"
+                                    >
+                                </div>
+
+                                <div class="text-center">
+                                    <button th:onclick="|academy.create()|" type="button"
+                                            class="btn btn-lg bg-gradient-primary btn-lg w-100 mt-4 mb-0">학원 등록
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                        <br>
-                        <div class="card-footer text-center pt-0 px-lg-2 px-1">
-                            <p class="mb-2 text-sm mx-auto">
-                                회원 가입 하시겠습니까?
-                                <a th:href="@{/join}" class="text-primary text-gradient font-weight-bold">회원 가입</a>
-                            </p>
+                            <br>
+                            <div class="card-footer text-center pt-0 px-lg-2 px-1">
+                                <p class="mb-2 text-sm mx-auto">
+                                    회원 가입 하시겠습니까?
+                                    <a th:href="@{/join}" class="text-primary text-gradient font-weight-bold">회원 가입</a>
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>

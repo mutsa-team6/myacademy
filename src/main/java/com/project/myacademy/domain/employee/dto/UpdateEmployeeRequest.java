@@ -10,9 +10,7 @@ import lombok.Setter;
 @Setter
 @Builder
 public class UpdateEmployeeRequest {
-    private String name;
     private String address;
-    private String email;
-    private String password;
     private String phoneNum;
+    private String subject;
 }
