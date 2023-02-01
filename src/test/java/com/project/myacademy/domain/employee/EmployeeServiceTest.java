@@ -4,15 +4,18 @@ import com.project.myacademy.domain.academy.Academy;
 import com.project.myacademy.domain.academy.AcademyRepository;
 import com.project.myacademy.domain.employee.dto.CreateEmployeeRequest;
 import com.project.myacademy.domain.employee.dto.CreateEmployeeResponse;
+import com.project.myacademy.domain.employee.dto.LoginEmployeeRequest;
+import com.project.myacademy.domain.employee.dto.LoginEmployeeResponse;
 import com.project.myacademy.global.exception.AppException;
 import com.project.myacademy.global.exception.ErrorCode;
 import com.project.myacademy.global.util.EmailUtil;
+import com.project.myacademy.global.util.JwtTokenUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
@@ -22,10 +25,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mockStatic;
+
 
 class EmployeeServiceTest {
     private EmployeeService employeeService;
@@ -47,9 +52,9 @@ class EmployeeServiceTest {
     void setUp() {
         employeeService = new EmployeeService(employeeRepository, academyRepository, bCryptPasswordEncoder, emailUtil);
         academy = Academy.builder().id(1L).name("학원").owner("원장").build();
-        employeeADMIN = Employee.builder().id(1L).name("원장").account("admin").phoneNum("010-0000-0000").email("employeeADMIN@gmail.com").academy(academy).employeeRole(EmployeeRole.ROLE_ADMIN).build();
-        employeeSTAFF = Employee.builder().id(2L).name("직원").account("staff").phoneNum("010-0000-0001").email("employeeSTAFF@gmail.com").academy(academy).employeeRole(EmployeeRole.ROLE_STAFF).build();
-        employeeUSER = Employee.builder().id(3L).name("강사").account("user").phoneNum("010-0000-0002").email("employeeUSER@gmail.com").academy(academy).employeeRole(EmployeeRole.ROLE_USER).build();
+        employeeADMIN = Employee.builder().id(1L).name("원장").account("admin").password("password").phoneNum("010-0000-0000").email("employeeADMIN@gmail.com").academy(academy).employeeRole(EmployeeRole.ROLE_ADMIN).build();
+        employeeSTAFF = Employee.builder().id(2L).name("직원").account("staff").password("password").phoneNum("010-0000-0001").email("employeeSTAFF@gmail.com").academy(academy).employeeRole(EmployeeRole.ROLE_STAFF).build();
+        employeeUSER = Employee.builder().id(3L).name("강사").account("user").password("password").phoneNum("010-0000-0002").email("employeeUSER@gmail.com").academy(academy).employeeRole(EmployeeRole.ROLE_USER).build();
         pageable = PageRequest.of(0, 20, Sort.Direction.DESC, "id");
     }
 
@@ -213,4 +218,68 @@ class EmployeeServiceTest {
         }
     }
 
+    @Nested
+    @DisplayName("로그인")
+    class LoginEmployee {
+
+        LoginEmployeeRequest request = new LoginEmployeeRequest("admin", "password");
+        @Test
+        @DisplayName("로그인 성공")
+        void login_employee_success() {
+
+
+            MockedStatic<JwtTokenUtil> jwtTokenUtilMockedStatic = mockStatic(JwtTokenUtil.class);
+
+            given(academyRepository.findById(any())).willReturn(Optional.of(academy));
+            given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeADMIN));
+            given(bCryptPasswordEncoder.matches(any(), any())).willReturn(true);
+            given(JwtTokenUtil.createToken(employeeADMIN.getAccount(), employeeADMIN.getEmail(), secretKey, 1000 * 60 * 60)).willReturn("token");
+
+            LoginEmployeeResponse response = employeeService.loginEmployee(request, academy.getId());
+
+            assertThat(response.getJwt().equals("token"));
+            assertThat(response.getEmployeeName().equals("원장"));
+
+            jwtTokenUtilMockedStatic.close();
+        }
+
+        @Test
+        @DisplayName("로그인 실패1 - 일치하는 학원 정보가 없음")
+        void login_employee_fail1() {
+
+            given(academyRepository.findById(any())).willReturn(Optional.empty());
+
+            AppException appException =  assertThrows(AppException.class,
+                    () -> employeeService.loginEmployee(request, academy.getId()));
+
+            assertThat(appException.getErrorCode().equals(ErrorCode.ACADEMY_NOT_FOUND));
+        }
+
+        @Test
+        @DisplayName("로그인 실패2 - 일치하는 직원 정보가 없음")
+        void login_employee_fail2() {
+
+            given(academyRepository.findById(any())).willReturn(Optional.of(academy));
+            given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.empty());
+
+            AppException appException =  assertThrows(AppException.class,
+                    () -> employeeService.loginEmployee(request, academy.getId()));
+
+            assertThat(appException.getErrorCode().equals(ErrorCode.EMPLOYEE_NOT_FOUND));
+        }
+
+        @Test
+        @DisplayName("로그인 실패3 - 비밀번호 틀림")
+        void login_employee_fail3() {
+
+            given(academyRepository.findById(any())).willReturn(Optional.of(academy));
+            given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeADMIN));
+            given(bCryptPasswordEncoder.matches(any(), any())).willReturn(false);
+
+            AppException appException =  assertThrows(AppException.class,
+                    () -> employeeService.loginEmployee(request, academy.getId()));
+
+            assertThat(appException.getErrorCode().equals(ErrorCode.INVALID_PASSWORD));
+        }
+    }
 }
