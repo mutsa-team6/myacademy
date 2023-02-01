@@ -58,11 +58,12 @@ class AnnouncementServiceTest {
     class CreateAnnouncement {
 
         CreateAnnouncementRequest request = new CreateAnnouncementRequest("제목", "내용");
+
         @Test
         @DisplayName("공지사항 등록 성공")
         void create_announcement_success() {
             given(academyRepository.findById(any())).willReturn(Optional.of(academy));
-            given(employeeRepository.findByAccountAndAcademy(any(),any())).willReturn(Optional.of(employeeSTAFF));
+            given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeSTAFF));
             given(announcementRepository.save(any())).willReturn(announcement1);
 
             CreateAnnouncementResponse response = announcementService.createAnnouncement(academy.getId(), employeeSTAFF.getAccount(), request);
@@ -86,7 +87,7 @@ class AnnouncementServiceTest {
         @DisplayName("공지사항 등록 실패2 - 일치하는 직원 정보 없음")
         void create_announcement_fail2() {
             given(academyRepository.findById(any())).willReturn(Optional.of(academy));
-            given(employeeRepository.findByAccountAndAcademy(any(),any())).willReturn(Optional.empty());
+            given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.empty());
 
             AppException appException = assertThrows(AppException.class,
                     () -> announcementService.createAnnouncement(academy.getId(), employeeSTAFF.getAccount(), request));
@@ -98,7 +99,7 @@ class AnnouncementServiceTest {
         @DisplayName("공지사항 등록 실패3 - 공지사항 작성 권한 없음")
         void create_announcement_fail() {
             given(academyRepository.findById(any())).willReturn(Optional.of(academy));
-            given(employeeRepository.findByAccountAndAcademy(any(),any())).willReturn(Optional.of(employeeUSER));
+            given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeUSER));
 
             AppException appException = assertThrows(AppException.class,
                     () -> announcementService.createAnnouncement(academy.getId(), employeeUSER.getAccount(), request));
@@ -115,7 +116,7 @@ class AnnouncementServiceTest {
         @DisplayName("공지사항 단건 조회 성공")
         void read_announcement_success() {
             given(academyRepository.findById(any())).willReturn(Optional.of(academy));
-            given(employeeRepository.findByAccountAndAcademy(any(),any())).willReturn(Optional.of(employeeSTAFF));
+            given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeSTAFF));
             given(announcementRepository.findById(any())).willReturn(Optional.of(announcement1));
 
             ReadAnnouncementResponse response = announcementService.readAnnouncement(academy.getId(), announcement1.getId(), employeeSTAFF.getAccount());
@@ -139,7 +140,7 @@ class AnnouncementServiceTest {
         @DisplayName("공지사항 단건 조회 실패2 - 일치하는 직원 정보가 없음")
         void read_announcement_fail2() {
             given(academyRepository.findById(any())).willReturn(Optional.of(academy));
-            given(employeeRepository.findByAccountAndAcademy(any(),any())).willReturn(Optional.empty());
+            given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.empty());
 
             AppException appException = assertThrows(AppException.class,
                     () -> announcementService.readAnnouncement(academy.getId(), announcement1.getId(), employeeSTAFF.getAccount()));
@@ -151,7 +152,7 @@ class AnnouncementServiceTest {
         @DisplayName("공지사항 단건 조회 실패3 - 일치하는 공지사항 정보가 없음")
         void read_announcement_fail3() {
             given(academyRepository.findById(any())).willReturn(Optional.of(academy));
-            given(employeeRepository.findByAccountAndAcademy(any(),any())).willReturn(Optional.of(employeeSTAFF));
+            given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeSTAFF));
             given(announcementRepository.findById(any())).willReturn(Optional.empty());
 
             AppException appException = assertThrows(AppException.class,
@@ -164,14 +165,14 @@ class AnnouncementServiceTest {
     @Nested
     @DisplayName("공지사항 전체 조회")
     class readALLAnnouncement {
-        Page<Announcement> announcementList = new PageImpl<>(List.of(announcement1,announcement2));
 
         @Test
         @DisplayName("공지사항 전체 조회 성공")
         void read_all_announcement_success() {
             given(academyRepository.findById(any())).willReturn(Optional.of(academy));
-            given(employeeRepository.findByAccountAndAcademy(any(),any())).willReturn(Optional.of(employeeSTAFF));
+            given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeSTAFF));
 
+            Page<Announcement> announcementList = new PageImpl<>(List.of(announcement1, announcement2));
             given(announcementRepository.findAllByAcademy(academy, pageable)).willReturn(announcementList);
 
             Page<ReadAllAnnouncementResponse> responses = announcementService.readAllAnnouncement(academy.getId(), pageable, employeeSTAFF.getAccount());
@@ -180,5 +181,27 @@ class AnnouncementServiceTest {
             assertThat(responses.getTotalElements()).isEqualTo(2);
         }
 
+        @Test
+        @DisplayName("공지사항 전체 조회 실패1 - 일치하는 학원 정보가 없음")
+        void read_all_announcement_fail1() {
+            given(academyRepository.findById(any())).willReturn(Optional.empty());
+
+            AppException appException = assertThrows(AppException.class,
+                    () -> announcementService.readAllAnnouncement(academy.getId(), pageable, employeeSTAFF.getAccount()));
+
+            assertThat(appException.getErrorCode().equals(ErrorCode.ACADEMY_NOT_FOUND));
+        }
+
+        @Test
+        @DisplayName("공지사항 전체 조회 실패2 - 일치하는 직원 정보가 없음")
+        void read_all_announcement_fail2() {
+            given(academyRepository.findById(any())).willReturn(Optional.of(academy));
+            given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.empty());
+
+            AppException appException = assertThrows(AppException.class,
+                    () -> announcementService.readAllAnnouncement(academy.getId(), pageable, employeeSTAFF.getAccount()));
+
+            assertThat(appException.getErrorCode().equals(ErrorCode.EMPLOYEE_NOT_FOUND));
+        }
     }
 }
