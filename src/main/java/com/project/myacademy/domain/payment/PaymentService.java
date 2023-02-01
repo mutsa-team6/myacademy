@@ -184,7 +184,8 @@ public class PaymentService {
             throw new AppException(ErrorCode.ALREADY_PAYMENT);
         }
 
-        enrollment.updatePaymentYN();
+        //결제 여부 false로 변경
+        enrollment.updatePaymentTrue();
 
         RestTemplate rest = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -246,6 +247,12 @@ public class PaymentService {
         //payment 결제된 내역이 있는지 확인
         Payment selcetedPayment = paymentRepository.findByPaymentKey(paymentKey)
                 .orElseThrow(() -> new AppException(ErrorCode.PAYMENT_NOT_FOUND));
+
+        Enrollment enrollment = enrollmentRepository.findByStudentAndLecture(selcetedPayment.getStudent(), selcetedPayment.getLecture())
+                .orElseThrow(() -> new AppException(ErrorCode.ENROLLMENT_NOT_FOUND));
+
+        //결제 여부 false로 변경
+        enrollment.updatePaymentFalse();
 
         RestTemplate rest = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
