@@ -2,10 +2,7 @@ package com.project.myacademy.domain.announcement;
 
 import com.project.myacademy.domain.academy.Academy;
 import com.project.myacademy.domain.academy.AcademyRepository;
-import com.project.myacademy.domain.announcement.dto.CreateAnnouncementRequest;
-import com.project.myacademy.domain.announcement.dto.CreateAnnouncementResponse;
-import com.project.myacademy.domain.announcement.dto.ReadAllAnnouncementResponse;
-import com.project.myacademy.domain.announcement.dto.ReadAnnouncementResponse;
+import com.project.myacademy.domain.announcement.dto.*;
 import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.domain.employee.EmployeeRepository;
 import com.project.myacademy.domain.employee.EmployeeRole;
@@ -202,6 +199,138 @@ class AnnouncementServiceTest {
                     () -> announcementService.readAllAnnouncement(academy.getId(), pageable, employeeSTAFF.getAccount()));
 
             assertThat(appException.getErrorCode().equals(ErrorCode.EMPLOYEE_NOT_FOUND));
+        }
+    }
+
+    @Nested
+    @DisplayName("공지사항 수정")
+    class updateAnnouncement {
+        UpdateAnnouncementRequest request = new UpdateAnnouncementRequest("바뀐제목", "바뀐내용");
+
+        @Test
+        @DisplayName("공지사항 수정 성공")
+        void update_announcement_success() {
+            given(academyRepository.findById(any())).willReturn(Optional.of(academy));
+            given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeSTAFF));
+            given(announcementRepository.findById(any())).willReturn(Optional.of(announcement1));
+
+            UpdateAnnouncementResponse response = announcementService.updateAnnouncement(academy.getId(), announcement1.getId(), request, employeeSTAFF.getAccount());
+
+            assertThat(response.getTitle().equals("바뀐제목"));
+            assertThat(response.getBody().equals("바뀐내용"));
+        }
+
+        @Test
+        @DisplayName("공지사항 수정 실패1 - 일치하는 학원 정보 없음")
+        void update_announcement_fail1() {
+            given(academyRepository.findById(any())).willReturn(Optional.empty());
+
+            AppException appException = assertThrows(AppException.class,
+                    () -> announcementService.updateAnnouncement(academy.getId(), announcement1.getId(), request, employeeSTAFF.getAccount()));
+
+            assertThat(appException.getErrorCode().equals(ErrorCode.ACADEMY_NOT_FOUND));
+        }
+
+        @Test
+        @DisplayName("공지사항 수정 실패2 - 일치하는 직원 정보 없음")
+        void update_announcement_fail2() {
+            given(academyRepository.findById(any())).willReturn(Optional.of(academy));
+            given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.empty());
+
+            AppException appException = assertThrows(AppException.class,
+                    () -> announcementService.updateAnnouncement(academy.getId(), announcement1.getId(), request, employeeSTAFF.getAccount()));
+
+            assertThat(appException.getErrorCode().equals(ErrorCode.EMPLOYEE_NOT_FOUND));
+        }
+
+        @Test
+        @DisplayName("공지사항 수정 실패3 - 일치하는 공지사항 정보 없음")
+        void update_announcement_fail3() {
+            given(academyRepository.findById(any())).willReturn(Optional.of(academy));
+            given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeSTAFF));
+            given(announcementRepository.findById(any())).willReturn(Optional.empty());
+
+            AppException appException = assertThrows(AppException.class,
+                    () -> announcementService.updateAnnouncement(academy.getId(), announcement1.getId(), request, employeeSTAFF.getAccount()));
+
+            assertThat(appException.getErrorCode().equals(ErrorCode.ANNOUNCEMENT_NOT_FOUND));
+        }
+
+        @Test
+        @DisplayName("공지사항 수정 실패4 - 사용자 권한 없음")
+        void update_announcement_fail4() {
+            given(academyRepository.findById(any())).willReturn(Optional.of(academy));
+            given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeUSER));
+
+            AppException appException = assertThrows(AppException.class,
+                    () -> announcementService.updateAnnouncement(academy.getId(), announcement1.getId(), request, employeeUSER.getAccount()));
+
+            assertThat(appException.getErrorCode().equals(ErrorCode.INVALID_PERMISSION));
+        }
+    }
+
+    @Nested
+    @DisplayName("공지사항 삭제")
+    class deleteAnnouncement {
+
+        @Test
+        @DisplayName("공지사항 삭제 성공")
+        void delete_announcement_success() {
+            given(academyRepository.findById(any())).willReturn(Optional.of(academy));
+            given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeSTAFF));
+            given(announcementRepository.findById(any())).willReturn(Optional.of(announcement1));
+
+            DeleteAnnouncementResponse response = announcementService.deleteAnnouncement(academy.getId(), announcement1.getId(), employeeSTAFF.getAccount());
+
+            assertThat(response.getId().equals(1L));
+            assertThat(response.getTitle().equals("제목1"));
+        }
+
+        @Test
+        @DisplayName("공지사항 삭제 실패1 - 일치하는 학원 정보 없음")
+        void delete_announcement_fail1() {
+            given(academyRepository.findById(any())).willReturn(Optional.empty());
+
+            AppException appException = assertThrows(AppException.class,
+                    () -> announcementService.deleteAnnouncement(academy.getId(), announcement1.getId(), employeeSTAFF.getAccount()));
+
+            assertThat(appException.getErrorCode().equals(ErrorCode.ACADEMY_NOT_FOUND));
+        }
+
+        @Test
+        @DisplayName("공지사항 삭제 실패2 - 일치하는 직원 정보 없음")
+        void delete_announcement_fail2() {
+            given(academyRepository.findById(any())).willReturn(Optional.of(academy));
+            given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.empty());
+
+            AppException appException = assertThrows(AppException.class,
+                    () -> announcementService.deleteAnnouncement(academy.getId(), announcement1.getId(), employeeSTAFF.getAccount()));
+
+            assertThat(appException.getErrorCode().equals(ErrorCode.EMPLOYEE_NOT_FOUND));
+        }
+
+        @Test
+        @DisplayName("공지사항 삭제 실패3 - 일치하는 공지사항 정보 없음")
+        void delete_announcement_fail3() {
+            given(academyRepository.findById(any())).willReturn(Optional.of(academy));
+            given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeSTAFF));
+            given(announcementRepository.findById(any())).willReturn(Optional.empty());
+
+            AppException appException = assertThrows(AppException.class,
+                    () -> announcementService.deleteAnnouncement(academy.getId(), announcement1.getId(), employeeSTAFF.getAccount()));
+
+            assertThat(appException.getErrorCode().equals(ErrorCode.ANNOUNCEMENT_NOT_FOUND));
+        }
+        @Test
+        @DisplayName("공지사항 삭제 실패4 - 사용자 권한 없음")
+        void delete_announcement_fail4() {
+            given(academyRepository.findById(any())).willReturn(Optional.of(academy));
+            given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeUSER));
+
+            AppException appException = assertThrows(AppException.class,
+                    () -> announcementService.deleteAnnouncement(academy.getId(), announcement1.getId(), employeeUSER.getAccount()));
+
+            assertThat(appException.getErrorCode().equals(ErrorCode.INVALID_PERMISSION));
         }
     }
 }
