@@ -62,12 +62,12 @@ public class Employee extends BaseEntity {
                 .build();
     }
 
-    public void update(UpdateEmployeeRequest request) {
-        this.name = request.getName();
+
+
+    public void updateEmployeeInfo(UpdateEmployeeRequest request) {
         this.address = request.getAddress();
         this.phoneNum = request.getPhoneNum();
-        this.email = request.getEmail();
-        this.password = request.getPassword();
+        this.subject = request.getSubject();
     }
 
     public void updatePasswordOnly(String password) {

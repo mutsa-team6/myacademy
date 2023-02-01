@@ -1,7 +1,18 @@
 package com.project.myacademy.controller;
 
+import com.project.myacademy.domain.employee.EmployeeRole;
+import com.project.myacademy.domain.employee.EmployeeService;
+import com.project.myacademy.domain.employee.dto.ReadEmployeeResponse;
+import com.project.myacademy.domain.lecture.LectureService;
+import com.project.myacademy.domain.lecture.dto.ReadAllLectureResponse;
+import com.project.myacademy.global.util.AuthenticationUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.util.CookieGenerator;
@@ -14,7 +25,11 @@ import java.io.PrintWriter;
 
 @Controller
 @Slf4j
+@RequiredArgsConstructor
 public class EmployeeController {
+
+    private final EmployeeService employeeService;
+    private final LectureService lectureService;
 
     @GetMapping("/join")
     public String join() {
@@ -39,7 +54,23 @@ public class EmployeeController {
     }
 
     @GetMapping("/academy/mypage")
-    public String mypage() {
+    public String mypage(Model model, Authentication authentication, Pageable pageable) {
+
+        String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
+        Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
+        log.info("🔎 마이페이지 조회한 사용자의 학원 id [{}] || 요청한 사용자의 계정 [{}]", academyId, requestAccount);
+
+        ReadEmployeeResponse employee = employeeService.readEmployee(academyId, requestAccount);
+        model.addAttribute("employee", employee);
+
+        Page<ReadAllLectureResponse> lectures = null;
+        if (!employee.getEmployeeRole().equals(EmployeeRole.ROLE_STAFF)) {
+            lectures = lectureService.readAllLecturesByTeacherId(academyId, requestAccount, employee.getId(), pageable);
+        }
+
+        model.addAttribute("lectures", lectures);
+        model.addAttribute("previous", pageable.previousOrFirst().getPageNumber());
+        model.addAttribute("next", pageable.next().getPageNumber());
 
         return "employee/mypage";
     }
