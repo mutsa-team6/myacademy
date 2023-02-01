@@ -37,13 +37,20 @@
                         <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
                             <div class="bg-gradient-primary shadow-primary border-radius-lg py-3 pe-1">
                                 <h4 class="text-white font-weight-bolder text-center mt-2 mb-0">
-                                    아이디 찾기
+                                    <img src="https://raw.githubusercontent.com/buinq/imageServer/main/img/image-20230120001920792.png"
+                                         alt="image-20230120001920792" style="zoom: 40%;"/>
                                 </h4>
 
                             </div>
                         </div>
                         <div class="card-body">
-
+                            <div class="text-center">
+                                <h5 style="color: #5A2082">아이디 찾기</h5>
+                            </div>
+                            <div>
+                                <hr style="color: #5A2082; height: 1.5px;background-color: #5A2082">
+                            </div>
+                            <br>
                             <form role="form" class="text-start">
                                 <div class="input-group input-group-outline my-3">
                                     <label class="form-label">사용자 실명</label>
@@ -63,8 +70,10 @@
                                     </button>
                                 </div>
                                 <p class="mt-4 text-sm text-end">
-                                    <a th:href="@{/login}" class="text-info text-gradient font-weight-bold opacity-5">로그인</a> |
-                                    <a th:href="@{/find/password}" class="text-info text-gradient font-weight-bold opacity-5">비밀번호 찾기</a>
+                                    <a th:href="@{/login}"
+                                       class="text-primary text-gradient font-weight-bold opacity-5">로그인</a> |
+                                    <a th:href="@{/find/password}"
+                                       class="text-info text-gradient font-weight-bold opacity-5">비밀번호 찾기</a>
                                 </p>
 
                             </form>

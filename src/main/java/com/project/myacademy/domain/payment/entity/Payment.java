@@ -1,6 +1,7 @@
 package com.project.myacademy.domain.payment.entity;
 
 import com.project.myacademy.domain.BaseEntity;
+import com.project.myacademy.domain.academy.Academy;
 import com.project.myacademy.domain.discount.Discount;
 import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.domain.lecture.Lecture;
@@ -39,6 +40,10 @@ public class Payment extends BaseEntity {
     @JoinColumn(name = "lecture_id")
     private Lecture lecture;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "academy_id")
+    private Academy academy;
+
     private String orderId;
     private String orderName;
 
@@ -48,7 +53,7 @@ public class Payment extends BaseEntity {
     private Integer amount;
     private String paymentKey;
 
-    private Long DiscountId;
+    private Long discountId;
 
     public void setPaymentKey(String paymentKey) {
         this.paymentKey = paymentKey;
