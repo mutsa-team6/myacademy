@@ -285,12 +285,11 @@ public class EmployeeService {
     }
 
     /**
-     * ADMIN 혹은 STAFF 계정은 ADMIN을 제외한 다른 계정을 삭제할 수 있다.
+     * ADMIN 계정은 ADMIN을 제외한 다른 계정을 삭제할 수 있다.
      * 접근하려는 학원이 존재하지 않는 경우 에러 처리
      * 삭제를 요청한 계정이 해당 학원에 존재하지 않는 경우 에러 처리
      * 삭제해버릴 계정이 해당 학원에 존재하지 않는 경우 에러 처리
-     * 자기 자신을 삭제 요청할 시, 에러 처리 ( 본인 탈퇴 기능은 따로 구현 )
-     * ADMIN 계정을 삭제하려고 할 시, 에러 처리
+     * 자기 자신을 삭제 요청할 시, 에러 처리 ( ADMIN 삭제 불가 )
      * USER 가 삭제하려고하는 경우는 security로 에러 처리
      *
      * @param requestAccount 삭제 요청한 직원 계정
@@ -309,6 +308,11 @@ public class EmployeeService {
         // 삭제하려는 계정이 해당 학원에 존재하지 않으면 에러 처리
         Employee foundEmployee = validateEmployee(employeeId, foundAcademy);
 
+        //request요청자 권한이 ADMIN 아니면 에러처리
+        if(!requestEmployee.getEmployeeRole().equals(EmployeeRole.ROLE_ADMIN)) {
+            throw new AppException(ErrorCode.INVALID_PERMISSION);
+        }
+
 
         // 삭제하려는 계정이 자기 자신인 경우 에러 처리
         if (foundEmployee.getAccount().equals(requestAccount)) {
@@ -317,11 +321,6 @@ public class EmployeeService {
 
         EmployeeRole foundEmployeeRole = foundEmployee.getEmployeeRole();
         log.info(" ❌ 삭제가 될 사용자 계정 [{}] || 삭제가 될 사용자 등급 [{}]", foundEmployee.getAccount(), foundEmployeeRole);
-
-        // 삭제하려는 계정이 ADMIN 인 경우 에러처리
-        if (foundEmployeeRole.equals(EmployeeRole.ROLE_ADMIN)) {
-            throw new AppException(ErrorCode.NOT_ALLOWED_CHANGE);
-        }
 
         employeeRepository.delete(foundEmployee);
 
