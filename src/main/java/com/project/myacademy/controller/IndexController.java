@@ -44,6 +44,9 @@ public class IndexController {
             session.setAttribute("name",foundName);
             model.addAttribute("name", foundName);
         }
+
+        model.addAttribute("account", requestAccount);
+
         return "pages/main";
     }
 

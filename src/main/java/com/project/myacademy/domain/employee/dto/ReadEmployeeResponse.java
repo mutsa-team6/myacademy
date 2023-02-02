@@ -9,6 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Builder
+@Setter
 public class ReadEmployeeResponse {
     private Long id;
     private String name;
@@ -19,6 +20,7 @@ public class ReadEmployeeResponse {
     private Academy academy;
     private String subject;
     private String phoneNum;
+    private String imageUrl;
 
     public ReadEmployeeResponse(Employee foundEmployee) {
         this.id = foundEmployee.getId();

@@ -1,7 +1,10 @@
 package com.project.myacademy.controller;
 
+import com.project.myacademy.domain.academy.AcademyService;
+import com.project.myacademy.domain.academy.dto.FindAcademyResponse;
 import com.project.myacademy.domain.employee.EmployeeRole;
 import com.project.myacademy.domain.employee.EmployeeService;
+import com.project.myacademy.domain.employee.dto.ReadAllEmployeeResponse;
 import com.project.myacademy.domain.employee.dto.ReadEmployeeResponse;
 import com.project.myacademy.domain.file.employeeprofile.EmployeeProfileS3UploadService;
 import com.project.myacademy.domain.lecture.LectureService;
@@ -31,6 +34,7 @@ public class EmployeeController {
 
     private final EmployeeService employeeService;
     private final LectureService lectureService;
+    private final AcademyService academyService;
 
     private final EmployeeProfileS3UploadService employeeProfileS3UploadService;
 
@@ -74,6 +78,7 @@ public class EmployeeController {
         if (!employee.getEmployeeRole().equals(EmployeeRole.ROLE_STAFF)) {
             lectures = lectureService.readAllLecturesByTeacherId(academyId, requestAccount, employee.getId(), pageable);
         }
+        model.addAttribute("account", requestAccount);
         model.addAttribute("academyId", academyId);
         model.addAttribute("employeeId", employee.getId());
         model.addAttribute("lectures", lectures);
@@ -83,6 +88,32 @@ public class EmployeeController {
         return "employee/mypage";
     }
 
+    /**
+     * 원장만 가능
+     */
+    @GetMapping("/academy/employees")
+    public String manageEmployee(Model model, Authentication authentication, Pageable pageable) {
+
+        String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
+        Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
+        log.info("🔎 마이페이지 조회한 사용자의 학원 id [{}] || 요청한 사용자의 계정 [{}]", academyId, requestAccount);
+
+        FindAcademyResponse academy = academyService.findAcademyById(academyId);
+        model.addAttribute("academy", academy);
+
+        Page<ReadAllEmployeeResponse> employees = employeeService.readAllEmployees(requestAccount, academyId, pageable);
+        for (ReadAllEmployeeResponse employee : employees) {
+            employee.setImageUrl(employeeProfileS3UploadService.getStoredUrl(employee.getId()));
+        }
+        model.addAttribute("employees", employees);
+        model.addAttribute("account", requestAccount);
+
+
+        model.addAttribute("previous", pageable.previousOrFirst().getPageNumber());
+        model.addAttribute("next", pageable.next().getPageNumber());
+
+        return "employee/employees";
+    }
 
     @GetMapping("/oauthFail")
     public void oauthFail(HttpServletResponse response) throws IOException {

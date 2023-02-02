@@ -82,8 +82,14 @@
 
                                                 <th class="align-middle text-center">
                                                     <div class="flex">
-                                                        <img src="/assets/img/team-2.jpg"
-                                                             class="avatar avatar-xl me-3 border-radius-lg" alt="user1">
+                                                        <th:block th:if="${teacher.imageUrl =='null'}">
+                                                            <img src="../assets/img/team-2.jpg"
+                                                                 class="avatar avatar-xl me-3 border-radius-lg">
+                                                        </th:block>
+                                                        <th:block th:if="${teacher.imageUrl != 'null'}">
+                                                            <img th:src="${teacher.imageUrl}"
+                                                                 class="avatar avatar-xl me-3 border-radius-lg">
+                                                        </th:block>
                                                     </div>
                                                 </th>
 

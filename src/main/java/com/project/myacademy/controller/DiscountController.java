@@ -26,6 +26,7 @@ public class DiscountController {
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
 
         Page<GetDiscountResponse> discounts = discountService.getAllDiscounts(academyId, requestAccount, pageable);
+        model.addAttribute("account", requestAccount);
         model.addAttribute("academyId", academyId);
         model.addAttribute("discounts", discounts);
 

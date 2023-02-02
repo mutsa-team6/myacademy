@@ -126,16 +126,28 @@ public class AcademyService {
 
 
     public FindAcademyResponse findAcademy(FindAcademyRequest request) {
-        String requestAcademyName = request.getName();
-        log.info("🔎 찾으려는 학원 이름 [{}] ", requestAcademyName);
 
         // 검색하려는 학원 데이터가 존재하지 않음
-        Academy academy = academyRepository.findByName(requestAcademyName)
+        Academy academy = academyRepository.findByName(request.getName())
                 .orElseThrow(() -> {
                     throw new AppException(ErrorCode.ACADEMY_NOT_FOUND);
                 });
 
-        FindAcademyResponse response = new FindAcademyResponse(academy.getId());
+        FindAcademyResponse response = new FindAcademyResponse(academy);
+
+        return response;
+
+    }
+
+    public FindAcademyResponse findAcademyById(Long academyId) {
+
+        // 검색하려는 학원 데이터가 존재하지 않음
+        Academy academy = academyRepository.findById(academyId)
+                .orElseThrow(() -> {
+                    throw new AppException(ErrorCode.ACADEMY_NOT_FOUND);
+                });
+
+        FindAcademyResponse response = new FindAcademyResponse(academy);
 
         return response;
 

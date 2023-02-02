@@ -5,10 +5,12 @@ import com.project.myacademy.domain.employee.EmployeeRole;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @AllArgsConstructor
 @Builder
+@Setter
 public class ReadAllEmployeeResponse {
     private Long id;
     private String name;
@@ -18,6 +20,8 @@ public class ReadAllEmployeeResponse {
     private String account;
     private EmployeeRole employeeRole;
     private String subject;
+    private String imageUrl;
+    private String job;
 
     public static ReadAllEmployeeResponse of(Employee employee) {
         return ReadAllEmployeeResponse.builder()
@@ -29,6 +33,7 @@ public class ReadAllEmployeeResponse {
                 .account(employee.getAccount())
                 .employeeRole(employee.getEmployeeRole())
                 .subject(employee.getSubject())
+                .job(employee.getEmployeeRole().toString())
                 .build();
     }
 }

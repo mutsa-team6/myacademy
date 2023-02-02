@@ -45,6 +45,7 @@ public class EnrollmentController {
             Page<ReadAllStudentResponse> studentList = studentService.readAllStudent(academyId, pageable, requestAccount);
             model.addAttribute("students", studentList);
         }
+        model.addAttribute("account", requestAccount);
         model.addAttribute("previous", pageable.previousOrFirst().getPageNumber());
         model.addAttribute("next", pageable.next().getPageNumber());
 
@@ -68,6 +69,7 @@ public class EnrollmentController {
         for (ReadAllLectureResponse lecture : lectures) {
             lecture.setWaitingNum(waitinglistService.countWaitingListByLecture(academyId, lecture.getLectureId(), requestAccount));
         }
+        model.addAttribute("account", requestAccount);
         model.addAttribute("lectures", lectures);
         model.addAttribute("student", foundStudent);
         model.addAttribute("academyId", academyId);
