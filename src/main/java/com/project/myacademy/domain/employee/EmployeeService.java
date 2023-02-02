@@ -222,7 +222,7 @@ public class EmployeeService {
      * 임시 비밀번호를 요청된 이메일로 전송
      */
     @Transactional
-    public ChangePasswordEmployeeResponse changePasswordEmployee(ChangePasswordEmployeeRequest request) {
+    public FindPasswordEmployeeResponse findPasswordEmployee(FindPasswordEmployeeRequest request) {
 
         String account = request.getAccount();
         String name = request.getName();
@@ -246,7 +246,7 @@ public class EmployeeService {
 
         emailUtil.sendEmail(email, title, body);
 
-        return new ChangePasswordEmployeeResponse(
+        return new FindPasswordEmployeeResponse(
                 changedEmployee.getId(),
                 changedEmployee.getName(),
                 changedEmployee.getAccount(),

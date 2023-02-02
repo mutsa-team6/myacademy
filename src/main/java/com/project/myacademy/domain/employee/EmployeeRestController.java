@@ -47,7 +47,7 @@ public class EmployeeRestController {
         return ResponseEntity.ok(Response.success(response));
     }
 
-    @Tag(name = "02-2. 직원", description = "직원 로그인,계정 및 비밀번호 찾기")
+    @Tag(name = "02-2. 직원", description = "직원 로그인,계정 및 비밀번호 찾기, 변경")
     @Operation(summary = "직원 로그인", description =
             "회원가입된 계정과 비밀번호로 로그인합니다. \n\n 로그인시 쿠키에 토큰이 담김니다.")
     @PostMapping("/{academyId}/employees/login")
@@ -123,7 +123,7 @@ public class EmployeeRestController {
      * @param request
      * @return
      */
-    @Tag(name = "02-2. 직원", description = "직원 로그인,계정 및 비밀번호 찾기")
+    @Tag(name = "02-2. 직원", description = "직원 로그인,계정 및 비밀번호 찾기, 변경")
     @Operation(summary = "직원 계정찾기", description = "직원 계정을 찾습니다.")
     @PostMapping("employee/findAccount")
     public ResponseEntity findAccount(@RequestBody FindAccountEmployeeRequest request) {
@@ -133,17 +133,27 @@ public class EmployeeRestController {
         return ResponseEntity.ok(Response.success(response));
     }
 
+//    @Tag(name = "02-2. 직원", description = "직원 로그인,계정 및 비밀번호 찾기, 변경")
+//    @Operation(summary = "직원 계정 비밀번호 변경", description = "비밀번호를 변경합니다.")
+//    @PostMapping("employee/changePassword")
+//    public ResponseEntity changePassword(@RequestBody FindAccountEmployeeRequest request) {
+//
+//        FindAccountEmployeeResponse response = employeeService.findAccountEmployee(request);
+//
+//        return ResponseEntity.ok(Response.success(response));
+//    }
+
     /**
      * 비밀번호 찾기
      *
      * @param request
      * @return
      */
-    @Tag(name = "02-2. 직원", description = "직원 로그인,계정 및 비밀번호 찾기")
+    @Tag(name = "02-2. 직원", description = "직원 로그인,계정 및 비밀번호 찾기, 변경")
     @Operation(summary = "직원 비밀번호 찾기", description = "이메일로 임시 비밀번호가 발송됩니다.")
     @PutMapping("/employee/findPassword")
-    public ResponseEntity changePassword(@RequestBody ChangePasswordEmployeeRequest request) {
-        ChangePasswordEmployeeResponse response = employeeService.changePasswordEmployee(request);
+    public ResponseEntity findPassword(@RequestBody FindPasswordEmployeeRequest request) {
+        FindPasswordEmployeeResponse response = employeeService.findPasswordEmployee(request);
         return ResponseEntity.ok(Response.success(response));
     }
 
