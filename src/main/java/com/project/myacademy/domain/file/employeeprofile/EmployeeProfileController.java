@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
 
 @Tag(name = "02-3. 직원", description = "직원 사진 등록,수정,조회")
 @RestController
@@ -30,7 +29,7 @@ public class EmployeeProfileController {
     @PostMapping("/{academyId}/employees/{employeeId}/files/upload")
     public ResponseEntity<Response<CreateEmployeeProfileResponse>> upload(@PathVariable("academyId") Long academyId,
                                                                           @PathVariable("employeeId") Long employeeId,
-                                                                          @RequestPart List<MultipartFile> multipartFile,
+                                                                          @RequestPart MultipartFile multipartFile,
                                                                           Authentication authentication) throws IOException {
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
         CreateEmployeeProfileResponse profileResponse = employeeProfileS3UploadService.uploadEmployeeProfile(academyId, employeeId, multipartFile, requestAccount);
