@@ -16,8 +16,6 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     Optional<Employee> findByAccountAndEmail(String account, String email);
     Optional<Employee> findByAccountAndAcademy(String account, Academy academy);
     Optional<Employee> findByIdAndAcademy(Long employeeId, Academy academy);
-    //Page<Employee> findAllByAcademy( Academy academy, Pageable pageable);
-
     @Query("select e from Employee e where e.academy = :academy and not e.account = 'admin'")
     Page<Employee> findAllEmployee(@Param("academy") Academy academy, Pageable pageable);
     @Query("select e from Employee e where e.academy = :academy and not e.subject = '직원'")
