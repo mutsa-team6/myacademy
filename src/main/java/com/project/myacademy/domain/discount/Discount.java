@@ -15,7 +15,6 @@ import javax.persistence.*;
 @Builder
 @Getter
 @Table(name = "discount_tb")
-@Where(clause = "deleted_at is NULL")
 @SQLDelete(sql = "UPDATE discount_tb SET deleted_at = current_timestamp WHERE discount_id = ?")
 public class Discount extends BaseEntity {
 

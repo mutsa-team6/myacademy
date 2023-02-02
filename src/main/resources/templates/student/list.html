@@ -130,8 +130,13 @@
                                                       th:text="${student.address}"></span>
                                     </td>
                                     <td class="align-middle">
-
-
+                                        <form action="/academy/student/info" method="get">
+                                            <input type="text" class="form-control" name="studentId"
+                                                   th:value="${student.id}" hidden>
+                                        <button class="btn btn-icon btn-2 btn-primary mt-3" type="submit">
+                                                    상세 조회</span>
+                                        </button>
+                                        </form>
                                     </td>
                                 </tr>
                                 </tbody>

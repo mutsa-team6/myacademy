@@ -1,6 +1,8 @@
 package com.project.myacademy.controller;
 
 import com.project.myacademy.domain.academy.Academy;
+import com.project.myacademy.domain.academy.AcademyService;
+import com.project.myacademy.domain.academy.dto.FindAcademyResponse;
 import com.project.myacademy.domain.employee.EmployeeService;
 import com.project.myacademy.domain.employee.dto.ReadEmployeeResponse;
 import com.project.myacademy.domain.file.employeeprofile.EmployeeProfileS3UploadService;
@@ -27,6 +29,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class LectureController {
     private final EmployeeService employeeService;
+    private final AcademyService academyService;
 
     private final LectureService lectureService;
     private final EmployeeProfileS3UploadService employeeProfileS3UploadService;
@@ -59,6 +62,8 @@ public class LectureController {
         for (ReadEmployeeResponse teacher : teachers) {
             teacher.setImageUrl(employeeProfileS3UploadService.getStoredUrl(teacher.getId()));
         }
+        FindAcademyResponse academy = academyService.findAcademyById(academyId);
+        model.addAttribute("academy", academy);
         model.addAttribute("teachers", teachers);
         model.addAttribute("account", requestAccount);
 
@@ -79,7 +84,8 @@ public class LectureController {
         }
 
         Page<ReadAllLectureResponse> lectures = lectureService.readAllLecturesByTeacherId(academyId, requestAccount, teacherId, pageable);
-
+        FindAcademyResponse academy = academyService.findAcademyById(academyId);
+        model.addAttribute("academy", academy);
         model.addAttribute("account", requestAccount);
         model.addAttribute("teacher", teacher);
         model.addAttribute("lectures", lectures);

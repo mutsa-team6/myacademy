@@ -1,6 +1,8 @@
 package com.project.myacademy.controller;
 
 import com.project.myacademy.domain.academy.Academy;
+import com.project.myacademy.domain.academy.AcademyService;
+import com.project.myacademy.domain.academy.dto.FindAcademyResponse;
 import com.project.myacademy.domain.employee.EmployeeService;
 import com.project.myacademy.domain.employee.dto.ReadEmployeeResponse;
 import com.project.myacademy.global.util.AuthenticationUtil;
@@ -21,6 +23,7 @@ import javax.servlet.http.HttpSession;
 public class IndexController {
 
     private final EmployeeService employeeService;
+    private final AcademyService academyService;
     @GetMapping("/academy/main")
     public String main(HttpServletRequest request, Model model, Authentication authentication){
 
@@ -44,7 +47,8 @@ public class IndexController {
             session.setAttribute("name",foundName);
             model.addAttribute("name", foundName);
         }
-
+        FindAcademyResponse academy = academyService.findAcademyById(academyId);
+        model.addAttribute("academy", academy);
         model.addAttribute("account", requestAccount);
 
         return "pages/main";
