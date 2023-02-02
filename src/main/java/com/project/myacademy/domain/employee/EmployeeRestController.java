@@ -133,15 +133,19 @@ public class EmployeeRestController {
         return ResponseEntity.ok(Response.success(response));
     }
 
-//    @Tag(name = "02-2. 직원", description = "직원 로그인,계정 및 비밀번호 찾기, 변경")
-//    @Operation(summary = "직원 계정 비밀번호 변경", description = "비밀번호를 변경합니다.")
-//    @PostMapping("employee/changePassword")
-//    public ResponseEntity changePassword(@RequestBody FindAccountEmployeeRequest request) {
-//
-//        FindAccountEmployeeResponse response = employeeService.findAccountEmployee(request);
-//
-//        return ResponseEntity.ok(Response.success(response));
-//    }
+    /**
+     * 직원 계정 비밀번호 변경
+     */
+    @Tag(name = "02-2. 직원", description = "직원 로그인,계정 및 비밀번호 찾기, 변경")
+    @Operation(summary = "직원 계정 비밀번호 변경", description = "비밀번호를 변경합니다.")
+    @PostMapping("{academyId}/employee/changePassword")
+    public ResponseEntity changePassword(@PathVariable Long academyId, @RequestBody ChangePasswordEmployeeRequest request, Authentication authentication) {
+
+        String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
+        ChangePasswordEmployeeResponse response = employeeService.changePasswordEmployee(request, academyId, requestAccount);
+
+        return ResponseEntity.ok(Response.success(response));
+    }
 
     /**
      * 비밀번호 찾기

@@ -252,7 +252,36 @@ public class EmployeeService {
                 changedEmployee.getAccount(),
                 changedEmployee.getEmail()
         );
+    }
 
+    /**
+     * oldPassword, newPassword를 입력받아 기존 비밀번호로 한번 더 확인하고 새로운 비밀 번호로 변경해주는 기능
+     * @param request 기존, 새로운 비밀번호가 담긴 request
+     * @param academyId 학원 id
+     * @param account jwt에 담긴 직원 account
+     */
+    @Transactional
+    public ChangePasswordEmployeeResponse changePasswordEmployee(ChangePasswordEmployeeRequest request, Long academyId, String account) {
+        //academyId 존재 유무 확인
+        Academy academy = validateAcademy(academyId);
+        //account 유효검사
+        Employee employee = validateRequestEmployee(account, academy);
+
+        //request에 담긴 기존 패스워드가 employee에 저장되어있는 패스워드와 다르면 에러발생
+        if(!bCryptPasswordEncoder.matches(request.getOldPassword(),employee.getPassword())) {
+            throw new AppException(ErrorCode.INVALID_PASSWORD);
+        }
+
+        // 새로운 패스워드와 기존 패스워드와 같으면 에러발생
+        if(request.getNewPassword().equals(request.getOldPassword())) {
+            throw new AppException(ErrorCode.SAME_PASSWORD);
+        }
+
+        String encodedNewPassword = bCryptPasswordEncoder.encode(request.getNewPassword());
+
+        employee.updatePasswordOnly(encodedNewPassword);
+
+        return new ChangePasswordEmployeeResponse(employee.getAccount(), "%n 님의 비밀번호 변경을 성공했습니다.");
     }
 
     /**
@@ -537,4 +566,6 @@ public class EmployeeService {
         }
         return str;
     }
+
+
 }
