@@ -54,6 +54,8 @@ class WaitinglistServiceTest {
     @Mock
     private LectureRepository lectureRepository;
     @Mock
+    private EnrollmentRepository enrollmentRepository;
+    @Mock
     private WaitinglistRepository waitinglistRepository;
     @InjectMocks
     private WaitinglistService waitinglistService;
@@ -66,9 +68,9 @@ class WaitinglistServiceTest {
     private Student student2;
     private Waitinglist waitinglist;
     private Waitinglist waitinglist2;
+    private Enrollment enrollment;
     private Employee mockEmployee;
     private Lecture mockLecture;
-
 
     @BeforeEach
     void setup() {
@@ -78,6 +80,7 @@ class WaitinglistServiceTest {
         lecture = Lecture.builder().id(1L).name("lecture").price(10000).employee(teacher).maximumCapacity(10).currentEnrollmentNumber(0).build();
         student = Student.builder().id(1L).name("student").academyId(academy.getId()).build();
         student2 = Student.builder().id(2L).name("student2").academyId(academy.getId()).build();
+        enrollment = Enrollment.builder().id(1L).student(student).lecture(lecture).build();
         waitinglist = Waitinglist.builder().id(1L).student(student).lecture(lecture).build();
         waitinglist2 = Waitinglist.builder().id(2L).student(student2).lecture(lecture).build();
         mockEmployee = mock(Employee.class);
@@ -339,7 +342,7 @@ class WaitinglistServiceTest {
         }
 
         @Test
-        @DisplayName("등록 실패(6) - 대기번호가 중복 등록되어 있는 경우")
+        @DisplayName("등록 실패(6) - 이미 수강 등록되어 있는 경우")
         public void createWaitingList_fail6() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
@@ -347,6 +350,32 @@ class WaitinglistServiceTest {
             given(studentRepository.findById(anyLong())).willReturn(Optional.of(student));
             given(lectureRepository.findById(anyLong())).willReturn(Optional.of(lecture));
             given(mockEmployee.getEmployeeRole()).willReturn(EmployeeRole.ROLE_STAFF);
+            given(enrollmentRepository.findByStudentAndLecture(any(Student.class), any(Lecture.class))).willReturn(Optional.of(enrollment));
+
+            AppException appException = assertThrows(AppException.class,
+                    () -> waitinglistService.createWaitinglist(academy.getId(), student.getId(), lecture.getId(), employee.getAccount()));
+
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.DUPLICATED_ENROLLMENT);
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("이미 존재하는 수강 내역입니다.");
+
+            then(academyRepository).should(times(1)).findById(anyLong());
+            then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
+            then(studentRepository).should(times(1)).findById(anyLong());
+            then(lectureRepository).should(times(1)).findById(anyLong());
+            then(mockEmployee).should(times(1)).getEmployeeRole();
+            then(enrollmentRepository).should(times(1)).findByStudentAndLecture(any(Student.class), any(Lecture.class));
+        }
+
+        @Test
+        @DisplayName("등록 실패(7) - 대기번호가 중복 등록되어 있는 경우")
+        public void createWaitingList_fail7() {
+
+            given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
+            given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
+            given(studentRepository.findById(anyLong())).willReturn(Optional.of(student));
+            given(lectureRepository.findById(anyLong())).willReturn(Optional.of(lecture));
+            given(mockEmployee.getEmployeeRole()).willReturn(EmployeeRole.ROLE_STAFF);
+            given(enrollmentRepository.findByStudentAndLecture(any(Student.class), any(Lecture.class))).willReturn(Optional.empty());
             given(waitinglistRepository.findByStudentAndLecture(any(Student.class), any(Lecture.class))).willReturn(Optional.of(waitinglist));
 
             AppException appException = assertThrows(AppException.class,
@@ -360,6 +389,7 @@ class WaitinglistServiceTest {
             then(studentRepository).should(times(1)).findById(anyLong());
             then(lectureRepository).should(times(1)).findById(anyLong());
             then(mockEmployee).should(times(1)).getEmployeeRole();
+            then(enrollmentRepository).should(times(1)).findByStudentAndLecture(any(Student.class), any(Lecture.class));
             then(waitinglistRepository).should(times(1)).findByStudentAndLecture(any(Student.class), any(Lecture.class));
         }
     }

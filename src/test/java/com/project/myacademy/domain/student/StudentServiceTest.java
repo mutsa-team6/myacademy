@@ -49,7 +49,7 @@ class StudentServiceTest {
         parent = Parent.builder().id(1L).name("부모").phoneNum("010-0000-0000").academyId(1L).build();
         student1 = Student.builder().id(1L).name("학생").phoneNum("010-1111-1111").email("student1@gmail.com").academyId(1L).parent(parent).build();
         student2 = Student.builder().id(2L).name("학생2").phoneNum("010-1111-1112").email("student2@gmail.com").academyId(1L).parent(parent).build();
-        student3 = Student.builder().id(3L).name("학생").phoneNum("010-1111-1113").email("student3@gmail.com").academyId(1L).build(); // 동명이인
+        student3 = Student.builder().id(3L).name("학생").phoneNum("010-1111-1113").email("student3@gmail.com").academyId(1L).parent(parent).build(); // 동명이인
         pageable = PageRequest.of(0, 20, Sort.Direction.DESC, "id");
     }
 
@@ -255,15 +255,14 @@ class StudentServiceTest {
         @Test
         @DisplayName("학생 이름으로 전체 조회")
         void read_by_name_students_success() {
-            List<Student> studentList = List.of(student1, student2);
+            Page<Student> studentList = new PageImpl<>(List.of(student1,student3));
 
-            given(studentRepository.findByAcademyIdAndName(any(), any())).willReturn(studentList);
+            given(studentRepository.findByAcademyIdAndName(any(), any(),any())).willReturn(studentList);
 
-            List<ReadAllStudentResponse> studentListResponse = studentService.findStudentForStudentList(academy.getId(), student1.getName());
+            Page<ReadAllStudentResponse> studentListResponse = studentService.findStudentForStudentList(academy.getId(), student1.getName(), pageable);
 
-            assertThat(studentListResponse.size() == 2);
-            assertThat(studentListResponse.get(0).equals(student1));
-            assertThat(studentListResponse.get(1).equals(student3));
+            assertThat(studentListResponse.getTotalElements() == 2);
+            assertThat(studentListResponse.getTotalPages() == 1);
         }
     }
 

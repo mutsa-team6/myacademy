@@ -454,12 +454,8 @@ public class EmployeeService {
         // 본인 정보 수정을 요청한 회원이 해당 학원에 존재하는지 확인
         Employee requestEmployee = validateRequestEmployee(requestAccount, foundAcademy);
 
-        // 요청 비밀번호 복호화
-        String encodedPassword = bCryptPasswordEncoder.encode(request.getPassword());
-        request.setPassword(encodedPassword);
-
         //정보 수정
-        requestEmployee.update(request);
+        requestEmployee.updateEmployeeInfo(request);
 
         return new UpdateEmployeeResponse(requestEmployee.getId(), requestAccount + "계정 정보를 수정했습니다");
     }
@@ -468,7 +464,7 @@ public class EmployeeService {
      * UI 용 메서드
      * 회원가입한 사용자 들 중에서, 특정 학원의 강사들만 추출하는 메서드
      */
-    public Page<ReadEmployeeResponse> findAllTeachers(String requestAccount,Long academyId,Pageable pageable) {
+    public Page<ReadEmployeeResponse> findAllTeachers(String requestAccount, Long academyId, Pageable pageable) {
         //해당 학원이 존재하는지 확인
         Academy foundAcademy = validateAcademy(academyId);
 
@@ -481,7 +477,7 @@ public class EmployeeService {
      * UI 용 메서드
      * 강좌 등록 시에 강사 정보를 보여주기 위함
      */
-    public ReadEmployeeResponse findOneTeacher(String requestAccount,Long academyId,Long teacherId) {
+    public ReadEmployeeResponse findOneTeacher(String requestAccount, Long academyId, Long teacherId) {
         //해당 학원이 존재하는지 확인
         Academy foundAcademy = validateAcademy(academyId);
 

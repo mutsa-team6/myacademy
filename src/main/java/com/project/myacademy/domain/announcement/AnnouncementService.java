@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,16 +61,12 @@ public class AnnouncementService {
      * @return
      */
     @Transactional(readOnly = true)
-    public Page<ReadAllAnnouncementResponse> readAllAnnouncement(Long academyId, PageRequest pageable, String account) {
+    public Page<ReadAllAnnouncementResponse> readAllAnnouncement(Long academyId, Pageable pageable, String account) {
 
         //academyId 존재 유무 확인
         Academy academy = validateAcademy(academyId);
         //account 유효검사
         Employee employee = validateAcademyEmployee(account, academy);
-        // 공지사항을 관리 할 수 있는 권한인지 확인(강사만 불가능)
-        if(Employee.isTeacherAuthority(employee)) {
-            throw new AppException(ErrorCode.INVALID_PERMISSION);
-        }
 
         return announcementRepository.findAllByAcademy(academy, pageable).map(announcement -> ReadAllAnnouncementResponse.of(announcement));
     }
@@ -86,10 +83,6 @@ public class AnnouncementService {
         Academy academy = validateAcademy(academyId);
         //account 유효검사
         Employee employee = validateAcademyEmployee(account, academy);
-        // 공지사항을 관리 할 수 있는 권한인지 확인(강사만 불가능)
-        if(Employee.isTeacherAuthority(employee)) {
-            throw new AppException(ErrorCode.INVALID_PERMISSION);
-        }
         //announcementId에 해당하는 특이사항이 있는 지확인하고 있으면 가져옴
         Announcement announcement = announcementRepository.findById(announcementId)
                 .orElseThrow(() -> new AppException(ErrorCode.ANNOUNCEMENT_NOT_FOUND));
