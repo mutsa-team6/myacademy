@@ -3,6 +3,7 @@ package com.project.myacademy.controller;
 import com.project.myacademy.domain.employee.EmployeeRole;
 import com.project.myacademy.domain.employee.EmployeeService;
 import com.project.myacademy.domain.employee.dto.ReadEmployeeResponse;
+import com.project.myacademy.domain.file.employeeprofile.EmployeeProfileS3UploadService;
 import com.project.myacademy.domain.lecture.LectureService;
 import com.project.myacademy.domain.lecture.dto.ReadAllLectureResponse;
 import com.project.myacademy.global.util.AuthenticationUtil;
@@ -30,6 +31,8 @@ public class EmployeeController {
 
     private final EmployeeService employeeService;
     private final LectureService lectureService;
+
+    private final EmployeeProfileS3UploadService employeeProfileS3UploadService;
 
     @GetMapping("/join")
     public String join() {
@@ -67,7 +70,8 @@ public class EmployeeController {
         if (!employee.getEmployeeRole().equals(EmployeeRole.ROLE_STAFF)) {
             lectures = lectureService.readAllLecturesByTeacherId(academyId, requestAccount, employee.getId(), pageable);
         }
-
+        model.addAttribute("academyId", academyId);
+        model.addAttribute("employeeId", employee.getId());
         model.addAttribute("lectures", lectures);
         model.addAttribute("previous", pageable.previousOrFirst().getPageNumber());
         model.addAttribute("next", pageable.next().getPageNumber());
