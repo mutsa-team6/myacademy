@@ -11,7 +11,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
@@ -194,12 +196,13 @@ public class EmployeeRestController {
     @Tag(name = "02-1. 직원", description = "직원 회원 가입 및 정보 수정,조회")
     @Operation(summary = "직원 조회", description = "ADMIN 회원만 조회가 가능합니다.")
     @GetMapping("/{academyId}/employees")
-    public ResponseEntity readAll(@PathVariable Long academyId, Authentication authentication, Pageable pageable) {
+    public ResponseEntity readAll(@PathVariable Long academyId, Authentication authentication) {
+        PageRequest pageable = PageRequest.of(0, 20, Sort.by("id").descending());
 
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
         log.info("🔎 조회를 요청한 사용자 계정 [{}] || 접근하려는 학원 id [{}] ", requestAccount, academyId);
 
-        Page<ReadEmployeeResponse> response = employeeService.readAllEmployees(requestAccount, academyId, pageable);
+        Page<ReadAllEmployeeResponse> response = employeeService.readAllEmployees(requestAccount, academyId, pageable);
 
         return ResponseEntity.ok(Response.success(response));
     }

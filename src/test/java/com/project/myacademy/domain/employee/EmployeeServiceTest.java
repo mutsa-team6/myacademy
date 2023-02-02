@@ -553,7 +553,7 @@ class EmployeeServiceTest {
             given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeADMIN));
             given(employeeRepository.findAll(pageable)).willReturn(employeeList);
 
-            Page<ReadEmployeeResponse> responses = employeeService.readAllEmployees(employeeADMIN.getAccount(), academy.getId(), pageable);
+            Page<ReadAllEmployeeResponse> responses = employeeService.readAllEmployees(employeeADMIN.getAccount(), academy.getId(), pageable);
 
             assertThat(responses.getTotalPages()).isEqualTo(1);
             assertThat(responses.getTotalElements()).isEqualTo(3);

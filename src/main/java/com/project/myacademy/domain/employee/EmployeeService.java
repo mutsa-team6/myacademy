@@ -17,6 +17,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.project.myacademy.domain.employee.QEmployee.employee;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -367,17 +369,20 @@ public class EmployeeService {
      * @param pageable
      * @return 모든 회원 목록 반환
      */
-    public Page<ReadEmployeeResponse> readAllEmployees(String requestAccount, Long academyId, Pageable pageable) {
+    public Page<ReadAllEmployeeResponse> readAllEmployees(String requestAccount, Long academyId, Pageable pageable) {
 
         //학원이 존재하지 않는 경우
         Academy foundAcademy = validateAcademy(academyId);
 
-
         // 조회를 요청한 회원이 해당 학원에 존재하지 않는 경우 에러 처리
-        validateRequestEmployee(requestAccount, foundAcademy);
+        Employee employeeAdmin = validateRequestEmployee(requestAccount, foundAcademy);
 
+        // 조회를 요청한 회원의 권한이 admin이 아닐경우 권한에러 처리
+        if (!employeeAdmin.getEmployeeRole().equals(EmployeeRole.ROLE_ADMIN)) {
+            throw new AppException(ErrorCode.NOT_ALLOWED_ROLE);
+        }
 
-        return employeeRepository.findAll(pageable).map(employee -> new ReadEmployeeResponse(employee));
+        return employeeRepository.findAllEmployee(foundAcademy, pageable).map(ReadAllEmployeeResponse::of);
     }
 
     /**
