@@ -80,7 +80,7 @@ class UniquenessServiceTest {
             when(uniquenessRepository.save(any())).thenReturn(uniqueness1);
 
             AppException appException = assertThrows(AppException.class, () -> uniquenessService.createUniqueness(1L, 1L, request, "admin"));
-            assertThat(appException.getErrorCode().equals(ErrorCode.EMPLOYEE_NOT_FOUND));
+            assertThat(appException.getErrorCode().equals(ErrorCode.ACCOUNT_NOT_FOUND));
         }
 
         @Test
@@ -140,7 +140,7 @@ class UniquenessServiceTest {
             when(uniquenessRepository.findAllByStudent(any(), any())).thenReturn(uniquenessList);
 
             AppException appException = assertThrows(AppException.class, () -> uniquenessService.readAllUniqueness(1L, 1L, pageable, "admin"));
-            assertThat(appException.getErrorCode().equals(ErrorCode.EMPLOYEE_NOT_FOUND));
+            assertThat(appException.getErrorCode().equals(ErrorCode.ACCOUNT_NOT_FOUND));
         }
 
         @Test
@@ -199,7 +199,7 @@ class UniquenessServiceTest {
             when(uniquenessRepository.findById(any())).thenReturn(Optional.of(uniqueness1));
 
             AppException appException = assertThrows(AppException.class, () -> uniquenessService.updateUniqueness(1L, 1L, 1L, request, "admin").getBody());
-            assertThat(appException.getErrorCode().equals(ErrorCode.EMPLOYEE_NOT_FOUND));
+            assertThat(appException.getErrorCode().equals(ErrorCode.ACCOUNT_NOT_FOUND));
         }
 
         @Test
@@ -269,7 +269,7 @@ class UniquenessServiceTest {
             when(uniquenessRepository.findById(any())).thenReturn(Optional.of(uniqueness1));
 
             AppException appException = assertThrows(AppException.class, () -> uniquenessService.deleteUniqueness(1L, 1L, 1L, "admin"));
-            assertThat(appException.getErrorCode().equals(ErrorCode.EMPLOYEE_NOT_FOUND));
+            assertThat(appException.getErrorCode().equals(ErrorCode.ACCOUNT_NOT_FOUND));
         }
 
         @Test
