@@ -78,7 +78,19 @@
                     <h6 class="ps-4 ms-2 text-uppercase text-xs text-white font-weight-bolder opacity-8">Account
                         pages</h6>
                 </li>
+                <th:block th:if="${account =='admin'}">
 
+                <li class="nav-item">
+                    <a class="nav-link text-white " href="/academy/employees">
+
+                        <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class='fas fa-users'></i>
+                        </div>
+
+                        <span class="nav-link-text ms-1">직원관리</span>
+                    </a>
+                </li>
+                </th:block>
                 <li class="nav-item">
                     <a class="nav-link text-white " href="/academy/mypage">
 

@@ -74,7 +74,7 @@ public class PaymentController {
 
         Page<GetDiscountResponse> discounts = discountService.getAllDiscounts(academyId, requestAccount, pageable);
         model.addAttribute("discounts", discounts);
-
+        model.addAttribute("account", requestAccount);
 
         return "payment/register";
     }
@@ -104,12 +104,15 @@ public class PaymentController {
 
         SuccessPaymentResponse payment = paymentService.findPayment(orderId);
         model.addAttribute("payment", payment);
-
+        model.addAttribute("account", requestAccount);
 
         return "payment/success";
     }
     @GetMapping("/academy/payment")
-    public String paySuccess() {
+    public String paySuccess(Authentication authentication,Model model) {
+        String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
+
+        model.addAttribute("account", requestAccount);
 
         return "pages/payment";
     }
@@ -130,6 +133,7 @@ public class PaymentController {
             Page<CompletePaymentResponse> payments = paymentService.findAllCompletePayment(academyId, requestAccount, pageable);
             model.addAttribute("payments", payments);
         }
+        model.addAttribute("account", requestAccount);
         model.addAttribute("previous", pageable.previousOrFirst().getPageNumber());
         model.addAttribute("next", pageable.next().getPageNumber());
 

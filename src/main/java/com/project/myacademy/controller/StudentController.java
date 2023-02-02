@@ -32,7 +32,10 @@ public class StudentController {
     private final StudentService studentService;
 
     @GetMapping("/academy/student")
-    public String student(Model model, Pageable pageable) {
+    public String student(Authentication authentication,Model model, Pageable pageable) {
+        String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
+
+        model.addAttribute("account", requestAccount);
 
         return "pages/student";
     }
@@ -41,8 +44,11 @@ public class StudentController {
     public String studentRegister( Model model, Authentication authentication) {
 
         Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
+        String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
+
 
         model.addAttribute("academyId", academyId);
+        model.addAttribute("account", requestAccount);
 
         return "student/register";
     }
@@ -74,6 +80,7 @@ public class StudentController {
             Page<ReadAllStudentResponse> studentList = studentService.readAllStudent(academyId, pageable, requestAccount);
             model.addAttribute("students", studentList);
         }
+        model.addAttribute("account", requestAccount);
         model.addAttribute("previous", pageable.previousOrFirst().getPageNumber());
         model.addAttribute("next", pageable.next().getPageNumber());
 

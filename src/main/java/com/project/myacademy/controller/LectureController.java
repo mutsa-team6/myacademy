@@ -3,6 +3,7 @@ package com.project.myacademy.controller;
 import com.project.myacademy.domain.academy.Academy;
 import com.project.myacademy.domain.employee.EmployeeService;
 import com.project.myacademy.domain.employee.dto.ReadEmployeeResponse;
+import com.project.myacademy.domain.file.employeeprofile.EmployeeProfileS3UploadService;
 import com.project.myacademy.domain.lecture.LectureService;
 import com.project.myacademy.domain.lecture.dto.ReadAllLectureResponse;
 import com.project.myacademy.domain.student.dto.ReadAllStudentResponse;
@@ -28,6 +29,7 @@ public class LectureController {
     private final EmployeeService employeeService;
 
     private final LectureService lectureService;
+    private final EmployeeProfileS3UploadService employeeProfileS3UploadService;
 
     @GetMapping("/academy/lecture")
     public String main(HttpServletRequest request, Model model, Authentication authentication, Pageable pageable) {
@@ -35,6 +37,7 @@ public class LectureController {
         Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
         log.info("⭐ 강좌 등록 요청한 사용자의 학원 id [{}] || 요청한 사용자의 계정 [{}]", academyId, requestAccount);
+
 
 
         //회원 이름 표시
@@ -53,7 +56,11 @@ public class LectureController {
         }
 
         Page<ReadEmployeeResponse> teachers = employeeService.findAllTeachers(requestAccount, academyId, pageable);
+        for (ReadEmployeeResponse teacher : teachers) {
+            teacher.setImageUrl(employeeProfileS3UploadService.getStoredUrl(teacher.getId()));
+        }
         model.addAttribute("teachers", teachers);
+        model.addAttribute("account", requestAccount);
 
         return "pages/lecture";
     }
@@ -68,10 +75,12 @@ public class LectureController {
         ReadEmployeeResponse teacher = null;
         if (teacherId != null) {
             teacher = employeeService.findOneTeacher(requestAccount, academyId, teacherId);
+            teacher.setImageUrl(employeeProfileS3UploadService.getStoredUrl(teacherId));
         }
 
         Page<ReadAllLectureResponse> lectures = lectureService.readAllLecturesByTeacherId(academyId, requestAccount, teacherId, pageable);
 
+        model.addAttribute("account", requestAccount);
         model.addAttribute("teacher", teacher);
         model.addAttribute("lectures", lectures);
         model.addAttribute("academyId", academyId);
