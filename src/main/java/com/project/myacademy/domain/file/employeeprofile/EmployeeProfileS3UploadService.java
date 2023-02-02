@@ -30,6 +30,7 @@ import java.io.InputStream;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -52,7 +53,7 @@ public class EmployeeProfileS3UploadService {
      * @param multipartFile 파일 업로드를 위한 객체
      * @param account       파일 업로드 진행하는 직원 계정
      */
-    public CreateEmployeeProfileResponse uploadEmployeeProfile(Long academyId, Long employeeId, List<MultipartFile> multipartFile, String account) {
+    public CreateEmployeeProfileResponse uploadEmployeeProfile(Long academyId, Long employeeId, MultipartFile multipartFile, String account) {
 
         // 파일이 들어있는지 확인
         validateFileExists(multipartFile);
@@ -66,60 +67,75 @@ public class EmployeeProfileS3UploadService {
         // 파일 업로드 대상인 직원 존재 유무 확인
         Employee targetEmployee = validateEmployee(employeeId, academy);
 
-        // 1. 직원이 파일 업로드할 권한이 있는지 확인 (강사 외 모든 직원 가능)
-        // 2. 일반 직원은 본인 관련 파일만 등록 가능
-        // 3. 원장은 모든 직원 파일 등록 가능
-        if(!employee.getEmployeeRole().equals(EmployeeRole.ROLE_ADMIN)) {
-            if(Employee.isTeacherAuthority(employee) || !employee.equals(targetEmployee)) {
-                throw new AppException(ErrorCode.INVALID_PERMISSION);
-            }
+        // 원장, 직원, 강사 모두 본인 프로필만 등록 가능
+        if(!employee.equals(targetEmployee)) {
+            throw new AppException(ErrorCode.INVALID_PERMISSION);
         }
 
-        // 원본 파일 이름, S3에 저장될 파일 이름 리스트
-        List<String> originalFileNameList = new ArrayList<>();
-        List<String> storedFileNameList = new ArrayList<>();
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        objectMetadata.setContentType(multipartFile.getContentType());
+        objectMetadata.setContentLength(multipartFile.getSize());
 
-        multipartFile.forEach(file -> {
-            ObjectMetadata objectMetadata = new ObjectMetadata();
-            objectMetadata.setContentType(file.getContentType());
-            objectMetadata.setContentLength(file.getSize());
+        // 업로드한 파일 이름
+        String originalFilename = multipartFile.getOriginalFilename();
 
-            String originalFilename = file.getOriginalFilename();
+        // file 형식이 잘못된 경우를 확인
+        int index;
+        try {
+           index = originalFilename.lastIndexOf(".");
+        } catch (StringIndexOutOfBoundsException e) {
+            throw new AppException(ErrorCode.WRONG_FILE_FORMAT);
+        }
 
-            int index;
-           // file 형식이 잘못된 경우를 확인
-            try {
-               index = originalFilename.lastIndexOf(".");
-            } catch (StringIndexOutOfBoundsException e) {
-                throw new AppException(ErrorCode.WRONG_FILE_FORMAT);
-            }
+        String ext = originalFilename.substring(index + 1);
 
-            String ext = originalFilename.substring(index + 1);
+        // 저장될 파일 이름
+        String storedFileName = UUID.randomUUID() + "." + ext;
 
-            // 저장될 파일 이름
-            String storedFileName = UUID.randomUUID() + "." + ext;
+        // 저장할 디렉토리 경로 + 파일 이름
+        String key = "employee/" + storedFileName;
 
-            // 저장할 디렉토리 경로 + 파일 이름
-            String key = "employee/" + storedFileName;
+        try (InputStream inputStream = multipartFile.getInputStream()) {
+            amazonS3Client.putObject(new PutObjectRequest(bucket, key, inputStream, objectMetadata)
+                    .withCannedAcl(CannedAccessControlList.PublicRead));
+        } catch (IOException e) {
+            throw new AppException(ErrorCode.FILE_UPLOAD_ERROR);
+        }
 
-            try (InputStream inputStream = file.getInputStream()) {
-                amazonS3Client.putObject(new PutObjectRequest(bucket, key, inputStream, objectMetadata)
-                        .withCannedAcl(CannedAccessControlList.PublicRead));
-            } catch (IOException e) {
-                throw new AppException(ErrorCode.FILE_UPLOAD_ERROR);
-            }
+        // 저장될 프로필의 url
+        String storeFileUrl = amazonS3Client.getUrl(bucket, key).toString();
 
-            String storeFileUrl = amazonS3Client.getUrl(bucket, key).toString();
-            EmployeeProfile employeeProfile = EmployeeProfile.makeEmployeeProfile(originalFilename, storeFileUrl, targetEmployee, employee);
-            employeeProfileRepository.save(employeeProfile);
+        // 만약 해당 직원의 기존 프로필이 존재하는 경우
+        employeeProfileRepository.findByEmployee_Id(employee.getId())
+                .ifPresent(employeeProfile -> {
+                    // 기존 프로필 객체 url 가져오기
+                    String oldFileUrl = employeeProfile.getStoredFileUrl();
+                    String oldFilePath = oldFileUrl.substring(52);
+                    // s3 버킷에서 기존 프로필 삭제하기
+                    amazonS3Client.deleteObject(new DeleteObjectRequest(bucket, oldFilePath));
+                    // db에서도 삭제하기
+                    employeeProfileRepository.delete(employeeProfile);
+                });
 
-            storedFileNameList.add(storedFileName);
-            originalFileNameList.add(originalFilename);
-
-        });
+        // 프로필 db에 저장하기
+        EmployeeProfile newEmployeeProfile = EmployeeProfile.makeEmployeeProfile(originalFilename, storeFileUrl, employee);
+        employeeProfileRepository.save(newEmployeeProfile);
 
         log.info("파일 등록 완료");
-        return CreateEmployeeProfileResponse.of(originalFileNameList, storedFileNameList);
+        return CreateEmployeeProfileResponse.of(originalFilename, storedFileName);
+    }
+
+    /**
+     * s3 버킷에 저장된 프로필 객체 url 가져오는 메서드
+     * @param employeeId 찾고자 하는 직원의 id
+     */
+    public String getStoredUrl(Long employeeId) {
+
+        if(employeeProfileRepository.existsEmployeeProfileByEmployee_Id(employeeId)) {
+            return employeeProfileRepository.findByEmployee_Id(employeeId).get().getStoredFileUrl();
+        } else {
+            return "null";
+        }
     }
 
     /**
@@ -238,11 +254,9 @@ public class EmployeeProfileS3UploadService {
     }
 
     // 빈 파일이 아닌지 확인, 파일 자체를 첨부안하거나 첨부해도 내용이 비어있으면 에러 처리
-    private void validateFileExists(List<MultipartFile> multipartFile) {
-        for(MultipartFile mf : multipartFile) {
-            if (mf.isEmpty()) {
-                throw new AppException(ErrorCode.FILE_NOT_EXISTS);
-            }
+    private void validateFileExists(MultipartFile multipartFile) {
+        if (multipartFile.isEmpty()) {
+            throw new AppException(ErrorCode.FILE_NOT_EXISTS);
         }
     }
 
@@ -262,5 +276,4 @@ public class EmployeeProfileS3UploadService {
                 return MediaType.APPLICATION_OCTET_STREAM;
         }
     }
-    
 }
