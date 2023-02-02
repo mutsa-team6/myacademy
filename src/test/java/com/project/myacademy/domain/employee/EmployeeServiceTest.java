@@ -52,10 +52,10 @@ class EmployeeServiceTest {
     void setUp() {
         employeeService = new EmployeeService(employeeRepository, academyRepository, bCryptPasswordEncoder, emailUtil);
         academy = Academy.builder().id(1L).name("학원").owner("원장").build();
-        employeeADMIN = Employee.builder().id(1L).name("원장").account("admin").password("password").phoneNum("010-0000-0000").email("employeeADMIN@gmail.com").academy(academy).employeeRole(EmployeeRole.ROLE_ADMIN).build();
-        employeeSTAFF = Employee.builder().id(2L).name("직원").account("staff").password("password").phoneNum("010-0000-0001").email("employeeSTAFF@gmail.com").academy(academy).employeeRole(ROLE_STAFF).build();
-        employeeUSER = Employee.builder().id(3L).name("강사").account("user").password("password").phoneNum("010-0000-0002").email("employeeUSER@gmail.com").academy(academy).employeeRole(ROLE_USER).build();
-        employeeUSER = Employee.builder().id(4L).name("강사2").account("user2").password("password").phoneNum("010-0000-0012").email("employeeUSER2@gmail.com").academy(academy).employeeRole(ROLE_USER).build();
+        employeeADMIN = Employee.builder().id(1L).name("원장").account("admin").password("password").phoneNum("010-0000-0000").email("employeeADMIN@gmail.com").academy(academy).subject("원장과목").employeeRole(EmployeeRole.ROLE_ADMIN).build();
+        employeeSTAFF = Employee.builder().id(2L).name("직원").account("staff").password("password").phoneNum("010-0000-0001").email("employeeSTAFF@gmail.com").academy(academy).subject("직원").employeeRole(ROLE_STAFF).build();
+        employeeUSER = Employee.builder().id(3L).name("강사").account("user").password("password").phoneNum("010-0000-0002").email("employeeUSER@gmail.com").academy(academy).subject("수학").employeeRole(ROLE_USER).build();
+        employeeUSER = Employee.builder().id(4L).name("강사2").account("user2").password("password").phoneNum("010-0000-0012").email("employeeUSER2@gmail.com").academy(academy).subject("과학").employeeRole(ROLE_USER).build();
         pageable = PageRequest.of(0, 20, Sort.Direction.DESC, "id");
     }
 
@@ -433,11 +433,11 @@ class EmployeeServiceTest {
         @DisplayName("직원 삭제 실패4 - 삭제하려는 계정이 자기 자신인경우")
         void delete_employee_fail4() {
             given(academyRepository.findById(any())).willReturn(Optional.of(academy));
-            given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeSTAFF));
-            given(employeeRepository.findByIdAndAcademy(any(), any())).willReturn(Optional.of(employeeSTAFF));
+            given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeADMIN));
+            given(employeeRepository.findByIdAndAcademy(any(), any())).willReturn(Optional.of(employeeADMIN));
 
             AppException appException = assertThrows(AppException.class,
-                    () -> employeeService.deleteEmployee(employeeSTAFF.getAccount(), academy.getId(), employeeSTAFF.getId()));
+                    () -> employeeService.deleteEmployee(employeeADMIN.getAccount(), academy.getId(), employeeADMIN.getId()));
 
             assertThat(appException.getErrorCode().equals(ErrorCode.BAD_DELETE_REQUEST));
         }
@@ -547,16 +547,16 @@ class EmployeeServiceTest {
         @DisplayName("모든 직원 찾기 성공")
         void find_all_employee_success() {
 
-            Page<Employee> employeeList = new PageImpl<>(List.of(employeeADMIN, employeeSTAFF, employeeUSER));
-
             given(academyRepository.findById(any())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeADMIN));
-            given(employeeRepository.findAll(pageable)).willReturn(employeeList);
+
+            Page<Employee> employeeList = new PageImpl<>(List.of(employeeSTAFF,employeeUSER));
+            given(employeeRepository.findAllEmployee(any(), any())).willReturn(employeeList);
 
             Page<ReadAllEmployeeResponse> responses = employeeService.readAllEmployees(employeeADMIN.getAccount(), academy.getId(), pageable);
 
             assertThat(responses.getTotalPages()).isEqualTo(1);
-            assertThat(responses.getTotalElements()).isEqualTo(3);
+            assertThat(responses.getTotalElements()).isEqualTo(2);
         }
 
         @Test
@@ -582,6 +582,19 @@ class EmployeeServiceTest {
                     () -> employeeService.readAllEmployees(employeeADMIN.getAccount(), academy.getId(), pageable));
 
             assertThat(appException.getErrorCode().equals(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND));
+        }
+
+        @Test
+        @DisplayName("모든 직원 찾기 실패3 - admin 권한이 아님")
+        void find_all_employee_fail3() {
+
+            given(academyRepository.findById(any())).willReturn(Optional.of(academy));
+            given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeSTAFF));
+
+            AppException appException = assertThrows(AppException.class,
+                    () -> employeeService.readAllEmployees(employeeSTAFF.getAccount(), academy.getId(), pageable));
+
+            assertThat(appException.getErrorCode().equals(ErrorCode.NOT_ALLOWED_ROLE));
         }
 
         @Test
