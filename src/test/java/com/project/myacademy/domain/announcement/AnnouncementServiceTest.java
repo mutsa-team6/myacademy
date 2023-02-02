@@ -45,8 +45,9 @@ class AnnouncementServiceTest {
         academy = Academy.builder().id(1L).name("학원").build();
         employeeSTAFF = Employee.builder().id(1L).name("직원").account("employeeSTAFF@gmail.com").employeeRole(EmployeeRole.ROLE_STAFF).build();
         employeeUSER = Employee.builder().id(2L).name("강사").account("employeeUSER@gmail.com").employeeRole(EmployeeRole.ROLE_USER).build();
-        announcement1 = Announcement.builder().id(1L).academy(academy).title("제목1").body("내용1").build();
-        announcement2 = Announcement.builder().id(2L).academy(academy).title("제목2").body("내용2").build();
+        announcement1 = Announcement.builder().id(1L).academy(academy).title("제목1").body("내용1").type(AnnouncementType.ANNOUNCEMENT).build();
+        announcement2 = Announcement.builder().id(2L).academy(academy).title("제목2").body("내용2").type(AnnouncementType.ANNOUNCEMENT).build();
+        announcement2 = Announcement.builder().id(2L).academy(academy).title("제목3").body("내용3").type(AnnouncementType.ADMISSION).build();
         pageable = PageRequest.of(0, 20, Sort.Direction.DESC, "id");
     }
 
@@ -54,7 +55,7 @@ class AnnouncementServiceTest {
     @DisplayName("공지사항 등록")
     class CreateAnnouncement {
 
-        CreateAnnouncementRequest request = new CreateAnnouncementRequest("제목", "내용");
+        CreateAnnouncementRequest request = new CreateAnnouncementRequest("제목", "내용", AnnouncementType.ADMISSION);
 
         @Test
         @DisplayName("공지사항 등록 성공")
@@ -199,6 +200,23 @@ class AnnouncementServiceTest {
                     () -> announcementService.readAllAnnouncement(academy.getId(), pageable, employeeSTAFF.getAccount()));
 
             assertThat(appException.getErrorCode().equals(ErrorCode.EMPLOYEE_NOT_FOUND));
+        }
+
+        @Test
+        @DisplayName("공지사항 타입별 전체 조회 성공")
+        void read_type_announcement_success() {
+            String stringType = "ANNOUNCEMENT";
+            AnnouncementType type = AnnouncementType.ANNOUNCEMENT;
+            given(academyRepository.findById(any())).willReturn(Optional.of(academy));
+            given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeSTAFF));
+
+            Page<Announcement> announcementList = new PageImpl<>(List.of(announcement1, announcement2));
+            given(announcementRepository.findAllByTypeAndAcademy(type, academy, pageable)).willReturn(announcementList);
+
+            Page<ReadAllAnnouncementResponse> responses = announcementService.readTypeAnnouncement(academy.getId(), pageable, employeeSTAFF.getAccount(), stringType);
+
+            assertThat(responses.getTotalPages()).isEqualTo(1);
+            assertThat(responses.getTotalElements()).isEqualTo(2);
         }
     }
 
