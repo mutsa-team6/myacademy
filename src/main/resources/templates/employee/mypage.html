@@ -36,7 +36,8 @@
                     <div class="card">
                         <div class="card-header pb-0">
                             <div class="d-flex align-items-center">
-                                <h3 style="font-family: 'Black Han Sans', sans-serif; font-size: 3.5rem; font-weight: lighter;color: #5A2082">마이 페이지</h3>
+                                <h3 style="font-family: 'Black Han Sans', sans-serif; font-size: 3.5rem; font-weight: lighter;color: #5A2082">
+                                    마이 페이지</h3>
                             </div>
                             <p class="mb-0 opacity-7" style="font-size: small;font-weight: bold;">계정명 · 이름 · 이메일은 수정할 수
                                 없습니다.</p>
@@ -60,8 +61,8 @@
                                             <div class="mt-n4 mt-lg-n6 mb-4 mb-lg-0">
                                                 <a href="javascript:;">
                                                     <th:block th:if="${imageUrl =='null'}">
-                                                    <img src="../assets/img/team-2.jpg"
-                                                         class="rounded-circle img-fluid border border-2 border-white">
+                                                        <img src="../assets/img/team-2.jpg"
+                                                             class="rounded-circle img-fluid border border-2 border-white">
                                                     </th:block>
                                                     <th:block th:if="${imageUrl != 'null'}">
                                                         <img th:src="${imageUrl}"
@@ -220,7 +221,8 @@
                                 </div>
                                 <br>
                                 <div class="d-flex align-items-center">
-                                    <h3 style="font-family: 'Black Han Sans', sans-serif; font-size: 3.5rem; font-weight: lighter;color: #5A2082">강의 목록</h3>
+                                    <h3 style="font-family: 'Black Han Sans', sans-serif; font-size: 3.5rem; font-weight: lighter;color: #5A2082">
+                                        강의 목록</h3>
 
                                 </div>
                                 <p class="mb-0 opacity-7" style="font-size: small;font-weight: bold;">맡은 강의 목록입니다.</p>
@@ -321,7 +323,7 @@
                                 data-bs-dismiss="modal">닫기
                         </button>
                         <button type="button" class="btn btn-primary"
-                                th:onclick="|payment.delete()|"
+                                th:onclick="|mypage.changePassword(${academyId})|"
                         >비밀번호 변경
                         </button>
                     </div>
@@ -406,7 +408,34 @@
 
                 });
 
-            }
+            },
+
+            changePassword: function (academyId) {
+                let data = {
+                    oldPassword: document.querySelector("#input-employeePassword").value.trim(),
+                    newPassword: document.querySelector('#input-employeeNewPassword').value.trim(),
+                };
+
+                axios.post("/api/v1/academies/" + academyId + "/employee/changePassword",
+                    JSON.stringify(data), {
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    }
+                ).then((response) => {
+                    console.log(response);
+                    alert("비밀번호 수정 성공");
+                    window.location.reload();
+                }).catch((error) => {
+                    console.log(error);
+                    if (error.response.data.result["errorCode"] == "INVALID_PASSWORD") {
+                        alert("현재 비밀번호가 일치하지 않습니다.");
+                    } else if (error.response.data.result["errorCode"] == "SAME_PASSWORD") {
+                        alert("현재 비밀번호와 변경하려는 비밀번호가 일치합니다.");
+                    }
+                });
+
+            },
 
 
         };
@@ -415,34 +444,6 @@
 
     </script>
 
-    <script>
-
-
-        Dropzone.options.fileDropzone = {
-            url: '/api/v1/academies/' + academyId + '/employees/' + employeeId + '/files/upload', //업로드할 url (ex)컨트롤러)
-            init: function () {
-                /* 최초 dropzone 설정시 init을 통해 호출 */
-                var submitButton = document.querySelector("#btn-upload-file");
-
-                var myDropzone = this; //closure
-                submitButton.addEventListener("click", function () {
-                    console.log("업로드"); //tell Dropzone to process all queued files
-
-                    myDropzone.processQueue();
-                });
-            },
-            autoProcessQueue: false, // 자동업로드 여부 (true일 경우, 바로 업로드 되어지며, false일 경우, 서버에는 올라가지 않은 상태임 processQueue() 호출시 올라간다.)
-            clickable: true, // 클릭가능여부
-            thumbnailHeight: 90, // Upload icon size
-            thumbnailWidth: 90, // Upload icon size
-            maxFiles: 1, // 업로드 파일수
-            maxFilesize: 10, // 최대업로드용량 : 10MB
-            parallelUploads: 1, // 동시파일업로드 수(이걸 지정한 수 만큼 여러파일을 한번에 컨트롤러에 넘긴다.)
-            addRemoveLinks: true, // 삭제버튼 표시 여부
-            dictRemoveFile: '삭제', // 삭제버튼 표시 텍스트
-            uploadMultiple: false, // 다중업로드 기능
-        };
-    </script>
     </body>
 </main>
 </body>
