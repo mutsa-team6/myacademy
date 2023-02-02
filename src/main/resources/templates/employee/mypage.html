@@ -59,8 +59,14 @@
                                         <div class="col-4 col-lg-4 order-lg-2">
                                             <div class="mt-n4 mt-lg-n6 mb-4 mb-lg-0">
                                                 <a href="javascript:;">
-                                                    <img src="https://team6bucket.s3.ap-northeast-2.amazonaws.com/employee/ccf5f5fb-0019-4ead-892d-b4e407618e42.png"
+                                                    <th:block th:if="${imageUrl =='null'}">
+                                                    <img src="../assets/img/team-2.jpg"
                                                          class="rounded-circle img-fluid border border-2 border-white">
+                                                    </th:block>
+                                                    <th:block th:if="${imageUrl != 'null'}">
+                                                        <img th:src="${imageUrl}"
+                                                             class="rounded-circle img-fluid border border-2 border-white">
+                                                    </th:block>
                                                 </a>
                                             </div>
                                         </div>

@@ -63,9 +63,13 @@ public class EmployeeController {
         Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
         log.info("🔎 마이페이지 조회한 사용자의 학원 id [{}] || 요청한 사용자의 계정 [{}]", academyId, requestAccount);
 
-        ReadEmployeeResponse employee = employeeService.readEmployee(academyId, requestAccount);
-        model.addAttribute("employee", employee);
 
+        ReadEmployeeResponse employee = employeeService.readEmployee(academyId, requestAccount);
+
+        String storedUrl = employeeProfileS3UploadService.getStoredUrl(employee.getId());
+        model.addAttribute("imageUrl",storedUrl);
+
+        model.addAttribute("employee", employee);
         Page<ReadAllLectureResponse> lectures = null;
         if (!employee.getEmployeeRole().equals(EmployeeRole.ROLE_STAFF)) {
             lectures = lectureService.readAllLecturesByTeacherId(academyId, requestAccount, employee.getId(), pageable);
