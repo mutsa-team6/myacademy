@@ -331,6 +331,53 @@ class EmployeeServiceTest {
 //    }
 
     @Nested
+    @DisplayName("직원 비밀번호 변경")
+    class ChangePasswordEmployee {
+        @Test
+        @DisplayName("비밀번호 변경 성공")
+        void change_password_success(){
+            ChangePasswordEmployeeRequest request = new ChangePasswordEmployeeRequest("password", "changedPassword");
+            String changedPassword = bCryptPasswordEncoder.encode(request.getNewPassword());
+            given(academyRepository.findById(any())).willReturn(Optional.of(academy));
+            given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeADMIN));
+            given(bCryptPasswordEncoder.matches(any(),any())).willReturn(true);
+            given(bCryptPasswordEncoder.encode(any())).willReturn(changedPassword);
+
+            ChangePasswordEmployeeResponse response = employeeService.changePasswordEmployee(request, academy.getId(), employeeADMIN.getAccount());
+
+            assertThat(response.getAccount().equals("admin"));
+        }
+
+        @Test
+        @DisplayName("비밀번호 변경 실패1 - 기존 패스워드 틀림")
+        void change_password_fail1(){
+            ChangePasswordEmployeeRequest request = new ChangePasswordEmployeeRequest("wrongPassword", "changedPassword");
+            given(academyRepository.findById(any())).willReturn(Optional.of(academy));
+            given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeADMIN));
+            given(bCryptPasswordEncoder.matches(any(),any())).willReturn(false);
+
+            AppException appException = assertThrows(AppException.class,
+                    () -> employeeService.changePasswordEmployee(request, academy.getId(), employeeADMIN.getAccount()));
+
+            assertThat(appException.getErrorCode().equals(ErrorCode.INVALID_PASSWORD));
+        }
+
+        @Test
+        @DisplayName("비밀번호 변경 실패2 - 기존 패스워드와 같음")
+        void change_password_fail2(){
+            ChangePasswordEmployeeRequest request = new ChangePasswordEmployeeRequest("password", "password");
+            given(academyRepository.findById(any())).willReturn(Optional.of(academy));
+            given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeADMIN));
+            given(bCryptPasswordEncoder.matches(any(),any())).willReturn(true);
+
+            AppException appException = assertThrows(AppException.class,
+                    () -> employeeService.changePasswordEmployee(request, academy.getId(), employeeADMIN.getAccount()));
+
+            assertThat(appException.getErrorCode().equals(ErrorCode.SAME_PASSWORD));
+        }
+    }
+
+    @Nested
     @DisplayName("직원 삭제")
     class DeleteEmployee {
 
