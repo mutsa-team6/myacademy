@@ -5,6 +5,7 @@ import com.project.myacademy.global.Response;
 import com.project.myacademy.global.exception.ErrorCode;
 import com.project.myacademy.global.exception.ErrorDto;
 import com.project.myacademy.global.util.AuthenticationUtil;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -104,8 +105,9 @@ public class EmployeeRestController {
     }
 
     // 본인 탈퇴 기능
-    @Tag(name = "02-1. 직원", description = "직원 회원 가입 및 정보 수정,조회")
-    @Operation(summary = "직원 본인 삭제", description = "ADMIN 회원 및 본인 만 삭제가 가능합니다.\n\n soft-delete 됩니다.")
+//    @Tag(name = "02-1. 직원", description = "직원 회원 가입 및 정보 수정,조회")
+//    @Operation(summary = "직원 본인 삭제", description = "ADMIN 회원 및 본인 만 삭제가 가능합니다.\n\n soft-delete 됩니다.")
+    @Hidden
     @DeleteMapping("/{academyId}")
     public ResponseEntity selfDelete(Authentication authentication, @PathVariable Long academyId) {
 
@@ -163,7 +165,7 @@ public class EmployeeRestController {
 
     // 관리자(ADMIN) 혹은 직원(STAFF) 등급은 다른 직원 계정을 삭제할 수 있다.
     @Tag(name = "02-1. 직원", description = "직원 회원 가입 및 정보 수정,조회")
-    @Operation(summary = "직원 삭제", description = "ADMIN,STAFF 회원만 삭제가 가능합니다.")
+    @Operation(summary = "직원 삭제", description = "ADMIN 회원만 삭제가 가능합니다.")
     @DeleteMapping("/{academyId}/employees/{employeeId}")
     public ResponseEntity delete(Authentication authentication, @PathVariable Long academyId, @PathVariable Long employeeId) {
 
@@ -203,8 +205,9 @@ public class EmployeeRestController {
     }
 
     // 관리자(ADMIN) 혹은 직원(STAFF) 등급은 다른 직원의 등급을 USER -> STAFF 혹은 STAFF -> USER 로 변경할 수 있다.
-    @Tag(name = "02-1. 직원", description = "직원 회원 가입 및 정보 수정,조회")
-    @Operation(summary = "직원 권한 변경", description = "ADMIN,STAFF 회원만 권한변경이 가능합니다. \n\n User ↔ STAFF")
+    //@Tag(name = "02-1. 직원", description = "직원 회원 가입 및 정보 수정,조회")
+    //@Operation(summary = "직원 권한 변경", description = "ADMIN,STAFF 회원만 권한변경이 가능합니다. \n\n User ↔ STAFF")
+    @Hidden
     @PutMapping("/{academyId}/changeRole/{employeeId}")
     public ResponseEntity changeRole(Authentication authentication, @PathVariable Long academyId, @PathVariable Long employeeId) {
 
