@@ -13,11 +13,11 @@ import java.util.List;
 @Builder
 public class CreateEmployeeProfileResponse {
 
-    private List<String> uploadFileName;
-    private List<String> S3StoredFileName;
+    private String uploadFileName;
+    private String S3StoredFileName;
     private String message;
 
-    public static CreateEmployeeProfileResponse of(List<String> original, List<String> stored) {
+    public static CreateEmployeeProfileResponse of(String original, String stored) {
         return CreateEmployeeProfileResponse.builder()
                 .uploadFileName(original)
                 .S3StoredFileName(stored)

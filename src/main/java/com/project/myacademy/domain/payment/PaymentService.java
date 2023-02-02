@@ -151,15 +151,15 @@ public class PaymentService {
      */
     @Transactional
     public void verifyRequest(String paymentKey, String orderId, Integer amount) {
-        paymentRepository.findByOrderId(orderId).ifPresentOrElse(
-                p -> {
+        paymentRepository.findByOrderId(orderId).ifPresentOrElse(p -> {
                     if (p.getAmount().equals(amount)) {
                         p.setPaymentKey(paymentKey);
                         log.info("paymentKey = {}", p.getPaymentKey());
                     } else {
                         throw new AppException(ErrorCode.PAYMENT_ERROR_ORDER_PRICE);
                     }
-                }, () -> {
+                }
+                , () -> {
                     throw new AppException(ErrorCode.PAYMENT_REQUIRED);
                 }
         );

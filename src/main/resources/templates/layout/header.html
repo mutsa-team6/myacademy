@@ -29,5 +29,38 @@
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
         <!-- CSS Files -->
         <link id="pagestyle" href="../assets/css/material-dashboard.css?v=3.0.4" rel="stylesheet"/>
+        <style>
+            .filebox .form-control {
+                display: inline-block;
+                height: 40px;
+                padding: 0 10px;
+                vertical-align: middle;
+                border: 1px solid #dddddd;
+                width: 200px;
+                color: #999999;
+            }
+
+            .filebox label {
+                display: inline-block;
+                padding: 10px 20px;
+                color: #fff;
+                vertical-align: middle;
+                background-color: gray;
+                cursor: pointer;
+                height: 35px;
+                padding-top: 10px;
+                margin-left: 10px;
+                margin-top: 0.5rem;
+            }
+
+            .filebox input[type="file"] {
+                position: absolute;
+                width: 0;
+                height: 0;
+                padding: 0;
+                overflow: hidden;
+                border: 0;
+            }
+        </style>
     </head>
 </th:block>
