@@ -26,7 +26,7 @@ public class AnnouncementRestController {
     /**
      * 특정 학원 공지사항 작성
      */
-    @Operation(summary = "공지사항 작성", description = "ADMIN,STAFF 회원만 작성이 가능합니다.")
+    @Operation(summary = "공지사항 작성", description = "ADMIN,STAFF 회원만 작성이 가능합니다. \n\n TYPE 종류, 1. 일반 공지사항 = ANNOUNCEMENT, 2. 입시 정보 = ADMISSION")
     @PostMapping("/{academyId}/announcements")
     public ResponseEntity<Response<CreateAnnouncementResponse>> create(@PathVariable Long academyId, CreateAnnouncementRequest request, Authentication authentication) {
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
@@ -35,14 +35,26 @@ public class AnnouncementRestController {
     }
 
     /**
-     * 특정 학원 공지사항 목록 조회
+     * 특정 학원 모든 공지사항 목록 조회
      */
-    @Operation(summary = "공지사항 전체 조회", description = "공지사항을 전체 조회합니다.")
+    @Operation(summary = "모든 공지사항 전체 조회", description = "모든 공지사항을 전체 조회합니다.")
     @GetMapping("/{academyId}/announcements")
     public ResponseEntity<Response<Page<ReadAllAnnouncementResponse>>> readAll(@PathVariable Long academyId, Authentication authentication) {
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
         PageRequest pageable = PageRequest.of(0, 20, Sort.by("id").descending());
         Page<ReadAllAnnouncementResponse> responses = announcementService.readAllAnnouncement(academyId, pageable, requestAccount);
+        return ResponseEntity.ok().body(Response.success(responses));
+    }
+
+    /**
+     * 특정 학원 type = 공지사항 타입에 따른 조회
+     */
+    @Operation(summary = "공지사항 타입별 전체 조회", description = "TYPE 별로 공지사항을 전체 조회합니다. \n\n TYPE 종류, 1. 일반 공지사항 = ANNOUNCEMENT, 2. 입시 정보 = ADMISSION")
+    @GetMapping("/{academyId}/announcements/type/{announcementType}")
+    public ResponseEntity<Response<Page<ReadAllAnnouncementResponse>>> readAllByType(@PathVariable Long academyId, @PathVariable String announcementType, Authentication authentication) {
+        String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
+        PageRequest pageable = PageRequest.of(0, 20, Sort.by("id").descending());
+        Page<ReadAllAnnouncementResponse> responses = announcementService.readTypeAnnouncement(academyId, pageable, requestAccount, announcementType);
         return ResponseEntity.ok().body(Response.success(responses));
     }
 

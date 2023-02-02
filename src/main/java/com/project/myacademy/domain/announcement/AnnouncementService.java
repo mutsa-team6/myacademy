@@ -23,10 +23,10 @@ public class AnnouncementService {
 
     /**
      * 공지사항에 추가하면 좋을 것 같은 기능들 (방법은 생각안해봄)
-     *  공지사항을 직원이 읽었을 경우 체크 할 수 있게
-     *  공지사항의 유효기간을 만들고 이후에 자동으로 삭제되도록
-     *  공지사항을 누가썼는지 알 수 있게
-     *  권한별로 공지사항이 다르게 표시되게
+     * 공지사항을 직원이 읽었을 경우 체크 할 수 있게
+     * 공지사항의 유효기간을 만들고 이후에 자동으로 삭제되도록
+     * 공지사항을 누가썼는지 알 수 있게
+     * 권한별로 공지사항이 다르게 표시되게
      */
     private final EmployeeRepository employeeRepository;
     private final AnnouncementRepository announcementRepository;
@@ -45,7 +45,7 @@ public class AnnouncementService {
         //account 유효검사
         Employee employee = validateAcademyEmployee(account, academy);
         // 공지사항을 관리 할 수 있는 권한인지 확인(강사만 불가능)
-        if(Employee.isTeacherAuthority(employee)) {
+        if (Employee.isTeacherAuthority(employee)) {
             throw new AppException(ErrorCode.INVALID_PERMISSION);
         }
 
@@ -70,6 +70,25 @@ public class AnnouncementService {
 
         return announcementRepository.findAllByAcademy(academy, pageable).map(announcement -> ReadAllAnnouncementResponse.of(announcement));
     }
+
+    /**
+     *
+     * @param academyId 학원 id
+     * @param pageable 20개씩 id순서대로(최신순)
+     * @param account 로그인한 계정
+     * @param type 공지사항 타입 (ANNOUNCEMENT, ADMISSION)
+     * @return
+     */
+    @Transactional(readOnly = true)
+    public Page<ReadAllAnnouncementResponse> readTypeAnnouncement(Long academyId, Pageable pageable, String account, String type) {
+        //academyId 존재 유무 확인
+        Academy academy = validateAcademy(academyId);
+        //account 유효검사
+        Employee employee = validateAcademyEmployee(account, academy);
+        AnnouncementType announcementType = AnnouncementType.valueOf(type);
+        return announcementRepository.findAllByTypeAndAcademy(announcementType, academy, pageable).map(announcement -> ReadAllAnnouncementResponse.of(announcement));
+    }
+
 
     /**
      * @param academyId      학원 id
@@ -103,7 +122,7 @@ public class AnnouncementService {
         //account 유효검사
         Employee employee = validateAcademyEmployee(account, academy);
         // 공지사항을 관리 할 수 있는 권한인지 확인(강사만 불가능)
-        if(Employee.isTeacherAuthority(employee)) {
+        if (Employee.isTeacherAuthority(employee)) {
             throw new AppException(ErrorCode.INVALID_PERMISSION);
         }
 
@@ -128,7 +147,7 @@ public class AnnouncementService {
         //account 유효검사
         Employee employee = validateAcademyEmployee(account, academy);
         // 공지사항을 관리 할 수 있는 권한인지 확인(강사만 불가능)
-        if(Employee.isTeacherAuthority(employee)) {
+        if (Employee.isTeacherAuthority(employee)) {
             throw new AppException(ErrorCode.INVALID_PERMISSION);
         }
 
@@ -154,4 +173,6 @@ public class AnnouncementService {
                 .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
         return employee;
     }
+
+
 }
