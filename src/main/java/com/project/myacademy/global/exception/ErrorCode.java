@@ -25,7 +25,6 @@ public enum ErrorCode {
     ALREADY_PAYMENT(HttpStatus.CONFLICT,"이미 결제된 수업입니다."),
     NOT_TEACHER(HttpStatus.CONFLICT,"해당 사용자는 강사가 아닙니다."),
 
-
     ACCOUNT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 계정명을 찾을 수 없습니다."),
     EMPLOYEE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 직원을 찾을 수 없습니다."),
     REQUEST_EMPLOYEE_NOT_FOUND(HttpStatus.NOT_FOUND, "요청한 직원을 해당 학원에서 찾을 수 없습니다."),
@@ -63,6 +62,8 @@ public enum ErrorCode {
     FILE_NOT_EXISTS(HttpStatus.BAD_REQUEST, "보낼 파일이 비어있습니다."),
     FILE_SIZE_EXCEED(HttpStatus.BAD_REQUEST, "파일 업로드 용량을 초과했습니다."),
     WRONG_FILE_FORMAT(HttpStatus.BAD_REQUEST, "잘못된 형식의 파일입니다"),
+    SAME_PASSWORD(HttpStatus.BAD_REQUEST, "기존 비밀번호와 동일한 비밀번호로는 변경 할 수 없습니다."),
+
 
     BLANK_NOT_ALLOWED(HttpStatus.FORBIDDEN,"NULL 값은 허용되지 않습니다."),
     EMPTY_SUBJECT_FORBIDDEN(HttpStatus.FORBIDDEN,"원장 · 강사 로 회원가입 시 담당 과목명을 입력해주세요."),
