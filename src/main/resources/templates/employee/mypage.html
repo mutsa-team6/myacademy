@@ -38,7 +38,8 @@
                             <div class="d-flex align-items-center">
                                 <h3 class="mb-0" style="color: #5A2082">마이페이지</h3>
                             </div>
-                            <p class="mb-0 opacity-7" style="font-size: small;font-weight: bold;">이름과 이메일은 수정할 수 없습니다.</p>
+                            <p class="mb-0 opacity-7" style="font-size: small;font-weight: bold;">이름과 이메일은 수정할 수
+                                없습니다.</p>
                             <div>
                                 <hr style="color: #5A2082; height: 1.5px;background-color: #5A2082">
                             </div>
@@ -46,7 +47,10 @@
                         <div class="card-body">
                             <br>
                             <br>
-
+                            <input type="text" class="form-control" id="employeeId"
+                                   placeholder="강좌 이름" th:value="${employeeId}" hidden>
+                            <input type="text" class="form-control" id="academyId"
+                                   placeholder="강좌 이름" th:value="${academyId}" hidden>
                             <div class="row">
                                 <div class="col-3">
                                 </div>
@@ -55,14 +59,62 @@
                                         <div class="col-4 col-lg-4 order-lg-2">
                                             <div class="mt-n4 mt-lg-n6 mb-4 mb-lg-0">
                                                 <a href="javascript:;">
+                                                    <th:block th:if="${imageUrl =='null'}">
                                                     <img src="../assets/img/team-2.jpg"
                                                          class="rounded-circle img-fluid border border-2 border-white">
+                                                    </th:block>
+                                                    <th:block th:if="${imageUrl != 'null'}">
+                                                        <img th:src="${imageUrl}"
+                                                             class="rounded-circle img-fluid border border-2 border-white">
+                                                    </th:block>
                                                 </a>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-3">
+                                </div>
+                            </div>
+
+                            <div class="col-md-2">
+                            </div>
+                            <div class="row">
+                                <div class="col-md-2">
+                                </div>
+                                <div class="col-md-8 mx-auto justify-content-center text-center">
+                                    <button class="btn btn-info" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapseExample" aria-expanded="false"
+                                            aria-controls="collapseExample">
+                                        프로필 사진 변경
+                                    </button>
+                                    <div class="collapse" id="collapseExample">
+                                        <div class="text-center">
+                                            <div class="filebox">
+                                                <div class="row">
+                                                    <div class="col">
+                                                        <input type="text" class="form-control mt-1" value="첨부파일"
+                                                               placeholder="첨부파일"
+                                                               aria-label="Username" aria-describedby="basic-addon1"
+                                                               id="input-fileName" readonly>
+                                                    </div>
+                                                    <div class="col justify-content-start">
+                                                        <div class="mt-2">
+                                                            <label for="input-file"
+                                                                   style="margin-top: auto">파일찾기</label>
+                                                        </div>
+                                                    </div>
+                                                    <input type="file" id="input-file">
+                                                </div>
+                                            </div>
+                                            <button type="button" class="btn btn-primary btn-sm"
+                                                    th:onclick="|mypage.fileUpload()|"
+                                            >이미지 업로드
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="col-md-2">
                                 </div>
                             </div>
                             <br>
@@ -132,9 +184,9 @@
                                         </div>
                                     </th:block>
                                     <th:block th:if="${employee.subject =='직원'}">
-                                            <input type="text" class="form-control" th:value="${employee.subject}"
-                                                   aria-label="Username" aria-describedby="basic-addon1"
-                                                   id="input-employeeSubject" hidden>
+                                        <input type="text" class="form-control" th:value="${employee.subject}"
+                                               aria-label="Username" aria-describedby="basic-addon1"
+                                               id="input-employeeSubject" hidden>
                                     </th:block>
                                 </div>
                                 <div class="col-md-2">
@@ -280,6 +332,16 @@
     <script src="/assets/js/plugins/smooth-scrollbar.min.js"></script>
     <script src="/assets/js/material-dashboard.min.js?v=3.0.4"></script>
     <Script>
+        $("#input-file").on('change', function () {
+            var fileName = $("#input-file").val();
+            $("#input-fileName").val(fileName);
+        });
+
+        let employeeId = document.getElementById('employeeId').value;
+        let academyId = document.getElementById('academyId').value;
+        console.log('academyId' + academyId);
+        console.log('employeeId' + employeeId);
+        //fileDropzone dropzone 설정할 태그의 id로 지정
 
         let mypage = {
             init: function () {
@@ -311,6 +373,33 @@
                     }
                 });
 
+            },
+
+            fileUpload: function () {
+                let data = {
+                    multipartFile: document.querySelector("#input-file").value.trim(),
+                };
+
+                console.log(data);
+                var frm = new FormData();
+                var image = document.getElementById("input-file");
+                frm.append("multipartFile", image.files[0]);
+
+
+                axios.post("/api/v1/academies/" + academyId + "/employees/" + employeeId + "/files/upload",
+                    frm, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data'
+                        }
+                    }).then((response) => {
+                    console.log(response);
+                    alert("이미지 업로드 성공");
+                    window.location.reload();
+                }).catch((error) => {
+                    console.log(error);
+
+                });
+
             }
 
 
@@ -320,6 +409,34 @@
 
     </script>
 
+    <script>
+
+
+        Dropzone.options.fileDropzone = {
+            url: '/api/v1/academies/' + academyId + '/employees/' + employeeId + '/files/upload', //업로드할 url (ex)컨트롤러)
+            init: function () {
+                /* 최초 dropzone 설정시 init을 통해 호출 */
+                var submitButton = document.querySelector("#btn-upload-file");
+
+                var myDropzone = this; //closure
+                submitButton.addEventListener("click", function () {
+                    console.log("업로드"); //tell Dropzone to process all queued files
+
+                    myDropzone.processQueue();
+                });
+            },
+            autoProcessQueue: false, // 자동업로드 여부 (true일 경우, 바로 업로드 되어지며, false일 경우, 서버에는 올라가지 않은 상태임 processQueue() 호출시 올라간다.)
+            clickable: true, // 클릭가능여부
+            thumbnailHeight: 90, // Upload icon size
+            thumbnailWidth: 90, // Upload icon size
+            maxFiles: 1, // 업로드 파일수
+            maxFilesize: 10, // 최대업로드용량 : 10MB
+            parallelUploads: 1, // 동시파일업로드 수(이걸 지정한 수 만큼 여러파일을 한번에 컨트롤러에 넘긴다.)
+            addRemoveLinks: true, // 삭제버튼 표시 여부
+            dictRemoveFile: '삭제', // 삭제버튼 표시 텍스트
+            uploadMultiple: false, // 다중업로드 기능
+        };
+    </script>
     </body>
 </main>
 </body>
