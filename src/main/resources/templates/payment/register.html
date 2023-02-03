@@ -171,10 +171,19 @@
                                                 th:onclick="|pay.createOrder(this.getAttribute('data-parameter1'),this.getAttribute('data-parameter2'),this.getAttribute('data-parameter3'),
                                                 this.getAttribute('data-parameter4'),this.getAttribute('data-parameter5'),
                                                 this.getAttribute('data-parameter6'),this.getAttribute('data-parameter7'))|"
-                                                class="btn btn-sm bg-gradient-danger btn-lg w-100 mb-0">결제
+                                                class="btn btn-sm bg-gradient-primary btn-lg w-100 mb-0">결제
                                         </button>
                                     </td>
+                                    <td class="align-middle text-center">
 
+                                        <button type="button" th:data-parameter1="${enrollment.studentId}"
+                                                th:data-parameter2="${enrollment.enrollmentId}"
+                                                th:data-parameter3="${academy.academyId}"
+                                                th:data-parameter4="${enrollment.lectureId}"
+                                                th:onclick="|pay.deleteEnrollment(this.getAttribute('data-parameter1'),this.getAttribute('data-parameter2')
+                                                ,this.getAttribute('data-parameter3'),this.getAttribute('data-parameter4'))|"
+                                                class="btn btn-sm bg-gradient-danger btn-lg w-100 mb-0">수강신청 취소
+                                        </button>
                                 </tr>
                                 </tbody>
                             </table>
@@ -300,6 +309,32 @@
                 }
             });
 
+        },
+
+        deleteEnrollment: function (studentId,enrollmentId,academyId,lectureId) {
+
+            const con_check = confirm("삭제하시겠습니까?");
+
+            let data = {
+                memo: "수강 신청이 취소되었습니다.",
+            };
+
+            if (con_check === true) {
+                axios.post("/api/v1/academies/"+academyId+"/students/"+studentId+"/lectures/"+lectureId+"/enrollments/"+enrollmentId,
+                    JSON.stringify(data), {
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    }
+                ).then((response) => {
+                    alert("수강신청이 취소되었습니다.");
+                }).catch((error) => {
+                    console.log(error);
+                    if (error.response.data.result["errorCode"] == "ACADEMY_NOT_FOUND") {
+                        alert("등록된 학원이 아닙니다. 등록 후 진행해주세요");
+                    }
+                });
+            }
         }
     };
 
