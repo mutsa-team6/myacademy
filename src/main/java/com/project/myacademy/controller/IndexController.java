@@ -3,6 +3,7 @@ package com.project.myacademy.controller;
 import com.project.myacademy.domain.academy.Academy;
 import com.project.myacademy.domain.academy.AcademyService;
 import com.project.myacademy.domain.academy.dto.FindAcademyResponse;
+import com.project.myacademy.domain.employee.EmployeeRole;
 import com.project.myacademy.domain.employee.EmployeeService;
 import com.project.myacademy.domain.employee.dto.ReadEmployeeResponse;
 import com.project.myacademy.global.util.AuthenticationUtil;
@@ -24,13 +25,13 @@ public class IndexController {
 
     private final EmployeeService employeeService;
     private final AcademyService academyService;
+
     @GetMapping("/academy/main")
-    public String main(HttpServletRequest request, Model model, Authentication authentication){
+    public String main(HttpServletRequest request, Model model, Authentication authentication) {
 
         Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
-        log.info("⭐ 메인 요청한 사용자의 학원 id [{}] || 요청한 사용자의 계정 [{}]",academyId,requestAccount);
-
+        log.info("⭐ 메인 요청한 사용자의 학원 id [{}] || 요청한 사용자의 계정 [{}]", academyId, requestAccount);
 
 
         //회원 이름 표시
@@ -44,7 +45,15 @@ public class IndexController {
             ReadEmployeeResponse found = employeeService.readEmployee(academyId, requestAccount);
             Academy foundAcademy = found.getAcademy();
             String foundName = found.getName();
-            session.setAttribute("name",foundName);
+            session.setAttribute("name", foundName);
+            if (found.getEmployeeRole().equals(EmployeeRole.ROLE_USER)) {
+                session.setAttribute("role", "강사");
+            } else if (found.getEmployeeRole().equals(EmployeeRole.ROLE_STAFF)) {
+                session.setAttribute("role", "직원");
+            } else {
+                session.setAttribute("role", "원장");
+
+            }
             model.addAttribute("name", foundName);
         }
         FindAcademyResponse academy = academyService.findAcademyById(academyId);

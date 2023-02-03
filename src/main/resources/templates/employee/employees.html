@@ -94,7 +94,7 @@
                                             <th class="align-middle text-center">
                                                 <div class="flex">
                                                     <th:block th:if="${employee.imageUrl =='null'}">
-                                                        <img src="../assets/img/team-2.jpg"
+                                                        <img src="https://raw.githubusercontent.com/buinq/imageServer/main/img/image-20230204013043779.png"
                                                              class="avatar avatar-xl me-3 border-radius-lg">
                                                     </th:block>
                                                     <th:block th:if="${employee.imageUrl != 'null'}">
@@ -158,7 +158,7 @@
                                                 <a href="javascript:;"
                                                    th:onclick="|employee.delete(${academy.academyId},${employee.id})|"
                                                    type="button"
-                                                   class="text-secondary font-weight-bold text-xs"
+                                                   class="text-danger font-weight-bold text-xs"
                                                    data-toggle="tooltip"
                                                    data-original-title="delete-academy">
                                                     delete

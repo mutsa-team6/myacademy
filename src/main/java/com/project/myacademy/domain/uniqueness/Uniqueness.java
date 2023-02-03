@@ -31,14 +31,16 @@ public class Uniqueness extends BaseEntity {
     @JoinColumn(name = "student_id")
     private Student student;
 
+    private String author;
     public void updateUniqueness(UpdateUniquenessRequest request) {
         this.body = request.getBody();
     }
 
-    public static Uniqueness toUniqueness(CreateUniquenessRequest request, Student student) {
+    public static Uniqueness toUniqueness(CreateUniquenessRequest request, Student student,String author) {
         return Uniqueness.builder()
                 .body(request.getBody())
                 .student(student)
+                .author(author)
                 .build();
     }
 }

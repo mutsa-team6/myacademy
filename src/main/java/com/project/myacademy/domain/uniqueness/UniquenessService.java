@@ -47,7 +47,7 @@ public class UniquenessService {
         //student Id에 해당하는 학생이 존재하는지 확인
         Student student = validateStudent(studentId);
 
-        Uniqueness savedUniqueness = uniquenessRepository.save(Uniqueness.toUniqueness(request, student));
+        Uniqueness savedUniqueness = uniquenessRepository.save(Uniqueness.toUniqueness(request, student,employee.getName()));
 
         return CreateUniquenessResponse.of(savedUniqueness);
     }

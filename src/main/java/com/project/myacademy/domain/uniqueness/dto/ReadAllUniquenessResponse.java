@@ -18,12 +18,15 @@ public class ReadAllUniquenessResponse {
     //특이사항 내용
     private String body;
     private String createdAt;
+    private String author;
 
     public static ReadAllUniquenessResponse of(Uniqueness uniqueness) {
         return ReadAllUniquenessResponse.builder()
                 .uniquenessId(uniqueness.getId())
                 .body(uniqueness.getBody())
                 .createdAt(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(Timestamp.valueOf(uniqueness.getCreatedAt())))
+                .author(uniqueness.getAuthor())
                 .build();
     }
+
 }
