@@ -328,6 +328,7 @@
                     }
                 ).then((response) => {
                     alert("수강신청이 취소되었습니다.");
+                    window.location.reload();
                 }).catch((error) => {
                     console.log(error);
                     if (error.response.data.result["errorCode"] == "ACADEMY_NOT_FOUND") {
