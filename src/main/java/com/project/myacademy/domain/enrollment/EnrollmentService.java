@@ -159,22 +159,19 @@ public class EnrollmentService {
         // DB 즉시 반영
         enrollmentRepository.saveAndFlush(enrollment);
 
-        // 수강 이력 먼저 삭제
+        // 다음 대기번호 존재하든 안하든 수강 이력 먼저 삭제
         enrollmentRepository.delete(enrollment);
         // 현재 등록인원 -1
         lecture.minusCurrentEnrollmentNumber();
 
-        // 대기번호 존재 유무 확인
-        Waitinglist waitinglist = waitinglistRepository.findTopByLectureOrderByCreatedAtAsc(lecture)
-                .orElseThrow(() -> new AppException(ErrorCode.WAITINGLIST_NOT_FOUND));
+        // 다음 대기번호가 존재하면 추가적으로 대기번호 -> 수강등록으로 정보 변경 후 기존 대기번호 삭제
+        waitinglistRepository.findTopByLectureOrderByCreatedAtAsc(lecture)
+                .ifPresent(waitinglist -> {
+                    createEnrollmentFromWaitinglist(academy.getId(), waitinglist.getStudent().getId(), waitinglist.getLecture().getId(), account);
+                    waitinglistRepository.delete(waitinglist);
+                });
 
-        // 대기번호 -> 수강등록으로 정보 변경
-        Long newEnrollmentId = createEnrollmentFromWaitinglist(academy.getId(), waitinglist.getStudent().getId(), waitinglist.getLecture().getId(), request, account);
-
-        // 수강등록이 끝나면 기존 대기번호 삭제
-        waitinglistRepository.delete(waitinglist);
-
-        return DeleteEnrollmentResponse.of(enrollmentId, newEnrollmentId);
+        return DeleteEnrollmentResponse.of(enrollmentId);
     }
 
     private Academy validateAcademy(Long academyId) {
@@ -210,7 +207,7 @@ public class EnrollmentService {
     }
 
     // 대기번호 -> 수강등록으로 이동하게 하는 메서드
-    private Long createEnrollmentFromWaitinglist(Long academyId, Long studentId, Long lectureId, CreateEnrollmentRequest request, String account) {
+    private void createEnrollmentFromWaitinglist(Long academyId, Long studentId, Long lectureId, String account) {
 
         // 등록 주체 권한 확인(학원 존재 유무, 해당 학원 직원인지 확인)
         Academy academy = validateAcademy(academyId);
@@ -230,11 +227,8 @@ public class EnrollmentService {
         lecture.plusCurrentEnrollmentNumber();
         Enrollment enrollment = Enrollment.createEnrollment(student, lecture, employee,academyId);
 
-        // 수강 내역 저장 즉시 DB 반영 -> 반환 DTO에 새롭게 생성된 수강 내역의 enrollmentId 추출하기 위함
-//        Enrollment newEnrollment = enrollmentRepository.saveAndFlush(enrollment);
-        Enrollment newEnrollment = enrollmentRepository.save(enrollment);
-
-        return newEnrollment.getId();
+        // 수강 내역 저장
+        enrollmentRepository.save(enrollment);
     }
 
     /**
