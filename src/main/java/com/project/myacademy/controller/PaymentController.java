@@ -1,6 +1,8 @@
 package com.project.myacademy.controller;
 
 import com.project.myacademy.domain.academy.Academy;
+import com.project.myacademy.domain.academy.AcademyService;
+import com.project.myacademy.domain.academy.dto.FindAcademyResponse;
 import com.project.myacademy.domain.discount.DiscountService;
 import com.project.myacademy.domain.discount.dto.GetDiscountResponse;
 import com.project.myacademy.domain.employee.EmployeeService;
@@ -35,6 +37,7 @@ import java.util.List;
 public class PaymentController {
 
     private final EmployeeService employeeService;
+    private final AcademyService academyService;
     private final EnrollmentService enrollmentService;
     private final DiscountService discountService;
     private final PaymentService paymentService;
@@ -76,6 +79,9 @@ public class PaymentController {
         model.addAttribute("discounts", discounts);
         model.addAttribute("account", requestAccount);
 
+        FindAcademyResponse academy = academyService.findAcademyById(academyId);
+        model.addAttribute("academy", academy);
+
         return "payment/register";
     }
 
@@ -101,6 +107,8 @@ public class PaymentController {
             paymentService.successApprovePayment(paymentKey, orderId, amount);
         }
 
+        FindAcademyResponse academy = academyService.findAcademyById(academyId);
+        model.addAttribute("academy", academy);
 
         SuccessPaymentResponse payment = paymentService.findPayment(orderId);
         model.addAttribute("payment", payment);
@@ -111,8 +119,12 @@ public class PaymentController {
     @GetMapping("/academy/payment")
     public String paySuccess(Authentication authentication,Model model) {
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
+        Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
 
         model.addAttribute("account", requestAccount);
+
+        FindAcademyResponse academy = academyService.findAcademyById(academyId);
+        model.addAttribute("academy", academy);
 
         return "pages/payment";
     }
@@ -133,6 +145,8 @@ public class PaymentController {
             Page<CompletePaymentResponse> payments = paymentService.findAllCompletePayment(academyId, requestAccount, pageable);
             model.addAttribute("payments", payments);
         }
+        FindAcademyResponse academy = academyService.findAcademyById(academyId);
+        model.addAttribute("academy", academy);
         model.addAttribute("account", requestAccount);
         model.addAttribute("previous", pageable.previousOrFirst().getPageNumber());
         model.addAttribute("next", pageable.next().getPageNumber());

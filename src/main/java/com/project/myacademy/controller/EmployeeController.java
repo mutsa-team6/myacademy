@@ -78,6 +78,8 @@ public class EmployeeController {
         if (!employee.getEmployeeRole().equals(EmployeeRole.ROLE_STAFF)) {
             lectures = lectureService.readAllLecturesByTeacherId(academyId, requestAccount, employee.getId(), pageable);
         }
+        FindAcademyResponse academy = academyService.findAcademyById(academyId);
+        model.addAttribute("academy", academy);
         model.addAttribute("account", requestAccount);
         model.addAttribute("academyId", academyId);
         model.addAttribute("employeeId", employee.getId());

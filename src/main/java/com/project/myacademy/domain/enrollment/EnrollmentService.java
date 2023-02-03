@@ -260,6 +260,22 @@ public class EnrollmentService {
     }
 
     /**
+     * 학생 상세 조회 페이지용 UI 메서드
+     * 수강신청 내역중에 결제가 완료된 내역만 가져온다.
+     */
+
+    public Page<FindEnrollmentResponse> findEnrollmentByStudentId(Long academyId, Long studentId,Pageable pageable) {
+
+        validateAcademy(academyId);
+
+        // 학생 id로 student 객체가 존재하는지 확인
+        Student foundStudent = studentRepository.findById(studentId)
+                .orElseThrow(() -> new AppException(ErrorCode.STUDENT_NOT_FOUND));
+
+        return enrollmentRepository.findByStudentAndPaymentYNIsTrue(foundStudent, pageable).map(enrollment -> new FindEnrollmentResponse(enrollment));
+    }
+
+    /**
      * UI용 메서드, 해당 학원의 모든 수강신청내역 가져오기 ( 최신순으로, 결제 내역이 false인 데이터만)
      */
     public Page<FindEnrollmentResponse> findAllEnrollmentForPay(Long academyId,Pageable pageable) {

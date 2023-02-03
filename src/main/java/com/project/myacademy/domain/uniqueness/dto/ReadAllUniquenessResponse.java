@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+
 @Getter
 @AllArgsConstructor
 @Builder
@@ -14,11 +17,13 @@ public class ReadAllUniquenessResponse {
     private Long uniquenessId;
     //특이사항 내용
     private String body;
+    private String createdAt;
 
     public static ReadAllUniquenessResponse of(Uniqueness uniqueness) {
         return ReadAllUniquenessResponse.builder()
                 .uniquenessId(uniqueness.getId())
                 .body(uniqueness.getBody())
+                .createdAt(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(Timestamp.valueOf(uniqueness.getCreatedAt())))
                 .build();
     }
 }

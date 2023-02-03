@@ -13,4 +13,5 @@ public interface DiscountRepository extends JpaRepository<Discount, Long> {
     Optional<Discount> findByDiscountNameAndAcademy(String name, Academy academy);
 
     Page<Discount> findAllByAcademy(Academy academy, Pageable pageable);
+    Page<Discount> findAllByAcademyAndDeletedAtIsNull(Academy academy, Pageable pageable);
 }

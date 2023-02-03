@@ -1,6 +1,7 @@
 package com.project.myacademy.controller;
 
 import com.project.myacademy.domain.academy.AcademyService;
+import com.project.myacademy.domain.academy.dto.FindAcademyResponse;
 import com.project.myacademy.domain.academy.dto.ReadAcademyResponse;
 import com.project.myacademy.domain.employee.dto.ReadEmployeeResponse;
 import com.project.myacademy.domain.lecture.LectureService;
@@ -30,6 +31,7 @@ public class EnrollmentController {
     private final StudentService studentService;
     private final LectureService lectureService;
     private final WaitinglistService waitinglistService;
+    private final AcademyService academyService;
 
     @GetMapping("/academy/enrollment")
     public String studentListForEnrollment(@RequestParam(required = false) String studentName, Model model, Pageable pageable, Authentication authentication) {
@@ -45,6 +47,8 @@ public class EnrollmentController {
             Page<ReadAllStudentResponse> studentList = studentService.readAllStudent(academyId, pageable, requestAccount);
             model.addAttribute("students", studentList);
         }
+        FindAcademyResponse academy = academyService.findAcademyById(academyId);
+        model.addAttribute("academy", academy);
         model.addAttribute("account", requestAccount);
         model.addAttribute("previous", pageable.previousOrFirst().getPageNumber());
         model.addAttribute("next", pageable.next().getPageNumber());
@@ -69,6 +73,8 @@ public class EnrollmentController {
         for (ReadAllLectureResponse lecture : lectures) {
             lecture.setWaitingNum(waitinglistService.countWaitingListByLecture(academyId, lecture.getLectureId(), requestAccount));
         }
+        FindAcademyResponse academy = academyService.findAcademyById(academyId);
+        model.addAttribute("academy", academy);
         model.addAttribute("account", requestAccount);
         model.addAttribute("lectures", lectures);
         model.addAttribute("student", foundStudent);
