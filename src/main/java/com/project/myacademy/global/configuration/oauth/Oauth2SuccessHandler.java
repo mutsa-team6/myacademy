@@ -15,8 +15,11 @@ import org.springframework.stereotype.Component;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.Map;
+import java.util.Optional;
 
 @Component
 @Slf4j
@@ -50,15 +53,23 @@ public class Oauth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         }
 
         // 이름과 이메일이 둘다 일치하는 회원이 저장되어있을 것
-        Employee foundEmployee = employeeRepository.findByNameAndEmail(realName, email).get();
-        String foundAccount = foundEmployee.getAccount();
-        log.info("🌈 소셜 로그인 인증한 계정명 [{}]", foundAccount);
+        Optional<Employee> foundEmployee = employeeRepository.findByNameAndEmail(realName, email);
+        if (foundEmployee.isPresent()) {
+            String foundAccount = foundEmployee.get().getAccount();
+            log.info("🌈 소셜 로그인 인증한 계정명 [{}]", foundAccount);
+            // 회원 계정으로 토큰 생성 후 쿼리 파라미터로 보냄
+            String token = JwtTokenUtil.createToken(foundAccount, email, key, 1000 * 60 * 60);
+
+            response.sendRedirect("/oauth2/redirect" + "?token=" + token);
+        } else {
+//            String encodedRealName = URLEncoder.encode(realName, "UTF-8");
+            HttpSession session = request.getSession(true);
+            session.setAttribute("realName", realName);
+            session.setAttribute("email", email);
+            response.sendRedirect("/join");
+        }
 
 
-        // 회원 계정으로 토큰 생성 후 쿼리 파라미터로 보냄
-        String token = JwtTokenUtil.createToken(foundAccount, email, key, 1000 * 60 * 60);
-
-        response.sendRedirect("/oauth2/redirect" + "?token=" + token);
 
     }
 }

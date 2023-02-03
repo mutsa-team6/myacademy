@@ -293,5 +293,17 @@ public class EnrollmentService {
         return new FindEnrollmentResponse(foundEnrollment);
     }
 
+    public Page<FindStudentInfoFromEnrollmentByLectureResponse> findStudentInfoFromEnrollmentByLecture(Long academyId, String requestAccount,Long lectureId, Pageable pageable) {
+
+
+        // 등록 주체 권한 확인(학원 존재 유무, 해당 학원 직원인지 확인)
+        Academy academy = validateAcademy(academyId);
+        Employee employee = validateAcademyEmployee(requestAccount, academy);
+        Lecture foundLecture = lectureRepository.findById(lectureId)
+                .orElseThrow(() -> new AppException(ErrorCode.LECTURE_NOT_FOUND));
+
+        return enrollmentRepository.findByLectureAndPaymentYNIsTrue(foundLecture, pageable).map(enrollment -> new FindStudentInfoFromEnrollmentByLectureResponse(enrollment));
+
+    }
 
 }
