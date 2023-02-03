@@ -75,7 +75,6 @@
                                                 style="color: #5A2082">
                                                 학생 이메일
                                             </th>
-
                                             <th class="text-secondary opacity-7"></th>
                                         </tr>
                                         </thead>
@@ -104,6 +103,7 @@
                                                       th:text="${student.email}"></span>
                                             </td>
 
+
                                         </div>
                                         </tbody>
                                     </table>
@@ -116,159 +116,258 @@
                 <br>
                 <br>
                 <div class="row">
-                    <div class="card my-4">
+                    <div class="row">
+                        <div class="card my-4">
 
-                        <div class="col-4">
-                            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-                                <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
-                                    <h6 class="text-white text-capitalize ps-3"> 해당 학생의 수강 내역입니다.</h6>
+                            <div class="col-4">
+                                <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                                    <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+                                        <h6 class="text-white text-capitalize ps-3">선택한 학생의 특이사항입니다.</h6>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
 
-                        <div class="card-body px-0 pb-2">
-                            <div class="table-responsive">
-                                <table class="table align-items-center mb-0">
-                                    <thead>
-
-                                    <tr>
-                                        <th class="text-center text-uppercase  font-weight-bolder"
-                                            style="color: #5A2082;font-size: small">
-                                            강의 이름
-                                        </th>
-                                        <th class="text-center text-uppercase  font-weight-bolder"
-                                            style="color: #5A2082;font-size: small">
-                                            강사 이름
-                                        </th>
-                                        <th class="text-center text-uppercase  font-weight-bolder "
-                                            style="color: #5A2082;font-size: small">
-                                            강의 시간
-                                        </th>
-                                        <th class="text-center text-uppercase  font-weight-bolder "
-                                            style="color: #5A2082;font-size: small">
-                                            강의 시작일
-                                        </th>
-                                        <th class="text-center text-uppercase  font-weight-bolder "
-                                            style="color: #5A2082;font-size: small">
-                                            강의 종료일
-                                        </th>
-                                        <th class="text-secondary opacity-7"></th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <div>
-
-                                        <tr th:each="enrollment : ${enrollments}">
-
-                                            <th class="align-middle text-center">
-                                                <span class=" text font-weight-bold" style="font-size: small"
-                                                      th:text="${enrollment.lectureName}"></span>
+                            <div class="card-body px-0 pb-2">
+                                <div class="table-responsive">
+                                    <table class="table align-items-center mb-0">
+                                        <thead>
+                                        <tr>
+                                            <th class="text-center text-uppercase  font-weight-bolder"
+                                                style="color: #5A2082">
+                                                특이사항 내용
+                                            </th>
+                                            <th class="text-center text-uppercase font-weight-bolder "
+                                                style="color: #5A2082">
+                                                작성 일시
                                             </th>
 
-                                            <th class="align-middle text-center">
-                                                <span class=" text font-weight-bold" style="font-size: small"
-                                                      th:text="${enrollment.teacherName}"></span>
-                                            </th>
-                                            <th class="align-middle text-center">
-                                                <span class=" text font-weight-bold" style="font-size: small"
-                                                      th:text="${enrollment.lectureTime}"></span>
-                                            </th>
-                                            <th class="align-middle text-center">
-                                                <span class=" text font-weight-bold" style="font-size: small"
-                                                      th:text="${enrollment.startDate}"></span>
-                                            </th>
-                                            <th class="align-middle text-center">
-                                                <span class=" text font-weight-bold" style="font-size: small"
-                                                      th:text="${enrollment.finishDate}"></span>
-                                            </th>
+                                            <th class="text-secondary opacity-7"></th>
                                         </tr>
-                                    </div>
-                                    </tbody>
-                                </table>
-                            </div>
+                                        </thead>
+                                        <tbody>
+                                        <div>
 
+                                            <tr th:each="uniqueness : ${uniquenesses}">
+                                                <td class="align-middle text-center">
+
+                                                    <div class="input-group input-group-dynamic"
+                                                         style="border-color: #5A2082">
+                                                    <textarea class="form-control"
+                                                              rows="2"
+                                                              spellcheck="false"
+                                                              th:text="${uniqueness.body}" readonly></textarea>
+                                                    </div>
+                                                </td>
+                                                <td class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${uniqueness.createdAt}"></span>
+                                                </td>
+                                                <td class="align-middle text-center">
+
+                                                    <a href="javascript:;"
+                                                       th:onclick="|student.delete(${academyId},${student.id},${uniqueness.uniquenessId})|"
+                                                       type="button"
+                                                       class="text-secondary font-weight-bold text-xs"
+                                                       data-toggle="tooltip"
+                                                       data-original-title="delete-academy">
+                                                        delete
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </div>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
                         </div>
                     </div>
-                </div>
-                <br>
-                <br>
-                <div class="row">
-                    <div class="card my-4">
 
-                        <div class="col-4">
-                            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-                                <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
-                                    <h6 class="text-white text-capitalize ps-3"> 해당 학생의 결제 내역입니다.</h6>
+                    <br>
+                    <br>
+                    <div class="row">
+                        <div class="card my-4">
+
+                            <div class="col-4">
+                                <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                                    <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+                                        <h6 class="text-white text-capitalize ps-3"> 해당 학생의 수강 내역입니다.</h6>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
 
-                        <div class="card-body px-0 pb-2">
-                            <div class="table-responsive">
-                                <table class="table align-items-center mb-0">
-                                    <thead>
+                            <div class="card-body px-0 pb-2">
+                                <div class="table-responsive">
+                                    <table class="table align-items-center mb-0">
+                                        <thead>
 
-                                    <tr>
-                                        <th class="text-center text-uppercase  font-weight-bolder">
-                                            주문 상품 이름
-                                        </th>
-                                        <th class="text-center text-uppercase  font-weight-bolder">
-                                            할인 정책 이름
-                                        </th>
-                                        <th class="text-center text-uppercase  font-weight-bolder">
-                                            결제 금액
-                                        </th>
-                                        <th class="text-center text-uppercase  font-weight-bolder">
-                                            주문 번호
-                                        </th>
-                                        <th class="text-center text-uppercase  font-weight-bolder">
-                                            결제 일시
-                                        </th>
-                                        <th class="text-secondary opacity-7"></th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <div>
-
-                                        <tr th:each="payment : ${payments}">
-
-                                            <th class="align-middle text-center">
-                                                <span class=" text font-weight-bold" style="font-size: small"
-                                                      th:text="${payment.orderName}"></span>
+                                        <tr>
+                                            <th class="text-center text-uppercase  font-weight-bolder"
+                                                style="color: #5A2082;font-size: small">
+                                                강의 이름
                                             </th>
-
-                                            <th class="align-middle text-center">
-                                                <span class=" text font-weight-bold" style="font-size: small"
-                                                      th:text="${payment.discountName}"></span>
+                                            <th class="text-center text-uppercase  font-weight-bolder"
+                                                style="color: #5A2082;font-size: small">
+                                                강사 이름
                                             </th>
-                                            <th class="align-middle text-center">
-                                                <span class=" text font-weight-bold" style="font-size: small"
-                                                      th:text="${payment.amount}"></span>
+                                            <th class="text-center text-uppercase  font-weight-bolder "
+                                                style="color: #5A2082;font-size: small">
+                                                강의 시간
                                             </th>
-                                            <th class="align-middle text-center">
-                                                <span class=" text font-weight-bold" style="font-size: small"
-                                                      th:text="${payment.orderId}"></span>
+                                            <th class="text-center text-uppercase  font-weight-bolder "
+                                                style="color: #5A2082;font-size: small">
+                                                강의 시작일
                                             </th>
-                                            <th class="align-middle text-center">
-                                                <span class=" text font-weight-bold" style="font-size: small"
-                                                      th:text="${payment.createdAt}"></span>
+                                            <th class="text-center text-uppercase  font-weight-bolder "
+                                                style="color: #5A2082;font-size: small">
+                                                강의 종료일
                                             </th>
+                                            <th class="text-secondary opacity-7"></th>
                                         </tr>
+                                        </thead>
+                                        <tbody>
+                                        <div>
+
+                                            <tr th:each="enrollment : ${enrollments}">
+
+                                                <th class="align-middle text-center">
+                                                <span class=" text font-weight-bold" style="font-size: small"
+                                                      th:text="${enrollment.lectureName}"></span>
+                                                </th>
+
+                                                <th class="align-middle text-center">
+                                                <span class=" text font-weight-bold" style="font-size: small"
+                                                      th:text="${enrollment.teacherName}"></span>
+                                                </th>
+                                                <th class="align-middle text-center">
+                                                <span class=" text font-weight-bold" style="font-size: small"
+                                                      th:text="${enrollment.lectureTime}"></span>
+                                                </th>
+                                                <th class="align-middle text-center">
+                                                <span class=" text font-weight-bold" style="font-size: small"
+                                                      th:text="${enrollment.startDate}"></span>
+                                                </th>
+                                                <th class="align-middle text-center">
+                                                <span class=" text font-weight-bold" style="font-size: small"
+                                                      th:text="${enrollment.finishDate}"></span>
+                                                </th>
+                                            </tr>
+                                        </div>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <br>
+                    <div class="row">
+                        <div class="card my-4">
+
+                            <div class="col-4">
+                                <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                                    <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+                                        <h6 class="text-white text-capitalize ps-3"> 해당 학생의 결제 내역입니다.</h6>
                                     </div>
-                                    </tbody>
-                                </table>
+                                </div>
                             </div>
 
+
+                            <div class="card-body px-0 pb-2">
+                                <div class="table-responsive">
+                                    <table class="table align-items-center mb-0">
+                                        <thead>
+
+                                        <tr>
+                                            <th class="text-center text-uppercase  font-weight-bolder">
+                                                주문 상품 이름
+                                            </th>
+                                            <th class="text-center text-uppercase  font-weight-bolder">
+                                                할인 정책 이름
+                                            </th>
+                                            <th class="text-center text-uppercase  font-weight-bolder">
+                                                결제 금액
+                                            </th>
+                                            <th class="text-center text-uppercase  font-weight-bolder">
+                                                주문 번호
+                                            </th>
+                                            <th class="text-center text-uppercase  font-weight-bolder">
+                                                결제 일시
+                                            </th>
+                                            <th class="text-secondary opacity-7"></th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <div>
+
+                                            <tr th:each="payment : ${payments}">
+
+                                                <th class="align-middle text-center">
+                                                <span class=" text font-weight-bold" style="font-size: small"
+                                                      th:text="${payment.orderName}"></span>
+                                                </th>
+
+                                                <th class="align-middle text-center">
+                                                <span class=" text font-weight-bold" style="font-size: small"
+                                                      th:text="${payment.discountName}"></span>
+                                                </th>
+                                                <th class="align-middle text-center">
+                                                <span class=" text font-weight-bold" style="font-size: small"
+                                                      th:text="${payment.amount}"></span>
+                                                </th>
+                                                <th class="align-middle text-center">
+                                                <span class=" text font-weight-bold" style="font-size: small"
+                                                      th:text="${payment.orderId}"></span>
+                                                </th>
+                                                <th class="align-middle text-center">
+                                                <span class=" text font-weight-bold" style="font-size: small"
+                                                      th:text="${payment.createdAt}"></span>
+                                                </th>
+                                            </tr>
+                                        </div>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+            <div class="col-2 ">
+                <div class="card">
+
+                    <div class="card card-plain mt-3 mx-3">
+                        <h5 class="font-weight-bolder" style="color: #5A2082">특이사항 등록</h5>
+                    </div>
+                    <div>
+                        <hr style="color: #5A2082; height: 1.5px;background-color: #5A2082">
+                    </div>
+                    <div class="card-body">
+                        <div class="input-group input-group-dynamic" style="border-color: #5A2082">
+                                <textarea class="form-control" rows="5"
+                                          spellcheck="false" placeholder="특이사항을 입력하세요."
+                                          id="input-uniqueness"></textarea>
+                        </div>
+
+                        <div class="align-middle text-center">
+                            <div class="text-center">
+                                <button th:onclick="|student.uniqueness(${academyId},${student.id})|"
+                                        type="button"
+                                        class="btn btn-sm bg-gradient-primary w-100 mt-4 mb-0">특이사항 등록
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
-    </div>
-    <!--footer-->
-    <th:block th:replace="layout/footer :: footerFragment"></th:block>
+        <!--footer-->
+        <th:block th:replace="layout/footer :: footerFragment"></th:block>
 </main>
 <!--   Core JS Files   -->
 <script src="/assets/js/core/popper.min.js"></script>
@@ -280,23 +379,25 @@
 
 <Script>
 
-    let register = {
+    let student = {
         init: function () {
             var _this = this;
         },
 
 
-        registerEnrollment: function (academyId, studentId, lectureId) {
-
-            const data = null;
-            axios.post("/api/v1/academies/" + academyId + "/students/" + studentId + "/lectures/" + lectureId + "/enrollments",
+        uniqueness: function (academyId, studentId) {
+            let data = {
+                body: document.querySelector('#input-uniqueness').value.trim(),
+            };
+            console.log(data)
+            axios.post("/api/v1/academies/" + academyId + "/students/" + studentId + "/uniqueness",
                 JSON.stringify(data), {
                     headers: {
                         'Content-Type': 'application/json',
                     }
                 }
             ).then((response) => {
-                alert("수강 신청을 성공했습니다.");
+                alert("특이사항을 작성했습니다.");
                 window.location.reload();
 
             }).catch((error) => {
@@ -309,31 +410,27 @@
 
         },
 
-        registerWaiting: function (academyId, studentId, lectureId) {
+        delete: function (academyId,studentId,uniquenessId) {
 
-            const data = null;
-            axios.post("/api/v1/academies/" + academyId + "/students/" + studentId + "/lectures/" + lectureId + "/waitinglists",
-                JSON.stringify(data), {
-                    headers: {
-                        'Content-Type': 'application/json',
+            const con_check = confirm("삭제하시겠습니까?");
+
+            if (con_check === true) {
+                axios.delete("/api/v1/academies/" + academyId + "/students/" + studentId + "/uniqueness/" + uniquenessId,
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
                     }
-                }
-            ).then((response) => {
-                alert("수강 대기 신청을 성공했습니다.");
-                window.location.reload();
-
-            }).catch((error) => {
-                if (error.response.data.result["errorCode"] == "INVALID_PERMISSION") {
-                    alert("강사는 접근할 수 없습니다.");
-                } else if (error.response.data.result["errorCode"] == "DUPLICATED_WAITINGLIST") {
-                    alert("해당 학생은 해당 강의를 이미 대기 신청한 상태입니다.");
-                }
-            });
-
+                ).then((response) => {
+                    alert("특이사항 삭제 성공");
+                    window.location.reload();
+                }).catch((error) => {
+                });
+            }
         }
     };
 
-    register.init();
+    student.init();
 
 </script>
 

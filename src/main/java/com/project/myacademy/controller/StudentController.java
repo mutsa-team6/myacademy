@@ -18,6 +18,8 @@ import com.project.myacademy.domain.payment.dto.CompletePaymentResponse;
 import com.project.myacademy.domain.student.StudentService;
 import com.project.myacademy.domain.student.dto.ReadAllStudentResponse;
 import com.project.myacademy.domain.student.dto.ReadStudentResponse;
+import com.project.myacademy.domain.uniqueness.UniquenessService;
+import com.project.myacademy.domain.uniqueness.dto.ReadAllUniquenessResponse;
 import com.project.myacademy.global.util.AuthenticationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,9 +44,10 @@ public class StudentController {
     private final LectureService lectureService;
     private final EnrollmentService enrollmentService;
     private final PaymentService paymentService;
+    private final UniquenessService uniquenessService;
 
     @GetMapping("/academy/student")
-    public String student(Authentication authentication,Model model, Pageable pageable) {
+    public String student(Authentication authentication, Model model, Pageable pageable) {
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
         Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
 
@@ -56,7 +59,7 @@ public class StudentController {
     }
 
     @GetMapping("/academy/student/register")
-    public String studentRegister( Model model, Authentication authentication) {
+    public String studentRegister(Model model, Authentication authentication) {
 
         Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
@@ -89,7 +92,7 @@ public class StudentController {
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
 
         if (studentName != null) {
-            Page<ReadAllStudentResponse> searchStudents = studentService.findStudentForStudentList(academyId, studentName,pageable);
+            Page<ReadAllStudentResponse> searchStudents = studentService.findStudentForStudentList(academyId, studentName, pageable);
             model.addAttribute("students", searchStudents);
 
         } else {
@@ -120,6 +123,9 @@ public class StudentController {
 
         FindAcademyResponse academy = academyService.findAcademyById(academyId);
 
+        Page<ReadAllUniquenessResponse> uniquenesses = uniquenessService.readAllUniqueness(academyId, studentId, pageable, requestAccount);
+
+        model.addAttribute("uniquenesses", uniquenesses);
         model.addAttribute("payments", payments);
         model.addAttribute("academy", academy);
         model.addAttribute("enrollments", enrollments);
