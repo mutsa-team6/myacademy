@@ -283,6 +283,15 @@
                                                 <span class=" text font-weight-bold" style="font-size: small"
                                                       th:text="${lecture.currentEnrollmentNumber}"></span>
                                                 </th>
+                                                <th class="align-middle">
+                                                    <form action="/academy/mypage/attendance" method="get">
+                                                        <input type="text" class="form-control" name="lectureId"
+                                                               th:value="${lecture.lectureId}" hidden>
+                                                        <button class="btn btn-icon btn-2 btn-primary mt-3" type="submit">
+                                                            출석부 조회</span>
+                                                        </button>
+                                                    </form>
+                                                </th>
                                             </tr>
                                         </div>
                                         </tbody>
