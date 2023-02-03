@@ -10,6 +10,7 @@ import com.project.myacademy.domain.lecture.LectureService;
 import com.project.myacademy.domain.lecture.dto.ReadAllLectureResponse;
 import com.project.myacademy.domain.student.dto.ReadAllStudentResponse;
 import com.project.myacademy.global.util.AuthenticationUtil;
+import com.project.myacademy.global.util.SessionUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -41,22 +42,9 @@ public class LectureController {
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
         log.info("⭐ 강좌 등록 요청한 사용자의 학원 id [{}] || 요청한 사용자의 계정 [{}]", academyId, requestAccount);
 
-
-
         //회원 이름 표시
-        HttpSession session = request.getSession(true);
-
-        if (session.getAttribute("name") != null) {
-            String loginUserName = (String) session.getAttribute("name");
-            log.info("세션에 저장된 실명 : [{}]", loginUserName);
-            model.addAttribute("name", loginUserName);
-        } else {
-            ReadEmployeeResponse found = employeeService.readEmployee(academyId, requestAccount);
-            Academy foundAcademy = found.getAcademy();
-            String foundName = found.getName();
-            session.setAttribute("name", foundName);
-            model.addAttribute("name", foundName);
-        }
+        ReadEmployeeResponse employee = employeeService.readEmployee(academyId, requestAccount);
+        SessionUtil.setSessionNameAndRole(request,employee);
 
         Page<ReadEmployeeResponse> teachers = employeeService.findAllTeachers(requestAccount, academyId, pageable);
         for (ReadEmployeeResponse teacher : teachers) {
@@ -71,11 +59,14 @@ public class LectureController {
     }
 
     @GetMapping("/academy/lecture/register")
-    public String lectureRegister(@RequestParam(required = false) Long teacherId, Model model, Pageable pageable, Authentication authentication) {
+    public String lectureRegister(@RequestParam(required = false) Long teacherId, HttpServletRequest request, Model model, Pageable pageable, Authentication authentication) {
 
         Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
 
+        //회원 이름 표시
+        ReadEmployeeResponse employee = employeeService.readEmployee(academyId, requestAccount);
+        SessionUtil.setSessionNameAndRole(request,employee);
 
         ReadEmployeeResponse teacher = null;
         if (teacherId != null) {

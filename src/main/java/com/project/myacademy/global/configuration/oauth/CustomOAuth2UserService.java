@@ -2,6 +2,7 @@ package com.project.myacademy.global.configuration.oauth;
 
 import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.domain.employee.EmployeeRepository;
+import com.project.myacademy.domain.employee.EmployeeRole;
 import com.project.myacademy.global.exception.AppException;
 import com.project.myacademy.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpSession;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -58,26 +60,35 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         EmployeeProfile employeeProfile = OAuthAttributes.extract(registrationId, attributes);
 
         // 소셜 로그인으로 들어온 이메일과 같은 이메일로 가입된 회원의 실명 + 이메일이 동일한 경우 승인
-        Employee employee = check(employeeProfile);
+        Optional<Employee> foundEmployee = employeeRepository.findByNameAndEmail(employeeProfile.getName(), employeeProfile.getEmail());
 
+        if (foundEmployee.isPresent()) {
+            // 로그인 성공하면 세션에 회원 실명 저장
+            httpSession.setAttribute("name",foundEmployee.get().getName());
+            if (foundEmployee.get().getEmployeeRole().equals(EmployeeRole.ROLE_USER)) {
+                httpSession.setAttribute("role", "강사");
+            } else if (foundEmployee.get().getEmployeeRole().equals(EmployeeRole.ROLE_STAFF)) {
+                httpSession.setAttribute("role", "직원");
+            } else {
+                httpSession.setAttribute("role", "원장");
 
-        // 로그인 성공하면 세션에 회원 실명 저장
-        httpSession.setAttribute("name",employee.getName());
+            }
+            httpSession.setAttribute("role",foundEmployee.get().getName());
 
-        // 해당 계정이 갖고 있는 권한 그대로 주입
-        return new DefaultOAuth2User(
-                Collections.singleton(new SimpleGrantedAuthority(employee.getEmployeeRole().name())),
-                attributes,
-                userNameAttributeName);
+            // 해당 계정이 갖고 있는 권한 그대로 주입
+            return new DefaultOAuth2User(
+                    Collections.singleton(new SimpleGrantedAuthority(foundEmployee.get().getEmployeeRole().name())),
+                    attributes,
+                    userNameAttributeName);
+        } else {
+            return new DefaultOAuth2User(
+                    null,
+                    attributes,
+                    userNameAttributeName);
+        }
 
     }
 
-    // 소셜 로그인 시, 소셜 로그인에 등록된 실명과 이메일로 가입한 회원이 존재하지 않을 경우 에러 처리
-    private Employee check(EmployeeProfile employeeProfile) {
-        Employee employee = employeeRepository.findByNameAndEmail(employeeProfile.getName(), employeeProfile.getEmail())
-                .orElseThrow(() -> new OAuth2AuthenticationException("가입된 회원이 아닙니다."));
 
-        return employee;
-    }
 
 }

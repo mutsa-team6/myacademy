@@ -7,6 +7,7 @@ import com.project.myacademy.domain.employee.EmployeeRole;
 import com.project.myacademy.domain.employee.EmployeeService;
 import com.project.myacademy.domain.employee.dto.ReadEmployeeResponse;
 import com.project.myacademy.global.util.AuthenticationUtil;
+import com.project.myacademy.global.util.SessionUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -35,27 +36,12 @@ public class IndexController {
 
 
         //회원 이름 표시
-        HttpSession session = request.getSession(true);
+        ReadEmployeeResponse employee = employeeService.readEmployee(academyId, requestAccount);
+        SessionUtil.setSessionNameAndRole(request,employee);
 
-        if (session.getAttribute("name") != null) {
-            String loginUserName = (String) session.getAttribute("name");
-            log.info("세션에 저장된 실명 : [{}]", loginUserName);
-            model.addAttribute("name", loginUserName);
-        } else {
-            ReadEmployeeResponse found = employeeService.readEmployee(academyId, requestAccount);
-            Academy foundAcademy = found.getAcademy();
-            String foundName = found.getName();
-            session.setAttribute("name", foundName);
-            if (found.getEmployeeRole().equals(EmployeeRole.ROLE_USER)) {
-                session.setAttribute("role", "강사");
-            } else if (found.getEmployeeRole().equals(EmployeeRole.ROLE_STAFF)) {
-                session.setAttribute("role", "직원");
-            } else {
-                session.setAttribute("role", "원장");
 
-            }
-            model.addAttribute("name", foundName);
-        }
+
+
         FindAcademyResponse academy = academyService.findAcademyById(academyId);
         model.addAttribute("academy", academy);
         model.addAttribute("account", requestAccount);
