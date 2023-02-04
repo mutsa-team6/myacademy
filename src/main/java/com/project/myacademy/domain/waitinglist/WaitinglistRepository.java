@@ -4,6 +4,7 @@ import com.project.myacademy.domain.lecture.Lecture;
 import com.project.myacademy.domain.student.Student;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface WaitinglistRepository extends JpaRepository<Waitinglist, Long> {
@@ -14,4 +15,6 @@ public interface WaitinglistRepository extends JpaRepository<Waitinglist, Long> 
     Optional<Waitinglist> findTopByLectureOrderByCreatedAtAsc(Lecture lecture);
 
     Long countWaitinglistByLecture(Lecture lecture);
+
+    List<Waitinglist> findByLectureOrderByCreatedAtAsc(Lecture lecture);
 }

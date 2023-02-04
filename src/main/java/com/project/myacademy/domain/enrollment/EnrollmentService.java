@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -291,6 +292,9 @@ public class EnrollmentService {
         return new FindEnrollmentResponse(foundEnrollment);
     }
 
+    /**
+     * 결제 완료된 수강신청내역을 활용해서 출석부를 표시하기 위해 만든 메서드
+     */
     public Page<FindStudentInfoFromEnrollmentByLectureResponse> findStudentInfoFromEnrollmentByLecture(Long academyId, String requestAccount,Long lectureId, Pageable pageable) {
 
 
@@ -303,5 +307,21 @@ public class EnrollmentService {
         return enrollmentRepository.findByLectureAndPaymentYNIsTrue(foundLecture, pageable).map(enrollment -> new FindStudentInfoFromEnrollmentByLectureResponse(enrollment));
 
     }
+
+    /**
+     * 결제 완료 여부와 상관없이 수강신청내역을 활용해서 수강 신청자 명단을 위해 만든 메서드 UI용
+     */
+    public List<FindStudentInfoFromEnrollmentByLectureResponse> findAllStudentInfoFromEnrollmentByLecture(Long academyId, String requestAccount,Long lectureId) {
+
+
+        // 등록 주체 권한 확인(학원 존재 유무, 해당 학원 직원인지 확인)
+        Academy academy = validateAcademy(academyId);
+        Employee employee = validateAcademyEmployee(requestAccount, academy);
+        Lecture foundLecture = lectureRepository.findById(lectureId)
+                .orElseThrow(() -> new AppException(ErrorCode.LECTURE_NOT_FOUND));
+        return enrollmentRepository.findByLecture(foundLecture).stream().map(enrollment -> new FindStudentInfoFromEnrollmentByLectureResponse(enrollment)).collect(Collectors.toList());
+
+    }
+
 
 }

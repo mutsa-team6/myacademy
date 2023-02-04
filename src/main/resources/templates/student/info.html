@@ -116,231 +116,229 @@
                 <br>
                 <br>
                 <div class="row">
-                    <div class="row">
-                        <div class="card my-4">
+                    <div class="card my-4">
 
-                            <div class="col-4">
-                                <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-                                    <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
-                                        <h6 class="text-white text-capitalize ps-3">선택한 학생의 특이사항입니다.</h6>
-                                    </div>
+                        <div class="col-4">
+                            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                                <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+                                    <h6 class="text-white text-capitalize ps-3">선택한 학생의 특이사항입니다.</h6>
                                 </div>
                             </div>
+                        </div>
 
 
-                            <div class="card-body px-0 pb-2">
-                                <div class="table-responsive">
-                                    <table class="table align-items-center mb-0">
-                                        <thead>
-                                        <tr>
-                                            <th class="text-center text-uppercase  font-weight-bolder"
-                                                style="color: #5A2082">
-                                                특이사항 내용
-                                            </th>
-                                            <th class="text-center text-uppercase font-weight-bolder "
-                                                style="color: #5A2082">
-                                                작성 일시
-                                            </th>
-                                            <th class="text-center text-uppercase font-weight-bolder "
-                                                style="color: #5A2082">
-                                                작성자
-                                            </th>
+                        <div class="card-body px-0 pb-2">
+                            <div class="table-responsive">
+                                <table class="table align-items-center mb-0">
+                                    <thead>
+                                    <tr>
+                                        <th class="text-center text-uppercase  font-weight-bolder"
+                                            style="color: #5A2082">
+                                            특이사항 내용
+                                        </th>
+                                        <th class="text-center text-uppercase font-weight-bolder "
+                                            style="color: #5A2082">
+                                            작성 일시
+                                        </th>
+                                        <th class="text-center text-uppercase font-weight-bolder "
+                                            style="color: #5A2082">
+                                            작성자
+                                        </th>
 
-                                            <th class="text-secondary opacity-7"></th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <div>
+                                        <th class="text-secondary opacity-7"></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <div>
 
-                                            <tr th:each="uniqueness : ${uniquenesses}">
-                                                <td class="align-middle text-center">
+                                        <tr th:each="uniqueness : ${uniquenesses}">
+                                            <td class="align-middle text-center">
 
-                                                    <div class="input-group input-group-dynamic"
-                                                         style="border-color: #5A2082">
+                                                <div class="input-group input-group-dynamic"
+                                                     style="border-color: #5A2082">
                                                     <textarea class="form-control"
                                                               rows="2"
                                                               spellcheck="false"
                                                               th:text="${uniqueness.body}" readonly></textarea>
-                                                    </div>
-                                                </td>
-                                                <td class="align-middle text-center">
+                                                </div>
+                                            </td>
+                                            <td class="align-middle text-center">
                                                 <span class=" text-xs font-weight-bold"
                                                       th:text="${uniqueness.createdAt}"></span>
-                                                </td>
-                                                <td class="align-middle text-center">
+                                            </td>
+                                            <td class="align-middle text-center">
                                                 <span class=" text-xs font-weight-bold"
                                                       th:text="${uniqueness.author}"></span>
-                                                </td>
-                                                <td class="align-middle text-center">
+                                            </td>
+                                            <td class="align-middle text-center">
 
-                                                    <a href="javascript:;"
-                                                       th:onclick="|student.delete(${academyId},${student.id},${uniqueness.uniquenessId})|"
-                                                       type="button"
-                                                       class="text-danger font-weight-bold text-xs"
-                                                       data-toggle="tooltip"
-                                                       data-original-title="delete-academy">
-                                                        delete
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        </div>
-                                        </tbody>
-                                    </table>
-                                </div>
-
+                                                <a href="javascript:;"
+                                                   th:onclick="|student.delete(${academyId},${student.id},${uniqueness.uniquenessId})|"
+                                                   type="button"
+                                                   class="text-danger font-weight-bold text-xs"
+                                                   data-toggle="tooltip"
+                                                   data-original-title="delete-academy">
+                                                    delete
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </div>
+                                    </tbody>
+                                </table>
                             </div>
+
                         </div>
                     </div>
+                </div>
 
-                    <br>
-                    <br>
-                    <div class="row">
-                        <div class="card my-4">
+                <br>
+                <br>
+                <div class="row">
+                    <div class="card my-4">
 
-                            <div class="col-4">
-                                <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-                                    <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
-                                        <h6 class="text-white text-capitalize ps-3"> 해당 학생의 수강 내역입니다.</h6>
-                                    </div>
+                        <div class="col-4">
+                            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                                <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+                                    <h6 class="text-white text-capitalize ps-3"> 해당 학생의 수강 내역입니다.</h6>
                                 </div>
                             </div>
+                        </div>
 
 
-                            <div class="card-body px-0 pb-2">
-                                <div class="table-responsive">
-                                    <table class="table align-items-center mb-0">
-                                        <thead>
+                        <div class="card-body px-0 pb-2">
+                            <div class="table-responsive">
+                                <table class="table align-items-center mb-0">
+                                    <thead>
 
-                                        <tr>
-                                            <th class="text-center text-uppercase  font-weight-bolder"
-                                                style="color: #5A2082;font-size: small">
-                                                강의 이름
-                                            </th>
-                                            <th class="text-center text-uppercase  font-weight-bolder"
-                                                style="color: #5A2082;font-size: small">
-                                                강사 이름
-                                            </th>
-                                            <th class="text-center text-uppercase  font-weight-bolder "
-                                                style="color: #5A2082;font-size: small">
-                                                강의 시간
-                                            </th>
-                                            <th class="text-center text-uppercase  font-weight-bolder "
-                                                style="color: #5A2082;font-size: small">
-                                                강의 시작일
-                                            </th>
-                                            <th class="text-center text-uppercase  font-weight-bolder "
-                                                style="color: #5A2082;font-size: small">
-                                                강의 종료일
-                                            </th>
-                                            <th class="text-secondary opacity-7"></th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <div>
+                                    <tr>
+                                        <th class="text-center text-uppercase  font-weight-bolder"
+                                            style="color: #5A2082;font-size: small">
+                                            강의 이름
+                                        </th>
+                                        <th class="text-center text-uppercase  font-weight-bolder"
+                                            style="color: #5A2082;font-size: small">
+                                            강사 이름
+                                        </th>
+                                        <th class="text-center text-uppercase  font-weight-bolder "
+                                            style="color: #5A2082;font-size: small">
+                                            강의 시간
+                                        </th>
+                                        <th class="text-center text-uppercase  font-weight-bolder "
+                                            style="color: #5A2082;font-size: small">
+                                            강의 시작일
+                                        </th>
+                                        <th class="text-center text-uppercase  font-weight-bolder "
+                                            style="color: #5A2082;font-size: small">
+                                            강의 종료일
+                                        </th>
+                                        <th class="text-secondary opacity-7"></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <div>
 
-                                            <tr th:each="enrollment : ${enrollments}">
+                                        <tr th:each="enrollment : ${enrollments}">
 
-                                                <th class="align-middle text-center">
+                                            <th class="align-middle text-center">
                                                 <span class=" text font-weight-bold" style="font-size: small"
                                                       th:text="${enrollment.lectureName}"></span>
-                                                </th>
+                                            </th>
 
-                                                <th class="align-middle text-center">
+                                            <th class="align-middle text-center">
                                                 <span class=" text font-weight-bold" style="font-size: small"
                                                       th:text="${enrollment.teacherName}"></span>
-                                                </th>
-                                                <th class="align-middle text-center">
+                                            </th>
+                                            <th class="align-middle text-center">
                                                 <span class=" text font-weight-bold" style="font-size: small"
                                                       th:text="${enrollment.lectureTime}"></span>
-                                                </th>
-                                                <th class="align-middle text-center">
+                                            </th>
+                                            <th class="align-middle text-center">
                                                 <span class=" text font-weight-bold" style="font-size: small"
                                                       th:text="${enrollment.startDate}"></span>
-                                                </th>
-                                                <th class="align-middle text-center">
+                                            </th>
+                                            <th class="align-middle text-center">
                                                 <span class=" text font-weight-bold" style="font-size: small"
                                                       th:text="${enrollment.finishDate}"></span>
-                                                </th>
-                                            </tr>
-                                        </div>
-                                        </tbody>
-                                    </table>
-                                </div>
-
+                                            </th>
+                                        </tr>
+                                    </div>
+                                    </tbody>
+                                </table>
                             </div>
+
                         </div>
                     </div>
-                    <br>
-                    <br>
-                    <div class="row">
-                        <div class="card my-4">
+                </div>
+                <br>
+                <br>
+                <div class="row">
+                    <div class="card my-4">
 
-                            <div class="col-4">
-                                <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-                                    <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
-                                        <h6 class="text-white text-capitalize ps-3"> 해당 학생의 결제 내역입니다.</h6>
-                                    </div>
+                        <div class="col-4">
+                            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                                <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+                                    <h6 class="text-white text-capitalize ps-3"> 해당 학생의 결제 내역입니다.</h6>
                                 </div>
                             </div>
+                        </div>
 
 
-                            <div class="card-body px-0 pb-2">
-                                <div class="table-responsive">
-                                    <table class="table align-items-center mb-0">
-                                        <thead>
+                        <div class="card-body px-0 pb-2">
+                            <div class="table-responsive">
+                                <table class="table align-items-center mb-0">
+                                    <thead>
 
-                                        <tr>
-                                            <th class="text-center text-uppercase  font-weight-bolder">
-                                                주문 상품 이름
-                                            </th>
-                                            <th class="text-center text-uppercase  font-weight-bolder">
-                                                할인 정책 이름
-                                            </th>
-                                            <th class="text-center text-uppercase  font-weight-bolder">
-                                                결제 금액
-                                            </th>
-                                            <th class="text-center text-uppercase  font-weight-bolder">
-                                                주문 번호
-                                            </th>
-                                            <th class="text-center text-uppercase  font-weight-bolder">
-                                                결제 일시
-                                            </th>
-                                            <th class="text-secondary opacity-7"></th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <div>
+                                    <tr>
+                                        <th class="text-center text-uppercase  font-weight-bolder">
+                                            주문 상품 이름
+                                        </th>
+                                        <th class="text-center text-uppercase  font-weight-bolder">
+                                            할인 정책 이름
+                                        </th>
+                                        <th class="text-center text-uppercase  font-weight-bolder">
+                                            결제 금액
+                                        </th>
+                                        <th class="text-center text-uppercase  font-weight-bolder">
+                                            주문 번호
+                                        </th>
+                                        <th class="text-center text-uppercase  font-weight-bolder">
+                                            결제 일시
+                                        </th>
+                                        <th class="text-secondary opacity-7"></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <div>
 
-                                            <tr th:each="payment : ${payments}">
+                                        <tr th:each="payment : ${payments}">
 
-                                                <th class="align-middle text-center">
+                                            <th class="align-middle text-center">
                                                 <span class=" text font-weight-bold" style="font-size: small"
                                                       th:text="${payment.orderName}"></span>
-                                                </th>
+                                            </th>
 
-                                                <th class="align-middle text-center">
+                                            <th class="align-middle text-center">
                                                 <span class=" text font-weight-bold" style="font-size: small"
                                                       th:text="${payment.discountName}"></span>
-                                                </th>
-                                                <th class="align-middle text-center">
+                                            </th>
+                                            <th class="align-middle text-center">
                                                 <span class=" text font-weight-bold" style="font-size: small"
                                                       th:text="${payment.amount}"></span>
-                                                </th>
-                                                <th class="align-middle text-center">
+                                            </th>
+                                            <th class="align-middle text-center">
                                                 <span class=" text font-weight-bold" style="font-size: small"
                                                       th:text="${payment.orderId}"></span>
-                                                </th>
-                                                <th class="align-middle text-center">
+                                            </th>
+                                            <th class="align-middle text-center">
                                                 <span class=" text font-weight-bold" style="font-size: small"
                                                       th:text="${payment.createdAt}"></span>
-                                                </th>
-                                            </tr>
-                                        </div>
-                                        </tbody>
-                                    </table>
-                                </div>
-
+                                            </th>
+                                        </tr>
+                                    </div>
+                                    </tbody>
+                                </table>
                             </div>
+
                         </div>
                     </div>
                 </div>
@@ -418,7 +416,7 @@
 
         },
 
-        delete: function (academyId,studentId,uniquenessId) {
+        delete: function (academyId, studentId, uniquenessId) {
 
             const con_check = confirm("삭제하시겠습니까?");
 
