@@ -233,7 +233,6 @@ public class EnrollmentService {
     /**
      * 결제 UI용 메서드
      */
-
     public Page<FindEnrollmentResponse> findEnrollmentForPay(Long academyId, String studentName,Pageable pageable) {
 
         // 학원과 학생 이름으로 student 객체를 찾아온다.
@@ -256,7 +255,6 @@ public class EnrollmentService {
      * 학생 상세 조회 페이지용 UI 메서드
      * 수강신청 내역중에 결제가 완료된 내역만 가져온다.
      */
-
     public Page<FindEnrollmentResponse> findEnrollmentByStudentId(Long academyId, Long studentId,Pageable pageable) {
 
         validateAcademy(academyId);
@@ -322,6 +320,4 @@ public class EnrollmentService {
         return enrollmentRepository.findByLecture(foundLecture).stream().map(enrollment -> new FindStudentInfoFromEnrollmentByLectureResponse(enrollment)).collect(Collectors.toList());
 
     }
-
-
 }
