@@ -181,7 +181,7 @@
 
                                             <th class="align-middle text-center">
                                                 <span class=" text font-weight-bold" style="font-size: small"
-                                                      th:text="${lecture.lectureDay} +' // ' + ${lecture.lectureTime}"></span>
+                                                      th:text="${lecture.lectureDay} +' | ' + ${lecture.lectureTime}"></span>
                                             </th>
                                             <th class="align-middle text-center">
                                                 <span class=" text font-weight-bold" style="font-size: small"
@@ -226,47 +226,100 @@
                         <input type="text" class="form-control" id="input-lecturePrice">
                     </div>
                     <div class="input-group input-group-static my-3">
-                        <label>강좌 요일 (ex. 월, 수)</label>
-                        <input type="text" class="form-control" id="input-lectureDay">
+                        <label>강좌 요일을 선택하세요.</label>
                     </div>
-                    <div class="input-group input-group-static my-3">
-                        <label>강좌 시작 시간</label>
-                        <input type="time" class="form-control" id="input-lectureStartTime">
+                    <div class="row">
+                        <div class="col-1">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="일" id="Sun" th:checked="false" name="lectureDay">
+                                <label class="custom-control-label" for="Sun">일</label>
+                            </div>
+                        </div>
+                        <div class="col-1">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="월" id="Mon" th:checked="false" name="lectureDay">
+                                <label class="custom-control-label" for="Mon">월</label>
+                            </div>
+                        </div>
+                        <div class="col-1">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="화" id="Tue" th:checked="false" name="lectureDay">
+                                <label class="custom-control-label" for="Tue">화</label>
+                            </div>
+                        </div>
+
+                        <div class="col-1">
+
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="수" id="Wed" th:checked="false" name="lectureDay">
+                                <label class="custom-control-label" for="Wed">수</label>
+                            </div>
+                        </div>
+
+                        <div class="col-1">
+
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="목" id="Thu" th:checked="false" name="lectureDay">
+                                <label class="custom-control-label" for="Thu">목</label>
+                            </div>
+                        </div>
+
+                        <div class="col-1">
+
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="금" id="Fri" th:checked="false" name="lectureDay">
+                                <label class="custom-control-label" for="Fri">금</label>
+                            </div>
+                        </div>
+
+                        <div class="col-1">
+
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="토" id="Sat" th:checked="false" name="lectureDay">
+                                <label class="custom-control-label" for="Sat">토</label>
+                            </div>
+                        </div>
                     </div>
-                    <div class="input-group input-group-static my-3">
-                        <label>강좌 종료 시간</label>
-                        <input type="time" class="form-control" id="input-lectureEndTime">
-                    </div>
-                    <div class="input-group input-group-static my-3">
-                        <label>강좌 시작일 </label>
-                        <input type="date" class="form-control" id="input-lectureStartDate">
-                    </div>
-                    <div class="input-group input-group-static my-3">
-                        <label>강좌 종료일</label>
-                        <input type="date" class="form-control" id="input-lectureEndDate">
-                    </div>
-                    <div class="input-group input-group-outline mb-3">
-                        <label class="form-label">최소 수강정원</label>
-                        <input type="text" class="form-control" id="input-minimumCapacity">
-                    </div>
-                    <div class="input-group input-group-outline mb-3">
-                        <label class="form-label">최대 수강정원</label>
-                        <input type="email" class="form-control" id="input-maximumCapacity">
-                    </div>
-                    <!--                    <button th:data-parameter1="${academyId}"  th:data-parameter2="${employeeId}"-->
-                    <!--                            th:onclick="|register.registerLecture(this.getAttribute('data-parameter1'),this.getAttribute('data-parameter2'))|" type="button"-->
-                    <div class="text-center">
-                        <button
-                                th:onclick="|register.registerLecture(${academyId},${teacherEmployeeId})|" type="button"
-                                class="btn btn-lg bg-gradient-primary btn-lg w-100 mt-4 mb-0">강좌 등록
-                        </button>
-                    </div>
+
                 </div>
-                <br>
+                <div class="input-group input-group-static my-3">
+                    <label>강좌 시작 시간</label>
+                    <input type="time" class="form-control" id="input-lectureStartTime">
+                </div>
+                <div class="input-group input-group-static my-3">
+                    <label>강좌 종료 시간</label>
+                    <input type="time" class="form-control" id="input-lectureEndTime">
+                </div>
+                <div class="input-group input-group-static my-3">
+                    <label>강좌 시작일 </label>
+                    <input type="date" class="form-control" id="input-lectureStartDate">
+                </div>
+                <div class="input-group input-group-static my-3">
+                    <label>강좌 종료일</label>
+                    <input type="date" class="form-control" id="input-lectureEndDate">
+                </div>
+                <div class="input-group input-group-outline mb-3">
+                    <label class="form-label">최소 수강정원</label>
+                    <input type="text" class="form-control" id="input-minimumCapacity">
+                </div>
+                <div class="input-group input-group-outline mb-3">
+                    <label class="form-label">최대 수강정원</label>
+                    <input type="email" class="form-control" id="input-maximumCapacity">
+                </div>
+                <!--                    <button th:data-parameter1="${academyId}"  th:data-parameter2="${employeeId}"-->
+                <!--                            th:onclick="|register.registerLecture(this.getAttribute('data-parameter1'),this.getAttribute('data-parameter2'))|" type="button"-->
+                <div class="text-center">
+                    <button
+                            th:onclick="|register.registerLecture(${academyId},${teacherEmployeeId})|" type="button"
+                            class="btn btn-lg bg-gradient-primary btn-lg w-100 mt-4 mb-0">강좌 등록
+                    </button>
+                </div>
             </div>
-            <div class="col-1">
-            </div>
+            <br>
         </div>
+        <div class="col-1">
+        </div>
+    </div>
     </div>
     <!--footer-->
     <th:block th:replace="layout/footer :: footerFragment"></th:block>
@@ -289,10 +342,22 @@
 
         registerLecture: function (academyId, teacherEmployeeId) {
 
+            const query = 'input[name="lectureDay"]:checked';
+            const selectedEls =
+                document.querySelectorAll(query);
+            let result = '';
+            selectedEls.forEach((el) => {
+                result += el.value + ', ';
+            });
+            let day = result.substring(0, result.length-2);
+
+            console.log(result);
+            console.log(day);
+
             let data = {
                 lectureName: document.querySelector('#input-lectureName').value.trim(),
                 lecturePrice: document.querySelector('#input-lecturePrice').value.trim(),
-                lectureDay: document.querySelector('#input-lectureDay').value.trim(),
+                lectureDay: day,
                 lectureTime: document.querySelector('#input-lectureStartTime').value + " ~ " + document.querySelector('#input-lectureEndTime').value,
                 startDate: document.querySelector('#input-lectureStartDate').value.trim(),
                 finishDate: document.querySelector('#input-lectureEndDate').value.trim(),
