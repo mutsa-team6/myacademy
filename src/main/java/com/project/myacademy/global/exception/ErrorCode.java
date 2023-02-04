@@ -63,6 +63,7 @@ public enum ErrorCode {
     FILE_SIZE_EXCEED(HttpStatus.BAD_REQUEST, "파일 업로드 용량을 초과했습니다."),
     WRONG_FILE_FORMAT(HttpStatus.BAD_REQUEST, "잘못된 형식의 파일입니다"),
     SAME_PASSWORD(HttpStatus.BAD_REQUEST, "기존 비밀번호와 동일한 비밀번호로는 변경 할 수 없습니다."),
+    CANNOT_REGISTER_WAITINGLIST(HttpStatus.BAD_REQUEST, "아직 수강 정원이 다 차지 않아 수강 등록으로 진행해야 합니다."),
 
 
     BLANK_NOT_ALLOWED(HttpStatus.FORBIDDEN,"NULL 값은 허용되지 않습니다."),

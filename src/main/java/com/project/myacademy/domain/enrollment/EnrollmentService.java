@@ -9,7 +9,6 @@ import com.project.myacademy.domain.lecture.Lecture;
 import com.project.myacademy.domain.lecture.LectureRepository;
 import com.project.myacademy.domain.student.Student;
 import com.project.myacademy.domain.student.StudentRepository;
-import com.project.myacademy.domain.waitinglist.Waitinglist;
 import com.project.myacademy.domain.waitinglist.WaitinglistRepository;
 import com.project.myacademy.global.exception.AppException;
 import com.project.myacademy.global.exception.ErrorCode;
@@ -78,7 +77,6 @@ public class EnrollmentService {
         }
         // 그렇지 않으면 수강정원 초과 에러처리
         else {
-//            waitinglistRepository.saveAndFlush(Waitinglist.makeWaitinglist(lecture, student));
             throw new AppException(ErrorCode.OVER_REGISTRATION_NUMBER);
         }
 
