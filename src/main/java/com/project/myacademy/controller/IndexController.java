@@ -3,6 +3,8 @@ package com.project.myacademy.controller;
 import com.project.myacademy.domain.academy.Academy;
 import com.project.myacademy.domain.academy.AcademyService;
 import com.project.myacademy.domain.academy.dto.FindAcademyResponse;
+import com.project.myacademy.domain.announcement.AnnouncementService;
+import com.project.myacademy.domain.announcement.dto.ReadAnnouncementResponse;
 import com.project.myacademy.domain.employee.EmployeeRole;
 import com.project.myacademy.domain.employee.EmployeeService;
 import com.project.myacademy.domain.employee.dto.ReadEmployeeResponse;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
 @Controller
 @Slf4j
@@ -26,6 +29,7 @@ public class IndexController {
 
     private final EmployeeService employeeService;
     private final AcademyService academyService;
+    private final AnnouncementService announcementService;
 
     @GetMapping("/academy/main")
     public String main(HttpServletRequest request, Model model, Authentication authentication) {
@@ -39,10 +43,13 @@ public class IndexController {
         ReadEmployeeResponse employee = employeeService.readEmployee(academyId, requestAccount);
         SessionUtil.setSessionNameAndRole(request,employee);
 
-
+        List<ReadAnnouncementResponse> announcements = announcementService.readAnnouncementForMain(academyId, requestAccount);
+        List<ReadAnnouncementResponse> admissions = announcementService.readAdmissionForMain(academyId, requestAccount);
 
 
         FindAcademyResponse academy = academyService.findAcademyById(academyId);
+        model.addAttribute("announcements", announcements);
+        model.addAttribute("admissions", admissions);
         model.addAttribute("academy", academy);
         model.addAttribute("account", requestAccount);
 

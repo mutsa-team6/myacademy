@@ -15,6 +15,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -49,7 +52,7 @@ public class AnnouncementService {
             throw new AppException(ErrorCode.INVALID_PERMISSION);
         }
 
-        Announcement savedAnnouncement = announcementRepository.save(Announcement.toAnnouncement(request, academy));
+        Announcement savedAnnouncement = announcementRepository.save(Announcement.toAnnouncement(request, academy,employee.getName()));
 
         return CreateAnnouncementResponse.of(savedAnnouncement);
     }
@@ -158,6 +161,33 @@ public class AnnouncementService {
         announcementRepository.delete(announcement);
 
         return DeleteAnnouncementResponse.of(announcement);
+    }
+
+    /**
+     * 메인에 공지사항 5개 보여주기 위한 메서드
+     */
+
+    public List<ReadAnnouncementResponse> readAnnouncementForMain(Long academyId, String account){
+        //academyId 존재 유무 확인
+        Academy academy = validateAcademy(academyId);
+        //account 유효검사
+        Employee employee = validateAcademyEmployee(account, academy);
+
+        return announcementRepository.findTop5ByTypeOrderByCreatedAtDesc(AnnouncementType.ANNOUNCEMENT).stream().map(announcement ->
+                ReadAnnouncementResponse.of(announcement)).collect(Collectors.toList());
+    }
+    /**
+     * 메인에 입시정보 5개 보여주기 위한 메서드
+     */
+
+    public List<ReadAnnouncementResponse> readAdmissionForMain(Long academyId, String account){
+        //academyId 존재 유무 확인
+        Academy academy = validateAcademy(academyId);
+        //account 유효검사
+        Employee employee = validateAcademyEmployee(account, academy);
+
+        return announcementRepository.findTop5ByTypeOrderByCreatedAtDesc(AnnouncementType.ADMISSION).stream().map(announcement ->
+                ReadAnnouncementResponse.of(announcement)).collect(Collectors.toList());
     }
 
     private Academy validateAcademy(Long academyId) {

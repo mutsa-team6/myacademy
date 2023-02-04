@@ -58,26 +58,32 @@
                             <table class="table align-items-center mb-0">
                                 <thead>
                                 <tr>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                        제목
+                                    <th class="text-center text-uppercase  font-weight-bolder" style="color: #5A2082;">
+
+                                    제목
                                     </th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                        작성자
+                                    <th class="text-center text-uppercase  font-weight-bolder" style="color: #5A2082;">
+
+                                    작성자
                                     </th>
-                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                        작성 날짜
+                                    <th class="text-center text-uppercase  font-weight-bolder" style="color: #5A2082;">
+
+                                    작성 날짜
                                     </th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 <tr th:each="announcement : ${announcements}">
                                     <th class="align-middle text-center">
+                                        <a th:href="@{/academy/announcements/detail(announcementsNum=${announcement.id})}">
+
                                                 <span class=" text-xs font-weight-bold"
                                                       th:text="${announcement.title}"></span>
+                                            </a>
                                     </th>
                                     <td class="align-middle text-center">
                                                 <span class=" text-xs font-weight-bold"
-                                                      th:text="${announcement.writer}"></span>
+                                                      th:text="${announcement.author}"></span>
                                     </td>
                                     <td class="align-middle text-center">
                                                 <span class=" text-xs font-weight-bold"
@@ -100,7 +106,7 @@
                             </div>
                             <div class="col-lg-6 col-5 my-auto text-end">
                                 <div class="dropdown float-lg-end pe-4">
-                                    <a th:href="@{/announcements}"
+                                    <a th:href="@{/academy/announcements}"
                                        class="text-info text-xs text-gradient font-weight-bold opacity-5">전체 보기</a>
                                 </div>
                             </div>
@@ -111,30 +117,36 @@
                             <table class="table align-items-center mb-0">
                                 <thead>
                                 <tr>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                        제목
+                                    <th class="text-center text-uppercase  font-weight-bolder" style="color: #5A2082;">
+
+                                    제목
                                     </th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                        작성자
+                                    <th class="text-center text-uppercase  font-weight-bolder" style="color: #5A2082;">
+
+                                    작성자
                                     </th>
-                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                        작성 날짜
+                                    <th class="text-center text-uppercase  font-weight-bolder" style="color: #5A2082;">
+
+                                    작성 날짜
                                     </th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr th:each="announcement : ${announcements}">
+                                <tr th:each="admission : ${admissions}">
                                     <th class="align-middle text-center">
+                                        <a th:href="@{/academy/announcements/detail(announcementsNum=${admission.id})}">
+
                                                 <span class=" text-xs font-weight-bold"
-                                                      th:text="${announcement.title}"></span>
+                                                      th:text="${admission.title}"></span>
+                                        </a>
                                     </th>
                                     <td class="align-middle text-center">
                                                 <span class=" text-xs font-weight-bold"
-                                                      th:text="${announcement.writer}"></span>
+                                                      th:text="${admission.author}"></span>
                                     </td>
                                     <td class="align-middle text-center">
                                                 <span class=" text-xs font-weight-bold"
-                                                      th:text="${announcement.createdAt}"></span>
+                                                      th:text="${admission.createdAt}"></span>
                                     </td>
 
                                 </tr>

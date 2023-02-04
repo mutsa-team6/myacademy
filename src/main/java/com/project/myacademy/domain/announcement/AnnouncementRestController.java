@@ -28,7 +28,7 @@ public class AnnouncementRestController {
      */
     @Operation(summary = "공지사항 작성", description = "ADMIN,STAFF 회원만 작성이 가능합니다. \n\n TYPE 종류, 1. 일반 공지사항 = ANNOUNCEMENT, 2. 입시 정보 = ADMISSION")
     @PostMapping("/{academyId}/announcements")
-    public ResponseEntity<Response<CreateAnnouncementResponse>> create(@PathVariable Long academyId, CreateAnnouncementRequest request, Authentication authentication) {
+    public ResponseEntity<Response<CreateAnnouncementResponse>> create(@PathVariable Long academyId, @RequestBody CreateAnnouncementRequest request, Authentication authentication) {
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
         CreateAnnouncementResponse response = announcementService.createAnnouncement(academyId, requestAccount, request);
         return ResponseEntity.ok().body(Response.success(response));
@@ -74,7 +74,7 @@ public class AnnouncementRestController {
      */
     @Operation(summary = "공지사항 수정", description = "ADMIN,STAFF 회원만 수정이 가능합니다.")
     @PutMapping("/{academyId}/announcements/{announcementId}")
-    public ResponseEntity<Response<UpdateAnnouncementResponse>> update(@PathVariable Long academyId, @PathVariable Long announcementId, UpdateAnnouncementRequest request, Authentication authentication) {
+    public ResponseEntity<Response<UpdateAnnouncementResponse>> update(@PathVariable Long academyId, @PathVariable Long announcementId,@RequestBody UpdateAnnouncementRequest request, Authentication authentication) {
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
         UpdateAnnouncementResponse response = announcementService.updateAnnouncement(academyId, announcementId, request, requestAccount);
         return ResponseEntity.ok().body(Response.success(response));
