@@ -5,6 +5,7 @@ import com.project.myacademy.domain.academy.AcademyRepository;
 import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.domain.employee.EmployeeRepository;
 import com.project.myacademy.domain.enrollment.EnrollmentRepository;
+import com.project.myacademy.domain.enrollment.dto.FindStudentInfoFromEnrollmentByLectureResponse;
 import com.project.myacademy.domain.lecture.Lecture;
 import com.project.myacademy.domain.lecture.LectureRepository;
 import com.project.myacademy.domain.student.Student;
@@ -20,6 +21,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -77,6 +81,22 @@ public class WaitinglistService {
         Waitinglist savedWaitinglist = waitinglistRepository.saveAndFlush(Waitinglist.makeWaitinglist(lecture, student));
 
         return CreateWaitinglistResponse.of(savedWaitinglist.getId());
+    }
+
+    public List<FindStudentInfoFromEnrollmentByLectureResponse> findWaitingStudentByLecture(Long academyId, Long lectureId,String requestAccount) {
+        Academy academy = validateAcademy(academyId);
+        Employee employee = validateAcademyEmployee(requestAccount, academy);
+        Lecture foundLecture = validateLecture(lectureId);
+
+        List<FindStudentInfoFromEnrollmentByLectureResponse> waitingStudents = waitinglistRepository.findByLectureOrderByCreatedAtAsc(foundLecture)
+                .stream().map(waitinglist -> new FindStudentInfoFromEnrollmentByLectureResponse(waitinglist.getStudent(),waitinglist.getId(),waitinglist.getLecture().getId())).collect(Collectors.toList());
+        Long num = 1L;
+        for (FindStudentInfoFromEnrollmentByLectureResponse waitingStudent : waitingStudents) {
+            waitingStudent.setWaitingNum(num++);
+        }
+
+        return waitingStudents;
+
     }
 
     public Long countWaitingListByLecture(Long academyId, Long lectureId,String requestAccount) {

@@ -5,6 +5,7 @@ import com.project.myacademy.domain.academy.dto.FindAcademyResponse;
 import com.project.myacademy.domain.academy.dto.ReadAcademyResponse;
 import com.project.myacademy.domain.employee.EmployeeService;
 import com.project.myacademy.domain.employee.dto.ReadEmployeeResponse;
+import com.project.myacademy.domain.enrollment.EnrollmentService;
 import com.project.myacademy.domain.lecture.LectureService;
 import com.project.myacademy.domain.lecture.dto.ReadAllLectureResponse;
 import com.project.myacademy.domain.student.StudentService;
@@ -36,6 +37,8 @@ public class EnrollmentController {
     private final WaitinglistService waitinglistService;
     private final AcademyService academyService;
     private final EmployeeService employeeService;
+
+    private final EnrollmentService enrollmentService;
 
     @GetMapping("/academy/enrollment")
     public String studentListForEnrollment(@RequestParam(required = false) String studentName, HttpServletRequest request, Model model, Pageable pageable, Authentication authentication) {
@@ -84,6 +87,8 @@ public class EnrollmentController {
         Page<ReadAllLectureResponse> lectures = lectureService.readAllLecturesForEnrollment(academyId, requestAccount, pageable);
         for (ReadAllLectureResponse lecture : lectures) {
             lecture.setWaitingNum(waitinglistService.countWaitingListByLecture(academyId, lecture.getLectureId(), requestAccount));
+            lecture.setRegisteredStudent(enrollmentService.findAllStudentInfoFromEnrollmentByLecture(academyId, requestAccount, lecture.getLectureId()));
+            lecture.setWaitingStduent(waitinglistService.findWaitingStudentByLecture(academyId, lecture.getLectureId(), requestAccount));
         }
         FindAcademyResponse academy = academyService.findAcademyById(academyId);
         model.addAttribute("academy", academy);
