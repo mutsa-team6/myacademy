@@ -349,7 +349,7 @@
                                                         </tr>
                                                         </thead>
                                                         <tbody>
-                                                        <tr th:each="student : ${lecture.waitingStduent}">
+                                                        <tr th:each="student : ${lecture.getWaitingStudent}">
                                                             <td class="align-middle text-center">
                                                 <span class=" text-xs font-weight-bold"
                                                       th:text="${student.waitingNum}"></span>

@@ -2,7 +2,6 @@ package com.project.myacademy.domain.lecture.dto;
 
 import com.project.myacademy.domain.enrollment.dto.FindStudentInfoFromEnrollmentByLectureResponse;
 import com.project.myacademy.domain.lecture.Lecture;
-import com.project.myacademy.domain.student.dto.ReadStudentResponse;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -26,9 +25,10 @@ public class ReadAllLectureResponse {
     private LocalDate startDate;
     private LocalDate finishDate;
     private Integer currentEnrollmentNumber;
+    private long CompletePaymentNumber;
     private Long waitingNum;
     private List<FindStudentInfoFromEnrollmentByLectureResponse> registeredStudent = new ArrayList<>();
-    private List<FindStudentInfoFromEnrollmentByLectureResponse> waitingStduent = new ArrayList<>();
+    private List<FindStudentInfoFromEnrollmentByLectureResponse> waitingStudent = new ArrayList<>();
 
     public static ReadAllLectureResponse of(Lecture lecture) {
         return ReadAllLectureResponse.builder()

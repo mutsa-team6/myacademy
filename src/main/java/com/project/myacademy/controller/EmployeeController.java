@@ -90,6 +90,10 @@ public class EmployeeController {
         Page<ReadAllLectureResponse> lectures = null;
         if (!employee.getEmployeeRole().equals(EmployeeRole.ROLE_STAFF)) {
             lectures = lectureService.readAllLecturesByTeacherId(academyId, requestAccount, employee.getId(), pageable);
+            lectures.stream().forEach(readAllLectureResponse ->
+                    readAllLectureResponse
+                            .setCompletePaymentNumber(enrollmentService
+                                    .findStudentInfoFromEnrollmentByLecture(academyId,requestAccount,readAllLectureResponse.getLectureId(),pageable).getTotalElements()));
         }
         FindAcademyResponse academy = academyService.findAcademyById(academyId);
         model.addAttribute("academy", academy);

@@ -2,7 +2,6 @@ package com.project.myacademy.controller;
 
 import com.project.myacademy.domain.academy.AcademyService;
 import com.project.myacademy.domain.academy.dto.FindAcademyResponse;
-import com.project.myacademy.domain.academy.dto.ReadAcademyResponse;
 import com.project.myacademy.domain.employee.EmployeeService;
 import com.project.myacademy.domain.employee.dto.ReadEmployeeResponse;
 import com.project.myacademy.domain.enrollment.EnrollmentService;
@@ -25,7 +24,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 @Controller
 @Slf4j
@@ -88,7 +86,7 @@ public class EnrollmentController {
         for (ReadAllLectureResponse lecture : lectures) {
             lecture.setWaitingNum(waitinglistService.countWaitingListByLecture(academyId, lecture.getLectureId(), requestAccount));
             lecture.setRegisteredStudent(enrollmentService.findAllStudentInfoFromEnrollmentByLecture(academyId, requestAccount, lecture.getLectureId()));
-            lecture.setWaitingStduent(waitinglistService.findWaitingStudentByLecture(academyId, lecture.getLectureId(), requestAccount));
+            lecture.setWaitingStudent(waitinglistService.findWaitingStudentByLecture(academyId, lecture.getLectureId(), requestAccount));
         }
         FindAcademyResponse academy = academyService.findAcademyById(academyId);
         model.addAttribute("academy", academy);
