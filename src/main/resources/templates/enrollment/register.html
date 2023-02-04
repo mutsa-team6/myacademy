@@ -36,7 +36,7 @@
 
     <div class="container">
         <div class="row">
-            <div class="col-10">
+            <div class="col-12">
                 <div class="row">
                     <div class="row">
                         <div class="card my-4">
@@ -146,6 +146,10 @@
                                         </th>
                                         <th class="text-center text-uppercase  font-weight-bolder"
                                             style="color: #5A2082;font-size: small">
+                                            강사 이름
+                                        </th>
+                                        <th class="text-center text-uppercase  font-weight-bolder"
+                                            style="color: #5A2082;font-size: small">
                                             강의 시간
                                         </th>
                                         <th class="text-center text-uppercase  font-weight-bolder "
@@ -181,6 +185,10 @@
                                                 <span class=" text font-weight-bold" style="font-size: small"
                                                       th:text="${lecture.lectureName}"></span>
                                             </th>
+                                            <th class="align-middle text-center">
+                                                <span class=" text font-weight-bold" style="font-size: small"
+                                                      th:text="${lecture.teacherName}"></span>
+                                            </th>
 
                                             <th class="align-middle text-center">
                                                 <span class=" text font-weight-bold" style="font-size: small"
@@ -195,17 +203,29 @@
                                                       th:text="${lecture.finishDate}"></span>
                                             </th>
                                             <th class="align-middle text-center">
-                                                <span class=" text font-weight-bold" style="font-size: small"
-                                                      th:text="${lecture.currentEnrollmentNumber}"></span>
+
+                                                <button type="button"
+                                                        data-bs-toggle="modal"
+                                                        th:attr="data-bs-target='#registerList'+${lecture.lectureId}"
+                                                        class="btn btn-lg bg-gradient-primary btn-sm w-110  mb-0"
+                                                        th:text="${lecture.currentEnrollmentNumber}">
+                                                </button>
                                             </th>
+
                                             <th class="align-middle text-center">
                                                 <span class=" text font-weight-bold" style="font-size: small"
                                                       th:text="${lecture.maximumCapacity}"></span>
                                             </th>
                                             <th class="align-middle text-center">
-                                                <span class=" text font-weight-bold" style="font-size: small"
-                                                      th:text="${lecture.waitingNum}"></span>
+
+                                                <button type="button"
+                                                        data-bs-toggle="modal"
+                                                        th:attr="data-bs-target='#waitingList'+${lecture.lectureId}"
+                                                        class="btn btn-lg bg-gradient-secondary btn-sm w-110  mb-0"
+                                                        th:text="${lecture.waitingNum}">
+                                                </button>
                                             </th>
+
                                             <th:block
                                                     th:if="${lecture.currentEnrollmentNumber <lecture.maximumCapacity}">
                                                 <th class="align-middle text-center">
@@ -228,23 +248,155 @@
                                                             th:onclick="|register.registerWaiting(this.getAttribute('data-parameter1'),this.getAttribute('data-parameter2'),this.getAttribute('data-parameter3'))|"
                                                             type="button"
                                                             class="btn btn-lg bg-gradient-secondary btn-lg w-100  mb-0">
-                                                        강좌
-                                                        대기
+                                                        대기 신청
                                                     </button>
                                                 </th>
                                             </th:block>
+
+
                                         </tr>
                                     </div>
                                     </tbody>
                                 </table>
                             </div>
 
+                            <!-- Modal -->
+                            <div th:each="lecture : ${lectures}">
+                                <div class="modal fade" th:id="'registerList'+${lecture.lectureId}"
+                                     tabindex="-1"
+                                     aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+
+                                                <h6 th:text="|${lecture.teacherName} 선생님의 ${lecture.lectureName} 강의의 수강 신청자 |"></h6>
+
+                                                <div class="row"></div>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="table">
+                                                    <table class="table align-items-center mb-0">
+                                                        <thead>
+                                                        <tr>
+                                                            <th class="text-center text-uppercase  font-weight-bolder">
+                                                                학생 이름
+                                                            </th>
+                                                            <th class="text-center text-uppercase  font-weight-bolder ">
+                                                                학생 전화번호
+                                                            </th>
+                                                            <th class="text-center text-uppercase font-weight-bolder ">
+                                                                결제 여부
+                                                            </th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        <tr th:each="student : ${lecture.registeredStudent}">
+                                                            <th class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${student.studentName}"></span>
+                                                            </th>
+                                                            <td class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${student.studentPhoneNum}"></span>
+                                                            </td>
+                                                            <td class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${student.paymentYn}"></span>
+                                                            </td>
+                                                        </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+
+                                            <div class="modal-footer mx-auto">
+                                                <button type="button" class="btn btn-secondary"
+                                                        data-bs-dismiss="modal">닫기
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Modal -->
+                            <div th:each="lecture : ${lectures}">
+                                <div class="modal fade" th:id="'waitingList'+${lecture.lectureId}"
+                                     tabindex="-1"
+                                     aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+
+                                                <h6 th:text="|${lecture.teacherName} 선생님의 ${lecture.lectureName} 강의의 대기 신청자 |"></h6>
+
+                                                <div class="row"></div>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="table">
+                                                    <table class="table align-items-center mb-0">
+                                                        <thead>
+                                                        <tr>
+                                                            <th class="text-center text-uppercase  font-weight-bolder">
+                                                                대기번호 순서
+                                                            </th>
+                                                            <th class="text-center text-uppercase  font-weight-bolder">
+                                                                학생 이름
+                                                            </th>
+                                                            <th class="text-center text-uppercase  font-weight-bolder ">
+                                                                학생 전화번호
+                                                            </th>
+
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        <tr th:each="student : ${lecture.getWaitingStudent}">
+                                                            <td class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${student.waitingNum}"></span>
+                                                            </td>
+                                                            <th class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${student.studentName}"></span>
+                                                            </th>
+                                                            <td class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${student.studentPhoneNum}"></span>
+                                                            </td>
+                                                            <td class="align-middle">
+
+                                                                <a href="javascript:;"
+                                                                   th:onclick="|register.deleteWaiting(${academyId},${student.studentId},${student.lectureId},${student.waitingId})|"
+                                                                   type="button"
+                                                                   class="text-danger font-weight-bold text-xs"
+                                                                   data-toggle="tooltip"
+                                                                   data-original-title="delete-academy">
+                                                                    delete
+                                                                </a>
+                                                            </td>
+
+                                                        </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+
+                                            <div class="modal-footer mx-auto">
+                                                <button type="button" class="btn btn-secondary"
+                                                        data-bs-dismiss="modal">닫기
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+
     <!--footer-->
     <th:block th:replace="layout/footer :: footerFragment"></th:block>
 </main>
@@ -280,7 +432,7 @@
             }).catch((error) => {
                 if (error.response.data.result["errorCode"] == "INVALID_PERMISSION") {
                     alert("강사는 접근할 수 없습니다.");
-                }else if (error.response.data.result["errorCode"] == "DUPLICATED_ENROLLMENT") {
+                } else if (error.response.data.result["errorCode"] == "DUPLICATED_ENROLLMENT") {
                     alert("해당 학생은 해당 강의를 이미 수강 신청한 상태입니다.");
                 }
             });
@@ -303,11 +455,30 @@
             }).catch((error) => {
                 if (error.response.data.result["errorCode"] == "INVALID_PERMISSION") {
                     alert("강사는 접근할 수 없습니다.");
-                }else if (error.response.data.result["errorCode"] == "DUPLICATED_WAITINGLIST") {
+                } else if (error.response.data.result["errorCode"] == "DUPLICATED_WAITINGLIST") {
                     alert("해당 학생은 해당 강의를 이미 대기 신청한 상태입니다.");
                 }
             });
 
+        },
+
+        deleteWaiting: function (academyId, studentId, lectureId, waitinglistId) {
+
+            const con_check = confirm("대기 취소하시겠습니까?");
+
+            if (con_check === true) {
+                axios.delete("/api/v1/academies/" + academyId + "/students/" + studentId + "/lectures/" + lectureId + "/waitinglists/" + waitinglistId,
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    }
+                ).then((response) => {
+                    alert("대기 취소 성공");
+                    window.location.reload();
+                }).catch((error) => {
+                });
+            }
         }
     };
 

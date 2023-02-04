@@ -29,7 +29,7 @@ public class UniquenessRestController {
     @Operation(summary = "학생 특이사항 등록", description = "ADMIN,STAFF 회원만 등록이 가능합니다.")
     @PostMapping("/{academyId}/students/{studentId}/uniqueness")
     public ResponseEntity<Response<CreateUniquenessResponse>> create(@PathVariable Long academyId,
-                                                                     @PathVariable Long studentId, CreateUniquenessRequest request, Authentication authentication) {
+                                                                     @PathVariable Long studentId, @RequestBody CreateUniquenessRequest request, Authentication authentication) {
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
         CreateUniquenessResponse response = uniquenessService.createUniqueness(academyId, studentId, request, requestAccount);
         return ResponseEntity.ok().body(Response.success(response));

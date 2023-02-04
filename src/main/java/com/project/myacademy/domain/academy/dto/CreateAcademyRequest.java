@@ -16,5 +16,4 @@ public class CreateAcademyRequest {
     private String phoneNum;
     private String owner;
     private String businessRegistrationNumber;
-
 }

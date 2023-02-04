@@ -18,9 +18,12 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
 
     List<Enrollment> findByStudentOrderByCreatedAtDesc(Student student);
 
-    Optional<Enrollment> findByStudentId(Long studentId);
+    Page<Enrollment> findByStudentAndPaymentYNIsTrue(Student student, Pageable pageable);
 
     Page<Enrollment> findAllByAcademyIdAndPaymentYNIsFalseOrderByCreatedAtDesc(Long academyId, Pageable pageable);
 
     Optional<Enrollment> findByLecture_IdAndStudent_Id(Long lectureId, Long studentId);
+
+    Page<Enrollment> findByLectureAndPaymentYNIsTrue(Lecture lecture, Pageable pageable);
+    List<Enrollment> findByLecture(Lecture lecture);
 }

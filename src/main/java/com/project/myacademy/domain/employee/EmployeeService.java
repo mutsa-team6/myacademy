@@ -17,6 +17,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.project.myacademy.domain.employee.QEmployee.employee;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -222,7 +224,7 @@ public class EmployeeService {
      * 임시 비밀번호를 요청된 이메일로 전송
      */
     @Transactional
-    public ChangePasswordEmployeeResponse changePasswordEmployee(ChangePasswordEmployeeRequest request) {
+    public FindPasswordEmployeeResponse findPasswordEmployee(FindPasswordEmployeeRequest request) {
 
         String account = request.getAccount();
         String name = request.getName();
@@ -246,22 +248,50 @@ public class EmployeeService {
 
         emailUtil.sendEmail(email, title, body);
 
-        return new ChangePasswordEmployeeResponse(
+        return new FindPasswordEmployeeResponse(
                 changedEmployee.getId(),
                 changedEmployee.getName(),
                 changedEmployee.getAccount(),
                 changedEmployee.getEmail()
         );
-
     }
 
     /**
-     * ADMIN 혹은 STAFF 계정은 ADMIN을 제외한 다른 계정을 삭제할 수 있다.
+     * oldPassword, newPassword를 입력받아 기존 비밀번호로 한번 더 확인하고 새로운 비밀 번호로 변경해주는 기능
+     * @param request 기존, 새로운 비밀번호가 담긴 request
+     * @param academyId 학원 id
+     * @param account jwt에 담긴 직원 account
+     */
+    @Transactional
+    public ChangePasswordEmployeeResponse changePasswordEmployee(ChangePasswordEmployeeRequest request, Long academyId, String account) {
+        //academyId 존재 유무 확인
+        Academy academy = validateAcademy(academyId);
+        //account 유효검사
+        Employee employee = validateRequestEmployee(account, academy);
+
+        //request에 담긴 기존 패스워드가 employee에 저장되어있는 패스워드와 다르면 에러발생
+        if(!bCryptPasswordEncoder.matches(request.getOldPassword(),employee.getPassword())) {
+            throw new AppException(ErrorCode.INVALID_PASSWORD);
+        }
+
+        // 새로운 패스워드와 기존 패스워드와 같으면 에러발생
+        if(request.getNewPassword().equals(request.getOldPassword())) {
+            throw new AppException(ErrorCode.SAME_PASSWORD);
+        }
+
+        String encodedNewPassword = bCryptPasswordEncoder.encode(request.getNewPassword());
+
+        employee.updatePasswordOnly(encodedNewPassword);
+
+        return new ChangePasswordEmployeeResponse(employee.getAccount(), "%n 님의 비밀번호 변경을 성공했습니다.");
+    }
+
+    /**
+     * ADMIN 계정은 ADMIN을 제외한 다른 계정을 삭제할 수 있다.
      * 접근하려는 학원이 존재하지 않는 경우 에러 처리
      * 삭제를 요청한 계정이 해당 학원에 존재하지 않는 경우 에러 처리
      * 삭제해버릴 계정이 해당 학원에 존재하지 않는 경우 에러 처리
-     * 자기 자신을 삭제 요청할 시, 에러 처리 ( 본인 탈퇴 기능은 따로 구현 )
-     * ADMIN 계정을 삭제하려고 할 시, 에러 처리
+     * 자기 자신을 삭제 요청할 시, 에러 처리 ( ADMIN 삭제 불가 )
      * USER 가 삭제하려고하는 경우는 security로 에러 처리
      *
      * @param requestAccount 삭제 요청한 직원 계정
@@ -280,6 +310,11 @@ public class EmployeeService {
         // 삭제하려는 계정이 해당 학원에 존재하지 않으면 에러 처리
         Employee foundEmployee = validateEmployee(employeeId, foundAcademy);
 
+        //request요청자 권한이 ADMIN 아니면 에러처리
+        if(!requestEmployee.getEmployeeRole().equals(EmployeeRole.ROLE_ADMIN)) {
+            throw new AppException(ErrorCode.INVALID_PERMISSION);
+        }
+
 
         // 삭제하려는 계정이 자기 자신인 경우 에러 처리
         if (foundEmployee.getAccount().equals(requestAccount)) {
@@ -288,11 +323,6 @@ public class EmployeeService {
 
         EmployeeRole foundEmployeeRole = foundEmployee.getEmployeeRole();
         log.info(" ❌ 삭제가 될 사용자 계정 [{}] || 삭제가 될 사용자 등급 [{}]", foundEmployee.getAccount(), foundEmployeeRole);
-
-        // 삭제하려는 계정이 ADMIN 인 경우 에러처리
-        if (foundEmployeeRole.equals(EmployeeRole.ROLE_ADMIN)) {
-            throw new AppException(ErrorCode.NOT_ALLOWED_CHANGE);
-        }
 
         employeeRepository.delete(foundEmployee);
 
@@ -339,17 +369,20 @@ public class EmployeeService {
      * @param pageable
      * @return 모든 회원 목록 반환
      */
-    public Page<ReadEmployeeResponse> readAllEmployees(String requestAccount, Long academyId, Pageable pageable) {
+    public Page<ReadAllEmployeeResponse> readAllEmployees(String requestAccount, Long academyId, Pageable pageable) {
 
         //학원이 존재하지 않는 경우
         Academy foundAcademy = validateAcademy(academyId);
 
-
         // 조회를 요청한 회원이 해당 학원에 존재하지 않는 경우 에러 처리
-        validateRequestEmployee(requestAccount, foundAcademy);
+        Employee employeeAdmin = validateRequestEmployee(requestAccount, foundAcademy);
 
+        // 조회를 요청한 회원의 권한이 admin이 아닐경우 권한에러 처리
+        if (!employeeAdmin.getEmployeeRole().equals(EmployeeRole.ROLE_ADMIN)) {
+            throw new AppException(ErrorCode.NOT_ALLOWED_ROLE);
+        }
 
-        return employeeRepository.findAll(pageable).map(employee -> new ReadEmployeeResponse(employee));
+        return employeeRepository.findAllEmployee(foundAcademy, pageable).map(ReadAllEmployeeResponse::of);
     }
 
     /**
@@ -537,4 +570,6 @@ public class EmployeeService {
         }
         return str;
     }
+
+
 }

@@ -151,15 +151,15 @@ public class PaymentService {
      */
     @Transactional
     public void verifyRequest(String paymentKey, String orderId, Integer amount) {
-        paymentRepository.findByOrderId(orderId).ifPresentOrElse(
-                p -> {
+        paymentRepository.findByOrderId(orderId).ifPresentOrElse(p -> {
                     if (p.getAmount().equals(amount)) {
                         p.setPaymentKey(paymentKey);
                         log.info("paymentKey = {}", p.getPaymentKey());
                     } else {
                         throw new AppException(ErrorCode.PAYMENT_ERROR_ORDER_PRICE);
                     }
-                }, () -> {
+                }
+                , () -> {
                     throw new AppException(ErrorCode.PAYMENT_REQUIRED);
                 }
         );
@@ -328,10 +328,14 @@ public class PaymentService {
         // paymentkey 값이 존재하는(결제가 완료된것) payment 가져오기
         Page<Payment> payments = paymentRepository.findByAcademy_IdAndPaymentKeyIsNotNullOrderByCreatedAtDesc(academyId, pageable);
         for (Payment payment : payments) {
-            CompletePaymentResponse completePayment = new CompletePaymentResponse(payment,
-                    discountRepository.findById(payment.getDiscountId())
-                            .orElseThrow(() -> new AppException(ErrorCode.DISCOUNT_NOT_FOUND)).getDiscountName()
+            CompletePaymentResponse completePayment = new CompletePaymentResponse(payment);
+
+            discountRepository.findById(payment.getDiscountId()).ifPresent(
+                    discount -> {
+                        completePayment.setDiscountName(discount.getDiscountName());
+                    }
             );
+
             Optional<CancelPayment> foundCancelPayment = cancelPaymentRepository.findByPayment(payment);
             foundCancelPayment.ifPresent(cancelPayment -> completePayment.setDeletedAt(cancelPayment));
 
@@ -343,7 +347,7 @@ public class PaymentService {
     }
 
     /**
-     * 해당 학원에 특정 학생의 결제 완료 내역을 가져오기 위해 만든 메서드 (UI 용)
+     * 해당 학원에 특정 학생의 결제 내역을 가져오기 위해 만든 메서드 // 학생 이름 검색용 메서드(UI 용)
      */
     public Page<CompletePaymentResponse> findAllCompletePaymentByStudent(Long academyId, String requestAccount, String studentName, Pageable pageable) {
 
@@ -352,7 +356,7 @@ public class PaymentService {
         //요청한 직원 체크
         validateAcademyEmployee(requestAccount, foundAcademy);
 
-        Page<Student> foundStudents = studentRepository.findByAcademyIdAndName(academyId, studentName,pageable);
+        Page<Student> foundStudents = studentRepository.findByAcademyIdAndName(academyId, studentName, pageable);
 
         // 아래 컬렉션에 정보를 담을 것임
         List<CompletePaymentResponse> foundPayments = new ArrayList<>();
@@ -361,9 +365,57 @@ public class PaymentService {
         for (Student foundStudent : foundStudents) {
             List<Payment> foundPaymentsByStudent = paymentRepository.findByAcademy_IdAndPaymentKeyIsNotNullAndStudentOrderByCreatedAtDesc(academyId, foundStudent);
             for (Payment payment : foundPaymentsByStudent) {
-                CompletePaymentResponse completePayment = new CompletePaymentResponse(payment,
-                        discountRepository.findById(payment.getDiscountId())
-                                .orElseThrow(() -> new AppException(ErrorCode.DISCOUNT_NOT_FOUND)).getDiscountName()
+                CompletePaymentResponse completePayment = new CompletePaymentResponse(payment);
+
+                discountRepository.findById(payment.getDiscountId()).ifPresent(
+                        discount -> {
+                            completePayment.setDiscountName(discount.getDiscountName());
+                        }
+                );
+
+                Optional<CancelPayment> foundCancelPayment = cancelPaymentRepository.findByPayment(payment);
+                foundCancelPayment.ifPresent(cancelPayment -> completePayment.setDeletedAt(cancelPayment));
+
+                foundPayments.add(completePayment);
+            }
+        }
+
+
+        return new PageImpl<>(foundPayments);
+    }
+
+    /**
+     * 해당 학원에 특정 학생 (id로 찾기) 의 결제 완료 내역을 가져오기 위해 만든 메서드 학생 상세페이지용 (UI 용)
+     */
+    public Page<CompletePaymentResponse> findAllCompletePaymentByStudent(Long academyId, String requestAccount, Long studentId, Pageable pageable) {
+
+        //학원 체크
+        Academy foundAcademy = validateAcademy(academyId);
+        //요청한 직원 체크
+        validateAcademyEmployee(requestAccount, foundAcademy);
+
+        //학생 유효성 검사
+        Student foundStudent = studentRepository.findByAcademyIdAndId(academyId, studentId)
+                .orElseThrow(() -> new AppException(ErrorCode.STUDENT_NOT_FOUND));
+
+        // 아래 컬렉션에 정보를 담을 것임
+        List<CompletePaymentResponse> foundPayments = new ArrayList<>();
+
+        List<Payment> foundPaymentsByStudent = paymentRepository.findByAcademy_IdAndPaymentKeyIsNotNullAndStudentOrderByCreatedAtDesc(academyId, foundStudent);
+
+        for (Payment payment : foundPaymentsByStudent) {
+            // 결제 완료된거만 추가할 것
+            Enrollment foundEnrollment = enrollmentRepository.findByLecture_IdAndStudent_Id(payment.getLecture().getId(), payment.getStudent().getId())
+                    .orElseThrow(() -> new AppException(ErrorCode.ENROLLMENT_NOT_FOUND));
+
+            if (foundEnrollment.getPaymentYN() == true) {
+
+                CompletePaymentResponse completePayment = new CompletePaymentResponse(payment);
+
+                discountRepository.findById(payment.getDiscountId()).ifPresent(
+                        discount -> {
+                            completePayment.setDiscountName(discount.getDiscountName());
+                        }
                 );
                 Optional<CancelPayment> foundCancelPayment = cancelPaymentRepository.findByPayment(payment);
                 foundCancelPayment.ifPresent(cancelPayment -> completePayment.setDeletedAt(cancelPayment));

@@ -9,7 +9,6 @@ import com.project.myacademy.domain.lecture.Lecture;
 import com.project.myacademy.domain.lecture.LectureRepository;
 import com.project.myacademy.domain.student.Student;
 import com.project.myacademy.domain.student.StudentRepository;
-import com.project.myacademy.domain.waitinglist.Waitinglist;
 import com.project.myacademy.domain.waitinglist.WaitinglistRepository;
 import com.project.myacademy.global.exception.AppException;
 import com.project.myacademy.global.exception.ErrorCode;
@@ -23,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -77,7 +77,6 @@ public class EnrollmentService {
         }
         // 그렇지 않으면 수강정원 초과 에러처리
         else {
-//            waitinglistRepository.saveAndFlush(Waitinglist.makeWaitinglist(lecture, student));
             throw new AppException(ErrorCode.OVER_REGISTRATION_NUMBER);
         }
 
@@ -159,22 +158,19 @@ public class EnrollmentService {
         // DB 즉시 반영
         enrollmentRepository.saveAndFlush(enrollment);
 
-        // 수강 이력 먼저 삭제
+        // 다음 대기번호 존재하든 안하든 수강 이력 먼저 삭제
         enrollmentRepository.delete(enrollment);
         // 현재 등록인원 -1
         lecture.minusCurrentEnrollmentNumber();
 
-        // 대기번호 존재 유무 확인
-        Waitinglist waitinglist = waitinglistRepository.findTopByLectureOrderByCreatedAtAsc(lecture)
-                .orElseThrow(() -> new AppException(ErrorCode.WAITINGLIST_NOT_FOUND));
+        // 다음 대기번호가 존재하면 추가적으로 대기번호 -> 수강등록으로 정보 변경 후 기존 대기번호 삭제
+        waitinglistRepository.findTopByLectureOrderByCreatedAtAsc(lecture)
+                .ifPresent(waitinglist -> {
+                    createEnrollmentFromWaitinglist(academy.getId(), waitinglist.getStudent().getId(), waitinglist.getLecture().getId(), account);
+                    waitinglistRepository.delete(waitinglist);
+                });
 
-        // 대기번호 -> 수강등록으로 정보 변경
-        Long newEnrollmentId = createEnrollmentFromWaitinglist(academy.getId(), waitinglist.getStudent().getId(), waitinglist.getLecture().getId(), request, account);
-
-        // 수강등록이 끝나면 기존 대기번호 삭제
-        waitinglistRepository.delete(waitinglist);
-
-        return DeleteEnrollmentResponse.of(enrollmentId, newEnrollmentId);
+        return DeleteEnrollmentResponse.of(enrollmentId);
     }
 
     private Academy validateAcademy(Long academyId) {
@@ -210,7 +206,7 @@ public class EnrollmentService {
     }
 
     // 대기번호 -> 수강등록으로 이동하게 하는 메서드
-    private Long createEnrollmentFromWaitinglist(Long academyId, Long studentId, Long lectureId, CreateEnrollmentRequest request, String account) {
+    private void createEnrollmentFromWaitinglist(Long academyId, Long studentId, Long lectureId, String account) {
 
         // 등록 주체 권한 확인(학원 존재 유무, 해당 학원 직원인지 확인)
         Academy academy = validateAcademy(academyId);
@@ -230,11 +226,8 @@ public class EnrollmentService {
         lecture.plusCurrentEnrollmentNumber();
         Enrollment enrollment = Enrollment.createEnrollment(student, lecture, employee,academyId);
 
-        // 수강 내역 저장 즉시 DB 반영 -> 반환 DTO에 새롭게 생성된 수강 내역의 enrollmentId 추출하기 위함
-//        Enrollment newEnrollment = enrollmentRepository.saveAndFlush(enrollment);
-        Enrollment newEnrollment = enrollmentRepository.save(enrollment);
-
-        return newEnrollment.getId();
+        // 수강 내역 저장
+        enrollmentRepository.save(enrollment);
     }
 
     /**
@@ -260,6 +253,22 @@ public class EnrollmentService {
     }
 
     /**
+     * 학생 상세 조회 페이지용 UI 메서드
+     * 수강신청 내역중에 결제가 완료된 내역만 가져온다.
+     */
+
+    public Page<FindEnrollmentResponse> findEnrollmentByStudentId(Long academyId, Long studentId,Pageable pageable) {
+
+        validateAcademy(academyId);
+
+        // 학생 id로 student 객체가 존재하는지 확인
+        Student foundStudent = studentRepository.findById(studentId)
+                .orElseThrow(() -> new AppException(ErrorCode.STUDENT_NOT_FOUND));
+
+        return enrollmentRepository.findByStudentAndPaymentYNIsTrue(foundStudent, pageable).map(enrollment -> new FindEnrollmentResponse(enrollment));
+    }
+
+    /**
      * UI용 메서드, 해당 학원의 모든 수강신청내역 가져오기 ( 최신순으로, 결제 내역이 false인 데이터만)
      */
     public Page<FindEnrollmentResponse> findAllEnrollmentForPay(Long academyId,Pageable pageable) {
@@ -281,6 +290,37 @@ public class EnrollmentService {
                 .orElseThrow(() -> new AppException(ErrorCode.ENROLLMENT_NOT_FOUND));
 
         return new FindEnrollmentResponse(foundEnrollment);
+    }
+
+    /**
+     * 결제 완료된 수강신청내역을 활용해서 출석부를 표시하기 위해 만든 메서드
+     */
+    public Page<FindStudentInfoFromEnrollmentByLectureResponse> findStudentInfoFromEnrollmentByLecture(Long academyId, String requestAccount,Long lectureId, Pageable pageable) {
+
+
+        // 등록 주체 권한 확인(학원 존재 유무, 해당 학원 직원인지 확인)
+        Academy academy = validateAcademy(academyId);
+        Employee employee = validateAcademyEmployee(requestAccount, academy);
+        Lecture foundLecture = lectureRepository.findById(lectureId)
+                .orElseThrow(() -> new AppException(ErrorCode.LECTURE_NOT_FOUND));
+
+        return enrollmentRepository.findByLectureAndPaymentYNIsTrue(foundLecture, pageable).map(enrollment -> new FindStudentInfoFromEnrollmentByLectureResponse(enrollment));
+
+    }
+
+    /**
+     * 결제 완료 여부와 상관없이 수강신청내역을 활용해서 수강 신청자 명단을 위해 만든 메서드 UI용
+     */
+    public List<FindStudentInfoFromEnrollmentByLectureResponse> findAllStudentInfoFromEnrollmentByLecture(Long academyId, String requestAccount,Long lectureId) {
+
+
+        // 등록 주체 권한 확인(학원 존재 유무, 해당 학원 직원인지 확인)
+        Academy academy = validateAcademy(academyId);
+        Employee employee = validateAcademyEmployee(requestAccount, academy);
+        Lecture foundLecture = lectureRepository.findById(lectureId)
+                .orElseThrow(() -> new AppException(ErrorCode.LECTURE_NOT_FOUND));
+        return enrollmentRepository.findByLecture(foundLecture).stream().map(enrollment -> new FindStudentInfoFromEnrollmentByLectureResponse(enrollment)).collect(Collectors.toList());
+
     }
 
 

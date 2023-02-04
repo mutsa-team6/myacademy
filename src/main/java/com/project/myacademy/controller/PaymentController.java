@@ -1,6 +1,8 @@
 package com.project.myacademy.controller;
 
 import com.project.myacademy.domain.academy.Academy;
+import com.project.myacademy.domain.academy.AcademyService;
+import com.project.myacademy.domain.academy.dto.FindAcademyResponse;
 import com.project.myacademy.domain.discount.DiscountService;
 import com.project.myacademy.domain.discount.dto.GetDiscountResponse;
 import com.project.myacademy.domain.employee.EmployeeService;
@@ -14,6 +16,7 @@ import com.project.myacademy.domain.payment.dto.SuccessPaymentResponse;
 import com.project.myacademy.domain.student.StudentService;
 import com.project.myacademy.domain.student.dto.ReadAllStudentResponse;
 import com.project.myacademy.global.util.AuthenticationUtil;
+import com.project.myacademy.global.util.SessionUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,6 +38,7 @@ import java.util.List;
 public class PaymentController {
 
     private final EmployeeService employeeService;
+    private final AcademyService academyService;
     private final EnrollmentService enrollmentService;
     private final DiscountService discountService;
     private final PaymentService paymentService;
@@ -52,6 +56,10 @@ public class PaymentController {
 
         Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
+
+        //회원 이름 표시
+        ReadEmployeeResponse employee = employeeService.readEmployee(academyId, requestAccount);
+        SessionUtil.setSessionNameAndRole(request, employee);
 
         if (studentName != null) {
 
@@ -74,7 +82,10 @@ public class PaymentController {
 
         Page<GetDiscountResponse> discounts = discountService.getAllDiscounts(academyId, requestAccount, pageable);
         model.addAttribute("discounts", discounts);
+        model.addAttribute("account", requestAccount);
 
+        FindAcademyResponse academy = academyService.findAcademyById(academyId);
+        model.addAttribute("academy", academy);
 
         return "payment/register";
     }
@@ -86,6 +97,10 @@ public class PaymentController {
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
         log.info("💲 결제 성공한 사용자의 학원 id [{}] || 요청한 사용자의 계정 [{}]", academyId, requestAccount);
         log.info("💲 결제 성공한 order id : [{}] || payment key [{}]", orderId, paymentKey);
+
+        //회원 이름 표시
+        ReadEmployeeResponse employee = employeeService.readEmployee(academyId, requestAccount);
+        SessionUtil.setSessionNameAndRole(request, employee);
 
         // 결제 성공 시, payment key 저장
         paymentService.verifyRequest(paymentKey, orderId, amount);
@@ -101,26 +116,40 @@ public class PaymentController {
             paymentService.successApprovePayment(paymentKey, orderId, amount);
         }
 
+        FindAcademyResponse academy = academyService.findAcademyById(academyId);
+        model.addAttribute("academy", academy);
 
         SuccessPaymentResponse payment = paymentService.findPayment(orderId);
         model.addAttribute("payment", payment);
-
+        model.addAttribute("account", requestAccount);
 
         return "payment/success";
     }
     @GetMapping("/academy/payment")
-    public String paySuccess() {
+    public String paySuccess(HttpServletRequest request,Authentication authentication,Model model) {
+        String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
+        Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
+        //회원 이름 표시
+        ReadEmployeeResponse employee = employeeService.readEmployee(academyId, requestAccount);
+        SessionUtil.setSessionNameAndRole(request, employee);
+
+        model.addAttribute("account", requestAccount);
+
+        FindAcademyResponse academy = academyService.findAcademyById(academyId);
+        model.addAttribute("academy", academy);
 
         return "pages/payment";
     }
 
     @GetMapping("/academy/payment/list")
-    public String paymentList(@RequestParam(required = false) String studentName, Model model, Pageable pageable, Authentication authentication) {
+    public String paymentList(@RequestParam(required = false) String studentName,HttpServletRequest request, Model model, Pageable pageable, Authentication authentication) {
 
         Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
         log.info("💲 결제 내역 조회한 사용자의 학원 id [{}] || 요청한 사용자의 계정 [{}]", academyId, requestAccount);
-
+        //회원 이름 표시
+        ReadEmployeeResponse employee = employeeService.readEmployee(academyId, requestAccount);
+        SessionUtil.setSessionNameAndRole(request, employee);
 
         if (studentName != null) {
             Page<CompletePaymentResponse> payments = paymentService.findAllCompletePaymentByStudent(academyId, requestAccount, studentName, pageable);
@@ -130,6 +159,9 @@ public class PaymentController {
             Page<CompletePaymentResponse> payments = paymentService.findAllCompletePayment(academyId, requestAccount, pageable);
             model.addAttribute("payments", payments);
         }
+        FindAcademyResponse academy = academyService.findAcademyById(academyId);
+        model.addAttribute("academy", academy);
+        model.addAttribute("account", requestAccount);
         model.addAttribute("previous", pageable.previousOrFirst().getPageNumber());
         model.addAttribute("next", pageable.next().getPageNumber());
 

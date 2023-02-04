@@ -1,0 +1,224 @@
+<!--
+=========================================================
+* Material Dashboard 2 - v3.0.4
+=========================================================
+
+* Product Page: https://www.creative-tim.com/product/material-dashboard
+* Copyright 2022 Creative Tim (https://www.creative-tim.com)
+* Licensed under MIT (https://www.creative-tim.com/license)
+* Coded by Creative Tim
+
+=========================================================
+
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+-->
+
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<!-- header -->
+<th:block th:replace="layout/header :: headerFragment"></th:block>
+
+
+<body class="g-sidenav-show  bg-gray-100">
+
+<!-- side bar -->
+<th:block th:replace="layout/aside :: asideFragment"></th:block>
+
+
+<main class="main-content border-radius-lg ">
+
+
+    <!-- Navbar -->
+    <th:block th:replace="layout/navbar :: navbarFragment"></th:block>
+
+
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+
+                <div class="card my-4">
+                    <div class="card-header pb-0">
+                        <div class="row">
+                            <div class="col-lg-9 col-7">
+                                <h3 style="font-family: 'Jua', sans-serif;; font-size: 3.5rem; font-weight: lighter;color: #5A2082">
+                                    임직원 정보</h3>
+                                <p class="mb-0" style="font-weight: bold;color: #5A2060"
+                                   th:text="|${academy.academyName} 에 근무하는 임직원 정보입니다.|"></p>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <hr style="color: #5A2082; height: 1.5px;background-color: #5A2082">
+                    </div>
+
+                    <div class="card-body px-0 pb-2">
+                        <div class="table-responsive">
+                            <table class="table align-items-center mb-0">
+                                <thead>
+                                <tr>
+                                    <th class="text-center text-uppercase  font-weight-bolder" style="color: #5A2082;">
+                                        사진
+                                    </th>
+                                    <th class="text-center text-uppercase  font-weight-bolder " style="color: #5A2082;">
+                                        계정명
+                                    </th>
+                                    <th class="text-center text-uppercase  font-weight-bolder" style="color: #5A2082;">
+                                        이름
+                                    </th>
+                                    <th class="text-center text-uppercase  font-weight-bolder " style="color: #5A2082;">
+                                        전화번호
+                                    </th>
+                                    <th class="text-center text-uppercase  font-weight-bolder " style="color: #5A2082;">
+                                        이메일
+                                    </th>
+                                    <th class="text-center text-uppercase  font-weight-bolder " style="color: #5A2082;">
+                                        주소
+                                    </th>
+                                    <th class="text-center text-uppercase  font-weight-bolder " style="color: #5A2082;">
+                                        직책
+                                    </th>
+                                    <th class="text-center text-uppercase  font-weight-bolder " style="color: #5A2082;">
+                                        과목
+                                    </th>
+
+                                    <th class="text-secondary opacity-7"></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <div>
+                                    <tr th:each="employee : ${employees}">
+                                        <form action="/academy/lecture/register" method="get">
+                                            <th class="align-middle text-center">
+                                                <div class="flex">
+                                                    <th:block th:if="${employee.imageUrl =='null'}">
+                                                        <img src="https://raw.githubusercontent.com/buinq/imageServer/main/img/image-20230204013043779.png"
+                                                             class="avatar avatar-xl me-3 border-radius-lg">
+                                                    </th:block>
+                                                    <th:block th:if="${employee.imageUrl != 'null'}">
+                                                        <img th:src="${employee.imageUrl}"
+                                                             class="avatar avatar-xl me-3 border-radius-lg">
+                                                    </th:block>
+                                                </div>
+                                            </th>
+                                            <th class="align-middle text-center">
+                                                <span class=" text font-weight-bold"
+                                                      th:text="${employee.account}"></span>
+                                            </th>
+                                            <th class="align-middle text-center">
+                                                <span class=" text font-weight-bold"
+                                                      th:text="${employee.name}"></span>
+                                            </th>
+                                            <th class="align-middle text-center">
+                                                <span class=" text font-weight-bold"
+                                                      th:text="${employee.phoneNum}"></span>
+                                            </th>
+                                            <th class="align-middle text-center">
+                                                <span class=" text font-weight-bold"
+                                                      th:text="${employee.email}"></span>
+                                            </th>
+                                            <th class="align-middle text-center">
+                                                <span class=" text font-weight-bold"
+                                                      th:text="${employee.address}"></span>
+                                            </th>
+                                            <th:block th:if="${employee.job == 'ROLE_STAFF'}">
+                                                <th class="align-middle text-center">
+                                                <span class=" text font-weight-bold"
+                                                      th:text="직원"></span>
+                                                </th>
+                                            </th:block>
+                                            <th:block th:if="${employee.job =='ROLE_USER'}">
+
+                                                <th class="align-middle text-center">
+                                                <span class=" text font-weight-bold"
+                                                      th:text="강사"></span>
+                                                </th>
+                                            </th:block>
+
+                                            <th:block th:if="${employee.subject !='직원'}">
+                                                <th class="align-middle text-center">
+                                                <span class=" text font-weight-bold"
+                                                      th:text="${employee.subject}"></span>
+                                                </th>
+
+                                            </th:block>
+                                            <th:block th:if="${employee.subject =='직원'}">
+                                                <th class="align-middle text-center">
+                                                <span class=" text font-weight-bold"
+                                                      > </span>
+                                                </th>
+
+                                            </th:block>
+                                            <input type="text" class="form-control" name="teacherId"
+                                                   th:value="${employee.id}" hidden>
+                                            <th class="align-middle text-center">
+
+                                                <a href="javascript:;"
+                                                   th:onclick="|employee.delete(${academy.academyId},${employee.id})|"
+                                                   type="button"
+                                                   class="text-danger font-weight-bold text-xs"
+                                                   data-toggle="tooltip"
+                                                   data-original-title="delete-academy">
+                                                    delete
+                                                </a>
+                                            </th>
+                                        </form>
+                                    </tr>
+                                </div>
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!--footer-->
+    <th:block th:replace="layout/footer :: footerFragment"></th:block>
+</main>
+<!--   Core JS Files   -->
+<script src="/assets/js/core/popper.min.js"></script>
+<script src="/assets/js/core/bootstrap.min.js"></script>
+<script src="/assets/js/plugins/perfect-scrollbar.min.js"></script>
+<script src="/assets/js/plugins/smooth-scrollbar.min.js"></script>
+<script src="/assets/js/material-dashboard.min.js?v=3.0.4"></script>
+<link id="pagestyle" href="/assets/css/material-dashboard.css?v=3.0.4" rel="stylesheet"/>
+
+<Script>
+
+    let employee = {
+        init: function () {
+            var _this = this;
+        },
+
+
+        delete: function (academyId, employeeId) {
+
+            const con_check = confirm("직원 정보를 삭제하시겠습니까?");
+
+            if (con_check === true) {
+                axios.delete("/api/v1/academies/" + academyId + "/employees/" + employeeId,
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    }
+                ).then((response) => {
+                    alert("직원 삭제 성공");
+                    window.location.reload();
+                }).catch((error) => {
+                });
+            }
+        }
+    };
+
+    employee.init();
+
+</script>
+</body>
+
+</html>

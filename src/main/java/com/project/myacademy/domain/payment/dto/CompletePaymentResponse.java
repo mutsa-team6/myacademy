@@ -42,7 +42,7 @@ public class CompletePaymentResponse {
     private Long lectureId; // 결제한 강의 이름
     private String paymentKey; // 결제한 강의 이름
 
-    public CompletePaymentResponse(Payment payment, String discountName) {
+    public CompletePaymentResponse(Payment payment) {
         this.paymentId = payment.getId();
         this.payType = payment.getPayType();
         this.amount = payment.getAmount();
@@ -50,7 +50,7 @@ public class CompletePaymentResponse {
         this.orderName = payment.getOrderName();
         this.studentEmail = payment.getStudent().getEmail();
         this.studentName = payment.getStudent().getName();
-        this.discountName = discountName;
+        this.discountName = "할인 정책 선택 안함.";
         this.createdAt = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(Timestamp.valueOf(payment.getCreatedAt()));
         this.deletedAt = "";
         this.employeeName = payment.getEmployee().getName();
@@ -60,9 +60,13 @@ public class CompletePaymentResponse {
         this.paymentKey = payment.getPaymentKey();
     }
 
+    public void setDiscountName(String discountName) {
+        this.discountName = discountName;
+    }
+
     public void setDeletedAt(CancelPayment cancelPayment) {
 
-            this.deletedAt = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(Timestamp.valueOf(cancelPayment.getCreatedAt()));
+        this.deletedAt = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(Timestamp.valueOf(cancelPayment.getCreatedAt()));
 
 
     }

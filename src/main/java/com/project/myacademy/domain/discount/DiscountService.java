@@ -99,7 +99,7 @@ public class DiscountService {
         validateAcademyEmployee(account, academy);
 
         //해당 학원에 존재하는 정책들 가져옴
-        Page<Discount> discounts = discountRepository.findAllByAcademy(academy, pageable);
+        Page<Discount> discounts = discountRepository.findAllByAcademyAndDeletedAtIsNull(academy, pageable);
 
         return discounts.map(GetDiscountResponse::of);
     }

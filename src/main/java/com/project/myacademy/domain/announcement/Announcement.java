@@ -26,8 +26,10 @@ public class Announcement extends BaseEntity {
     private Long id;
 
     private String title;
-
     private String body;
+
+    @Enumerated(value = EnumType.STRING)
+    private AnnouncementType type;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "academy_id")
@@ -41,6 +43,7 @@ public class Announcement extends BaseEntity {
     public static Announcement toAnnouncement(CreateAnnouncementRequest request, Academy academy) {
         return Announcement.builder()
                 .title(request.getTitle())
+                .type(request.getType())
                 .body(request.getBody())
                 .academy(academy)
                 .build();

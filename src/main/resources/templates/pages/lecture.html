@@ -42,7 +42,7 @@
                     <div class="card-header pb-0">
                         <div class="row">
                             <div class="col-lg-9 col-7">
-                                <h3 style="font-family: 'Black Han Sans', sans-serif; font-size: 3.5rem; font-weight: lighter;color: #5A2082">강사 정보</h3>
+                                <h3 style="font-family: 'Jua', sans-serif; font-size: 3.5rem; font-weight: lighter;color: #5A2082">강사 정보</h3>
                                 <p class="mb-0" style="font-weight: bold;color: #5A2060">강좌 등록 전에 강좌를 맡을 강사를 먼저 선택해주세요.</p>
 
                             </div>
@@ -79,8 +79,14 @@
                                         <form action="/academy/lecture/register" method="get">
                                             <th class="align-middle text-center">
                                                 <div class="flex">
-                                                    <img src="../assets/img/team-2.jpg"
-                                                         class="avatar avatar-xl me-3 border-radius-lg" alt="user1">
+                                                    <th:block th:if="${teacher.imageUrl =='null'}">
+                                                        <img src="https://raw.githubusercontent.com/buinq/imageServer/main/img/image-20230204013043779.png"
+                                                             class="avatar avatar-xl me-3 border-radius-lg">
+                                                    </th:block>
+                                                    <th:block th:if="${teacher.imageUrl != 'null'}">
+                                                        <img th:src="${teacher.imageUrl}"
+                                                             class="avatar avatar-xl me-3 border-radius-lg">
+                                                    </th:block>
                                                 </div>
                                             </th>
 

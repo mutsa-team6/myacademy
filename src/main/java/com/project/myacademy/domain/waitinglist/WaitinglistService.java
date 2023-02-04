@@ -5,12 +5,13 @@ import com.project.myacademy.domain.academy.AcademyRepository;
 import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.domain.employee.EmployeeRepository;
 import com.project.myacademy.domain.enrollment.EnrollmentRepository;
+import com.project.myacademy.domain.enrollment.dto.FindStudentInfoFromEnrollmentByLectureResponse;
 import com.project.myacademy.domain.lecture.Lecture;
 import com.project.myacademy.domain.lecture.LectureRepository;
 import com.project.myacademy.domain.student.Student;
 import com.project.myacademy.domain.student.StudentRepository;
-import com.project.myacademy.domain.waitinglist.dto.CreateWaitinglistRequest;
 import com.project.myacademy.domain.waitinglist.dto.CreateWaitinglistResponse;
+import com.project.myacademy.domain.waitinglist.dto.DeleteWaitinglistResponse;
 import com.project.myacademy.domain.waitinglist.dto.ReadAllWaitinglistResponse;
 import com.project.myacademy.global.exception.AppException;
 import com.project.myacademy.global.exception.ErrorCode;
@@ -20,6 +21,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -61,13 +65,18 @@ public class WaitinglistService {
             throw new AppException(ErrorCode.INVALID_PERMISSION);
         }
 
-        // 이미 수강등록되어 있는지 확인
-        enrollmentRepository.findByStudentAndLecture(student,lecture)
-                        .ifPresent((enrollment -> {
-                            throw new AppException(ErrorCode.DUPLICATED_ENROLLMENT);
-                        }));
+        // 현재 수강 등록 인원이 최대 수강 정원보다 적으면 대기 등록이 아니라 수강 등록으로 진행해야 함
+        if(lecture.getCurrentEnrollmentNumber() < lecture.getMaximumCapacity()) {
+            throw new AppException(ErrorCode.CANNOT_REGISTER_WAITINGLIST);
+        }
 
-        // 대기번호 이력 중복 확인
+        // 이미 수강 등록되어 있는지 확인
+        enrollmentRepository.findByStudentAndLecture(student, lecture)
+                .ifPresent((enrollment -> {
+                    throw new AppException(ErrorCode.DUPLICATED_ENROLLMENT);
+                }));
+
+        // 대기번호 중복 확인
         waitinglistRepository.findByStudentAndLecture(student,lecture)
                 .ifPresent((waitinglist -> {
                     throw new AppException(ErrorCode.DUPLICATED_WAITINGLIST);
@@ -75,8 +84,45 @@ public class WaitinglistService {
 
         // 대기번호 저장
         Waitinglist savedWaitinglist = waitinglistRepository.saveAndFlush(Waitinglist.makeWaitinglist(lecture, student));
-
         return CreateWaitinglistResponse.of(savedWaitinglist.getId());
+    }
+
+    public DeleteWaitinglistResponse deleteWaitinglist(Long academyId, Long studentId, Long lectureId, Long waitinglistId, String account) {
+
+        // 등록하는 직원 존재 유무 확인(학원 존재 유무, 해당 학원 직원인지 확인)
+        Academy academy = validateAcademy(academyId);
+        Employee employee = validateAcademyEmployee(account, academy);
+
+        // 학생, 강좌, 대기번호 존재 유무 확인
+        validateStudent(studentId);
+        validateLecture(lectureId);
+        Waitinglist waitinglist = validateWaitinglist(waitinglistId);
+
+        // 직원이 대기번호를 삭제할 권한이 있는지 확인(강사만 불가능)
+        if (Employee.isTeacherAuthority(employee)) {
+            throw new AppException(ErrorCode.INVALID_PERMISSION);
+        }
+
+        // 대기번호 삭제
+        waitinglistRepository.delete(waitinglist);
+        return DeleteWaitinglistResponse.of(waitinglistId);
+    }
+
+
+    public List<FindStudentInfoFromEnrollmentByLectureResponse> findWaitingStudentByLecture(Long academyId, Long lectureId,String requestAccount) {
+        Academy academy = validateAcademy(academyId);
+        Employee employee = validateAcademyEmployee(requestAccount, academy);
+        Lecture foundLecture = validateLecture(lectureId);
+
+        List<FindStudentInfoFromEnrollmentByLectureResponse> waitingStudents = waitinglistRepository.findByLectureOrderByCreatedAtAsc(foundLecture)
+                .stream().map(waitinglist -> new FindStudentInfoFromEnrollmentByLectureResponse(waitinglist.getStudent(),waitinglist.getId(),waitinglist.getLecture().getId())).collect(Collectors.toList());
+        Long num = 1L;
+        for (FindStudentInfoFromEnrollmentByLectureResponse waitingStudent : waitingStudents) {
+            waitingStudent.setWaitingNum(num++);
+        }
+
+        return waitingStudents;
+
     }
 
     public Long countWaitingListByLecture(Long academyId, Long lectureId,String requestAccount) {
@@ -113,5 +159,11 @@ public class WaitinglistService {
         Lecture validatedLecture = lectureRepository.findById(lectureId)
                 .orElseThrow(() -> new AppException(ErrorCode.LECTURE_NOT_FOUND));
         return validatedLecture;
+    }
+
+    private Waitinglist validateWaitinglist(Long waitinglistId) {
+        Waitinglist validatedWaitinglist = waitinglistRepository.findById(waitinglistId)
+                .orElseThrow(() -> new AppException(ErrorCode.WAITINGLIST_NOT_FOUND));
+        return validatedWaitinglist;
     }
 }

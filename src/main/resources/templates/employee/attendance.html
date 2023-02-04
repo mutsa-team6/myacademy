@@ -1,0 +1,181 @@
+<!--
+=========================================================
+* Material Dashboard 2 - v3.0.4
+=========================================================
+
+* Product Page: https://www.creative-tim.com/product/material-dashboard
+* Copyright 2022 Creative Tim (https://www.creative-tim.com)
+* Licensed under MIT (https://www.creative-tim.com/license)
+* Coded by Creative Tim
+
+=========================================================
+
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+-->
+
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<!-- header -->
+<th:block th:replace="layout/header :: headerFragment"></th:block>
+
+
+<body class="g-sidenav-show  bg-gray-100">
+
+<!-- side bar -->
+<th:block th:replace="layout/aside :: asideFragment"></th:block>
+
+
+<main class="main-content border-radius-lg ">
+
+
+    <!-- Navbar -->
+    <th:block th:replace="layout/navbar :: navbarFragment"></th:block>
+
+
+    <div class="container">
+        <div class="row">
+            <div class="col-10">
+                <div class="row">
+                    <div class="row">
+                        <div class="card my-4">
+
+                            <div class="col-4">
+                                <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                                    <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+                                        <h6 class="text-white text-capitalize ps-3">선택한 강의를 수강하는 학생 정보입니다.</h6>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="card-body px-0 pb-2">
+                                <div class="table-responsive">
+                                    <table class="table align-items-center mb-0">
+                                        <thead>
+                                        <tr>
+                                            <th class="text-center text-uppercase  font-weight-bolder"
+                                                style="color: #5A2082">
+                                                학생 이름
+                                            </th>
+                                            <th class="text-center text-uppercase font-weight-bolder "
+                                                style="color: #5A2082">
+                                                학생 전화번호
+                                            </th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <div>
+                                            <tr th:each="student : ${studentsInfo}">
+
+                                                <th class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${student.studentName}"></span>
+                                                </th>
+                                                <th class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${student.studentPhoneNum}"></span>
+                                                </th>
+                                                <th class="align-middle text-center">
+
+                                                    <form action="/academy/student/info" method="get">
+                                                        <input type="text" class="form-control" name="studentId"
+                                                               th:value="${student.studentId}" hidden>
+                                                        <button class="btn btn-icon btn-2 btn-primary mt-3"
+                                                                type="submit">
+                                                            학생 정보 상세 조회</span>
+                                                        </button>
+                                                    </form>
+                                                </th>
+
+                                            </tr>
+
+
+                                        </div>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <br>
+
+            </div>
+
+
+        </div>
+        <!--footer-->
+        <th:block th:replace="layout/footer :: footerFragment"></th:block>
+</main>
+<!--   Core JS Files   -->
+<script src="/assets/js/core/popper.min.js"></script>
+<script src="/assets/js/core/bootstrap.min.js"></script>
+<script src="/assets/js/plugins/perfect-scrollbar.min.js"></script>
+<script src="/assets/js/plugins/smooth-scrollbar.min.js"></script>
+<script src="/assets/js/material-dashboard.min.js?v=3.0.4"></script>
+<link id="pagestyle" href="/assets/css/material-dashboard.css?v=3.0.4" rel="stylesheet"/>
+
+<Script>
+
+    let student = {
+        init: function () {
+            var _this = this;
+        },
+
+
+        uniqueness: function (academyId, studentId) {
+            let data = {
+                body: document.querySelector('#input-uniqueness').value.trim(),
+            };
+            console.log(data)
+            axios.post("/api/v1/academies/" + academyId + "/students/" + studentId + "/uniqueness",
+                JSON.stringify(data), {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                }
+            ).then((response) => {
+                alert("특이사항을 작성했습니다.");
+                window.location.reload();
+
+            }).catch((error) => {
+                if (error.response.data.result["errorCode"] == "INVALID_PERMISSION") {
+                    alert("강사는 접근할 수 없습니다.");
+                } else if (error.response.data.result["errorCode"] == "DUPLICATED_ENROLLMENT") {
+                    alert("해당 학생은 해당 강의를 이미 수강 신청한 상태입니다.");
+                }
+            });
+
+        },
+
+        delete: function (academyId, studentId, uniquenessId) {
+
+            const con_check = confirm("삭제하시겠습니까?");
+
+            if (con_check === true) {
+                axios.delete("/api/v1/academies/" + academyId + "/students/" + studentId + "/uniqueness/" + uniquenessId,
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    }
+                ).then((response) => {
+                    alert("특이사항 삭제 성공");
+                    window.location.reload();
+                }).catch((error) => {
+                });
+            }
+        }
+    };
+
+    student.init();
+
+</script>
+
+</body>
+
+</html>

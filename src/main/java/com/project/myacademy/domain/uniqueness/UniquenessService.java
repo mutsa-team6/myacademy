@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,7 +47,7 @@ public class UniquenessService {
         //student Id에 해당하는 학생이 존재하는지 확인
         Student student = validateStudent(studentId);
 
-        Uniqueness savedUniqueness = uniquenessRepository.save(Uniqueness.toUniqueness(request, student));
+        Uniqueness savedUniqueness = uniquenessRepository.save(Uniqueness.toUniqueness(request, student,employee.getName()));
 
         return CreateUniquenessResponse.of(savedUniqueness);
     }
@@ -56,7 +57,7 @@ public class UniquenessService {
      * @param pageable  20개씩 id순서대로(최신순대로)
      * @param account jwt로 받아온 사용자(Employee) 계정
      */
-    public Page<ReadAllUniquenessResponse> readAllUniqueness(Long academyId, Long studentId, PageRequest pageable, String account) {
+    public Page<ReadAllUniquenessResponse> readAllUniqueness(Long academyId, Long studentId, Pageable pageable, String account) {
 
         //academyId 존재 유무 확인
         Academy academy = validateAcademy(academyId);

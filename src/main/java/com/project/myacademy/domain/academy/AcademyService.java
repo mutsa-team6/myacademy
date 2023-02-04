@@ -1,42 +1,134 @@
 package com.project.myacademy.domain.academy;
 
 import com.project.myacademy.domain.academy.dto.*;
-import com.project.myacademy.domain.employee.EmployeeRepository;
-import com.project.myacademy.domain.parent.ParentRepository;
-import com.project.myacademy.domain.student.StudentRepository;
 import com.project.myacademy.global.exception.AppException;
 import com.project.myacademy.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-@Slf4j
 public class AcademyService {
 
     private final AcademyRepository academyRepository;
 
 
-//    private final EmployeeRepository employeeRepository;
-//    private final BCryptPasswordEncoder bCryptPasswordEncoder;
-//
-//    @Value("${jwt.token.secret}")
-//    private String secretKey;
-//    private long expiredTimeMs = 1000 * 60 * 60;
-
     /**
      * 학원 등록
      *
-     * @param request
-     * @return AcademyDto
+     * @param request 이름, 주소, 폰번호, 원장이름, 사업자번호가 담긴 학원 등록 request
      */
+    @Transactional
+    public CreateAcademyResponse createAcademy(CreateAcademyRequest request) {
+
+        //중복되는 학원이름은 등록 불가
+        ifPresentAcademyByName(request.getName());
+
+        Academy savedAcademy = academyRepository.save(Academy.createAcademy(request));
+        log.info("✨ 학원 데이터 저장 성공");
+
+        return new CreateAcademyResponse(savedAcademy);
+    }
+
+    /**
+     * 학원 삭제
+     *
+     * @param academyId 학원 Id
+     */
+    @Transactional
+    public Long deleteAcademy(Long academyId) {
+
+        // 학원Id로 Academy 조회
+        Academy academy = validateAcademyById(academyId);
+
+        log.info("학원정보를 삭제하겠습니다.");
+        academyRepository.delete(academy);
+        log.info("학원정보를 삭제하였습니다.");
+
+        return academyId;
+    }
+
+    /**
+     * 학원 이름으로 학원 조회
+     *
+     * @param request 찾을 학원의 이름이 담긴 request
+     */
+    public FindAcademyResponse findAcademy(FindAcademyRequest request) {
+
+        // 학원이름으로 Academy 조회
+        Academy academy = validateAcademyByName(request.getName());
+
+        FindAcademyResponse response = new FindAcademyResponse(academy);
+
+        return response;
+    }
+
+    /**
+     * 학원Id로 학원 조회
+     *
+     * @param academyId 찾을 학원의 id
+     */
+    public FindAcademyResponse findAcademyById(Long academyId) {
+
+        // 학원 Id로 학원 조회
+        Academy academy = validateAcademyById(academyId);
+
+        FindAcademyResponse response = new FindAcademyResponse(academy);
+
+        return response;
+    }
+
+    /**
+     * 모든학원 조회
+     *
+     * @param pageable
+     */
+    public Page<ReadAcademyResponse> readAllAcademies(Pageable pageable) {
+
+        return academyRepository.findAll(pageable).map(academy -> new ReadAcademyResponse(academy));
+    }
+
+    /**
+     * 해당 이름의 학원의 존재 여부
+     *
+     * @param academyName 학원이름
+     */
+    public boolean checkExistByAcademyName(String academyName) {
+        return academyRepository.existsByName(academyName);
+    }
+
+    //학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+    private Academy validateAcademyById(Long academyId) {
+        Academy validateAcademy = academyRepository.findById(academyId)
+                .orElseThrow(() -> new AppException(ErrorCode.ACADEMY_NOT_FOUND));
+        return validateAcademy;
+    }
+
+    //학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+    private Academy validateAcademyByName(String academyName) {
+        Academy validateAcademy = academyRepository.findByName(academyName)
+                .orElseThrow(() -> new AppException(ErrorCode.ACADEMY_NOT_FOUND));
+        return validateAcademy;
+    }
+
+    //학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+    private void ifPresentAcademyByName(String academyName) {
+        academyRepository.findByName(academyName)
+                .ifPresent(academy -> {throw new AppException(ErrorCode.DUPLICATED_ACADEMY);});
+    }
+}
+//    /**
+//     * 학원 등록
+//     *
+//     * @param request
+//     * @return AcademyDto
+//     */
 //    @Transactional
 //    public AcademyDto createAcademy(CreateAcademyRequest request) {
 //
@@ -54,7 +146,7 @@ public class AcademyService {
 //
 //        // 학원을 저장소에 등록
 //        log.info("학원정보를 저장소에 등록합니다.");
-////        Academy savedAcademy = academyRepository.save(request.toAcademy(bCryptPasswordEncoder.encode(request.getPassword())));
+//        Academy savedAcademy = academyRepository.save(request.toAcademy(bCryptPasswordEncoder.encode(request.getPassword())));
 //        log.info("학원정보가 저장소에 등록되었습니다.");
 //
 //        return savedAcademy.toAcademyDto();
@@ -102,66 +194,3 @@ public class AcademyService {
 //
 //        return updatedAcademy.toAcademyDto();
 //    }
-
-    /**
-     * 학원 삭제
-     *
-     * @param academyId
-     * @return Long
-     */
-    @Transactional
-    public Long deleteAcademy(Long academyId) {
-
-
-        Academy academy = academyRepository.findById(academyId)
-                .orElseThrow(() -> new AppException(ErrorCode.ACADEMY_NOT_FOUND));
-
-        log.info("학원정보를 삭제하겠습니다.");
-        academyRepository.delete(academy);
-        log.info("학원정보를 삭제하였습니다.");
-
-        return academyId;
-    }
-
-
-
-    public FindAcademyResponse findAcademy(FindAcademyRequest request) {
-        String requestAcademyName = request.getName();
-        log.info("🔎 찾으려는 학원 이름 [{}] ", requestAcademyName);
-
-        // 검색하려는 학원 데이터가 존재하지 않음
-        Academy academy = academyRepository.findByName(requestAcademyName)
-                .orElseThrow(() -> {
-                    throw new AppException(ErrorCode.ACADEMY_NOT_FOUND);
-                });
-
-        FindAcademyResponse response = new FindAcademyResponse(academy.getId());
-
-        return response;
-
-    }
-
-    public Page<ReadAcademyResponse> readAllAcademies(Pageable pageable) {
-
-        return academyRepository.findAll(pageable).map(academy -> new ReadAcademyResponse(academy));
-    }
-
-    @Transactional
-    public CreateAcademyResponse createAcademy(CreateAcademyRequest request) {
-
-        //같은 이름 학원은 허용하지 않는다.
-        academyRepository.findByName(request.getName())
-                .ifPresent(academy -> {
-                    throw new AppException(ErrorCode.DUPLICATED_ACADEMY);
-                });
-
-        Academy savedAcademy = academyRepository.save(Academy.createAcademy(request));
-        log.info("✨ 학원 데이터 저장 성공");
-
-        return new CreateAcademyResponse(savedAcademy);
-    }
-
-    public boolean checkExistByAcademyName(String academyName) {
-        return academyRepository.existsByName(academyName);
-    }
-}

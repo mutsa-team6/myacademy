@@ -36,9 +36,11 @@
                     <div class="card">
                         <div class="card-header pb-0">
                             <div class="d-flex align-items-center">
-                                <h3 class="mb-0" style="color: #5A2082">마이페이지</h3>
+                                <h3 style="font-family: 'Jua', sans-serif;; font-size: 3.5rem; font-weight: lighter;color: #5A2082">
+                                    마이 페이지</h3>
                             </div>
-                            <p class="mb-0 opacity-7" style="font-size: small;font-weight: bold;">이름과 이메일은 수정할 수 없습니다.</p>
+                            <p class="mb-0 opacity-7" style="font-size: small;font-weight: bold;">계정명 · 이름 · 이메일은 수정할 수
+                                없습니다.</p>
                             <div>
                                 <hr style="color: #5A2082; height: 1.5px;background-color: #5A2082">
                             </div>
@@ -46,7 +48,10 @@
                         <div class="card-body">
                             <br>
                             <br>
-
+                            <input type="text" class="form-control" id="employeeId"
+                                   placeholder="강좌 이름" th:value="${employeeId}" hidden>
+                            <input type="text" class="form-control" id="academyId"
+                                   placeholder="강좌 이름" th:value="${academyId}" hidden>
                             <div class="row">
                                 <div class="col-3">
                                 </div>
@@ -55,14 +60,67 @@
                                         <div class="col-4 col-lg-4 order-lg-2">
                                             <div class="mt-n4 mt-lg-n6 mb-4 mb-lg-0">
                                                 <a href="javascript:;">
-                                                    <img src="../assets/img/team-2.jpg"
-                                                         class="rounded-circle img-fluid border border-2 border-white">
+                                                    <th:block th:if="${imageUrl =='null'}">
+                                                        <img src="https://raw.githubusercontent.com/buinq/imageServer/main/img/image-20230204013043779.png"
+                                                             class="rounded-circle img-fluid border border-2 border-white">
+                                                    </th:block>
+                                                    <th:block th:if="${imageUrl != 'null'}">
+                                                        <img th:src="${imageUrl}"
+                                                             class="rounded-circle img-fluid border border-2 border-white">
+                                                    </th:block>
                                                 </a>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-3">
+                                </div>
+                            </div>
+
+                            <div class="col-md-2">
+                            </div>
+                            <div class="row">
+                                <div class="col-md-2">
+                                </div>
+                                <div class="col-md-8 mx-auto justify-content-center text-center">
+                                    <button class="btn btn-info" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapseExample" aria-expanded="false"
+                                            aria-controls="collapseExample">
+                                        프로필 사진 변경
+                                    </button>
+                                    <div class="collapse" id="collapseExample">
+                                        <div class="text-center">
+                                            <div class="filebox">
+                                                <div class="row">
+                                                    <div class="col-3">
+                                                    </div>
+                                                    <div class="col-4">
+                                                        <input type="text" class="form-control mt-1" value="첨부파일"
+                                                               placeholder="첨부파일"
+                                                               aria-label="Username" aria-describedby="basic-addon1"
+                                                               id="input-fileName" readonly>
+                                                    </div>
+                                                    <div class="col-2">
+                                                        <div class="mt-2">
+                                                            <label for="input-file"
+                                                                   style="margin-top: auto">파일찾기</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-3">
+                                                    </div>
+
+                                                    <input type="file" id="input-file">
+                                                </div>
+                                            </div>
+                                            <button type="button" class="btn btn-primary btn-sm"
+                                                    th:onclick="|mypage.fileUpload()|"
+                                            >이미지 업로드
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="col-md-2">
                                 </div>
                             </div>
                             <br>
@@ -132,9 +190,9 @@
                                         </div>
                                     </th:block>
                                     <th:block th:if="${employee.subject =='직원'}">
-                                            <input type="text" class="form-control" th:value="${employee.subject}"
-                                                   aria-label="Username" aria-describedby="basic-addon1"
-                                                   id="input-employeeSubject" hidden>
+                                        <input type="text" class="form-control" th:value="${employee.subject}"
+                                               aria-label="Username" aria-describedby="basic-addon1"
+                                               id="input-employeeSubject" hidden>
                                     </th:block>
                                 </div>
                                 <div class="col-md-2">
@@ -163,7 +221,9 @@
                                 </div>
                                 <br>
                                 <div class="d-flex align-items-center">
-                                    <h3 class="mb-0" style="color: #5A2082">강의 목록</h3>
+                                    <h3 style="font-family: 'Jua', sans-serif;; font-size: 3.5rem; font-weight: lighter;color: #5A2082">
+                                        강의 목록</h3>
+
                                 </div>
                                 <p class="mb-0 opacity-7" style="font-size: small;font-weight: bold;">맡은 강의 목록입니다.</p>
                                 <div>
@@ -191,7 +251,7 @@
                                             </th>
                                             <th class="text-center text-uppercase  font-weight-bolder "
                                                 style="color: #5A2082;font-size: small">
-                                                수강 인원
+                                                수강 확정 인원
                                             </th>
 
                                             <th class="text-secondary opacity-7"></th>
@@ -221,7 +281,16 @@
                                                 </th>
                                                 <th class="align-middle text-center">
                                                 <span class=" text font-weight-bold" style="font-size: small"
-                                                      th:text="${lecture.currentEnrollmentNumber}"></span>
+                                                      th:text="${lecture.completePaymentNumber}"></span>
+                                                </th>
+                                                <th class="align-middle">
+                                                    <form action="/academy/mypage/attendance" method="get">
+                                                        <input type="text" class="form-control" name="lectureId"
+                                                               th:value="${lecture.lectureId}" hidden>
+                                                        <button class="btn btn-icon btn-2 btn-primary mt-3" type="submit">
+                                                            출석부 조회</span>
+                                                        </button>
+                                                    </form>
                                                 </th>
                                             </tr>
                                         </div>
@@ -263,7 +332,7 @@
                                 data-bs-dismiss="modal">닫기
                         </button>
                         <button type="button" class="btn btn-primary"
-                                th:onclick="|payment.delete()|"
+                                th:onclick="|mypage.changePassword(${academyId})|"
                         >비밀번호 변경
                         </button>
                     </div>
@@ -280,6 +349,16 @@
     <script src="/assets/js/plugins/smooth-scrollbar.min.js"></script>
     <script src="/assets/js/material-dashboard.min.js?v=3.0.4"></script>
     <Script>
+        $("#input-file").on('change', function () {
+            var fileName = $("#input-file").val();
+            $("#input-fileName").val(fileName);
+        });
+
+        let employeeId = document.getElementById('employeeId').value;
+        let academyId = document.getElementById('academyId').value;
+        console.log('academyId' + academyId);
+        console.log('employeeId' + employeeId);
+        //fileDropzone dropzone 설정할 태그의 id로 지정
 
         let mypage = {
             init: function () {
@@ -311,7 +390,61 @@
                     }
                 });
 
-            }
+            },
+
+            fileUpload: function () {
+                let data = {
+                    multipartFile: document.querySelector("#input-file").value.trim(),
+                };
+
+                console.log(data);
+                var frm = new FormData();
+                var image = document.getElementById("input-file");
+                frm.append("multipartFile", image.files[0]);
+
+
+                axios.post("/api/v1/academies/" + academyId + "/employees/" + employeeId + "/files/upload",
+                    frm, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data'
+                        }
+                    }).then((response) => {
+                    console.log(response);
+                    alert("이미지 업로드 성공");
+                    window.location.reload();
+                }).catch((error) => {
+                    console.log(error);
+
+                });
+
+            },
+
+            changePassword: function (academyId) {
+                let data = {
+                    oldPassword: document.querySelector("#input-employeePassword").value.trim(),
+                    newPassword: document.querySelector('#input-employeeNewPassword').value.trim(),
+                };
+
+                axios.post("/api/v1/academies/" + academyId + "/employee/changePassword",
+                    JSON.stringify(data), {
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    }
+                ).then((response) => {
+                    console.log(response);
+                    alert("비밀번호 수정 성공");
+                    window.location.reload();
+                }).catch((error) => {
+                    console.log(error);
+                    if (error.response.data.result["errorCode"] == "INVALID_PASSWORD") {
+                        alert("현재 비밀번호가 일치하지 않습니다.");
+                    } else if (error.response.data.result["errorCode"] == "SAME_PASSWORD") {
+                        alert("현재 비밀번호와 변경하려는 비밀번호가 일치합니다.");
+                    }
+                });
+
+            },
 
 
         };

@@ -5,12 +5,15 @@ import com.project.myacademy.global.Response;
 import com.project.myacademy.global.exception.ErrorCode;
 import com.project.myacademy.global.exception.ErrorDto;
 import com.project.myacademy.global.util.AuthenticationUtil;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
@@ -47,7 +50,7 @@ public class EmployeeRestController {
         return ResponseEntity.ok(Response.success(response));
     }
 
-    @Tag(name = "02-2. 직원", description = "직원 로그인,계정 및 비밀번호 찾기")
+    @Tag(name = "02-2. 직원", description = "직원 로그인,계정 및 비밀번호 찾기, 변경")
     @Operation(summary = "직원 로그인", description =
             "회원가입된 계정과 비밀번호로 로그인합니다. \n\n 로그인시 쿠키에 토큰이 담김니다.")
     @PostMapping("/{academyId}/employees/login")
@@ -104,8 +107,9 @@ public class EmployeeRestController {
     }
 
     // 본인 탈퇴 기능
-    @Tag(name = "02-1. 직원", description = "직원 회원 가입 및 정보 수정,조회")
-    @Operation(summary = "직원 본인 삭제", description = "ADMIN 회원 및 본인 만 삭제가 가능합니다.\n\n soft-delete 됩니다.")
+//    @Tag(name = "02-1. 직원", description = "직원 회원 가입 및 정보 수정,조회")
+//    @Operation(summary = "직원 본인 삭제", description = "ADMIN 회원 및 본인 만 삭제가 가능합니다.\n\n soft-delete 됩니다.")
+    @Hidden
     @DeleteMapping("/{academyId}")
     public ResponseEntity selfDelete(Authentication authentication, @PathVariable Long academyId) {
 
@@ -123,7 +127,7 @@ public class EmployeeRestController {
      * @param request
      * @return
      */
-    @Tag(name = "02-2. 직원", description = "직원 로그인,계정 및 비밀번호 찾기")
+    @Tag(name = "02-2. 직원", description = "직원 로그인,계정 및 비밀번호 찾기, 변경")
     @Operation(summary = "직원 계정찾기", description = "직원 계정을 찾습니다.")
     @PostMapping("employee/findAccount")
     public ResponseEntity findAccount(@RequestBody FindAccountEmployeeRequest request) {
@@ -134,22 +138,36 @@ public class EmployeeRestController {
     }
 
     /**
+     * 직원 계정 비밀번호 변경
+     */
+    @Tag(name = "02-2. 직원", description = "직원 로그인,계정 및 비밀번호 찾기, 변경")
+    @Operation(summary = "직원 계정 비밀번호 변경", description = "비밀번호를 변경합니다.")
+    @PostMapping("{academyId}/employee/changePassword")
+    public ResponseEntity changePassword(@PathVariable Long academyId, @RequestBody ChangePasswordEmployeeRequest request, Authentication authentication) {
+
+        String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
+        ChangePasswordEmployeeResponse response = employeeService.changePasswordEmployee(request, academyId, requestAccount);
+
+        return ResponseEntity.ok(Response.success(response));
+    }
+
+    /**
      * 비밀번호 찾기
      *
      * @param request
      * @return
      */
-    @Tag(name = "02-2. 직원", description = "직원 로그인,계정 및 비밀번호 찾기")
+    @Tag(name = "02-2. 직원", description = "직원 로그인,계정 및 비밀번호 찾기, 변경")
     @Operation(summary = "직원 비밀번호 찾기", description = "이메일로 임시 비밀번호가 발송됩니다.")
     @PutMapping("/employee/findPassword")
-    public ResponseEntity changePassword(@RequestBody ChangePasswordEmployeeRequest request) {
-        ChangePasswordEmployeeResponse response = employeeService.changePasswordEmployee(request);
+    public ResponseEntity findPassword(@RequestBody FindPasswordEmployeeRequest request) {
+        FindPasswordEmployeeResponse response = employeeService.findPasswordEmployee(request);
         return ResponseEntity.ok(Response.success(response));
     }
 
     // 관리자(ADMIN) 혹은 직원(STAFF) 등급은 다른 직원 계정을 삭제할 수 있다.
     @Tag(name = "02-1. 직원", description = "직원 회원 가입 및 정보 수정,조회")
-    @Operation(summary = "직원 삭제", description = "ADMIN,STAFF 회원만 삭제가 가능합니다.")
+    @Operation(summary = "직원 삭제", description = "ADMIN 회원만 삭제가 가능합니다.")
     @DeleteMapping("/{academyId}/employees/{employeeId}")
     public ResponseEntity delete(Authentication authentication, @PathVariable Long academyId, @PathVariable Long employeeId) {
 
@@ -178,19 +196,21 @@ public class EmployeeRestController {
     @Tag(name = "02-1. 직원", description = "직원 회원 가입 및 정보 수정,조회")
     @Operation(summary = "직원 조회", description = "ADMIN 회원만 조회가 가능합니다.")
     @GetMapping("/{academyId}/employees")
-    public ResponseEntity readAll(@PathVariable Long academyId, Authentication authentication, Pageable pageable) {
+    public ResponseEntity readAll(@PathVariable Long academyId, Authentication authentication) {
+        PageRequest pageable = PageRequest.of(0, 20, Sort.by("id").descending());
 
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
         log.info("🔎 조회를 요청한 사용자 계정 [{}] || 접근하려는 학원 id [{}] ", requestAccount, academyId);
 
-        Page<ReadEmployeeResponse> response = employeeService.readAllEmployees(requestAccount, academyId, pageable);
+        Page<ReadAllEmployeeResponse> response = employeeService.readAllEmployees(requestAccount, academyId, pageable);
 
         return ResponseEntity.ok(Response.success(response));
     }
 
     // 관리자(ADMIN) 혹은 직원(STAFF) 등급은 다른 직원의 등급을 USER -> STAFF 혹은 STAFF -> USER 로 변경할 수 있다.
-    @Tag(name = "02-1. 직원", description = "직원 회원 가입 및 정보 수정,조회")
-    @Operation(summary = "직원 권한 변경", description = "ADMIN,STAFF 회원만 권한변경이 가능합니다. \n\n User ↔ STAFF")
+    //@Tag(name = "02-1. 직원", description = "직원 회원 가입 및 정보 수정,조회")
+    //@Operation(summary = "직원 권한 변경", description = "ADMIN,STAFF 회원만 권한변경이 가능합니다. \n\n User ↔ STAFF")
+    @Hidden
     @PutMapping("/{academyId}/changeRole/{employeeId}")
     public ResponseEntity changeRole(Authentication authentication, @PathVariable Long academyId, @PathVariable Long employeeId) {
 

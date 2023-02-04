@@ -42,7 +42,7 @@
                     <div class="card-header pb-0">
                         <div class="row">
                             <div class="col-lg-9 col-7">
-                                <h3 style="font-family: 'Black Han Sans', sans-serif; font-size: 3.5rem; font-weight: lighter;color: #5A2082">학생 정보</h3>
+                                <h3 style="font-family: 'Jua', sans-serif;; font-size: 3.5rem; font-weight: lighter;color: #5A2082">학생 정보</h3>
 
                             </div>
                             <div class="col-lg-3 col-5 my-auto text-end">
@@ -130,8 +130,13 @@
                                                       th:text="${student.address}"></span>
                                     </td>
                                     <td class="align-middle">
-
-
+                                        <form action="/academy/student/info" method="get">
+                                            <input type="text" class="form-control" name="studentId"
+                                                   th:value="${student.id}" hidden>
+                                        <button class="btn btn-icon btn-2 btn-primary mt-3" type="submit">
+                                                    상세 조회</span>
+                                        </button>
+                                        </form>
                                     </td>
                                 </tr>
                                 </tbody>

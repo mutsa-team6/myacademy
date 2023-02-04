@@ -30,14 +30,11 @@ public class EmployeeProfile extends BaseEntity {
     @JoinColumn(name = "employee_id")
     private Employee employee;
 
-    private Long uploadEmployee;
-
-    public static EmployeeProfile makeEmployeeProfile(String uploadFileName, String storedFileUrl, Employee employee, Employee uploadEmployee) {
+    public static EmployeeProfile makeEmployeeProfile(String uploadFileName, String storedFileUrl, Employee employee) {
         return EmployeeProfile.builder()
                 .uploadFileName(uploadFileName)
                 .storedFileUrl(storedFileUrl)
                 .employee(employee)
-                .uploadEmployee(uploadEmployee.getId())
                 .build();
     }
 }
