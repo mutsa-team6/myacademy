@@ -28,10 +28,7 @@ public class AcademyService {
     public CreateAcademyResponse createAcademy(CreateAcademyRequest request) {
 
         //중복되는 학원이름은 등록 불가
-        academyRepository.findByName(request.getName())
-                .ifPresent(academy -> {
-                    throw new AppException(ErrorCode.DUPLICATED_ACADEMY);
-                });
+        ifPresentAcademyByName(request.getName());
 
         Academy savedAcademy = academyRepository.save(Academy.createAcademy(request));
         log.info("✨ 학원 데이터 저장 성공");
@@ -65,10 +62,7 @@ public class AcademyService {
     public FindAcademyResponse findAcademy(FindAcademyRequest request) {
 
         // 학원이름으로 Academy 조회
-        Academy academy = academyRepository.findByName(request.getName())
-                .orElseThrow(() -> {
-                    throw new AppException(ErrorCode.ACADEMY_NOT_FOUND);
-                });
+        Academy academy = validateAcademyByName(request.getName());
 
         FindAcademyResponse response = new FindAcademyResponse(academy);
 
@@ -109,11 +103,24 @@ public class AcademyService {
         return academyRepository.existsByName(academyName);
     }
 
-    //학원 Id로 학원을 조회
+    //학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
     private Academy validateAcademyById(Long academyId) {
         Academy validateAcademy = academyRepository.findById(academyId)
                 .orElseThrow(() -> new AppException(ErrorCode.ACADEMY_NOT_FOUND));
         return validateAcademy;
+    }
+
+    //학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+    private Academy validateAcademyByName(String academyName) {
+        Academy validateAcademy = academyRepository.findByName(academyName)
+                .orElseThrow(() -> new AppException(ErrorCode.ACADEMY_NOT_FOUND));
+        return validateAcademy;
+    }
+
+    //학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+    private void ifPresentAcademyByName(String academyName) {
+        academyRepository.findByName(academyName)
+                .ifPresent(academy -> {throw new AppException(ErrorCode.DUPLICATED_ACADEMY);});
     }
 }
 //    /**
