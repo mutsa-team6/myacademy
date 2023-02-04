@@ -87,7 +87,7 @@ class DiscountServiceTest {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(employee));
-            given(discountRepository.findAllByAcademy(academy, pageable)).willReturn(discountList);
+            given(discountRepository.findAllByAcademyAndDeletedAtIsNull(academy,pageable)).willReturn(discountList);
 
             Page<GetDiscountResponse> allDiscounts = discountService.getAllDiscounts(academy.getId(), employee.getAccount(), pageable);
 
@@ -96,7 +96,7 @@ class DiscountServiceTest {
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
-            then(discountRepository).should(times(1)).findAllByAcademy(academy, pageable);
+            then(discountRepository).should(times(1)).findAllByAcademyAndDeletedAtIsNull(academy,pageable);
         }
 
         @Test

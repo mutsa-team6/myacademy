@@ -1,9 +1,11 @@
 package com.project.myacademy.domain.uniqueness;
 
+import com.project.myacademy.domain.BaseEntity;
 import com.project.myacademy.domain.academy.Academy;
 import com.project.myacademy.domain.academy.AcademyRepository;
 import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.domain.employee.EmployeeRepository;
+import com.project.myacademy.domain.employee.EmployeeRole;
 import com.project.myacademy.domain.student.Student;
 import com.project.myacademy.domain.student.StudentRepository;
 import com.project.myacademy.domain.uniqueness.dto.CreateUniquenessRequest;
@@ -17,8 +19,12 @@ import com.project.myacademy.global.exception.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.test.util.ReflectionTestUtils;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,8 +40,8 @@ class UniquenessServiceTest {
     StudentRepository studentRepository = mock(StudentRepository.class);
     EmployeeRepository employeeRepository = mock(EmployeeRepository.class);
     AcademyRepository academyRepository = mock(AcademyRepository.class);
-
     UniquenessService uniquenessService = new UniquenessService(uniquenessRepository, studentRepository, employeeRepository, academyRepository);
+    private Employee mockEmployee = mock(Employee.class);
 
     @Nested
     @DisplayName("특이사항 등록 테스트")
@@ -84,6 +90,18 @@ class UniquenessServiceTest {
         }
 
         @Test
+        @DisplayName("특이사항 등록 : 실패 - 권한에러")
+        public void createUniquenessFailPermission() {
+
+            when(academyRepository.findById(any())).thenReturn(Optional.of(academy1));
+            when(employeeRepository.findByAccountAndAcademy(any(), any())).thenReturn(Optional.of(mockEmployee));
+            when(mockEmployee.getEmployeeRole()).thenReturn(EmployeeRole.ROLE_USER);
+
+            AppException appException = assertThrows(AppException.class, () -> uniquenessService.createUniqueness(1L, 1L, request, "user"));
+            assertThat(appException.getErrorCode().equals(ErrorCode.INVALID_PERMISSION));
+        }
+
+        @Test
         @DisplayName("특이사항 등록 : 실패 - 학생에러")
         void createUniquenessFailStudent() {
 
@@ -111,12 +129,16 @@ class UniquenessServiceTest {
         @DisplayName("특이사항 조회 : 성공")
         public void readUniquenessSuccess() {
 
-            when(academyRepository.findById(any())).thenReturn(Optional.of(academy1));
-            when(employeeRepository.findByAccountAndAcademy(any(), any())).thenReturn(Optional.of(employee1));
-            when(studentRepository.findById(any())).thenReturn(Optional.of(student1));
-            when(uniquenessRepository.findAllByStudent(any(), any())).thenReturn(uniquenessList);
+            ReflectionTestUtils.setField(uniqueness1, BaseEntity.class, "createdAt", LocalDateTime.of(2021, 12, 6, 12, 0), LocalDateTime.class);
+            ReflectionTestUtils.setField(uniqueness2, BaseEntity.class, "createdAt", LocalDateTime.of(2021, 12, 6, 13, 0), LocalDateTime.class);
 
-            assertDoesNotThrow(() -> uniquenessService.readAllUniqueness(1L, 1L, pageable, "admin"));
+            when(academyRepository.findById(any())).thenReturn(Optional.of(academy1));
+            when(employeeRepository.findByAccountAndAcademy(any(), any())).thenReturn(Optional.of(mockEmployee));
+            when(mockEmployee.getEmployeeRole()).thenReturn(EmployeeRole.ROLE_ADMIN);
+            when(studentRepository.findById(any())).thenReturn(Optional.of(student1));
+            when(uniquenessRepository.findAllByStudent(student1, pageable)).thenReturn(uniquenessList);
+
+            assertDoesNotThrow(() -> uniquenessService.readAllUniqueness(academy1.getId(), student1.getId(), pageable, employee1.getAccount()));
         }
 
         @Test
@@ -144,12 +166,25 @@ class UniquenessServiceTest {
         }
 
         @Test
+        @DisplayName("특이사항 조회 : 실패 - 권한에러")
+        public void readUniquenessFailPermission() {
+
+            when(academyRepository.findById(any())).thenReturn(Optional.of(academy1));
+            when(employeeRepository.findByAccountAndAcademy(any(), any())).thenReturn(Optional.of(mockEmployee));
+            when(mockEmployee.getEmployeeRole()).thenReturn(EmployeeRole.ROLE_USER);
+
+            AppException appException = assertThrows(AppException.class, () -> uniquenessService.readAllUniqueness(1L, 1L, pageable, "user"));
+            assertThat(appException.getErrorCode().equals(ErrorCode.INVALID_PERMISSION));
+        }
+
+        @Test
         @DisplayName("특이사항 조회 : 실패 - 학생에러")
         public void readUniquenessFailStudent() {
 
             when(academyRepository.findById(any())).thenReturn(Optional.of(academy1));
-            when(employeeRepository.findByAccountAndAcademy(any(), any())).thenReturn(Optional.of(employee1));
-            when(uniquenessRepository.findAllByStudent(any(), any())).thenReturn(uniquenessList);
+            when(employeeRepository.findByAccountAndAcademy(any(), any())).thenReturn(Optional.of(mockEmployee));
+            when(mockEmployee.getEmployeeRole()).thenReturn(EmployeeRole.ROLE_ADMIN);
+            when(studentRepository.findById(any())).thenReturn(Optional.empty());
 
             AppException appException = assertThrows(AppException.class, () -> uniquenessService.readAllUniqueness(1L, 1L, pageable, "admin"));
             assertThat(appException.getErrorCode().equals(ErrorCode.STUDENT_NOT_FOUND));
@@ -200,6 +235,18 @@ class UniquenessServiceTest {
 
             AppException appException = assertThrows(AppException.class, () -> uniquenessService.updateUniqueness(1L, 1L, 1L, request, "admin").getBody());
             assertThat(appException.getErrorCode().equals(ErrorCode.ACCOUNT_NOT_FOUND));
+        }
+
+        @Test
+        @DisplayName("특이사항 수정 : 실패 - 권한에러")
+        public void updateUniquenessFailPermission() {
+
+            when(academyRepository.findById(any())).thenReturn(Optional.of(academy1));
+            when(employeeRepository.findByAccountAndAcademy(any(), any())).thenReturn(Optional.of(mockEmployee));
+            when(mockEmployee.getEmployeeRole()).thenReturn(EmployeeRole.ROLE_USER);
+
+            AppException appException = assertThrows(AppException.class, () -> uniquenessService.updateUniqueness(1L, 1L, 1L, request, "user").getBody());
+            assertThat(appException.getErrorCode().equals(ErrorCode.INVALID_PERMISSION));
         }
 
         @Test
@@ -270,6 +317,18 @@ class UniquenessServiceTest {
 
             AppException appException = assertThrows(AppException.class, () -> uniquenessService.deleteUniqueness(1L, 1L, 1L, "admin"));
             assertThat(appException.getErrorCode().equals(ErrorCode.ACCOUNT_NOT_FOUND));
+        }
+
+        @Test
+        @DisplayName("특이사항 삭제 : 실패 - 권한에러")
+        public void deleteUniquenessFailPermission() {
+
+            when(academyRepository.findById(any())).thenReturn(Optional.of(academy1));
+            when(employeeRepository.findByAccountAndAcademy(any(), any())).thenReturn(Optional.of(mockEmployee));
+            when(mockEmployee.getEmployeeRole()).thenReturn(EmployeeRole.ROLE_USER);
+
+            AppException appException = assertThrows(AppException.class, () -> uniquenessService.deleteUniqueness(1L, 1L, 1L, "user"));
+            assertThat(appException.getErrorCode().equals(ErrorCode.INVALID_PERMISSION));
         }
 
         @Test

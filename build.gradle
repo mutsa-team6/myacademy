@@ -102,8 +102,8 @@ jacocoTestReport {
 	}
 
 	def Qdomains = []
-	for (qPattern in '**/QA'..'**/QZ') {
-		Qdomains.add(qPattern + '*')
+	for(qPattern in "**/QA" .. "**/QZ"){
+		Qdomains.add(qPattern+"*")
 	}
 
 
@@ -115,11 +115,11 @@ jacocoTestReport {
 							'**/MyacademyApplication*',
 							'**/*Request*',
 							'**/*Response*',
-							'**/Swagger*',
-							'**/JpaAuditingConfig*',
 							'**/controller',
 							'**/*RestController*',
-							'**/*ExceptionManager*'
+							'**/*ExceptionManager*',
+							'**/configuration',
+							'**/util'
 					] + Qdomains)
 				})
 		)
@@ -133,8 +133,8 @@ jacocoTestReport {
 jacocoTestCoverageVerification {
 
 	def Qdomains = []
-	for (qPattern in '**/QA'..'**/QZ') {
-		Qdomains.add(qPattern + '*')
+	for (qPattern in "*.QA".."*.QZ") {  // qPattern = "*.QA","*.QB","*.QC", ... "*.QZ"
+		Qdomains.add(qPattern + "*")
 	}
 
 	violationRules {
@@ -163,16 +163,16 @@ jacocoTestCoverageVerification {
 				value = 'TOTALCOUNT'
 				maximum = 200
 			}
+
 			excludes = [
-					'**.*ProjectApplication*',
-					'**.*Request*',
-					'**.*Response*',
-					'**.*Swagger*',
-					'**.*PasswordEncoder*',
-					'**.*JpaAuditing*',
-					'**.controller',
-					'**.*RestController*',
-					'**.*ExceptionManager*'
+					'*.*ProjectApplication*',
+					'*.*Request*',
+					'*.*Response*',
+					'*.*RestController*',
+					'*.controller.*',
+					'*.*ExceptionManager*',
+					'*.configuration.*',
+					'*.util.*'
 			] + Qdomains
 		}
 	}

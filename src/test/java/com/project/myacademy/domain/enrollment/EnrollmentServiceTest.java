@@ -1,5 +1,6 @@
 package com.project.myacademy.domain.enrollment;
 
+import com.project.myacademy.domain.BaseEntity;
 import com.project.myacademy.domain.academy.Academy;
 import com.project.myacademy.domain.academy.AcademyRepository;
 import com.project.myacademy.domain.employee.Employee;
@@ -27,7 +28,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.test.util.ReflectionTestUtils;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -77,8 +80,8 @@ class EnrollmentServiceTest {
         lecture = Lecture.builder().id(1L).name("lecture").price(10000).employee(teacher).maximumCapacity(10).currentEnrollmentNumber(0).build();
         student = Student.builder().id(1L).name("student").academyId(academy.getId()).build();
         student2 = Student.builder().id(2L).name("student2").academyId(academy.getId()).build();
-        enrollment = Enrollment.builder().id(1L).student(student).lecture(lecture).build();
-        enrollment2 = Enrollment.builder().id(2L).student(student2).lecture(lecture).build();
+        enrollment = Enrollment.builder().id(1L).student(student).lecture(lecture).paymentYN(true).build();
+        enrollment2 = Enrollment.builder().id(2L).student(student2).lecture(lecture).paymentYN(true).build();
         waitinglist = Waitinglist.builder().student(student2).lecture(lecture).build();
         mockEmployee = mock(Employee.class);
         mockLecture = mock(Lecture.class);
@@ -496,8 +499,7 @@ class EnrollmentServiceTest {
 
             DeleteEnrollmentResponse deletedEnrollment = enrollmentService.deleteEnrollment(academy.getId(), student.getId(), lecture.getId(), enrollment.getId(), createEnrollmentRequest, employee.getAccount());
             assertThat(deletedEnrollment.getDeletedEnrollmentId()).isEqualTo(1L);
-            assertThat(deletedEnrollment.getNewEnrollmentId()).isEqualTo(2L);
-            assertThat(deletedEnrollment.getMessage()).isEqualTo("기존 수강 내역 삭제 성공, 대기번호 -> 수강 내역 이동 성공");
+            assertThat(deletedEnrollment.getMessage()).isEqualTo("수강 등록 삭제 완료");
 
             then(academyRepository).should(times(2)).findById(anyLong());
             then(employeeRepository).should(times(2)).findByAccountAndAcademy(anyString(), any(Academy.class));
@@ -630,34 +632,7 @@ class EnrollmentServiceTest {
         }
 
         @Test
-        @DisplayName("삭제 실패(7) - 해당 강좌의 다음 대기번호가 존재하지 않을 때")
-        public void deleteEnrollment_fail7() {
-
-            given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
-            given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
-            given(studentRepository.findById(anyLong())).willReturn(Optional.of(student));
-            given(lectureRepository.findById(anyLong())).willReturn(Optional.of(lecture));
-            given(enrollmentRepository.findById(anyLong())).willReturn(Optional.of(enrollment));
-            given(mockEmployee.getEmployeeRole()).willReturn(EmployeeRole.ROLE_STAFF);
-            given(waitinglistRepository.findTopByLectureOrderByCreatedAtAsc(any(Lecture.class))).willReturn(Optional.empty());
-
-            AppException appException = assertThrows(AppException.class,
-                    () -> enrollmentService.deleteEnrollment(academy.getId(), student.getId(), lecture.getId(), enrollment.getId(), createEnrollmentRequest, employee.getAccount()));
-
-            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.WAITINGLIST_NOT_FOUND);
-            assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 대기번호를 찾을 수 없습니다.");
-
-            then(academyRepository).should(times(1)).findById(anyLong());
-            then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
-            then(studentRepository).should(times(1)).findById(anyLong());
-            then(lectureRepository).should(times(1)).findById(anyLong());
-            then(enrollmentRepository).should(times(1)).findById(anyLong());
-            then(mockEmployee).should(times(1)).getEmployeeRole();
-            then(waitinglistRepository).should(times(1)).findTopByLectureOrderByCreatedAtAsc(any(Lecture.class));
-        }
-
-        @Test
-        @DisplayName("삭제 실패(8) - 대기번호를 수강등록으로 변경하려고 할 때 이미 해당 수강이력이 있는 경우")
+        @DisplayName("삭제 실패(7) - 대기번호를 수강등록으로 변경하려고 할 때 이미 해당 수강이력이 있는 경우")
         public void deleteEnrollment_fail8() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
@@ -692,32 +667,137 @@ class EnrollmentServiceTest {
     @DisplayName("UI")
     class UI{
 
-//        @Test
-//        @DisplayName("결제를 위한 수강 조회 성공")
-//        public void findEnrollment_ForPay() {
-//
-//            List<Student> students = new ArrayList<>();
-//            students.add(student);
-//            students.add(student2);
-//
-//            List<Enrollment> enrollments = new ArrayList<>();
-//            enrollments.add(enrollment);
-//            enrollments.add(enrollment2);
-//
-//            PageImpl<Enrollment> enrollmentList = new PageImpl<>(List.of(enrollment, enrollment2));
-//            PageRequest pageable = PageRequest.of(0, 20, Sort.Direction.DESC,"createdAt");
-//
-//            given(studentRepository.findByAcademyIdAndName(academy.getId(),student.getName(),pageable)).willReturn(new PageImpl<>(students));
-//            given(enrollmentRepository.findByStudentOrderByCreatedAtDesc(student)).willReturn(enrollments);
-//            given(enrollmentRepository.findByStudentOrderByCreatedAtDesc(student2)).willReturn(enrollments);
-//
-//            given(enrollmentRepository.findAll(pageable)).willReturn(enrollmentList);
-//
-//            Page<FindEnrollmentResponse> enrollmentForPay = enrollmentService.findEnrollmentForPay(academy.getId(), student.getName(),pageable);
-//
-//            assertThat(enrollmentForPay.getTotalPages()).isEqualTo(1);
-//            assertThat(enrollmentForPay.getTotalElements()).isEqualTo(2);
-//        }
+        PageRequest pageable = PageRequest.of(0, 20, Sort.Direction.DESC,"createdAt");
+
+        @Test
+        @DisplayName("결제를 위한 수강 조회 성공")
+        public void findEnrollment_ForPay() {
+
+            Student student3 = Student.builder().id(3L).name("student").academyId(academy.getId()).build();
+            Lecture lecture2 = Lecture.builder().id(2L).name("lecture2").price(10000).employee(teacher).maximumCapacity(10).currentEnrollmentNumber(0).build();
+            Enrollment enrollment3 = Enrollment.builder().id(3L).student(student).lecture(lecture2).paymentYN(false).build();
+            Enrollment enrollment4 = Enrollment.builder().id(4L).student(student3).lecture(lecture).paymentYN(false).build();
+            Enrollment enrollment5 = Enrollment.builder().id(4L).student(student3).lecture(lecture2).paymentYN(false).build();
+            ReflectionTestUtils.setField(enrollment, BaseEntity.class, "createdAt", LocalDateTime.of(2021, 12, 6, 12, 0), LocalDateTime.class);
+            ReflectionTestUtils.setField(enrollment3, BaseEntity.class, "createdAt", LocalDateTime.of(2021, 12, 6, 12, 0), LocalDateTime.class);
+            ReflectionTestUtils.setField(enrollment4, BaseEntity.class, "createdAt", LocalDateTime.of(2021, 12, 6, 13, 0), LocalDateTime.class);
+            ReflectionTestUtils.setField(enrollment5, BaseEntity.class, "createdAt", LocalDateTime.of(2021, 12, 6, 13, 0), LocalDateTime.class);
+
+            List<Student> students = new ArrayList<>();
+            students.add(student);
+            students.add(student3);
+
+            List<Enrollment> studentEnrollments = new ArrayList<>();
+            studentEnrollments.add(enrollment);
+            studentEnrollments.add(enrollment3);
+
+            List<Enrollment> student3Enrollments = new ArrayList<>();
+            student3Enrollments.add(enrollment4);
+            student3Enrollments.add(enrollment5);
+
+            PageRequest pageable = PageRequest.of(0, 20, Sort.Direction.DESC,"createdAt");
+
+            given(studentRepository.findByAcademyIdAndName(academy.getId(), student.getName(), pageable)).willReturn(new PageImpl<>(students));
+            given(enrollmentRepository.findByStudentOrderByCreatedAtDesc(student)).willReturn(studentEnrollments);
+            given(enrollmentRepository.findByStudentOrderByCreatedAtDesc(student3)).willReturn(student3Enrollments);
+
+            Page<FindEnrollmentResponse> enrollmentForPay = enrollmentService.findEnrollmentForPay(academy.getId(), student.getName(), pageable);
+
+            assertThat(enrollmentForPay.getTotalPages()).isEqualTo(1);
+            assertThat(enrollmentForPay.getTotalElements()).isEqualTo(4);
+        }
+
+        @Test
+        @DisplayName("특정 학생의 결제가 완료된 수강 신청 내역 조회 성공")
+        public void findEnrollment_ByStudentId_success() {
+
+            Enrollment enrollment3 = Enrollment.builder().id(3L).student(student).lecture(lecture).paymentYN(true).build();
+            ReflectionTestUtils.setField(enrollment, BaseEntity.class, "createdAt", LocalDateTime.of(2021, 12, 6, 12, 0), LocalDateTime.class);
+            ReflectionTestUtils.setField(enrollment3, BaseEntity.class, "createdAt", LocalDateTime.of(2021, 12, 6, 13, 0), LocalDateTime.class);
+            PageImpl<Enrollment> enrollmentList = new PageImpl<>(List.of(enrollment, enrollment3));
+
+            given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
+            given(studentRepository.findById(anyLong())).willReturn(Optional.of(student));
+            given(enrollmentRepository.findByStudentAndPaymentYNIsTrue(student, pageable)).willReturn(enrollmentList);
+
+            Page<FindEnrollmentResponse> response = enrollmentService.findEnrollmentByStudentId(academy.getId(), student.getId(), pageable);
+            assertThat(response.getTotalPages()).isEqualTo(1L);
+            assertThat(response.getTotalElements()).isEqualTo(2);
+
+            then(academyRepository).should(times(1)).findById(anyLong());
+            then(studentRepository).should(times(1)).findById(anyLong());
+            then(enrollmentRepository).should(times(1)).findByStudentAndPaymentYNIsTrue(student, pageable);
+        }
+
+        @Test
+        @DisplayName("특정 학생의 결제가 완료된 수강 신청 내역 조회 실패(1) - 학원이 존재하지 않을 때")
+        public void findEnrollment_ByStudentId_fail1() {
+
+            given(academyRepository.findById(anyLong())).willReturn(Optional.empty());
+
+            AppException appException = assertThrows(AppException.class,
+                    () -> enrollmentService.findEnrollmentByStudentId(academy.getId(), student.getId(), pageable));
+
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACADEMY_NOT_FOUND);
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 학원을 찾을 수 없습니다.");
+
+            then(academyRepository).should(times(1)).findById(anyLong());
+        }
+
+        @Test
+        @DisplayName("특정 학생의 결제가 완료된 수강 신청 내역 조회 실패(2) - 학생이 존재하지 않을 때")
+        public void findEnrollment_ByStudentId_fail2() {
+
+            given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
+            given(studentRepository.findById(anyLong())).willReturn(Optional.empty());
+
+            AppException appException = assertThrows(AppException.class,
+                    () -> enrollmentService.findEnrollmentByStudentId(academy.getId(), student.getId(), pageable));
+
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.STUDENT_NOT_FOUND);
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 학생을 찾을 수 없습니다.");
+
+            then(academyRepository).should(times(1)).findById(anyLong());
+            then(studentRepository).should(times(1)).findById(anyLong());
+        }
+
+        @Test
+        @DisplayName("해당 학원의 미결제 상태의 모든 수강신청내역 조회 성공")
+        public void findAllEnrollment_ForPay_success() {
+
+            Lecture lecture2 = Lecture.builder().id(2L).name("lecture2").price(10000).employee(teacher).maximumCapacity(10).currentEnrollmentNumber(0).build();
+            Enrollment enrollment3 = Enrollment.builder().id(3L).student(student).lecture(lecture2).paymentYN(false).build();
+            Enrollment enrollment4 = Enrollment.builder().id(4L).student(student2).lecture(lecture2).paymentYN(false).build();
+            ReflectionTestUtils.setField(enrollment3, BaseEntity.class, "createdAt", LocalDateTime.of(2021, 12, 6, 12, 0), LocalDateTime.class);
+            ReflectionTestUtils.setField(enrollment4, BaseEntity.class, "createdAt", LocalDateTime.of(2021, 12, 6, 13, 0), LocalDateTime.class);
+            PageImpl<Enrollment> enrollmentList = new PageImpl<>(List.of(enrollment3, enrollment4));
+
+            given(enrollmentRepository.findAllByAcademyIdAndPaymentYNIsFalseOrderByCreatedAtDesc(academy.getId(), pageable)).willReturn(enrollmentList);
+
+            Page<FindEnrollmentResponse> response = enrollmentService.findAllEnrollmentForPay(academy.getId(), pageable);
+            assertThat(response.getTotalPages()).isEqualTo(1L);
+            assertThat(response.getTotalElements()).isEqualTo(2);
+
+            then(enrollmentRepository).should(times(1)).findAllByAcademyIdAndPaymentYNIsFalseOrderByCreatedAtDesc(academy.getId(), pageable);
+        }
+
+        @Test
+        @DisplayName("해당 학원의 특정 학생의 결제가 끝난 수강 내역 조회 성공")
+        public void findEnrollment_ForPaySuccess_success() {
+
+            ReflectionTestUtils.setField(enrollment, BaseEntity.class, "createdAt", LocalDateTime.of(2021, 12, 6, 12, 0), LocalDateTime.class);
+
+            given(enrollmentRepository.findByLecture_IdAndStudent_Id(anyLong(), anyLong())).willReturn(Optional.of(enrollment));
+
+            FindEnrollmentResponse response = enrollmentService.findEnrollmentForPaySuccess(student.getId(), lecture.getId());
+            assertThat(response.getEnrollmentId()).isEqualTo(1L);
+            assertThat(response.getStudentId()).isEqualTo(1L);
+            assertThat(response.getStudentName()).isEqualTo("student");
+            assertThat(response.getLectureId()).isEqualTo(1L);
+            assertThat(response.getLectureName()).isEqualTo("lecture");
+
+            then(enrollmentRepository).should(times(1)).findByLecture_IdAndStudent_Id(anyLong(), anyLong());
+        }
 
         @Test
         @DisplayName("해당 학원의 특정 학생의 수강 내역 조회 실패 - 수강 내역 없음")
@@ -734,5 +814,153 @@ class EnrollmentServiceTest {
             then(enrollmentRepository).should(times(1)).findByLecture_IdAndStudent_Id(anyLong(), anyLong());
         }
 
+        @Test
+        @DisplayName("결제 완료된 수강신청내역을 활용해서 출석부에 표시하기 위한 메서드 - 성공")
+        public void findStudentInfo_FromEnrollment_ByLecture_success() {
+
+            PageImpl<Enrollment> enrollmentList = new PageImpl<>(List.of(enrollment, enrollment2));
+
+            given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
+            given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(employee));
+            given(lectureRepository.findById(anyLong())).willReturn(Optional.of(lecture));
+            given(enrollmentRepository.findByLectureAndPaymentYNIsTrue(lecture, pageable)).willReturn(enrollmentList);
+
+            Page<FindStudentInfoFromEnrollmentByLectureResponse> responses = enrollmentService.findStudentInfoFromEnrollmentByLecture(academy.getId(), employee.getAccount(), lecture.getId(), pageable);
+            assertThat(responses.getTotalPages()).isEqualTo(1);
+            assertThat(responses.getTotalElements()).isEqualTo(2);
+
+            then(academyRepository).should(times(1)).findById(anyLong());
+            then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
+            then(lectureRepository).should(times(1)).findById(anyLong());
+            then(enrollmentRepository).should(times(1)).findByLectureAndPaymentYNIsTrue(lecture, pageable);
+        }
+
+        @Test
+        @DisplayName("결제 완료된 수강신청내역을 활용해서 출석부에 표시하기 위한 메서드 - 실패(1) - 학원이 존재하지 않을 때")
+        public void findStudentInfo_FromEnrollment_ByLecture_fail1() {
+
+            given(academyRepository.findById(anyLong())).willReturn(Optional.empty());
+
+            AppException appException = assertThrows(AppException.class,
+                    () -> enrollmentService.findStudentInfoFromEnrollmentByLecture(academy.getId(), employee.getAccount(), lecture.getId(), pageable));
+
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACADEMY_NOT_FOUND);
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 학원을 찾을 수 없습니다.");
+
+            then(academyRepository).should(times(1)).findById(anyLong());
+        }
+
+        @Test
+        @DisplayName("결제 완료된 수강신청내역을 활용해서 출석부에 표시하기 위한 메서드 - 실패(2) - 직원이 해당 학원 소속이 아닐 때")
+        public void findStudentInfo_FromEnrollment_ByLecture_fail2() {
+
+            given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
+            given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.empty());
+
+            AppException appException = assertThrows(AppException.class,
+                    () -> enrollmentService.findStudentInfoFromEnrollmentByLecture(academy.getId(), employee.getAccount(), lecture.getId(), pageable));
+
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACCOUNT_NOT_FOUND);
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 계정명을 찾을 수 없습니다.");
+
+            then(academyRepository).should(times(1)).findById(anyLong());
+            then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
+        }
+
+        @Test
+        @DisplayName("결제 완료된 수강신청내역을 활용해서 출석부에 표시하기 위한 메서드 - 실패(3) - 강좌가 존재하지 않을 때")
+        public void findStudentInfo_FromEnrollment_ByLecture_fail3() {
+
+            given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
+            given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(employee));
+            given(lectureRepository.findById(anyLong())).willReturn(Optional.empty());
+
+            AppException appException = assertThrows(AppException.class,
+                    () -> enrollmentService.findStudentInfoFromEnrollmentByLecture(academy.getId(), employee.getAccount(), lecture.getId(), pageable));
+
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.LECTURE_NOT_FOUND);
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 수업을 찾을 수 없습니다.");
+
+            then(academyRepository).should(times(1)).findById(anyLong());
+            then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
+            then(lectureRepository).should(times(1)).findById(anyLong());
+        }
+
+        @Test
+        @DisplayName("결제 완료 여부와 상관없이 수강신청내역을 활용해서 수강 신청자 명단 조회 - 성공")
+        public void findAllStudentInfo_FromEnrollment_ByLecture_success() {
+
+            Student student3 = Student.builder().id(3L).name("student3").academyId(academy.getId()).build();
+            Student student4 = Student.builder().id(4L).name("student4").academyId(academy.getId()).build();
+            Enrollment enrollment3 = Enrollment.builder().id(3L).student(student3).lecture(lecture).paymentYN(false).build();
+            Enrollment enrollment4 = Enrollment.builder().id(4L).student(student4).lecture(lecture).paymentYN(false).build();
+
+            List<Enrollment> enrollmentList = List.of(enrollment, enrollment2,enrollment3,enrollment4);
+
+            given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
+            given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(employee));
+            given(lectureRepository.findById(anyLong())).willReturn(Optional.of(lecture));
+            given(enrollmentRepository.findByLecture(any(Lecture.class))).willReturn(enrollmentList);
+
+            List<FindStudentInfoFromEnrollmentByLectureResponse> responses = enrollmentService.findAllStudentInfoFromEnrollmentByLecture(academy.getId(), employee.getAccount(), lecture.getId());
+            assertThat(responses.size()).isEqualTo(4);
+            assertThat(responses).asList();
+
+            then(academyRepository).should(times(1)).findById(anyLong());
+            then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
+            then(lectureRepository).should(times(1)).findById(anyLong());
+            then(enrollmentRepository).should(times(1)).findByLecture(any(Lecture.class));
+        }
+
+        @Test
+        @DisplayName("결제 완료 여부와 상관없이 수강신청내역을 활용해서 수강 신청자 명단 조회 - 실패(1) - 학원이 존재하지 않을 때")
+        public void findAllStudentInfo_FromEnrollment_ByLecture_fail1() {
+
+            given(academyRepository.findById(anyLong())).willReturn(Optional.empty());
+
+            AppException appException = assertThrows(AppException.class,
+                    () -> enrollmentService.findAllStudentInfoFromEnrollmentByLecture(academy.getId(), employee.getAccount(), lecture.getId()));
+
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACADEMY_NOT_FOUND);
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 학원을 찾을 수 없습니다.");
+
+            then(academyRepository).should(times(1)).findById(anyLong());
+        }
+
+        @Test
+        @DisplayName("결제 완료 여부와 상관없이 수강신청내역을 활용해서 수강 신청자 명단 조회 - 실패(2) - 직원이 해당 학원 소속이 아닐 때")
+        public void findAllStudentInfo_FromEnrollment_ByLecture_fail2() {
+
+            given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
+            given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.empty());
+
+            AppException appException = assertThrows(AppException.class,
+                    () -> enrollmentService.findAllStudentInfoFromEnrollmentByLecture(academy.getId(), employee.getAccount(), lecture.getId()));
+
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACCOUNT_NOT_FOUND);
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 계정명을 찾을 수 없습니다.");
+
+            then(academyRepository).should(times(1)).findById(anyLong());
+            then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
+        }
+
+        @Test
+        @DisplayName("결제 완료 여부와 상관없이 수강신청내역을 활용해서 수강 신청자 명단 조회 - 실패(3) - 강좌가 존재하지 않을 때")
+        public void findAllStudentInfo_FromEnrollment_ByLecture_fail3() {
+
+            given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
+            given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(employee));
+            given(lectureRepository.findById(anyLong())).willReturn(Optional.empty());
+
+            AppException appException = assertThrows(AppException.class,
+                    () -> enrollmentService.findAllStudentInfoFromEnrollmentByLecture(academy.getId(), employee.getAccount(), lecture.getId()));
+
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.LECTURE_NOT_FOUND);
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 수업을 찾을 수 없습니다.");
+
+            then(academyRepository).should(times(1)).findById(anyLong());
+            then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
+            then(lectureRepository).should(times(1)).findById(anyLong());
+        }
     }
 }
