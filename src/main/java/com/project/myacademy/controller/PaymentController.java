@@ -16,6 +16,7 @@ import com.project.myacademy.domain.payment.dto.SuccessPaymentResponse;
 import com.project.myacademy.domain.student.StudentService;
 import com.project.myacademy.domain.student.dto.ReadAllStudentResponse;
 import com.project.myacademy.global.util.AuthenticationUtil;
+import com.project.myacademy.global.util.SessionUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -56,6 +57,10 @@ public class PaymentController {
         Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
 
+        //회원 이름 표시
+        ReadEmployeeResponse employee = employeeService.readEmployee(academyId, requestAccount);
+        SessionUtil.setSessionNameAndRole(request, employee);
+
         if (studentName != null) {
 
             Page<FindEnrollmentResponse> enrollments = enrollmentService.findEnrollmentForPay(academyId, studentName, pageable);
@@ -93,6 +98,10 @@ public class PaymentController {
         log.info("💲 결제 성공한 사용자의 학원 id [{}] || 요청한 사용자의 계정 [{}]", academyId, requestAccount);
         log.info("💲 결제 성공한 order id : [{}] || payment key [{}]", orderId, paymentKey);
 
+        //회원 이름 표시
+        ReadEmployeeResponse employee = employeeService.readEmployee(academyId, requestAccount);
+        SessionUtil.setSessionNameAndRole(request, employee);
+
         // 결제 성공 시, payment key 저장
         paymentService.verifyRequest(paymentKey, orderId, amount);
 
@@ -117,9 +126,12 @@ public class PaymentController {
         return "payment/success";
     }
     @GetMapping("/academy/payment")
-    public String paySuccess(Authentication authentication,Model model) {
+    public String paySuccess(HttpServletRequest request,Authentication authentication,Model model) {
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
         Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
+        //회원 이름 표시
+        ReadEmployeeResponse employee = employeeService.readEmployee(academyId, requestAccount);
+        SessionUtil.setSessionNameAndRole(request, employee);
 
         model.addAttribute("account", requestAccount);
 
@@ -130,12 +142,14 @@ public class PaymentController {
     }
 
     @GetMapping("/academy/payment/list")
-    public String paymentList(@RequestParam(required = false) String studentName, Model model, Pageable pageable, Authentication authentication) {
+    public String paymentList(@RequestParam(required = false) String studentName,HttpServletRequest request, Model model, Pageable pageable, Authentication authentication) {
 
         Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
         log.info("💲 결제 내역 조회한 사용자의 학원 id [{}] || 요청한 사용자의 계정 [{}]", academyId, requestAccount);
-
+        //회원 이름 표시
+        ReadEmployeeResponse employee = employeeService.readEmployee(academyId, requestAccount);
+        SessionUtil.setSessionNameAndRole(request, employee);
 
         if (studentName != null) {
             Page<CompletePaymentResponse> payments = paymentService.findAllCompletePaymentByStudent(academyId, requestAccount, studentName, pageable);

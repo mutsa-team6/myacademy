@@ -1,7 +1,7 @@
 package com.project.myacademy.domain.waitinglist;
 
-import com.project.myacademy.domain.waitinglist.dto.CreateWaitinglistRequest;
 import com.project.myacademy.domain.waitinglist.dto.CreateWaitinglistResponse;
+import com.project.myacademy.domain.waitinglist.dto.DeleteWaitinglistResponse;
 import com.project.myacademy.domain.waitinglist.dto.ReadAllWaitinglistResponse;
 import com.project.myacademy.global.Response;
 import com.project.myacademy.global.util.AuthenticationUtil;
@@ -50,5 +50,18 @@ public class WaitinglistRestController {
         log.info("대기번호 생성 성공");
         return ResponseEntity.ok().body(Response.success(createWaitinglist));
 
+    }
+
+    @Operation(summary = "대기번호 삭제", description = "ADMIN, STAFF 회원만 대기번호 삭제 가능합니다.")
+    @DeleteMapping("/{academyId}/students/{studentId}/lectures/{lectureId}/waitinglists/{waitinglistId}")
+    public ResponseEntity<Response<DeleteWaitinglistResponse>> create(@PathVariable("academyId") Long academyId,
+                                                                      @PathVariable("studentId") Long studentId,
+                                                                      @PathVariable("lectureId") Long lectureId,
+                                                                      @PathVariable("waitinglistId") Long waitinglistId,
+                                                                      Authentication authentication) {
+        String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
+        DeleteWaitinglistResponse deletedWaitinglist = waitingListService.deleteWaitinglist(academyId, studentId, lectureId, waitinglistId, requestAccount);
+        log.info("대기번호 삭제 성공");
+        return ResponseEntity.ok().body(Response.success(deletedWaitinglist));
     }
 }

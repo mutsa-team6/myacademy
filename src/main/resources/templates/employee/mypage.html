@@ -61,7 +61,7 @@
                                             <div class="mt-n4 mt-lg-n6 mb-4 mb-lg-0">
                                                 <a href="javascript:;">
                                                     <th:block th:if="${imageUrl =='null'}">
-                                                        <img src="../assets/img/team-2.jpg"
+                                                        <img src="https://raw.githubusercontent.com/buinq/imageServer/main/img/image-20230204013043779.png"
                                                              class="rounded-circle img-fluid border border-2 border-white">
                                                     </th:block>
                                                     <th:block th:if="${imageUrl != 'null'}">
@@ -282,6 +282,15 @@
                                                 <th class="align-middle text-center">
                                                 <span class=" text font-weight-bold" style="font-size: small"
                                                       th:text="${lecture.currentEnrollmentNumber}"></span>
+                                                </th>
+                                                <th class="align-middle">
+                                                    <form action="/academy/mypage/attendance" method="get">
+                                                        <input type="text" class="form-control" name="lectureId"
+                                                               th:value="${lecture.lectureId}" hidden>
+                                                        <button class="btn btn-icon btn-2 btn-primary mt-3" type="submit">
+                                                            출석부 조회</span>
+                                                        </button>
+                                                    </form>
                                                 </th>
                                             </tr>
                                         </div>

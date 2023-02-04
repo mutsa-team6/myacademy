@@ -4,6 +4,7 @@ import com.project.myacademy.domain.academy.AcademyService;
 import com.project.myacademy.domain.academy.dto.FindAcademyRequest;
 import com.project.myacademy.domain.academy.dto.FindAcademyResponse;
 import com.project.myacademy.domain.academy.dto.ReadAcademyResponse;
+import com.project.myacademy.domain.employee.EmployeeService;
 import com.project.myacademy.domain.employee.dto.ReadEmployeeResponse;
 import com.project.myacademy.domain.enrollment.EnrollmentService;
 import com.project.myacademy.domain.enrollment.dto.FindEnrollmentResponse;
@@ -21,6 +22,7 @@ import com.project.myacademy.domain.student.dto.ReadStudentResponse;
 import com.project.myacademy.domain.uniqueness.UniquenessService;
 import com.project.myacademy.domain.uniqueness.dto.ReadAllUniquenessResponse;
 import com.project.myacademy.global.util.AuthenticationUtil;
+import com.project.myacademy.global.util.SessionUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -30,6 +32,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @Controller
@@ -45,11 +48,17 @@ public class StudentController {
     private final EnrollmentService enrollmentService;
     private final PaymentService paymentService;
     private final UniquenessService uniquenessService;
+    private final EmployeeService employeeService;
 
     @GetMapping("/academy/student")
-    public String student(Authentication authentication, Model model, Pageable pageable) {
+    public String student(HttpServletRequest request, Authentication authentication, Model model, Pageable pageable) {
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
         Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
+
+        //회원 이름 표시
+        ReadEmployeeResponse employee = employeeService.readEmployee(academyId, requestAccount);
+        SessionUtil.setSessionNameAndRole(request, employee);
+
 
         FindAcademyResponse academy = academyService.findAcademyById(academyId);
         model.addAttribute("academy", academy);
@@ -59,10 +68,13 @@ public class StudentController {
     }
 
     @GetMapping("/academy/student/register")
-    public String studentRegister(Model model, Authentication authentication) {
-
-        Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
+    public String studentRegister(HttpServletRequest request, Model model, Authentication authentication) {
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
+        Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
+
+        //회원 이름 표시
+        ReadEmployeeResponse employee = employeeService.readEmployee(academyId, requestAccount);
+        SessionUtil.setSessionNameAndRole(request, employee);
 
         FindAcademyResponse academy = academyService.findAcademyById(academyId);
         model.addAttribute("academy", academy);
@@ -86,10 +98,14 @@ public class StudentController {
     }
 
     @GetMapping("/academy/students/list")
-    public String studentList(@RequestParam(required = false) String studentName, Model model, Pageable pageable, Authentication authentication) {
+    public String studentList(@RequestParam(required = false) String studentName,HttpServletRequest request, Model model, Pageable pageable, Authentication authentication) {
 
-        Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
+        Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
+
+        //회원 이름 표시
+        ReadEmployeeResponse employee = employeeService.readEmployee(academyId, requestAccount);
+        SessionUtil.setSessionNameAndRole(request, employee);
 
         if (studentName != null) {
             Page<ReadAllStudentResponse> searchStudents = studentService.findStudentForStudentList(academyId, studentName, pageable);
@@ -110,10 +126,13 @@ public class StudentController {
     }
 
     @GetMapping("/academy/student/info")
-    public String lectureRegister(@RequestParam Long studentId, Model model, Pageable pageable, Authentication authentication) {
+    public String lectureRegister(@RequestParam Long studentId,HttpServletRequest request, Model model, Pageable pageable, Authentication authentication) {
 
         Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
+        //회원 이름 표시
+        ReadEmployeeResponse employee = employeeService.readEmployee(academyId, requestAccount);
+        SessionUtil.setSessionNameAndRole(request, employee);
 
         ReadStudentResponse student = studentService.readStudent(academyId, studentId, requestAccount);
 

@@ -6,10 +6,13 @@ import com.project.myacademy.domain.employee.EmployeeRole;
 import com.project.myacademy.domain.employee.EmployeeService;
 import com.project.myacademy.domain.employee.dto.ReadAllEmployeeResponse;
 import com.project.myacademy.domain.employee.dto.ReadEmployeeResponse;
+import com.project.myacademy.domain.enrollment.EnrollmentService;
+import com.project.myacademy.domain.enrollment.dto.FindStudentInfoFromEnrollmentByLectureResponse;
 import com.project.myacademy.domain.file.employeeprofile.EmployeeProfileS3UploadService;
 import com.project.myacademy.domain.lecture.LectureService;
 import com.project.myacademy.domain.lecture.dto.ReadAllLectureResponse;
 import com.project.myacademy.global.util.AuthenticationUtil;
+import com.project.myacademy.global.util.SessionUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -35,11 +38,19 @@ public class EmployeeController {
     private final EmployeeService employeeService;
     private final LectureService lectureService;
     private final AcademyService academyService;
+    private final EnrollmentService enrollmentService;
 
     private final EmployeeProfileS3UploadService employeeProfileS3UploadService;
 
     @GetMapping("/join")
-    public String join() {
+    public String join(@RequestParam(required = false) String realName, @RequestParam(required = false) String email, Model model) {
+
+        if (realName != null && email != null) {
+            model.addAttribute("realName", realName);
+            model.addAttribute("email", email);
+        }
+
+
         return "employee/join";
     }
 
@@ -61,17 +72,19 @@ public class EmployeeController {
     }
 
     @GetMapping("/academy/mypage")
-    public String mypage(Model model, Authentication authentication, Pageable pageable) {
+    public String mypage(HttpServletRequest request, Model model, Authentication authentication, Pageable pageable) {
 
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
         Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
         log.info("🔎 마이페이지 조회한 사용자의 학원 id [{}] || 요청한 사용자의 계정 [{}]", academyId, requestAccount);
 
-
+        //회원 이름 표시
         ReadEmployeeResponse employee = employeeService.readEmployee(academyId, requestAccount);
+        SessionUtil.setSessionNameAndRole(request, employee);
+
 
         String storedUrl = employeeProfileS3UploadService.getStoredUrl(employee.getId());
-        model.addAttribute("imageUrl",storedUrl);
+        model.addAttribute("imageUrl", storedUrl);
 
         model.addAttribute("employee", employee);
         Page<ReadAllLectureResponse> lectures = null;
@@ -94,11 +107,16 @@ public class EmployeeController {
      * 원장만 가능
      */
     @GetMapping("/academy/employees")
-    public String manageEmployee(Model model, Authentication authentication, Pageable pageable) {
+    public String manageEmployee(HttpServletRequest request, Model model, Authentication authentication, Pageable pageable) {
 
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
         Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
         log.info("🔎 마이페이지 조회한 사용자의 학원 id [{}] || 요청한 사용자의 계정 [{}]", academyId, requestAccount);
+
+
+        //회원 이름 표시
+        ReadEmployeeResponse requestEmployee = employeeService.readEmployee(academyId, requestAccount);
+        SessionUtil.setSessionNameAndRole(request, requestEmployee);
 
         FindAcademyResponse academy = academyService.findAcademyById(academyId);
         model.addAttribute("academy", academy);
@@ -115,6 +133,36 @@ public class EmployeeController {
         model.addAttribute("next", pageable.next().getPageNumber());
 
         return "employee/employees";
+    }
+
+    @GetMapping("/academy/mypage/attendance")
+    public String attendance(@RequestParam Long lectureId, HttpServletRequest request, Model model, Authentication authentication, Pageable pageable) {
+
+        String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
+        Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
+        log.info("🔎 마이페이지 조회한 사용자의 학원 id [{}] || 요청한 사용자의 계정 [{}]", academyId, requestAccount);
+
+        //회원 이름 표시
+        ReadEmployeeResponse employee = employeeService.readEmployee(academyId, requestAccount);
+        SessionUtil.setSessionNameAndRole(request, employee);
+
+
+        Page<FindStudentInfoFromEnrollmentByLectureResponse> studentsInfo = enrollmentService.findStudentInfoFromEnrollmentByLecture(academyId, requestAccount, lectureId, pageable);
+
+        model.addAttribute("studentsInfo", studentsInfo);
+
+
+        model.addAttribute("employee", employee);
+
+        FindAcademyResponse academy = academyService.findAcademyById(academyId);
+        model.addAttribute("academy", academy);
+        model.addAttribute("account", requestAccount);
+        model.addAttribute("academyId", academyId);
+        model.addAttribute("employeeId", employee.getId());
+        model.addAttribute("previous", pageable.previousOrFirst().getPageNumber());
+        model.addAttribute("next", pageable.next().getPageNumber());
+
+        return "employee/attendance";
     }
 
     @GetMapping("/oauthFail")

@@ -141,6 +141,10 @@
                                                 style="color: #5A2082">
                                                 작성 일시
                                             </th>
+                                            <th class="text-center text-uppercase font-weight-bolder "
+                                                style="color: #5A2082">
+                                                작성자
+                                            </th>
 
                                             <th class="text-secondary opacity-7"></th>
                                         </tr>
@@ -164,11 +168,15 @@
                                                       th:text="${uniqueness.createdAt}"></span>
                                                 </td>
                                                 <td class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold"
+                                                      th:text="${uniqueness.author}"></span>
+                                                </td>
+                                                <td class="align-middle text-center">
 
                                                     <a href="javascript:;"
                                                        th:onclick="|student.delete(${academyId},${student.id},${uniqueness.uniquenessId})|"
                                                        type="button"
-                                                       class="text-secondary font-weight-bold text-xs"
+                                                       class="text-danger font-weight-bold text-xs"
                                                        data-toggle="tooltip"
                                                        data-original-title="delete-academy">
                                                         delete
