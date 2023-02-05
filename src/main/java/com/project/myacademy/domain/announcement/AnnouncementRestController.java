@@ -83,7 +83,7 @@ public class AnnouncementRestController {
     /**
      * 특정 학원 공지사항 삭제
      */
-    @Operation(summary = "공지사항 수정", description = "ADMIN,STAFF 회원만 삭제가 가능합니다.")
+    @Operation(summary = "공지사항 삭제", description = "ADMIN,STAFF 회원만 삭제가 가능합니다.")
     @DeleteMapping("/{academyId}/announcements/{announcementId}")
     public ResponseEntity<Response<DeleteAnnouncementResponse>> delete(@PathVariable Long academyId, @PathVariable Long announcementId, Authentication authentication) {
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
