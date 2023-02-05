@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "10. 결제", description = "Toss 결제 OpenAPI")
+@Tag(name = "11. 결제", description = "Toss 결제 OpenAPI")
 @RestController
 @RequestMapping("/api/v1/payments")
 @RequiredArgsConstructor
