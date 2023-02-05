@@ -30,7 +30,7 @@ public class AnnouncementController {
     private final EmployeeProfileS3UploadService employeeProfileS3UploadService;
 
     @GetMapping("/academy/announcements")
-    public String announcement(@RequestParam(required = false) String announcementName, HttpServletRequest request, Authentication authentication,Model model, Pageable pageable) {
+    public String announcement(@RequestParam(required = false) String title, HttpServletRequest request, Authentication authentication, Model model, Pageable pageable) {
 
         Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
@@ -39,15 +39,21 @@ public class AnnouncementController {
         ReadEmployeeResponse employee = employeeService.readEmployee(academyId, requestAccount);
         SessionUtil.setSessionNameAndRole(request, employee);
 
-        Page<ReadAllAnnouncementResponse> announcements = announcementService.readAllAnnouncement(academyId, pageable, requestAccount);
-        model.addAttribute("announcements", announcements);
-        model.addAttribute("account", requestAccount);
+        if (title != null) {
+            Page<ReadAllAnnouncementResponse> announcements = announcementService.searchAnnouncement(academyId, title, pageable, requestAccount);
+            model.addAttribute("announcements", announcements);
 
+        } else {
+            Page<ReadAllAnnouncementResponse> announcements = announcementService.readAllAnnouncement(academyId, pageable, requestAccount);
+            model.addAttribute("announcements", announcements);
+        }
+
+        model.addAttribute("account", requestAccount);
         return "announcement/list";
     }
 
     @GetMapping("/academy/announcements/write")
-    public String announcementWrite(@RequestParam(required = false) String announcementName, HttpServletRequest request, Authentication authentication, Model model) {
+    public String announcementWrite(HttpServletRequest request, Authentication authentication, Model model) {
 
         Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
@@ -61,8 +67,9 @@ public class AnnouncementController {
 
         return "announcement/write";
     }
+
     @GetMapping("/academy/announcements/detail")
-    public String announcementWrite(@RequestParam(required = false) Long announcementsNum, HttpServletRequest request, Authentication authentication, Model model) {
+    public String announcementWrite(@RequestParam(required = false) Long announcementNum, HttpServletRequest request, Authentication authentication, Model model) {
         Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
 
@@ -71,7 +78,7 @@ public class AnnouncementController {
         SessionUtil.setSessionNameAndRole(request, employee);
 
 
-        ReadAnnouncementResponse announcement = announcementService.readAnnouncement(academyId, announcementsNum, requestAccount);
+        ReadAnnouncementResponse announcement = announcementService.readAnnouncement(academyId, announcementNum, requestAccount);
         String image = employeeProfileS3UploadService.getStoredUrl(announcement.getAuthorId());
 
         model.addAttribute("image", image);
@@ -80,5 +87,26 @@ public class AnnouncementController {
         model.addAttribute("account", requestAccount);
 
         return "announcement/detail";
+    }
+
+    @GetMapping("/academy/announcements/edit")
+    public String announcementEdit(@RequestParam(required = false) Long announcementNum, HttpServletRequest request, Authentication authentication, Model model) {
+        Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
+        String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
+
+        //회원 이름 표시
+        ReadEmployeeResponse employee = employeeService.readEmployee(academyId, requestAccount);
+        SessionUtil.setSessionNameAndRole(request, employee);
+
+
+        ReadAnnouncementResponse announcement = announcementService.readAnnouncement(academyId, announcementNum, requestAccount);
+        String image = employeeProfileS3UploadService.getStoredUrl(announcement.getAuthorId());
+
+        model.addAttribute("image", image);
+        model.addAttribute("academyId", academyId);
+        model.addAttribute("announcement", announcement);
+        model.addAttribute("account", requestAccount);
+
+        return "announcement/edit";
     }
 }
