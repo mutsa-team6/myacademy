@@ -4,6 +4,7 @@ import com.project.myacademy.domain.academy.Academy;
 import com.project.myacademy.domain.academy.AcademyRepository;
 import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.domain.employee.EmployeeRepository;
+import com.project.myacademy.domain.employee.EmployeeRole;
 import com.project.myacademy.domain.parent.dto.CreateParentRequest;
 import com.project.myacademy.domain.parent.dto.UpdateParentRequest;
 import com.project.myacademy.domain.parent.util.AcademyFixtureUtil;
@@ -30,6 +31,7 @@ class ParentServiceTest {
     AcademyRepository academyRepository = mock(AcademyRepository.class);
 
     ParentService parentService = new ParentService(parentRepository, employeeRepository, academyRepository);
+    Employee mockEmployee = mock(Employee.class);
 
     @Nested
     @DisplayName("부모 정보 등록 테스트")
@@ -39,6 +41,7 @@ class ParentServiceTest {
         Academy academy1 = AcademyFixtureUtil.ACADEMY1.init();
         Employee employee1 = EmployeeFixtureUtil.ROLE_ADMIN.init();
         Parent parent1 = ParentFixtureUtil.PARENT1.init();
+
 
         @Test
         @DisplayName("부모 정보 등록 : 성공")
@@ -74,6 +77,18 @@ class ParentServiceTest {
 
             AppException appException = assertThrows(AppException.class, () -> parentService.createParent(1L, request, "admin"));
             assertThat(appException.getErrorCode().equals(ErrorCode.ACCOUNT_NOT_FOUND));
+        }
+
+        @Test
+        @DisplayName("부모 정보 등록 : 실패 - 권한에러")
+        public void createParentFailPermission() {
+
+            when(academyRepository.findById(any())).thenReturn(Optional.of(academy1));
+            when(employeeRepository.findByAccountAndAcademy(any(), any())).thenReturn(Optional.of(mockEmployee));
+            when(mockEmployee.getEmployeeRole()).thenReturn(EmployeeRole.ROLE_USER);
+
+            AppException appException = assertThrows(AppException.class, () -> parentService.createParent(1L, request, "user"));
+            assertThat(appException.getErrorCode().equals(ErrorCode.INVALID_PERMISSION));
         }
 
         @Test
@@ -132,6 +147,19 @@ class ParentServiceTest {
         }
 
         @Test
+        @DisplayName("부모 정보 조회 : 실패 - 권한에러")
+        public void readParentFailPermission() {
+
+            when(academyRepository.findById(any())).thenReturn(Optional.of(academy1));
+            when(employeeRepository.findByAccountAndAcademy(any(), any())).thenReturn(Optional.of(mockEmployee));
+            when(mockEmployee.getEmployeeRole()).thenReturn(EmployeeRole.ROLE_USER);
+
+            AppException appException = assertThrows(AppException.class, () -> parentService.readParent(1L, 1L,"user"));
+            assertThat(appException.getErrorCode().equals(ErrorCode.INVALID_PERMISSION));
+        }
+
+
+        @Test
         @DisplayName("부모 정보 조회 : 실패 - 부모에러")
         void readParentFailParent() {
 
@@ -183,6 +211,18 @@ class ParentServiceTest {
 
             AppException appException = assertThrows(AppException.class, () -> parentService.updateParent(1L, 1L, request, "admin"));
             assertThat(appException.getErrorCode().equals(ErrorCode.ACCOUNT_NOT_FOUND));
+        }
+
+        @Test
+        @DisplayName("부모 정보 수정 : 실패 - 권한에러")
+        public void updateParentFailPermission() {
+
+            when(academyRepository.findById(any())).thenReturn(Optional.of(academy1));
+            when(employeeRepository.findByAccountAndAcademy(any(), any())).thenReturn(Optional.of(mockEmployee));
+            when(mockEmployee.getEmployeeRole()).thenReturn(EmployeeRole.ROLE_USER);
+
+            AppException appException = assertThrows(AppException.class, () -> parentService.updateParent(1L, 1L, request, "user"));
+            assertThat(appException.getErrorCode().equals(ErrorCode.INVALID_PERMISSION));
         }
 
         @Test
@@ -239,6 +279,18 @@ class ParentServiceTest {
         }
 
         @Test
+        @DisplayName("부모 정보 삭제 : 실패 - 권한에러")
+        public void deleteParentFailPermission() {
+
+            when(academyRepository.findById(any())).thenReturn(Optional.of(academy1));
+            when(employeeRepository.findByAccountAndAcademy(any(), any())).thenReturn(Optional.of(mockEmployee));
+            when(mockEmployee.getEmployeeRole()).thenReturn(EmployeeRole.ROLE_USER);
+
+            AppException appException = assertThrows(AppException.class, () -> parentService.deleteParent(1L, 1L, "admin"));
+            assertThat(appException.getErrorCode().equals(ErrorCode.INVALID_PERMISSION));
+        }
+
+        @Test
         @DisplayName("부모 정보 삭제 : 실패 - 부모에러")
         void deleteParentFailParent() {
 
@@ -248,5 +300,16 @@ class ParentServiceTest {
             AppException appException = assertThrows(AppException.class, () -> parentService.deleteParent(1L, 1L, "admin"));
             assertThat(appException.getErrorCode().equals(ErrorCode.PARENT_NOT_FOUND));
         }
+    }
+
+    @Test
+    @DisplayName("부모의 전화번호와 등록된 학원으로 부모가 존재하는지 찾아오기")
+    public void checkExistByPhoneAndAcademy_success() {
+
+        Parent parent1 = ParentFixtureUtil.PARENT1.init();
+
+        when(parentRepository.existsByPhoneNum(any(String.class))).thenReturn(true);
+
+        assertDoesNotThrow(() -> parentService.checkExistByPhoneAndAcademy(parent1.getPhoneNum(), parent1.getAcademyId()));
     }
 }
