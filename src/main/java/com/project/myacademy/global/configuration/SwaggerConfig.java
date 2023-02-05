@@ -67,6 +67,7 @@ public class SwaggerConfig {
                 "com.project.myacademy.domain.lecture",
                 "com.project.myacademy.domain.enrollment",
                 "com.project.myacademy.domain.waitinglist",
+                "com.project.myacademy.domain.discount",
                 "com.project.myacademy.domain.payment",
                 "com.project.myacademy.domain.file.teacherprofile"
         };
