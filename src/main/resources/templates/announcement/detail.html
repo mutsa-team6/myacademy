@@ -1,0 +1,157 @@
+<!--
+=========================================================
+* Material Dashboard 2 - v3.0.4
+=========================================================
+
+* Product Page: https://www.creative-tim.com/product/material-dashboard
+* Copyright 2022 Creative Tim (https://www.creative-tim.com)
+* Licensed under MIT (https://www.creative-tim.com/license)
+* Coded by Creative Tim
+
+=========================================================
+
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+-->
+
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<!-- header -->
+<th:block th:replace="layout/header :: headerFragment"></th:block>
+
+
+<body class="g-sidenav-show  bg-gray-100">
+
+<!-- side bar -->
+<th:block th:replace="layout/aside :: asideFragment"></th:block>
+
+
+<main class="main-content border-radius-lg ">
+
+
+    <!-- Navbar -->
+    <th:block th:replace="layout/navbar :: navbarFragment"></th:block>
+
+
+    <div class="container">
+        <div class="row">
+            <div class="col-2">
+            </div>
+            <div class="col-8">
+
+                <div class="card my-4">
+                    <div class="card-header pb-0 mx-4">
+                        <div class=" d-flex justify-content-start mb-3" style="flex: 0 0 auto;">
+                            <h4 th:text="|【${announcement.type}】|"></h4>
+                        </div>
+
+                        <div class="row">
+                            <div class="input-group input-group-dynamic mb-4">
+                                <input type="text" class="form-control" placeholder="제목을 입력하세요." id="input-title"
+                                       style="font-size: 2rem" readonly th:value="${announcement.title}" th:rows="10">
+                            </div>
+                        </div>
+                        <ul class="navbar-nav  justify-content-end" style="float: right">
+
+                            <li class="nav-item d-flex align-items-end" style="margin-left: 5px">
+                                <p th:text="|${announcement.author}|" style="font-size: 20px;font-weight: bold"></p>
+                            </li>
+                            <li class="nav-item d-flex align-items-center" style="margin-left: 5px">
+                                <p th:text="|${announcement.createdAt}|" style="font-size: 15px"></p>
+                            </li>
+
+                        </ul>
+                    </div>
+
+
+                    <div class="card-body px-0 pb-2 mx-5">
+                        <div style="border: 1px solid;border-width: 1px; border-radius: 10px  ;height: 800px">
+                            <p   
+                                    spellcheck="false"
+                                    th:utext="${announcement.body}" readonly></p>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="d-flex justify-content-center mb-3">
+                        <form action="/academy/announcements" method="get">
+                            <button type="submit"
+                                    class="btn btn-lg bg-gradient-primary btn-lg mb-0">목록으로
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-2">
+            </div>
+        </div>
+    </div>
+    <!--footer-->
+    <th:block th:replace="layout/footer :: footerFragment"></th:block>
+</main>
+<!--   Core JS Files   -->
+<script src="/assets/js/core/popper.min.js"></script>
+<script src="/assets/js/core/bootstrap.min.js"></script>
+<script src="/assets/js/plugins/perfect-scrollbar.min.js"></script>
+<script src="/assets/js/plugins/smooth-scrollbar.min.js"></script>
+<script src="/assets/js/material-dashboard.min.js?v=3.0.4"></script>
+<link id="pagestyle" href="/assets/css/material-dashboard.css?v=3.0.4" rel="stylesheet"/>
+<!-- TOAST UI Editor CDN URL(JS) -->
+<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+
+<Script>
+    const editor = new toastui.Editor({
+        el: document.querySelector('#editor'),
+        previewStyle: 'vertical',
+        height: '800px',
+        initialEditType: 'wysiwyg'
+    });
+
+    let announcement = {
+        init: function () {
+            var _this = this;
+        },
+        create: function (academyId) {
+            let data = {
+                title: document.querySelector('#input-title').value.trim(),
+                body: editor.getMarkdown(),
+                type: document.querySelector('#input-type').value.trim()
+            };
+
+            if (data.type == 0) {
+                alert("카테고리 선택은 필수입니다.")
+                return;
+            }
+            console.log(data);
+
+            axios.post("/api/v1/academies/" + academyId + "/announcements",
+                JSON.stringify(data), {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                }
+            ).then((response) => {
+                console.log(response);
+                alert("학원등록 성공");
+                // window.location.href = '/academies';
+
+            }).catch((error) => {
+                console.log(error);
+                if (error.response.data.result["errorCode"] == "DUPLICATED_ACADEMY") {
+                    alert("학원 이름은 중복될 수 없습니다.");
+                    // window.location.href = '/academies';
+                }
+
+
+            });
+
+        }
+    };
+
+    academy.init();
+
+</script>
+</body>
+
+</html>

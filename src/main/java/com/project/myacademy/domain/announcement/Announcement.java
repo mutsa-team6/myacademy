@@ -28,6 +28,8 @@ public class Announcement extends BaseEntity {
     private String title;
     private String body;
 
+    private String author;
+
     @Enumerated(value = EnumType.STRING)
     private AnnouncementType type;
 
@@ -40,11 +42,12 @@ public class Announcement extends BaseEntity {
         this.body = request.getBody();
     }
 
-    public static Announcement toAnnouncement(CreateAnnouncementRequest request, Academy academy) {
+    public static Announcement toAnnouncement(CreateAnnouncementRequest request, Academy academy,String author) {
         return Announcement.builder()
                 .title(request.getTitle())
                 .type(request.getType())
                 .body(request.getBody())
+                .author(author)
                 .academy(academy)
                 .build();
     }
