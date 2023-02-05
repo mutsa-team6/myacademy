@@ -5,6 +5,7 @@ import com.project.myacademy.domain.academy.AcademyRepository;
 import com.project.myacademy.domain.announcement.dto.*;
 import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.domain.employee.EmployeeRepository;
+import com.project.myacademy.domain.employee.EmployeeRole;
 import com.project.myacademy.global.exception.AppException;
 import com.project.myacademy.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -52,7 +54,7 @@ public class AnnouncementService {
             throw new AppException(ErrorCode.INVALID_PERMISSION);
         }
 
-        Announcement savedAnnouncement = announcementRepository.save(Announcement.toAnnouncement(request, academy,employee.getName()));
+        Announcement savedAnnouncement = announcementRepository.save(Announcement.toAnnouncement(request, academy, employee));
 
         return CreateAnnouncementResponse.of(savedAnnouncement);
     }
@@ -75,11 +77,10 @@ public class AnnouncementService {
     }
 
     /**
-     *
      * @param academyId 학원 id
-     * @param pageable 20개씩 id순서대로(최신순)
-     * @param account 로그인한 계정
-     * @param type 공지사항 타입 (ANNOUNCEMENT, ADMISSION)
+     * @param pageable  20개씩 id순서대로(최신순)
+     * @param account   로그인한 계정
+     * @param type      공지사항 타입 (ANNOUNCEMENT, ADMISSION)
      * @return
      */
     @Transactional(readOnly = true)
@@ -158,6 +159,14 @@ public class AnnouncementService {
         Announcement announcement = announcementRepository.findById(announcementId)
                 .orElseThrow(() -> new AppException(ErrorCode.ANNOUNCEMENT_NOT_FOUND));
 
+        // Admin이 아닌 경우
+        if (!employee.getEmployeeRole().equals(EmployeeRole.ROLE_ADMIN)) {
+            // 삭제 요청자와 게시글 작성자가 일치해야 삭제 가능
+            if (!announcement.getEmployee().equals(employee)) {
+                throw new AppException(ErrorCode.INVALID_PERMISSION);
+            }
+        }
+
         announcementRepository.delete(announcement);
 
         return DeleteAnnouncementResponse.of(announcement);
@@ -167,20 +176,23 @@ public class AnnouncementService {
      * 메인에 공지사항 5개 보여주기 위한 메서드
      */
 
-    public List<ReadAnnouncementResponse> readAnnouncementForMain(Long academyId, String account){
+    public List<ReadAnnouncementResponse> readAnnouncementForMain(Long academyId, String account) {
         //academyId 존재 유무 확인
         Academy academy = validateAcademy(academyId);
         //account 유효검사
         Employee employee = validateAcademyEmployee(account, academy);
 
-        return announcementRepository.findTop5ByTypeOrderByCreatedAtDesc(AnnouncementType.ANNOUNCEMENT).stream().map(announcement ->
+        List<Announcement> announcements = announcementRepository.findTop5ByTypeOrderByCreatedAtDesc(AnnouncementType.ANNOUNCEMENT);
+
+        return announcements.stream().map(announcement ->
                 ReadAnnouncementResponse.of(announcement)).collect(Collectors.toList());
     }
+
     /**
      * 메인에 입시정보 5개 보여주기 위한 메서드
      */
 
-    public List<ReadAnnouncementResponse> readAdmissionForMain(Long academyId, String account){
+    public List<ReadAnnouncementResponse> readAdmissionForMain(Long academyId, String account) {
         //academyId 존재 유무 확인
         Academy academy = validateAcademy(academyId);
         //account 유효검사

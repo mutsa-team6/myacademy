@@ -23,6 +23,7 @@ public class ReadAllAnnouncementResponse {
     private String body;
     private String createdAt;
     private String author;
+    private Long authorId;
 
     public static ReadAllAnnouncementResponse of(Announcement announcement) {
         return ReadAllAnnouncementResponse.builder()
@@ -30,8 +31,9 @@ public class ReadAllAnnouncementResponse {
                 .type(announcement.getType().getType())
                 .title(announcement.getTitle())
                 .body(announcement.getBody())
-                .author(announcement.getAuthor())
-                .createdAt(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(Timestamp.valueOf(announcement.getCreatedAt())))
+                .author(announcement.getEmployee().getName())
+                .authorId(announcement.getEmployee().getId())
+                .createdAt(new SimpleDateFormat("yyyy/MM/dd HH:mm").format(Timestamp.valueOf(announcement.getCreatedAt())))
                 .build();
     }
 }

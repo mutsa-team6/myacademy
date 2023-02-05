@@ -5,6 +5,7 @@ import com.project.myacademy.domain.announcement.AnnouncementType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -12,6 +13,7 @@ import java.text.SimpleDateFormat;
 @Builder
 @AllArgsConstructor
 @Getter
+@Setter
 public class ReadAnnouncementResponse {
     //공지사항 id
     private Long id;
@@ -23,6 +25,7 @@ public class ReadAnnouncementResponse {
     private String body;
     private String author;
     private String createdAt;
+    private Long authorId;
 
 
     public static ReadAnnouncementResponse of(Announcement announcement) {
@@ -31,7 +34,8 @@ public class ReadAnnouncementResponse {
                 .type(announcement.getType().getType())
                 .title(announcement.getTitle())
                 .body(announcement.getBody())
-                .author(announcement.getAuthor())
+                .author(announcement.getEmployee().getName())
+                .authorId(announcement.getEmployee().getId())
                 .createdAt(new SimpleDateFormat("yyyy/MM/dd HH:mm").format(Timestamp.valueOf(announcement.getCreatedAt())))
                 .build();
     }

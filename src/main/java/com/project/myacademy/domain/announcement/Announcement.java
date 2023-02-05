@@ -4,6 +4,7 @@ import com.project.myacademy.domain.BaseEntity;
 import com.project.myacademy.domain.academy.Academy;
 import com.project.myacademy.domain.announcement.dto.CreateAnnouncementRequest;
 import com.project.myacademy.domain.announcement.dto.UpdateAnnouncementRequest;
+import com.project.myacademy.domain.employee.Employee;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
@@ -26,9 +27,9 @@ public class Announcement extends BaseEntity {
     private Long id;
 
     private String title;
-    private String body;
 
-    private String author;
+    @Lob
+    private String body;
 
     @Enumerated(value = EnumType.STRING)
     private AnnouncementType type;
@@ -37,17 +38,22 @@ public class Announcement extends BaseEntity {
     @JoinColumn(name = "academy_id")
     private Academy academy;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "employee_id")
+    private Employee employee;
+
+
     public void updateAnnouncement(UpdateAnnouncementRequest request) {
         this.title = request.getTitle();
         this.body = request.getBody();
     }
 
-    public static Announcement toAnnouncement(CreateAnnouncementRequest request, Academy academy,String author) {
+    public static Announcement toAnnouncement(CreateAnnouncementRequest request, Academy academy,Employee employee) {
         return Announcement.builder()
                 .title(request.getTitle())
                 .type(request.getType())
                 .body(request.getBody())
-                .author(author)
+                .employee(employee)
                 .academy(academy)
                 .build();
     }
