@@ -75,7 +75,7 @@
                                 <tbody>
                                 <tr th:each="announcement : ${announcements}">
                                     <th class="align-middle text-center">
-                                        <a th:href="@{/academy/announcements/detail(announcementsNum=${announcement.id})}">
+                                        <a th:href="@{/academy/announcements/detail(announcementNum=${announcement.id})}">
 
                                                 <span class=" text-xs font-weight-bold"
                                                       th:text="${announcement.title}"></span>
@@ -134,7 +134,7 @@
                                 <tbody>
                                 <tr th:each="admission : ${admissions}">
                                     <th class="align-middle text-center">
-                                        <a th:href="@{/academy/announcements/detail(announcementsNum=${admission.id})}">
+                                        <a th:href="@{/academy/announcements/detail(announcementNum=${admission.id})}">
 
                                                 <span class=" text-xs font-weight-bold"
                                                       th:text="${admission.title}"></span>

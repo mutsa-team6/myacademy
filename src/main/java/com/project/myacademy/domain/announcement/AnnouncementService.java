@@ -11,12 +11,11 @@ import com.project.myacademy.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -119,7 +118,7 @@ public class AnnouncementService {
      * @param request        변경할 내용과 제목을 담은 dto
      * @param account        직원 계정
      */
-    public UpdateAnnouncementResponse updateAnnouncement(Long academyId, Long announcementId, UpdateAnnouncementRequest request, String account) {
+    public UpdateAnnouncementResponse updateAnnouncement(Long academyId, Long announcementId, @RequestBody UpdateAnnouncementRequest request, String account) {
 
         //academyId 존재 유무 확인
         Academy academy = validateAcademy(academyId);
@@ -133,6 +132,14 @@ public class AnnouncementService {
         //announcementId에 해당하는 특이사항이 있는지 확인하고 있으면 가져옴
         Announcement announcement = announcementRepository.findById(announcementId)
                 .orElseThrow(() -> new AppException(ErrorCode.ANNOUNCEMENT_NOT_FOUND));
+
+        // Admin이 아닌 경우
+        if (!employee.getEmployeeRole().equals(EmployeeRole.ROLE_ADMIN)) {
+            // 삭제 요청자와 게시글 작성자가 일치해야 삭제 가능
+            if (!announcement.getEmployee().equals(employee)) {
+                throw new AppException(ErrorCode.INVALID_PERMISSION);
+            }
+        }
 
         announcement.updateAnnouncement(request);
 
@@ -175,6 +182,7 @@ public class AnnouncementService {
     /**
      * 메인에 공지사항 5개 보여주기 위한 메서드
      */
+    @Transactional(readOnly = true)
 
     public List<ReadAnnouncementResponse> readAnnouncementForMain(Long academyId, String account) {
         //academyId 존재 유무 확인
@@ -182,7 +190,7 @@ public class AnnouncementService {
         //account 유효검사
         Employee employee = validateAcademyEmployee(account, academy);
 
-        List<Announcement> announcements = announcementRepository.findTop5ByTypeOrderByCreatedAtDesc(AnnouncementType.ANNOUNCEMENT);
+        List<Announcement> announcements = announcementRepository.findTop5ByTypeAndAcademyOrderByCreatedAtDesc(AnnouncementType.ANNOUNCEMENT, academy);
 
         return announcements.stream().map(announcement ->
                 ReadAnnouncementResponse.of(announcement)).collect(Collectors.toList());
@@ -191,6 +199,7 @@ public class AnnouncementService {
     /**
      * 메인에 입시정보 5개 보여주기 위한 메서드
      */
+    @Transactional(readOnly = true)
 
     public List<ReadAnnouncementResponse> readAdmissionForMain(Long academyId, String account) {
         //academyId 존재 유무 확인
@@ -198,8 +207,22 @@ public class AnnouncementService {
         //account 유효검사
         Employee employee = validateAcademyEmployee(account, academy);
 
-        return announcementRepository.findTop5ByTypeOrderByCreatedAtDesc(AnnouncementType.ADMISSION).stream().map(announcement ->
+        return announcementRepository.findTop5ByTypeAndAcademyOrderByCreatedAtDesc(AnnouncementType.ADMISSION, academy).stream().map(announcement ->
                 ReadAnnouncementResponse.of(announcement)).collect(Collectors.toList());
+    }
+
+    /**
+     *
+     */
+    @Transactional(readOnly = true)
+    public Page<ReadAllAnnouncementResponse> searchAnnouncement(Long academyId, String title, Pageable pageable, String account) {
+
+        //academyId 존재 유무 확인
+        Academy academy = validateAcademy(academyId);
+        //account 유효검사
+        Employee employee = validateAcademyEmployee(account, academy);
+
+        return announcementRepository.findAllByAcademyAndTitleContainingOrderByCreatedAtDesc(academy, title, pageable).map(announcement -> ReadAllAnnouncementResponse.of(announcement));
     }
 
     private Academy validateAcademy(Long academyId) {
