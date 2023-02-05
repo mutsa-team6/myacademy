@@ -36,40 +36,65 @@
 
     <div class="container">
         <div class="row">
-            <div class="col-2">
-            </div>
-            <div class="col-8">
+
+            <div class="col-12">
+
 
                 <div class="card my-4">
                     <div class="card-header pb-0 mx-4">
                         <div class=" d-flex justify-content-start mb-3" style="flex: 0 0 auto;">
-                            <h4 th:text="|【${announcement.type}】|"></h4>
+                            <h6 th:text="|【${announcement.type}】|" style="color:#5A2082;"></h6>
                         </div>
 
                         <div class="row">
-                            <div class="input-group input-group-dynamic mb-4">
+                            <div class="input-group  mb-4">
                                 <input type="text" class="form-control" placeholder="제목을 입력하세요." id="input-title"
                                        style="font-size: 2rem" readonly th:value="${announcement.title}" th:rows="10">
                             </div>
                         </div>
-                        <ul class="navbar-nav  justify-content-end" style="float: right">
+                        <div class="row">
+                            <div class="d-flex mb-3" style="overflow: hidden">
+                                <div style="float: left">
+                                    <th:block th:if="${image=='null'}">
+                                        <img src="https://raw.githubusercontent.com/buinq/imageServer/main/img/image-20230204013043779.png"
+                                             class="avatar avatar-sm me-3 border-radius-sm">
+                                    </th:block>
+                                    <th:block th:if="${image != 'null'}">
+                                        <img th:src="${image}"
+                                             class="avatar avatar-sm me-3 border-radius-sm">
+                                    </th:block>
+                                </div>
+                                <div style="float: left">
+                                    <div style="margin-left: 5px">
+                                        <h5 class="mb-0 text-sm" th:text="|${announcement.author}|"></h5>
+                                        <p class="text-xs text-secondary mb-0"
+                                           th:text="|${announcement.createdAt}|"></p>
+                                    </div>
+                                    <div style="margin-left: 5px">
+                                    </div>
+                                </div>
 
-                            <li class="nav-item d-flex align-items-end" style="margin-left: 5px">
-                                <p th:text="|${announcement.author}|" style="font-size: 20px;font-weight: bold"></p>
-                            </li>
-                            <li class="nav-item d-flex align-items-center" style="margin-left: 5px">
-                                <p th:text="|${announcement.createdAt}|" style="font-size: 15px"></p>
-                            </li>
-
-                        </ul>
+                            </div>
+                        </div>
+                        <div>
+                            <hr style="color: gray; height: 1.5px;background-color: gray">
+                        </div>
                     </div>
 
 
-                    <div class="card-body px-0 pb-2 mx-5">
-                        <div style="border: 1px solid;border-width: 1px; border-radius: 10px  ;height: 800px">
-                            <p   
-                                    spellcheck="false"
-                                    th:utext="${announcement.body}" readonly></p>
+                    <div class="card-body  mx-5" style="padding-top: 1px">
+                        <div class="d-flex justify-content-end my-2">
+                            <button th:onclick="|announcement.delete(${academyId},${announcement.id})|"
+                                    type="button"
+                                    class="btn btn-sm bg-gradient-danger">게시글 삭제
+                            </button>
+                        </div>
+                        <div style="border: 1px solid #E0E0E0;border-width: 1px; border-radius: 5px;">
+                            <div class="mx-5">
+                                <p
+                                        spellcheck="false"
+                                        th:utext="${announcement.body}" readonly></p>
+                            </div>
                         </div>
                     </div>
                     <br>
@@ -83,8 +108,7 @@
                 </div>
 
             </div>
-            <div class="col-2">
-            </div>
+
         </div>
     </div>
     <!--footer-->
@@ -101,51 +125,32 @@
 <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
 
 <Script>
-    const editor = new toastui.Editor({
-        el: document.querySelector('#editor'),
-        previewStyle: 'vertical',
-        height: '800px',
-        initialEditType: 'wysiwyg'
-    });
+
 
     let announcement = {
         init: function () {
             var _this = this;
         },
-        create: function (academyId) {
-            let data = {
-                title: document.querySelector('#input-title').value.trim(),
-                body: editor.getMarkdown(),
-                type: document.querySelector('#input-type').value.trim()
-            };
 
-            if (data.type == 0) {
-                alert("카테고리 선택은 필수입니다.")
-                return;
-            }
-            console.log(data);
+        delete: function (academyId, announcementId) {
+            console.log(academyId);
+            console.log(announcementId);
 
-            axios.post("/api/v1/academies/" + academyId + "/announcements",
-                JSON.stringify(data), {
-                    headers: {
-                        'Content-Type': 'application/json',
+            const con_check = confirm("삭제하시겠습니까?");
+
+            if (con_check === true) {
+                axios.delete("/api/v1/academies/" + academyId + "/announcements/" + announcementId,
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
                     }
-                }
-            ).then((response) => {
-                console.log(response);
-                alert("학원등록 성공");
-                // window.location.href = '/academies';
-
-            }).catch((error) => {
-                console.log(error);
-                if (error.response.data.result["errorCode"] == "DUPLICATED_ACADEMY") {
-                    alert("학원 이름은 중복될 수 없습니다.");
-                    // window.location.href = '/academies';
-                }
-
-
-            });
-
+                ).then((response) => {
+                    alert("게시글 삭제 성공");
+                    window.location.href = '/academy/main';
+                }).catch((error) => {
+                });
+            }
         }
     };
 
