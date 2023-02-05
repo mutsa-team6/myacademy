@@ -30,6 +30,9 @@ public class AcademyService {
         // 학원 Id로 학원을 조회 - 존재한다면 DUPLICATE_ACADEMY 에러발생
         ifPresentAcademyByName(request.getName());
 
+        //사업자등록번호로 학원을 조회 - 있을시 DUPLICATED_BUSINESS_REGISTRATION_NUMBER 에러발생
+        ifPresentBusinessRegistrationNumber(request.getBusinessRegistrationNumber());
+
         Academy savedAcademy = academyRepository.save(Academy.createAcademy(request));
         log.info("✨ 학원 데이터 저장 성공");
 
@@ -114,9 +117,16 @@ public class AcademyService {
         return validateAcademy;
     }
 
-    //학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+    //학원 이름으로 학원을 조회 - 없을시 DUPLICATED_ACADEMY 에러발생
     private void ifPresentAcademyByName(String academyName) {
         academyRepository.findByName(academyName)
                 .ifPresent(academy -> {throw new AppException(ErrorCode.DUPLICATED_ACADEMY);});
+    }
+
+    //사업자등록번호로 학원을 조회 - 있을시 DUPLICATED_BUSINESS_REGISTRATION_NUMBER 에러발생
+    private void ifPresentBusinessRegistrationNumber(String businessRegistrationNumber) {
+        academyRepository.findByBusinessRegistrationNumber(businessRegistrationNumber)
+                .ifPresent(academy -> {throw new AppException(ErrorCode.DUPLICATED_BUSINESS_REGISTRATION_NUMBER);}
+                );
     }
 }

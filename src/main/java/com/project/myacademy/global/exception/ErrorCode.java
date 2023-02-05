@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
 
     DUPLICATED_ACADEMY(HttpStatus.CONFLICT, "이미 존재하는 학원입니다."),
+    DUPLICATED_BUSINESS_REGISTRATION_NUMBER(HttpStatus.CONFLICT, "이미 등록된 사업자등록번호입니다."),
     DUPLICATED_EMPLOYEE(HttpStatus.CONFLICT, "이미 존재하는 회원입니다."),
     DUPLICATED_ACCOUNT(HttpStatus.CONFLICT, "이미 존재하는 계정명입니다."),
     DUPLICATED_EMAIL(HttpStatus.CONFLICT, "이미 존재하는 이메일입니다."),
