@@ -5,6 +5,7 @@ import com.project.myacademy.domain.announcement.dto.ReadAllAnnouncementResponse
 import com.project.myacademy.domain.announcement.dto.ReadAnnouncementResponse;
 import com.project.myacademy.domain.employee.EmployeeService;
 import com.project.myacademy.domain.employee.dto.ReadEmployeeResponse;
+import com.project.myacademy.domain.file.employeeprofile.EmployeeProfileS3UploadService;
 import com.project.myacademy.global.util.AuthenticationUtil;
 import com.project.myacademy.global.util.SessionUtil;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class AnnouncementController {
 
     private final AnnouncementService announcementService;
     private final EmployeeService employeeService;
+    private final EmployeeProfileS3UploadService employeeProfileS3UploadService;
 
     @GetMapping("/academy/announcements")
     public String announcement(@RequestParam(required = false) String announcementName, HttpServletRequest request, Authentication authentication,Model model, Pageable pageable) {
@@ -68,8 +70,11 @@ public class AnnouncementController {
         ReadEmployeeResponse employee = employeeService.readEmployee(academyId, requestAccount);
         SessionUtil.setSessionNameAndRole(request, employee);
 
-        ReadAnnouncementResponse announcement = announcementService.readAnnouncement(academyId, announcementsNum, requestAccount);
 
+        ReadAnnouncementResponse announcement = announcementService.readAnnouncement(academyId, announcementsNum, requestAccount);
+        String image = employeeProfileS3UploadService.getStoredUrl(announcement.getAuthorId());
+
+        model.addAttribute("image", image);
         model.addAttribute("academyId", academyId);
         model.addAttribute("announcement", announcement);
         model.addAttribute("account", requestAccount);
