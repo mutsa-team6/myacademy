@@ -65,7 +65,7 @@ class AcademyServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> academyService.createAcademy(request));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.DUPLICATED_ACADEMY));
+             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.DUPLICATED_ACADEMY);
         }
     }
 
@@ -78,7 +78,7 @@ class AcademyServiceTest {
         @DisplayName("학원 삭제 성공")
         void delete_academy_success() {
 
-            given(academyRepository.findById(deleteAcademyId)).willReturn(Optional.of(academy1));
+            given(academyRepository.findById(any())).willReturn(Optional.of(academy1));
 
             Long deletedId = academyService.deleteAcademy(deleteAcademyId);
 
@@ -94,7 +94,7 @@ class AcademyServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> academyService.deleteAcademy(deleteAcademyId));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.ACADEMY_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACADEMY_NOT_FOUND);
         }
     }
 
@@ -123,7 +123,7 @@ class AcademyServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> academyService.findAcademy(request));
 
-            assertEquals(ErrorCode.ACADEMY_NOT_FOUND, appException.getErrorCode());
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACADEMY_NOT_FOUND);
         }
 
         @Test
