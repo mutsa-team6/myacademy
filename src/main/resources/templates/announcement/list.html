@@ -74,10 +74,19 @@
                                 </thead>
                                 <tbody>
                                 <tr th:each="announcement : ${announcements}">
-                                    <th class="align-middle text-center">
+
+                                    <th:block th:if="${announcement.type =='공지사항'}">
+                                        <th class="align-middle text-center">
                                                 <span class=" text-xs font-weight-bold" style="color: #0d6efd"
                                                       th:text="${announcement.type}"></span>
-                                    </th>
+                                        </th>
+                                    </th:block>
+                                    <th:block th:if="${announcement.type =='입시정보'}">
+                                        <th class="align-middle text-center">
+                                                <span class=" text-xs font-weight-bold" style="color: #5A2082"
+                                                      th:text="${announcement.type}"></span>
+                                        </th>
+                                    </th:block>
                                     <td class="align-middle text-center">
                                         <a th:href="@{/academy/announcements/detail(announcementsNum=${announcement.id})}">
                                                 <span class=" text-xs font-weight-bold"

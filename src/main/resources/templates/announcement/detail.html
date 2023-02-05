@@ -36,11 +36,13 @@
 
     <div class="container">
         <div class="row">
-            <div class="col-12">
+            <div class="col-2">
+            </div>
+            <div class="col-8">
 
                 <div class="card my-4">
                     <div class="card-header pb-0 mx-4">
-                        <div class=" d-flex justify-content-start mb-3" style="flex: 0 0 auto;width: 10%;">
+                        <div class=" d-flex justify-content-start mb-3" style="flex: 0 0 auto;">
                             <h4 th:text="|【${announcement.type}】|"></h4>
                         </div>
 
@@ -50,14 +52,25 @@
                                        style="font-size: 2rem" readonly th:value="${announcement.title}" th:rows="10">
                             </div>
                         </div>
+                        <ul class="navbar-nav  justify-content-end" style="float: right">
+
+                            <li class="nav-item d-flex align-items-end" style="margin-left: 5px">
+                                <p th:text="|${announcement.author}|" style="font-size: 20px;font-weight: bold"></p>
+                            </li>
+                            <li class="nav-item d-flex align-items-center" style="margin-left: 5px">
+                                <p th:text="|${announcement.createdAt}|" style="font-size: 15px"></p>
+                            </li>
+
+                        </ul>
                     </div>
 
 
                     <div class="card-body px-0 pb-2 mx-5">
-                           <p class="form-control"
-                                     rows="10"
-                                     spellcheck="false"
-                                     th:utext="${announcement.body}" readonly></p>
+                        <div style="border: 1px solid;border-width: 1px; border-radius: 10px  ;height: 800px">
+                            <p   
+                                    spellcheck="false"
+                                    th:utext="${announcement.body}" readonly></p>
+                        </div>
                     </div>
                     <br>
                     <div class="d-flex justify-content-center mb-3">
@@ -69,6 +82,8 @@
                     </div>
                 </div>
 
+            </div>
+            <div class="col-2">
             </div>
         </div>
     </div>
@@ -110,7 +125,7 @@
             }
             console.log(data);
 
-            axios.post("/api/v1/academies/"+academyId+"/announcements",
+            axios.post("/api/v1/academies/" + academyId + "/announcements",
                 JSON.stringify(data), {
                     headers: {
                         'Content-Type': 'application/json',

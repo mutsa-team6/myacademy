@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface AnnouncementRepository extends JpaRepository<Announcement, Long> {
 
-    Page<Announcement> findAllByAcademy(Academy academy, Pageable pageable);
+    Page<Announcement> findAllByAcademyOrderByCreatedAtDesc(Academy academy, Pageable pageable);
 
     Page<Announcement> findAllByTypeAndAcademy(AnnouncementType type, Academy academy,Pageable pageable);
 

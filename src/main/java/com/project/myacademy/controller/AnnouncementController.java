@@ -39,6 +39,7 @@ public class AnnouncementController {
 
         Page<ReadAllAnnouncementResponse> announcements = announcementService.readAllAnnouncement(academyId, pageable, requestAccount);
         model.addAttribute("announcements", announcements);
+        model.addAttribute("account", requestAccount);
 
         return "announcement/list";
     }
@@ -54,6 +55,7 @@ public class AnnouncementController {
         SessionUtil.setSessionNameAndRole(request, employee);
 
         model.addAttribute("academyId", academyId);
+        model.addAttribute("account", requestAccount);
 
         return "announcement/write";
     }
@@ -70,6 +72,7 @@ public class AnnouncementController {
 
         model.addAttribute("academyId", academyId);
         model.addAttribute("announcement", announcement);
+        model.addAttribute("account", requestAccount);
 
         return "announcement/detail";
     }

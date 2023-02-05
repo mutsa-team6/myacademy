@@ -71,7 +71,7 @@ public class AnnouncementService {
         //account 유효검사
         Employee employee = validateAcademyEmployee(account, academy);
 
-        return announcementRepository.findAllByAcademy(academy, pageable).map(announcement -> ReadAllAnnouncementResponse.of(announcement));
+        return announcementRepository.findAllByAcademyOrderByCreatedAtDesc(academy, pageable).map(announcement -> ReadAllAnnouncementResponse.of(announcement));
     }
 
     /**
