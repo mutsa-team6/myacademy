@@ -84,7 +84,7 @@ public class EmployeeService {
             }
 
             //ADMIN 권한의 Employee 객체 생성
-            Employee AdminEmployee = Employee.createAdminEmployee(request,foundAcademy,encryptedPassword);
+            Employee AdminEmployee = Employee.createAdminEmployee(request, foundAcademy, encryptedPassword);
 
             Employee saved = employeeRepository.save(AdminEmployee);
             return new CreateEmployeeResponse(saved, foundAcademy.getName());
@@ -98,19 +98,18 @@ public class EmployeeService {
                 throw new AppException(ErrorCode.EMPTY_SUBJECT_FORBIDDEN);
             }
             //USER 권한의 Employee 객체 생성
-            Employee UserEmployee = Employee.createUserEmployee(request,foundAcademy,encryptedPassword);
+            Employee UserEmployee = Employee.createUserEmployee(request, foundAcademy, encryptedPassword);
 
             Employee saved = employeeRepository.save(UserEmployee);
             return new CreateEmployeeResponse(saved, foundAcademy.getName());
         }
 
         //STAFF 권한의 Employee 객체 생성
-        Employee staffEmployee = Employee.createStaffEmployee(request,foundAcademy,encryptedPassword);
+        Employee staffEmployee = Employee.createStaffEmployee(request, foundAcademy, encryptedPassword);
 
         Employee saved = employeeRepository.save(staffEmployee);
         return new CreateEmployeeResponse(saved, foundAcademy.getName());
     }
-
 
     /**
      * 로그인 기능
@@ -150,9 +149,8 @@ public class EmployeeService {
 
         log.info("🔎 아이디 찾기를 요청한 사용자 실명 [{}]  || 사용자 이메일 [{}] ", requestEmployeeName, requestEmployeeEmail);
 
-        // 실명과 이메일에 해당하는 사용자 계정이 있는지 확인
-        Employee foundEmployee = employeeRepository.findByEmail(requestEmployeeEmail)
-                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
+        // 이메일로 직원을 조회 - 없을시 EMPLOYEE_NOT_FOUND 에러발생
+        Employee foundEmployee = validateEmployeeByEmail(requestEmployeeEmail);
 
         String account = foundEmployee.getAccount();
 
@@ -170,14 +168,13 @@ public class EmployeeService {
     public FindPasswordEmployeeResponse findPasswordEmployee(FindPasswordEmployeeRequest request) {
 
         String account = request.getAccount();
-        String name = request.getName();
         String email = request.getEmail();
 
-        employeeRepository.findByAccount(account)
-                .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
+        // 계정이 등록된 계정인지 확인 - 없을시 ACCOUNT_NOT_FOUND 에러발생
+        ifPresentAccount(account);
 
-        Employee foundEmployee = employeeRepository.findByNameAndEmail(name, email)
-                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
+        // 이메일로 직원을 조회 - 없을시 EMPLOYEE_NOT_FOUND 에러발생
+        Employee foundEmployee = validateEmployeeByEmail(email);
 
         String tempPassword = getTempPassword();
         String encodedTempPassword = bCryptPasswordEncoder.encode(tempPassword);
@@ -191,16 +188,11 @@ public class EmployeeService {
 
         emailUtil.sendEmail(email, title, body);
 
-        return new FindPasswordEmployeeResponse(
-                changedEmployee.getId(),
-                changedEmployee.getName(),
-                changedEmployee.getAccount(),
-                changedEmployee.getEmail()
-        );
+        return FindPasswordEmployeeResponse.of(changedEmployee);
     }
 
     /**
-     * oldPassword, newPassword를 입력받아 기존 비밀번호로 한번 더 확인하고 새로운 비밀 번호로 변경해주는 기능
+     * 직원 비밀번호 변경 (Old/New 비밀번호를 입력받아 변경해줌)
      *
      * @param request   기존, 새로운 비밀번호가 담긴 request
      * @param academyId 학원 id
@@ -208,9 +200,11 @@ public class EmployeeService {
      */
     @Transactional
     public ChangePasswordEmployeeResponse changePasswordEmployee(ChangePasswordEmployeeRequest request, Long academyId, String account) {
-        //academyId 존재 유무 확인
+
+        // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
         Academy academy = validateAcademyById(academyId);
-        //account 유효검사
+
+        // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
         Employee employee = validateRequestEmployeeByAccount(account, academy);
 
         //request에 담긴 기존 패스워드가 employee에 저장되어있는 패스워드와 다르면 에러발생
@@ -231,36 +225,29 @@ public class EmployeeService {
     }
 
     /**
-     * ADMIN 계정은 ADMIN을 제외한 다른 계정을 삭제할 수 있다.
-     * 접근하려는 학원이 존재하지 않는 경우 에러 처리
-     * 삭제를 요청한 계정이 해당 학원에 존재하지 않는 경우 에러 처리
-     * 삭제해버릴 계정이 해당 학원에 존재하지 않는 경우 에러 처리
-     * 자기 자신을 삭제 요청할 시, 에러 처리 ( ADMIN 삭제 불가 )
-     * USER 가 삭제하려고하는 경우는 security로 에러 처리
+     * 직원 삭제
      *
      * @param requestAccount 삭제 요청한 직원 계정
      * @param employeeId     삭제를 할 직원 기본키 id
-     * @return
      */
     @Transactional
     public DeleteEmployeeResponse deleteEmployee(String requestAccount, Long academyId, Long employeeId) {
 
-        //학원이 존재하지 않는 경우
+        // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
         Academy foundAcademy = validateAcademyById(academyId);
 
-        // 삭제를 요청한 계정이 해당 학원에 존재하지 않은 경우 에러 처리
+        // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
         Employee requestEmployee = validateRequestEmployeeByAccount(requestAccount, foundAcademy);
 
-        // 삭제하려는 계정이 해당 학원에 존재하지 않으면 에러 처리
+        // 적용될 계정과 학원으로 직원을 조회 - 없을시 ACCOUNT_NOT_FOUND 에러발생
         Employee foundEmployee = validateEmployeeById(employeeId, foundAcademy);
 
-        //request요청자 권한이 ADMIN 아니면 에러처리
+        // 삭제 요청자 권한이 ADMIN 아니면 - INVALID_PERMISSION 에러발생
         if (!requestEmployee.getEmployeeRole().equals(EmployeeRole.ROLE_ADMIN)) {
             throw new AppException(ErrorCode.INVALID_PERMISSION);
         }
 
-
-        // 삭제하려는 계정이 자기 자신인 경우 에러 처리
+        // 삭제하려는 계정이 자기 자신인 경우 - BAD_DELETE_REQUEST 에러발생
         if (foundEmployee.getAccount().equals(requestAccount)) {
             throw new AppException(ErrorCode.BAD_DELETE_REQUEST);
         }
@@ -276,19 +263,16 @@ public class EmployeeService {
     /**
      * 본인 인적사항은 jwt 토큰으로 추출하기 때문에, 다른 사람이 접근할 수 없음
      *
-     * @param academyId      학원 기본키
+     * @param academyId      학원 id
      * @param requestAccount 본인 인적사항을 확인할 계정
-     * @return
      */
-
     public ReadEmployeeResponse readEmployee(Long academyId, String requestAccount) {
 
-        //학원이 존재하는지 확인
+        // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
         Academy foundAcademy = validateAcademyById(academyId);
 
-        //마이페이지 조회를 요청한 회원이 해당 학원에 존재하는지 확인
+        // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
         Employee RequestEmployee = validateRequestEmployeeByAccount(requestAccount, foundAcademy);
-
 
         return new ReadEmployeeResponse(RequestEmployee);
     }
@@ -296,11 +280,9 @@ public class EmployeeService {
     /**
      * JwtTokenFilter 에서 사용하기 위해 만든 메서드 ( 계정 찾아와서 권한 부여하기 위함 )
      */
-    public Employee findByAccountAndEmail(String account, String email) {
-        return employeeRepository.findByAccountAndEmail(account, email)
-                .orElseThrow(() -> {
-                    throw new AppException(ErrorCode.EMPLOYEE_NOT_FOUND);
-                });
+    public Employee findByEmail(String email) {
+
+        return validateEmployeeByEmail(email);
     }
 
     /**
@@ -321,7 +303,7 @@ public class EmployeeService {
         // 조회를 요청한 회원이 해당 학원에 존재하지 않는 경우 에러 처리
         Employee employeeAdmin = validateRequestEmployeeByAccount(requestAccount, foundAcademy);
 
-        // 조회를 요청한 회원의 권한이 admin이 아닐경우 권한에러 처리
+        // 조회를 요청한 회원의 권한이 admin 이 아닐경우 권한에러 처리
         if (!employeeAdmin.getEmployeeRole().equals(EmployeeRole.ROLE_ADMIN)) {
             throw new AppException(ErrorCode.NOT_ALLOWED_ROLE);
         }
@@ -496,6 +478,12 @@ public class EmployeeService {
         return validateEmployee;
     }
 
+    // 계정이 등록된 계정인지 확인 - 없을시 ACCOUNT_NOT_FOUND 에러발생
+    private void ifPresentAccount(String requestAccount) {
+        employeeRepository.findByAccount(requestAccount)
+                .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
+    }
+
     // 가입을 요청한 계정과 학원으로 직원을 조회 - 있을시 DUPLICATED_ACCOUNT 에러발생
     private void ifPresentAccountInAcademy(String requestAccount, Academy foundAcademy) {
         employeeRepository.findByAccountAndAcademy(requestAccount, foundAcademy)
@@ -504,6 +492,12 @@ public class EmployeeService {
                 });
     }
 
+    // 이메일로 직원을 조회 - 없을시 EMPLOYEE_NOT_FOUND 에러발생
+    private Employee validateEmployeeByEmail(String email) {
+        Employee foundEmployee = employeeRepository.findByEmail(email)
+                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
+        return foundEmployee;
+    }
 
     public String getTempPassword() {
         char[] charSet = new char[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',

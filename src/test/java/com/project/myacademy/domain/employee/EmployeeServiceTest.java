@@ -523,11 +523,11 @@ class EmployeeServiceTest {
     @DisplayName("직원 찾기")
     class findEmployee {
         @Test
-        @DisplayName("Account와 Email로 직원찾기 성공")
+        @DisplayName("Email로 직원찾기 성공")
         void find_by_account_email_success() {
-            given(employeeRepository.findByAccountAndEmail(any(), any())).willReturn(Optional.of(employeeADMIN));
+            given(employeeRepository.findByEmail(any())).willReturn(Optional.of(employeeADMIN));
 
-            Employee employee = employeeService.findByAccountAndEmail(employeeADMIN.getAccount(), employeeADMIN.getEmail());
+            Employee employee = employeeService.findByEmail(employeeADMIN.getEmail());
 
             assertThat(employee.equals(employeeADMIN));
         }
@@ -538,7 +538,7 @@ class EmployeeServiceTest {
             given(employeeRepository.findByAccountAndEmail(any(), any())).willReturn(Optional.empty());
 
             AppException appException = assertThrows(AppException.class,
-                    () -> employeeService.findByAccountAndEmail(employeeADMIN.getAccount(), employeeADMIN.getEmail()));
+                    () -> employeeService.findByEmail(employeeADMIN.getEmail()));
 
             assertThat(appException.getErrorCode().equals(ErrorCode.EMPLOYEE_NOT_FOUND));
         }

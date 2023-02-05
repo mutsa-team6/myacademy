@@ -1,5 +1,6 @@
 package com.project.myacademy.domain.employee.dto;
 
+import com.project.myacademy.domain.employee.Employee;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,4 +15,13 @@ public class FindPasswordEmployeeResponse {
     private String name;
     private String account;
     private String email;
+
+    public static FindPasswordEmployeeResponse of(Employee employee) {
+        return FindPasswordEmployeeResponse.builder()
+                .id(employee.getId())
+                .name(employee.getName())
+                .account(employee.getAccount())
+                .email(employee.getEmail())
+                .build();
+    }
 }
