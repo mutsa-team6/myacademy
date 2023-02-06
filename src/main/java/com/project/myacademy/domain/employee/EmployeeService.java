@@ -17,8 +17,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.project.myacademy.domain.employee.QEmployee.employee;
-
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -26,7 +24,6 @@ import static com.project.myacademy.domain.employee.QEmployee.employee;
 public class EmployeeService {
 
     private final EmployeeRepository employeeRepository;
-
     private final AcademyRepository academyRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final EmailUtil emailUtil;
@@ -167,13 +164,13 @@ public class EmployeeService {
     @Transactional
     public FindPasswordEmployeeResponse findPasswordEmployee(FindPasswordEmployeeRequest request) {
 
-        String account = request.getAccount();
+        String name = request.getName();
         String email = request.getEmail();
 
-        // 계정이 등록된 계정인지 확인 - 없을시 ACCOUNT_NOT_FOUND 에러발생
-        ifPresentAccount(account);
+        // 이름으로 직원을 조회 - 없을시 EMPLOYEE_NAME_NOT_FOUND 에러발생
+       validateEmployeeByName(name);
 
-        // 이메일로 직원을 조회 - 없을시 EMPLOYEE_NOT_FOUND 에러발생
+        // 이메일로 직원을 조회 - 없을시 EMAIL_NOT_FOUND 에러발생
         Employee foundEmployee = validateEmployeeByEmail(email);
 
         String tempPassword = getTempPassword();
@@ -183,8 +180,8 @@ public class EmployeeService {
 
         Employee changedEmployee = employeeRepository.save(foundEmployee);
 
-        String title = String.format("%s님의 임시 비밀번호 안내 메일입니다.", account);
-        String body = String.format("안녕하세요.%n%nMyAcademy 임시 비밀번호 안내 관련 메일입니다.%n%n%s님의 임시 비밀번호는 %s입니다.%n%n발급된 임시 비밀번호로 로그인해서 새 비밀번호로 변경 후 이용바랍니다.%n%n감사합니다.", account, tempPassword);
+        String title = String.format("%s님의 임시 비밀번호 안내 메일입니다.", name);
+        String body = String.format("안녕하세요.%n%nMyAcademy 임시 비밀번호 안내 관련 메일입니다.%n%n%s님의 임시 비밀번호는 %s입니다.%n%n발급된 임시 비밀번호로 로그인해서 새 비밀번호로 변경 후 이용바랍니다.%n%n감사합니다.", name, tempPassword);
 
         emailUtil.sendEmail(email, title, body);
 
@@ -289,7 +286,6 @@ public class EmployeeService {
      * 관리자가 모든 직원 정보를 조회
      *
      * @param requestAccount 조회를 요청한 사용자 계정
-     * @param pageable
      */
     public Page<ReadAllEmployeeResponse> readAllEmployees(String requestAccount, Long academyId, Pageable pageable) {
 
@@ -473,10 +469,10 @@ public class EmployeeService {
         return validateEmployee;
     }
 
-    // 계정이 등록된 계정인지 확인 - 없을시 ACCOUNT_NOT_FOUND 에러발생
-    private void ifPresentAccount(String requestAccount) {
-        employeeRepository.findByAccount(requestAccount)
-                .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
+    // 계정이 등록된 계정인지 확인 - 없을시 NAME_NOT_FOUND 에러발생
+    private void validateEmployeeByName(String name) {
+        employeeRepository.findByName(name)
+                .orElseThrow(() -> new AppException(ErrorCode.NAME_NOT_FOUND));
     }
 
     // 가입을 요청한 계정과 학원으로 직원을 조회 - 있을시 DUPLICATED_ACCOUNT 에러발생
@@ -490,7 +486,7 @@ public class EmployeeService {
     // 이메일로 직원을 조회 - 없을시 EMPLOYEE_NOT_FOUND 에러발생
     private Employee validateEmployeeByEmail(String email) {
         Employee foundEmployee = employeeRepository.findByEmail(email)
-                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.EMAIL_NOT_FOUND));
         return foundEmployee;
     }
 

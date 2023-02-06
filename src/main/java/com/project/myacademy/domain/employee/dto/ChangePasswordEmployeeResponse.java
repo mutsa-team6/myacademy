@@ -1,4 +1,4 @@
-package com.project.myacademy.domain.employee;
+package com.project.myacademy.domain.employee.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
