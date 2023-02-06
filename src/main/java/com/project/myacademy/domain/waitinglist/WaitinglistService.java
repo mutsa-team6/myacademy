@@ -15,6 +15,7 @@ import com.project.myacademy.domain.waitinglist.dto.DeleteWaitinglistResponse;
 import com.project.myacademy.domain.waitinglist.dto.ReadAllWaitinglistResponse;
 import com.project.myacademy.global.exception.AppException;
 import com.project.myacademy.global.exception.ErrorCode;
+import com.project.myacademy.global.util.EmailUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -37,7 +38,7 @@ public class WaitinglistService {
     private final LectureRepository lectureRepository;
     private final EnrollmentRepository enrollmentRepository;
     private final WaitinglistRepository waitinglistRepository;
-
+    private final EmailUtil emailUtil;
 
     public Page<ReadAllWaitinglistResponse> readAllWaitinglists(Long academyId, String account, Pageable pageable) {
 
@@ -84,6 +85,13 @@ public class WaitinglistService {
 
         // 대기번호 저장
         Waitinglist savedWaitinglist = waitinglistRepository.saveAndFlush(Waitinglist.makeWaitinglist(lecture, student));
+
+        // 학생의 이메일로 메시지 전송
+        String email = student.getEmail();
+        String subject = String.format("MyAcademy 대기 신청 완료 안내 메일");
+        String body = String.format("%s님의 %s 대기 신청이 정상적으로 완료되었습니다.%n%n감사합니다.", student.getName(), lecture.getName());
+        emailUtil.sendEmail(email, subject, body);
+
         return CreateWaitinglistResponse.of(savedWaitinglist.getId());
     }
 
@@ -94,8 +102,8 @@ public class WaitinglistService {
         Employee employee = validateAcademyEmployee(account, academy);
 
         // 학생, 강좌, 대기번호 존재 유무 확인
-        validateStudent(studentId);
-        validateLecture(lectureId);
+        Student student = validateStudent(studentId);
+        Lecture lecture = validateLecture(lectureId);
         Waitinglist waitinglist = validateWaitinglist(waitinglistId);
 
         // 직원이 대기번호를 삭제할 권한이 있는지 확인(강사만 불가능)
@@ -105,6 +113,13 @@ public class WaitinglistService {
 
         // 대기번호 삭제
         waitinglistRepository.delete(waitinglist);
+
+        // 학생의 이메일로 메시지 전송
+        String email = student.getEmail();
+        String subject = String.format("MyAcademy 대기 신청 취소 안내 메일");
+        String body = String.format("%s님의 %s 대기 신청 취소가 정상적으로 처리되었습니다.%n%n감사합니다.", student.getName(), lecture.getName());
+        emailUtil.sendEmail(email, subject, body);
+
         return DeleteWaitinglistResponse.of(waitinglistId);
     }
 
