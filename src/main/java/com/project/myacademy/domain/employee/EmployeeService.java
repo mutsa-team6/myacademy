@@ -286,29 +286,115 @@ public class EmployeeService {
     }
 
     /**
-     * 관리자(ADMIN)는 모든 회원 정보를 조회할 수 있다.
-     * 정보를 조회하려는 학원이 존재하지 않는 경우 에러 처리
-     * 조회를 요청한 회원이 해당 학원에 존재하지 않는 경우 에러 처리
-     * ADMIN 이 아니면 접근할 수 없는 에러처리는 security 단 에서 진행
+     * 관리자가 모든 직원 정보를 조회
      *
      * @param requestAccount 조회를 요청한 사용자 계정
      * @param pageable
-     * @return 모든 회원 목록 반환
      */
     public Page<ReadAllEmployeeResponse> readAllEmployees(String requestAccount, Long academyId, Pageable pageable) {
 
-        //학원이 존재하지 않는 경우
+        // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
         Academy foundAcademy = validateAcademyById(academyId);
 
-        // 조회를 요청한 회원이 해당 학원에 존재하지 않는 경우 에러 처리
+        // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
         Employee employeeAdmin = validateRequestEmployeeByAccount(requestAccount, foundAcademy);
 
-        // 조회를 요청한 회원의 권한이 admin 이 아닐경우 권한에러 처리
+        // 조회를 요청한 회원의 권한이 admin 이 아닐경우 - NOT_ALLOWED_ROLE 에러발생
         if (!employeeAdmin.getEmployeeRole().equals(EmployeeRole.ROLE_ADMIN)) {
             throw new AppException(ErrorCode.NOT_ALLOWED_ROLE);
         }
 
         return employeeRepository.findAllEmployee(foundAcademy, pageable).map(ReadAllEmployeeResponse::of);
+    }
+
+
+
+    /**
+     * ADMIN 회원은 본인 탈퇴 불가
+     *
+     * @param requestAccount 탈퇴 요청한 계정명
+     * @param academyId 학원 Id
+     */
+    @Transactional
+    public DeleteEmployeeResponse selfDeleteEmployee(String requestAccount, Long academyId) {
+
+        // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+        Academy foundAcademy = validateAcademyById(academyId);
+
+        // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
+        Employee requestEmployee = validateRequestEmployeeByAccount(requestAccount, foundAcademy);
+
+        EmployeeRole requestEmployeeRole = requestEmployee.getEmployeeRole();
+        log.info(" ❌ 본인 탈퇴를 요청한 사용자 권한 [{}] ", requestEmployeeRole);
+
+        // ADMIN 계정이 탈퇴를 시도 할 경우 - NOT_ALLOWED_CHANGE 에러발생
+        if (requestEmployeeRole.equals(EmployeeRole.ROLE_ADMIN)) {
+            throw new AppException(ErrorCode.NOT_ALLOWED_CHANGE);
+        }
+
+        employeeRepository.delete(requestEmployee);
+
+        return new DeleteEmployeeResponse(requestEmployee.getId(), requestAccount + " 계정이 삭제되었습니다. ");
+
+    }
+
+    /**
+     * 직원 정보 변경
+     * 계정명, 등급은 본인이 변경 불가
+     *
+     * @param requestAccount 정보변경을 요청한 직원 계정
+     * @param academyId 학원 Id
+     */
+    @Transactional
+    public UpdateEmployeeResponse updateEmployee(UpdateEmployeeRequest request, String requestAccount, Long academyId) {
+
+        // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+        Academy foundAcademy = validateAcademyById(academyId);
+
+        // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
+        Employee requestEmployee = validateRequestEmployeeByAccount(requestAccount, foundAcademy);
+
+        //정보 수정
+        requestEmployee.updateEmployeeInfo(request);
+
+        return new UpdateEmployeeResponse(requestEmployee.getId(), requestAccount + "계정 정보를 수정했습니다");
+    }
+
+    /**
+     * UI 용 메서드
+     * 회원가입한 사용자 들 중에서, 특정 학원의 강사들만 추출하는 메서드
+     */
+    public Page<ReadEmployeeResponse> findAllTeachers(String requestAccount, Long academyId, Pageable pageable) {
+        // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+        Academy foundAcademy = validateAcademyById(academyId);
+
+        // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
+        Employee requestEmployee = validateRequestEmployeeByAccount(requestAccount, foundAcademy);
+        return employeeRepository.findAllTeacher(foundAcademy, pageable).map(employee -> new ReadEmployeeResponse(employee));
+    }
+
+    /**
+     * UI 용 메서드
+     * 강좌 등록 시에 강사 정보를 보여주기 위함
+     */
+    public ReadEmployeeResponse findOneTeacher(String requestAccount, Long academyId, Long teacherId) {
+        // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+        Academy foundAcademy = validateAcademyById(academyId);
+
+        // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
+        Employee requestEmployee = validateRequestEmployeeByAccount(requestAccount, foundAcademy);
+
+        // 해당 강사가 해당 학원에 존재하는지 확인
+        Employee foundTeacher = validateEmployeeById(teacherId, foundAcademy);
+
+        // 강사가 맞는지 체크 - 아니면 NOT_TEACHER 에러발생
+        if (foundTeacher.getEmployeeRole().equals(EmployeeRole.ROLE_STAFF)) {
+            throw new AppException(ErrorCode.NOT_TEACHER);
+        }
+
+        ReadEmployeeResponse response = new ReadEmployeeResponse(foundTeacher);
+
+        return response;
     }
 
     /**
@@ -327,16 +413,16 @@ public class EmployeeService {
     @Transactional
     public ChangeRoleEmployeeResponse changeRoleEmployee(String requestAccount, Long academyId, Long employeeId) {
 
-        //학원이 존재하지 않는 경우
+        // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
         Academy foundAcademy = validateAcademyById(academyId);
 
-        // 등급 수정을 요청한 계정이 해당 학원에 존재하지 않은 경우 에러 처리
-        Employee requestEmployee = validateRequestEmployeeByAccount(requestAccount, foundAcademy);
+        // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
+        validateRequestEmployeeByAccount(requestAccount, foundAcademy);
 
-        // 수정하려는 계정이 해당 학원에 존재하지 않으면 에러 처리
+        // 적용될 계정과 학원으로 직원을 조회 - 없을시 ACCOUNT_NOT_FOUND 에러발생
         Employee foundEmployee = validateEmployeeById(employeeId, foundAcademy);
 
-        // 변경하려는 계정이 자기 자신인 경우 에러 처리
+        // 변경하려는 계정이 자기 자신인 경우 - BAD_CHANGE_REQUEST 에러발생
         if (foundEmployee.getAccount().equals(requestAccount)) {
             throw new AppException(ErrorCode.BAD_CHANGE_REQUEST);
         }
@@ -363,97 +449,6 @@ public class EmployeeService {
         }
 
         return new ChangeRoleEmployeeResponse(employeeId, foundEmployee.getAccount() + " 계정의 권한을 " + changedRole + "로 변경했습니다");
-
-    }
-
-    /**
-     * ADMIN 회원은 본인 탈퇴 불가
-     *
-     * @param requestAccount 탈퇴 요청한 계정명
-     * @param academyId
-     * @return
-     */
-    @Transactional
-    public DeleteEmployeeResponse selfDeleteEmployee(String requestAccount, Long academyId) {
-
-        //해당 학원이 존재하는지 확인
-        Academy foundAcademy = validateAcademyById(academyId);
-
-        // 본인 탈퇴를 요청한 회원이 해당 학원에 존재하는지 확인
-        Employee requestEmployee = validateRequestEmployeeByAccount(requestAccount, foundAcademy);
-
-        EmployeeRole requestEmployeeRole = requestEmployee.getEmployeeRole();
-        log.info(" ❌ 본인 탈퇴를 요청한 사용자 권한 [{}] ", requestEmployeeRole);
-
-        // ADMIN 계정은 본인 탈퇴 불가
-        if (requestEmployeeRole.equals(EmployeeRole.ROLE_ADMIN)) {
-            throw new AppException(ErrorCode.NOT_ALLOWED_CHANGE);
-        }
-
-        employeeRepository.delete(requestEmployee);
-
-        return new DeleteEmployeeResponse(requestEmployee.getId(), requestAccount + " 계정이 삭제되었습니다. ");
-
-    }
-
-    /**
-     * 직원 정보 변경
-     * 계정명, 등급은 본인이 변경 불가
-     *
-     * @param requestAccount
-     * @param academyId
-     * @return
-     */
-    @Transactional
-    public UpdateEmployeeResponse updateEmployee(UpdateEmployeeRequest request, String requestAccount, Long academyId) {
-
-        //해당 학원이 존재하는지 확인
-        Academy foundAcademy = validateAcademyById(academyId);
-
-        // 본인 정보 수정을 요청한 회원이 해당 학원에 존재하는지 확인
-        Employee requestEmployee = validateRequestEmployeeByAccount(requestAccount, foundAcademy);
-
-        //정보 수정
-        requestEmployee.updateEmployeeInfo(request);
-
-        return new UpdateEmployeeResponse(requestEmployee.getId(), requestAccount + "계정 정보를 수정했습니다");
-    }
-
-    /**
-     * UI 용 메서드
-     * 회원가입한 사용자 들 중에서, 특정 학원의 강사들만 추출하는 메서드
-     */
-    public Page<ReadEmployeeResponse> findAllTeachers(String requestAccount, Long academyId, Pageable pageable) {
-        //해당 학원이 존재하는지 확인
-        Academy foundAcademy = validateAcademyById(academyId);
-
-        // 조회 요청을한 회원이 해당 학원에 존재하는지 확인
-        Employee requestEmployee = validateRequestEmployeeByAccount(requestAccount, foundAcademy);
-        return employeeRepository.findAllTeacher(foundAcademy, pageable).map(employee -> new ReadEmployeeResponse(employee));
-    }
-
-    /**
-     * UI 용 메서드
-     * 강좌 등록 시에 강사 정보를 보여주기 위함
-     */
-    public ReadEmployeeResponse findOneTeacher(String requestAccount, Long academyId, Long teacherId) {
-        //해당 학원이 존재하는지 확인
-        Academy foundAcademy = validateAcademyById(academyId);
-
-        // 강좌 등록 신청한 사람이 해당 학원에 존재하는지 확인
-        Employee requestEmployee = validateRequestEmployeeByAccount(requestAccount, foundAcademy);
-
-        // 해당 강사가 해당 학원에 존재하는지 확인
-        Employee foundTeacher = validateEmployeeById(teacherId, foundAcademy);
-
-        // 강사가 맞는지 한번더 체크
-        if (foundTeacher.getEmployeeRole().equals(EmployeeRole.ROLE_STAFF)) {
-            throw new AppException(ErrorCode.NOT_TEACHER);
-        }
-
-        ReadEmployeeResponse response = new ReadEmployeeResponse(foundTeacher);
-
-        return response;
 
     }
 
