@@ -79,6 +79,10 @@ dependencies {
 	// Querydsl 추가
 	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
 	implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
+
+	jar {
+		enabled = false
+	}
 }
 
 task copyPrivate(type: Copy) {
@@ -115,7 +119,6 @@ jacocoTestReport {
 	for(qPattern in "**/QA" .. "**/QZ"){
 		Qdomains.add(qPattern+"*")
 	}
-
 
 	// 리포트 작성 시 특정 파일 제외
 	afterEvaluate {
