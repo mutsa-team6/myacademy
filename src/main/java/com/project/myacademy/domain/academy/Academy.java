@@ -47,16 +47,4 @@ public class Academy extends BaseEntity {
     public static Academy createAcademy(CreateAcademyRequest request) {
         return new Academy(request.getName(), request.getAddress(), request.getPhoneNum(), request.getOwner(), request.getBusinessRegistrationNumber());
     }
-
-//    public AcademyDto toAcademyDto() {
-//        return new AcademyDto(this.id, this.name, this.owner, "");
-//    }
-
-//    public void update(UpdateAcademyReqeust reqeust) {
-//        this.name = reqeust.getName();
-//        this.address = reqeust.getAddress();
-//        this.phoneNum = reqeust.getPhoneNum();
-//        this.owner = reqeust.getOwner();
-//        this.businessRegistrationNumber = reqeust.getBusinessRegistrationNumber();
-//    }
 }
