@@ -19,6 +19,7 @@ import com.project.myacademy.domain.student.Student;
 import com.project.myacademy.domain.student.StudentRepository;
 import com.project.myacademy.global.exception.AppException;
 import com.project.myacademy.global.exception.ErrorCode;
+import com.project.myacademy.global.util.EmailUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONObject;
@@ -49,6 +50,7 @@ public class PaymentService {
     private final LectureRepository lectureRepository;
     private final CancelPaymentRepository cancelPaymentRepository;
     private final DiscountRepository discountRepository;
+    private final EmailUtil emailUtil;
 
     @Value("${payment.toss.testSecretApiKey}")
     private String testSecretApiKey;
@@ -134,6 +136,12 @@ public class PaymentService {
 
         //저장
         Payment savedPayment = paymentRepository.save(request.toEntity(foundEmployee, foundStudent, studentEnrollment, academy));
+
+        // 학생의 이메일로 메시지 전송
+        String email = foundStudent.getEmail();
+        String subject = String.format("MyAcademy 결제 완료 안내 메일");
+        String body = String.format("%s님의 %s 결제가 정상적으로 완료되었습니다.%n%n감사합니다.", foundStudent.getName(), foundLecture.getName());
+        emailUtil.sendEmail(email, subject, body);
 
         CreatePaymentResponse response = CreatePaymentResponse.of(savedPayment);
         response.setSuccessUrl(successCallbackUrl);
@@ -281,6 +289,14 @@ public class PaymentService {
                 .payment(selcetedPayment)
                 .employee(foundEmployee)
                 .build());
+
+        // 학생의 이메일로 메시지 전송
+        Student foundStudent = enrollment.getStudent();
+        Lecture foundLecture = enrollment.getLecture();
+        String email = foundStudent.getEmail();
+        String subject = String.format("MyAcademy 결제 취소 안내 메일");
+        String body = String.format("%s님의 %s 결제 취소가 정상적으로 처리되었습니다.%n%n감사합니다.", foundStudent.getName(), foundLecture.getName());
+        emailUtil.sendEmail(email, subject, body);
 
         return rest.postForEntity(
                         uri,
