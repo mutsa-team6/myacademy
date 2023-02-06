@@ -133,14 +133,6 @@ public class AnnouncementService {
         Announcement announcement = announcementRepository.findById(announcementId)
                 .orElseThrow(() -> new AppException(ErrorCode.ANNOUNCEMENT_NOT_FOUND));
 
-        // Admin이 아닌 경우
-        if (!employee.getEmployeeRole().equals(EmployeeRole.ROLE_ADMIN)) {
-            // 삭제 요청자와 게시글 작성자가 일치해야 삭제 가능
-            if (!announcement.getEmployee().equals(employee)) {
-                throw new AppException(ErrorCode.INVALID_PERMISSION);
-            }
-        }
-
         announcement.updateAnnouncement(request);
 
         return UpdateAnnouncementResponse.of(announcement);
@@ -165,14 +157,6 @@ public class AnnouncementService {
         //announcementId에 해당하는 특이사항이 있는지 확인하고 있으면 가져옴
         Announcement announcement = announcementRepository.findById(announcementId)
                 .orElseThrow(() -> new AppException(ErrorCode.ANNOUNCEMENT_NOT_FOUND));
-
-        // Admin이 아닌 경우
-        if (!employee.getEmployeeRole().equals(EmployeeRole.ROLE_ADMIN)) {
-            // 삭제 요청자와 게시글 작성자가 일치해야 삭제 가능
-            if (!announcement.getEmployee().equals(employee)) {
-                throw new AppException(ErrorCode.INVALID_PERMISSION);
-            }
-        }
 
         announcementRepository.delete(announcement);
 
