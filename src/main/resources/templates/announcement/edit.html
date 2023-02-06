@@ -42,10 +42,17 @@
                     <div class="card-header pb-0 mx-4">
                         <div class=" d-flex justify-content-start mb-3" style="flex: 0 0 auto;width: 10%;">
                             <div class="col-3 input-group input-group-static text-xs font-weight-bold  text-center">
-                                <select class="form-control text-lg font-weight-bold  text-center" style="border-color: #5A2082" id="input-type">
-                                    <option value="0" selected >카테고리 선택</option>
-                                    <option value="ANNOUNCEMENT">공지사항</option>
-                                    <option value="ADMISSION">입시정보</option>
+                                <select class="form-control text-lg font-weight-bold  text-center"
+                                        style="border-color: #5A2082" id="input-type">
+                                    <option value="0">카테고리 선택</option>
+                                    <th:block th:if="${announcement.type =='공지사항'}">
+                                        <option value="ANNOUNCEMENT" selected>공지사항</option>
+                                        <option value="ADMISSION">입시정보</option>
+                                    </th:block>
+                                    <th:block th:if="${announcement.type =='입시정보'}">
+                                        <option value="ANNOUNCEMENT">공지사항</option>
+                                        <option value="ADMISSION" selected>입시정보</option>
+                                    </th:block>
                                 </select>
                             </div>
                         </div>
@@ -53,6 +60,7 @@
                         <div class="row">
                             <div class="input-group input-group-dynamic mb-4">
                                 <input type="text" class="form-control" placeholder="제목을 입력하세요." id="input-title"
+                                       th:value="${announcement.title}"
                                        style="font-size: 2rem">
                             </div>
                         </div>
@@ -64,17 +72,16 @@
                     </div>
                     <br>
                     <div class="d-flex justify-content-center mb-3">
-                        <form action="/academy/announcements" method="get">
+                        <a th:href="@{/academy/announcements/detail(announcementNum=${announcement.id})}">
                             <button type="submit"
-                                    class="btn btn-lg bg-gradient-danger btn-lg mb-0">작성 취소
+                                    class="btn btn-lg bg-gradient-danger btn-lg mb-0">수정 취소
                             </button>
-                        </form>
-                            <button type="submit" th:onclick="|announcement.create(${academyId})|"
-                                    class="btn btn-lg bg-gradient-primary btn-lg mb-0 mx-2">게시글 작성
-                            </button>
+                        </a>
+                        <button type="submit" th:onclick="|announcement.edit(${academyId},${announcement.id})|"
+                                class="btn btn-lg bg-gradient-primary btn-lg mb-0 mx-2">게시글 수정
+                        </button>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
@@ -91,19 +98,28 @@
 <!-- TOAST UI Editor CDN URL(JS) -->
 <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
 
-<Script>
+<Script th:inline="javascript">
+    /*<![CDATA[*/
     const editor = new toastui.Editor({
         el: document.querySelector('#editor'),
         previewStyle: 'vertical',
         height: '800px',
-        initialEditType: 'wysiwyg'
+        initialEditType: 'wysiwyg',
+
     });
+    var testValue = /*[[${announcement.body}]]*/;
+    console.log(testValue);
+    editor.setHTML(testValue);
+    /*]]>*/
+</script>
+
+<Script>
 
     let announcement = {
         init: function () {
             var _this = this;
         },
-        create: function (academyId) {
+        edit: function (academyId,announcementId) {
             let data = {
                 title: document.querySelector('#input-title').value.trim(),
                 // body: editor.getMarkdown(),
@@ -117,7 +133,7 @@
             }
             console.log(data);
 
-            axios.post("/api/v1/academies/"+academyId+"/announcements",
+            axios.put("/api/v1/academies/" + academyId + "/announcements/"+announcementId,
                 JSON.stringify(data), {
                     headers: {
                         'Content-Type': 'application/json',
@@ -125,8 +141,8 @@
                 }
             ).then((response) => {
                 console.log(response);
-                alert("작성 성공");
-                window.location.href = '/academy/announcements';
+                alert("수정 성공");
+                window.location.href = '/academy/announcements/detail?announcementNum='+announcementId;
 
             }).catch((error) => {
                 console.log(error);
@@ -141,7 +157,7 @@
         }
     };
 
-    academy.init();
+    announcement.init();
 
 </script>
 </body>

@@ -35,6 +35,7 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+	implementation 'io.findify:s3mock_2.13:0.2.6'
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 
 	//토큰
@@ -78,7 +79,20 @@ dependencies {
 	// Querydsl 추가
 	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
 	implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
+
+	jar {
+		enabled = false
+	}
 }
+
+task copyPrivate(type: Copy) {
+	copy {
+		from './myacademy-config'
+		include "application-dev.yml"
+		into 'src/main/resources'
+	}
+}
+
 
 tasks.named('test') {
 	useJUnitPlatform()
@@ -105,7 +119,6 @@ jacocoTestReport {
 	for(qPattern in "**/QA" .. "**/QZ"){
 		Qdomains.add(qPattern+"*")
 	}
-
 
 	// 리포트 작성 시 특정 파일 제외
 	afterEvaluate {

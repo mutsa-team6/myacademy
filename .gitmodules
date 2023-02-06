@@ -1,0 +1,3 @@
+[submodule "myacademy-config"]
+	path = myacademy-config
+	url = https://github.com/mutsa-team6/myacademy-config.git
