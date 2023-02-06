@@ -6,12 +6,14 @@ import com.project.myacademy.domain.employee.EmployeeRole;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 
 @AllArgsConstructor
 @Getter
 @Builder
+@NoArgsConstructor
 public class CreateEmployeeRequest {
     @NotBlank
     private String name;

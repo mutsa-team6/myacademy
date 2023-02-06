@@ -79,6 +79,7 @@
                         <div>
                             <hr style="color: gray; height: 1.5px;background-color: gray">
                         </div>
+
                     </div>
 
 
@@ -86,23 +87,50 @@
                         <div class="d-flex justify-content-end my-2">
                             <form action="/academy/announcements/edit" method="get">
                                 <input type="text" class="form-control" id="announcementNum" name="announcementNum"
-                                    th:value="${announcement.id}" hidden>
+                                       th:value="${announcement.id}" hidden>
 
-                            <button
-                                    type="submit"
-                                    class="btn btn-sm bg-gradient-info">게시글 수정
-                            </button>
+                                <button
+                                        type="submit"
+                                        class="btn btn-sm bg-gradient-info">게시글 수정
+                                </button>
                             </form>
                             <button th:onclick="|announcement.delete(${academyId},${announcement.id})|"
                                     type="button"
                                     class="btn btn-sm bg-gradient-danger mx-2">게시글 삭제
                             </button>
                         </div>
-                        <div style="border: 1px solid #E0E0E0;border-width: 1px; border-radius: 5px;">
-                            <div class="mx-5">
-                                <p
-                                        spellcheck="false"
-                                        th:utext="${announcement.body}" readonly></p>
+                        <div style="overflow: hidden">
+                            <div style="float: right;">
+                                <div class="mb-3"
+                                     style="border: 1px solid #E0E0E0;border-width: 1px; border-radius: 5px;">
+                                    <div class="mx-3 my-3">
+                                        <th:block th:if="${files != null}">
+                                            <th class="align-middle text-center">
+                                                <span class=" text-sm font-weight-bold" style="color: #5A2082"
+                                                >첨부파일 목록</span>
+                                            </th>
+                                            <tr th:each="file : ${files}">
+                                                <div class="row">
+                                                    <th class="align-middle text-center">
+                                                        <a th:href="${file.fileUrl}" target='_blank'>
+                                                <span class=" text-xs font-weight-bold" style="color: #0d6efd"
+                                                      th:text="${file.fileName}"></span>
+                                                        </a>
+                                                    </th>
+                                                </div>
+                                            </tr>
+
+                                        </th:block>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="clear: both"></div>
+                            <div style="border: 1px solid #E0E0E0;border-width: 1px; border-radius: 5px;float: none">
+                                <div class="mx-5">
+                                    <p
+                                            spellcheck="false"
+                                            th:utext="${announcement.body}" readonly></p>
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -12,6 +12,7 @@ import com.project.myacademy.domain.student.StudentRepository;
 import com.project.myacademy.domain.waitinglist.WaitinglistRepository;
 import com.project.myacademy.global.exception.AppException;
 import com.project.myacademy.global.exception.ErrorCode;
+import com.project.myacademy.global.util.EmailUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -36,7 +37,7 @@ public class EnrollmentService {
     private final StudentRepository studentRepository;
     private final LectureRepository lectureRepository;
     private final WaitinglistRepository waitinglistRepository;
-
+    private final EmailUtil emailUtil;
     /**
      * @param academyId 직원의 소속 학원 id
      * @param studentId 학생 id
@@ -79,6 +80,12 @@ public class EnrollmentService {
         else {
             throw new AppException(ErrorCode.OVER_REGISTRATION_NUMBER);
         }
+
+        // 학생의 이메일로 메시지 전송
+        String email = student.getEmail();
+        String subject = String.format("MyAcademy 수강 등록 안내 메일");
+        String body = String.format("%s님의 %s 수강 등록이 정상적으로 완료되었습니다.%n%n감사합니다.", student.getName(), lecture.getName());
+        emailUtil.sendEmail(email, subject, body);
 
         return CreateEnrollmentResponse.of(savedEnrollment.getId());
     }
@@ -143,7 +150,7 @@ public class EnrollmentService {
         Employee employee = validateAcademyEmployee(account, academy);
 
         // 학생, 강좌, 수강 존재 유무 확인
-        validateStudent(studentId);
+        Student student = validateStudent(studentId);
         Lecture lecture = validateLecture(lectureId);
         Enrollment enrollment = validateEnrollment(enrollmentId);
 
@@ -160,6 +167,13 @@ public class EnrollmentService {
 
         // 다음 대기번호 존재하든 안하든 수강 이력 먼저 삭제
         enrollmentRepository.delete(enrollment);
+
+        // 학생의 이메일로 메시지 전송
+        String email = student.getEmail();
+        String subject = String.format("MyAcademy 수강 취소 안내 메일");
+        String body = String.format("%s님의 %s 수강 취소 신청이 정상적으로 처리되었습니다.%n%n감사합니다.", student.getName(), lecture.getName());
+        emailUtil.sendEmail(email, subject, body);
+
         // 현재 등록인원 -1
         lecture.minusCurrentEnrollmentNumber();
 
