@@ -1,5 +1,6 @@
 package com.project.myacademy.domain.announcement;
 
+import com.project.myacademy.domain.BaseEntity;
 import com.project.myacademy.domain.academy.Academy;
 import com.project.myacademy.domain.academy.AcademyRepository;
 import com.project.myacademy.domain.announcement.dto.*;
@@ -12,10 +13,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
+import org.springframework.test.util.ReflectionTestUtils;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,20 +29,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 
-
+@ExtendWith(MockitoExtension.class)
 class AnnouncementServiceTest {
 
-
-    EmployeeRepository employeeRepository = Mockito.mock(EmployeeRepository.class);
-    AnnouncementRepository announcementRepository = Mockito.mock(AnnouncementRepository.class);
-    AcademyRepository academyRepository = Mockito.mock(AcademyRepository.class);
+    EmployeeRepository employeeRepository = mock(EmployeeRepository.class);
+    AnnouncementRepository announcementRepository = mock(AnnouncementRepository.class);
+    AcademyRepository academyRepository = mock(AcademyRepository.class);
     @InjectMocks
     private AnnouncementService announcementService;
     private Academy academy;
-    private Employee employeeSTAFF, employeeUSER;
-    private Announcement announcement1, announcement2;
+    private Employee employeeADMIN, employeeSTAFF, employeeUSER;
+    private Announcement announcement1, announcement2, announcement3;
     private Pageable pageable;
+
+    private Employee mockEmployee;
 
 
     @BeforeEach
@@ -45,10 +53,12 @@ class AnnouncementServiceTest {
         academy = Academy.builder().id(1L).name("학원").build();
         employeeSTAFF = Employee.builder().id(1L).name("직원").account("employeeSTAFF@gmail.com").employeeRole(EmployeeRole.ROLE_STAFF).build();
         employeeUSER = Employee.builder().id(2L).name("강사").account("employeeUSER@gmail.com").employeeRole(EmployeeRole.ROLE_USER).build();
-        announcement1 = Announcement.builder().id(1L).academy(academy).title("제목1").body("내용1").type(AnnouncementType.ANNOUNCEMENT).build();
-        announcement2 = Announcement.builder().id(2L).academy(academy).title("제목2").body("내용2").type(AnnouncementType.ANNOUNCEMENT).build();
-        announcement2 = Announcement.builder().id(2L).academy(academy).title("제목3").body("내용3").type(AnnouncementType.ADMISSION).build();
+        employeeADMIN = Employee.builder().id(3L).name("대표").account("employeeADMIN@gmail.com").employeeRole(EmployeeRole.ROLE_ADMIN).build();
+        announcement1 = Announcement.builder().id(1L).academy(academy).employee(employeeSTAFF).title("제목1").body("내용1").type(AnnouncementType.ANNOUNCEMENT).build();
+        announcement2 = Announcement.builder().id(2L).academy(academy).employee(employeeSTAFF).title("제목2").body("내용2").type(AnnouncementType.ANNOUNCEMENT).build();
+        announcement3 = Announcement.builder().id(3L).academy(academy).employee(employeeSTAFF).title("제목3").body("내용3").type(AnnouncementType.ADMISSION).build();
         pageable = PageRequest.of(0, 20, Sort.Direction.DESC, "id");
+        mockEmployee = mock(Employee.class);
     }
 
     @Nested
@@ -113,6 +123,9 @@ class AnnouncementServiceTest {
         @Test
         @DisplayName("공지사항 단건 조회 성공")
         void read_announcement_success() {
+
+            ReflectionTestUtils.setField(announcement1, BaseEntity.class, "createdAt", LocalDateTime.of(2021, 12, 6, 12, 0), LocalDateTime.class);
+
             given(academyRepository.findById(any())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeSTAFF));
             given(announcementRepository.findById(any())).willReturn(Optional.of(announcement1));
@@ -167,11 +180,14 @@ class AnnouncementServiceTest {
         @Test
         @DisplayName("공지사항 전체 조회 성공")
         void read_all_announcement_success() {
+
             given(academyRepository.findById(any())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeSTAFF));
-
+            ReflectionTestUtils.setField(announcement1, BaseEntity.class, "createdAt", LocalDateTime.of(2021, 12, 6, 12, 0), LocalDateTime.class);
+            ReflectionTestUtils.setField(announcement2, BaseEntity.class, "createdAt", LocalDateTime.of(2021, 12, 6, 13, 0), LocalDateTime.class);
             Page<Announcement> announcementList = new PageImpl<>(List.of(announcement1, announcement2));
-            given(announcementRepository.findAllByAcademy(academy, pageable)).willReturn(announcementList);
+
+            given(announcementRepository.findAllByAcademyOrderByCreatedAtDesc(academy, pageable)).willReturn(announcementList);
 
             Page<ReadAllAnnouncementResponse> responses = announcementService.readAllAnnouncement(academy.getId(), pageable, employeeSTAFF.getAccount());
 
@@ -193,6 +209,7 @@ class AnnouncementServiceTest {
         @Test
         @DisplayName("공지사항 전체 조회 실패2 - 일치하는 직원 정보가 없음")
         void read_all_announcement_fail2() {
+
             given(academyRepository.findById(any())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.empty());
 
@@ -205,12 +222,15 @@ class AnnouncementServiceTest {
         @Test
         @DisplayName("공지사항 타입별 전체 조회 성공")
         void read_type_announcement_success() {
+
             String stringType = "ANNOUNCEMENT";
             AnnouncementType type = AnnouncementType.ANNOUNCEMENT;
             given(academyRepository.findById(any())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeSTAFF));
-
+            ReflectionTestUtils.setField(announcement1, BaseEntity.class, "createdAt", LocalDateTime.of(2021, 12, 6, 12, 0), LocalDateTime.class);
+            ReflectionTestUtils.setField(announcement2, BaseEntity.class, "createdAt", LocalDateTime.of(2021, 12, 6, 13, 0), LocalDateTime.class);
             Page<Announcement> announcementList = new PageImpl<>(List.of(announcement1, announcement2));
+
             given(announcementRepository.findAllByTypeAndAcademy(type, academy, pageable)).willReturn(announcementList);
 
             Page<ReadAllAnnouncementResponse> responses = announcementService.readTypeAnnouncement(academy.getId(), pageable, employeeSTAFF.getAccount(), stringType);
@@ -262,28 +282,30 @@ class AnnouncementServiceTest {
         }
 
         @Test
-        @DisplayName("공지사항 수정 실패3 - 일치하는 공지사항 정보 없음")
+        @DisplayName("공지사항 수정 실패3 - 직원의 권한이 USER인 경우")
         void update_announcement_fail3() {
             given(academyRepository.findById(any())).willReturn(Optional.of(academy));
-            given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeSTAFF));
-            given(announcementRepository.findById(any())).willReturn(Optional.empty());
+            given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(mockEmployee));
+            given(mockEmployee.getEmployeeRole()).willReturn(EmployeeRole.ROLE_USER);
 
             AppException appException = assertThrows(AppException.class,
-                    () -> announcementService.updateAnnouncement(academy.getId(), announcement1.getId(), request, employeeSTAFF.getAccount()));
+                    () -> announcementService.updateAnnouncement(academy.getId(), announcement1.getId(), request, mockEmployee.getAccount()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.ANNOUNCEMENT_NOT_FOUND));
+            assertThat(appException.getErrorCode().equals(ErrorCode.INVALID_PERMISSION));
         }
 
         @Test
-        @DisplayName("공지사항 수정 실패4 - 사용자 권한 없음")
+        @DisplayName("공지사항 수정 실패4 - 일치하는 공지사항 정보 없음")
         void update_announcement_fail4() {
             given(academyRepository.findById(any())).willReturn(Optional.of(academy));
-            given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeUSER));
+            given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(mockEmployee));
+            given(mockEmployee.getEmployeeRole()).willReturn(EmployeeRole.ROLE_STAFF);
+            given(announcementRepository.findById(any())).willReturn(Optional.empty());
 
             AppException appException = assertThrows(AppException.class,
-                    () -> announcementService.updateAnnouncement(academy.getId(), announcement1.getId(), request, employeeUSER.getAccount()));
+                    () -> announcementService.updateAnnouncement(academy.getId(), announcement1.getId(), request, mockEmployee.getAccount()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.INVALID_PERMISSION));
+            assertThat(appException.getErrorCode().equals(ErrorCode.ANNOUNCEMENT_NOT_FOUND));
         }
     }
 
@@ -328,27 +350,30 @@ class AnnouncementServiceTest {
         }
 
         @Test
-        @DisplayName("공지사항 삭제 실패3 - 일치하는 공지사항 정보 없음")
+        @DisplayName("공지사항 삭제 실패3 - 사용자 권한 없음")
         void delete_announcement_fail3() {
             given(academyRepository.findById(any())).willReturn(Optional.of(academy));
-            given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeSTAFF));
+            given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(mockEmployee));
+            given(mockEmployee.getEmployeeRole()).willReturn(EmployeeRole.ROLE_USER);
+
+            AppException appException = assertThrows(AppException.class,
+                    () -> announcementService.deleteAnnouncement(academy.getId(), announcement1.getId(), mockEmployee.getAccount()));
+
+            assertThat(appException.getErrorCode().equals(ErrorCode.INVALID_PERMISSION));
+        }
+
+        @Test
+        @DisplayName("공지사항 삭제 실패4 - 일치하는 공지사항 정보 없음")
+        void delete_announcement_fail4() {
+            given(academyRepository.findById(any())).willReturn(Optional.of(academy));
+            given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(mockEmployee));
+            given(mockEmployee.getEmployeeRole()).willReturn(EmployeeRole.ROLE_STAFF);
             given(announcementRepository.findById(any())).willReturn(Optional.empty());
 
             AppException appException = assertThrows(AppException.class,
-                    () -> announcementService.deleteAnnouncement(academy.getId(), announcement1.getId(), employeeSTAFF.getAccount()));
+                    () -> announcementService.deleteAnnouncement(academy.getId(), announcement1.getId(), mockEmployee.getAccount()));
 
             assertThat(appException.getErrorCode().equals(ErrorCode.ANNOUNCEMENT_NOT_FOUND));
-        }
-        @Test
-        @DisplayName("공지사항 삭제 실패4 - 사용자 권한 없음")
-        void delete_announcement_fail4() {
-            given(academyRepository.findById(any())).willReturn(Optional.of(academy));
-            given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeUSER));
-
-            AppException appException = assertThrows(AppException.class,
-                    () -> announcementService.deleteAnnouncement(academy.getId(), announcement1.getId(), employeeUSER.getAccount()));
-
-            assertThat(appException.getErrorCode().equals(ErrorCode.INVALID_PERMISSION));
         }
     }
 }
