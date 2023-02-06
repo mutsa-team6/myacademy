@@ -3,9 +3,11 @@ package com.project.myacademy.domain.announcement.dto;
 import com.project.myacademy.domain.announcement.AnnouncementType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 public class CreateAnnouncementRequest {
     //공지사항 제목
     private String title;

@@ -2,9 +2,11 @@ package com.project.myacademy.domain.student.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 public class UpdateStudentRequest {
     //학생 이름
     private String name;
