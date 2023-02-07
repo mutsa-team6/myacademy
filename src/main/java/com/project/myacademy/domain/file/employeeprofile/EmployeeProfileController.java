@@ -59,7 +59,7 @@ public class EmployeeProfileController {
                                            Authentication authentication) throws IOException {
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
         // 버킷 폴더 이하 경로
-        String filePath = fileUrl.substring(52);
+        String filePath = fileUrl.substring(56);
         log.info("filePath : {}", filePath);
         return employeeProfileS3UploadService.downloadEmployeeProfile(academyId, employeeId, filePath, requestAccount);
     }
