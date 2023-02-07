@@ -61,7 +61,7 @@ public class AnnouncementFileController {
 
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
         // 버킷 폴더 이하 경로
-        String filePath = fileUrl.substring(52);
+        String filePath = fileUrl.substring(56);
         log.info("filePath : {}", filePath);
         return announcementFileS3UploadService.downloadAnnouncementFile(academyId, announcementId, filePath, requestAccount);
     }

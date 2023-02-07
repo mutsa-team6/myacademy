@@ -17,11 +17,12 @@ import org.springframework.data.domain.*;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.times;
 
 class AcademyServiceTest {
     private AcademyService academyService;
@@ -34,8 +35,8 @@ class AcademyServiceTest {
     @BeforeEach
     void setUp() {
         academyService = new AcademyService(academyRepository);
-        academy1 = Academy.builder().id(1L).name("학원1`").build();
-        academy2 = Academy.builder().id(1L).name("학원2`").build();
+        academy1 = Academy.builder().id(1L).name("학원1").businessRegistrationNumber("사업자번호1").build();
+        academy2 = Academy.builder().id(2L).name("학원2").businessRegistrationNumber("사업자번호2").build();
     }
 
     @Nested
@@ -47,25 +48,47 @@ class AcademyServiceTest {
         @DisplayName("학원 등록 성공")
         void create_academy_success() {
 
-            Academy savedAcademy = Academy.createAcademy(request);
-            given(academyRepository.save(any())).willReturn(savedAcademy);
+            given(academyRepository.findByName(anyString())).willReturn(Optional.empty());
+            given(academyRepository.findByBusinessRegistrationNumber(anyString())).willReturn(Optional.empty());
+            given(academyRepository.save(any(Academy.class))).willReturn(academy1);
 
             CreateAcademyResponse response = academyService.createAcademy(request);
 
-            assertEquals("학원이름", response.getName());
+            assertThat(response.getName()).isEqualTo("학원1");
 
+            then(academyRepository).should(times(1)).findByName(anyString());
+            then(academyRepository).should(times(1)).findByBusinessRegistrationNumber(anyString());
+            then(academyRepository).should(times(1)).save(any(Academy.class));
         }
 
         @Test
         @DisplayName("학원 등록 실패 - 학원 이름 중복")
-        void create_academy_fail() {
+        void create_academy_fail1() {
 
-            given(academyRepository.findByName(request.getName())).willReturn(Optional.of(academy1));
+            given(academyRepository.findByName(anyString())).willReturn(Optional.of(academy1));
 
             AppException appException = assertThrows(AppException.class,
                     () -> academyService.createAcademy(request));
 
              assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.DUPLICATED_ACADEMY);
+
+            then(academyRepository).should(times(1)).findByName(anyString());
+        }
+
+        @Test
+        @DisplayName("학원 등록 실패 - 사업자번호 중복")
+        public void create_academy_fail2() {
+
+            given(academyRepository.findByName(anyString())).willReturn(Optional.empty());
+            given(academyRepository.findByBusinessRegistrationNumber(anyString())).willReturn(Optional.of(academy1));
+
+            AppException appException = assertThrows(AppException.class,
+                    () -> academyService.createAcademy(request));
+
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.DUPLICATED_BUSINESS_REGISTRATION_NUMBER);
+
+            then(academyRepository).should(times(1)).findByName(anyString());
+            then(academyRepository).should(times(1)).findByBusinessRegistrationNumber(anyString());
         }
     }
 
@@ -78,23 +101,27 @@ class AcademyServiceTest {
         @DisplayName("학원 삭제 성공")
         void delete_academy_success() {
 
-            given(academyRepository.findById(any())).willReturn(Optional.of(academy1));
+            given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy1));
 
             Long deletedId = academyService.deleteAcademy(deleteAcademyId);
 
-            assertEquals(1, deletedId);
+            assertThat(deletedId).isEqualTo(1L);
+
+            then(academyRepository).should(times(1)).findById(anyLong());
         }
 
         @Test
         @DisplayName("학원 삭제 실패 - 일치하는 학원 정보 없음")
         void delete_academy_fail() {
 
-            given(academyRepository.findById(deleteAcademyId)).willReturn(Optional.empty());
+            given(academyRepository.findById(anyLong())).willReturn(Optional.empty());
 
             AppException appException = assertThrows(AppException.class,
                     () -> academyService.deleteAcademy(deleteAcademyId));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACADEMY_NOT_FOUND);
+
+            then(academyRepository).should(times(1)).findById(anyLong());
         }
     }
 
@@ -104,45 +131,77 @@ class AcademyServiceTest {
         private final FindAcademyRequest request = new FindAcademyRequest("학원1");
 
         @Test
-        @DisplayName("학원 조회 성공")
+        @DisplayName("학원 이름으로 학원 조회 성공")
         void find_academy_success() {
 
-            given(academyRepository.findByName(request.getName())).willReturn(Optional.of(academy1));
+            given(academyRepository.findByName(anyString())).willReturn(Optional.of(academy1));
 
             FindAcademyResponse response = academyService.findAcademy(request);
 
-            assertEquals(1L, response.getAcademyId());
+            assertThat(response.getAcademyId()).isEqualTo(1L);
+
+            then(academyRepository).should(times(1)).findByName(anyString());
         }
 
         @Test
-        @DisplayName("학원 조회 실패")
+        @DisplayName("학원 이름으로 학원 조회 실패")
         void find_academy_fail() {
 
-            given(academyRepository.findByName(request.getName())).willReturn(Optional.empty());
+            given(academyRepository.findByName(anyString())).willReturn(Optional.empty());
 
             AppException appException = assertThrows(AppException.class,
                     () -> academyService.findAcademy(request));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACADEMY_NOT_FOUND);
+
+            then(academyRepository).should(times(1)).findByName(anyString());
         }
 
         @Test
         @DisplayName("학원 존재 확인")
         void check_academy_success() {
 
-            given(academyRepository.existsByName(any())).willReturn(true);
+            given(academyRepository.existsByName(anyString())).willReturn(true);
 
             boolean checkAcademyExist = academyService.checkExistByAcademyName(academy1.getName());
 
             assertTrue(checkAcademyExist);
+
+            then(academyRepository).should(times(1)).existsByName(anyString());
+        }
+
+        @Test
+        @DisplayName("학원 id로 학원 조회 성공")
+        public void  find_acdemyById_success() {
+
+            given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy1));
+
+            FindAcademyResponse response = academyService.findAcademyById(academy1.getId());
+
+            assertThat(response.getAcademyId()).isEqualTo(1L);
+            assertThat(response.getAcademyName()).isEqualTo("학원1");
+
+            then(academyRepository).should(times(1)).findById(anyLong());
+        }
+
+        @Test
+        @DisplayName("학원 id로 학원 조회 실패")
+       public void find_acdemyById_fail1() {
+
+            given(academyRepository.findById(any())).willReturn(Optional.empty());
+
+            AppException appException = assertThrows(AppException.class,
+                    () -> academyService.findAcademyById(academy1.getId()));
+
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACADEMY_NOT_FOUND);
+
+            then(academyRepository).should(times(1)).findById(anyLong());
         }
 
 
         @Test
         @DisplayName("학원 전체 조회 성공")
         void find_All_academy_success() {
-        ReadAcademyResponse response1 = new ReadAcademyResponse(academy1);
-        ReadAcademyResponse response2 = new ReadAcademyResponse(academy2);
 
             Pageable pageable = PageRequest.of(0, 20, Sort.Direction.DESC,"id");
             Page<Academy> academyList = new PageImpl<>(List.of(academy1, academy2));
@@ -154,7 +213,7 @@ class AcademyServiceTest {
             assertThat(responses.getTotalPages()).isEqualTo(1);
             assertThat(responses.getTotalElements()).isEqualTo(2);
 
+            then(academyRepository).should(times(1)).findAll(pageable);
         }
-
     }
 }
