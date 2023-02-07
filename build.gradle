@@ -132,7 +132,8 @@ jacocoTestReport {
 							'**/*RestController*',
 							'**/*ExceptionManager*',
 							'**/configuration',
-							'**/util'
+							'**/util',
+							'**/file'
 					] + Qdomains)
 				})
 		)
@@ -178,14 +179,15 @@ jacocoTestCoverageVerification {
 			}
 
 			excludes = [
-					'*.*ProjectApplication*',
+					'*.MyacademyApplication*',
 					'*.*Request*',
 					'*.*Response*',
 					'*.*RestController*',
 					'*.controller.*',
 					'*.*ExceptionManager*',
 					'*.configuration.*',
-					'*.util.*'
+					'*.util.*',
+					'*.file.*'
 			] + Qdomains
 		}
 	}
