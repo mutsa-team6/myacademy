@@ -167,7 +167,6 @@ public class AnnouncementService {
      * 메인에 공지사항 5개 보여주기 위한 메서드
      */
     @Transactional(readOnly = true)
-
     public List<ReadAnnouncementResponse> readAnnouncementForMain(Long academyId, String account) {
         //academyId 존재 유무 확인
         Academy academy = validateAcademy(academyId);
@@ -184,7 +183,6 @@ public class AnnouncementService {
      * 메인에 입시정보 5개 보여주기 위한 메서드
      */
     @Transactional(readOnly = true)
-
     public List<ReadAnnouncementResponse> readAdmissionForMain(Long academyId, String account) {
         //academyId 존재 유무 확인
         Academy academy = validateAcademy(academyId);
@@ -195,9 +193,6 @@ public class AnnouncementService {
                 ReadAnnouncementResponse.of(announcement)).collect(Collectors.toList());
     }
 
-    /**
-     *
-     */
     @Transactional(readOnly = true)
     public Page<ReadAllAnnouncementResponse> searchAnnouncement(Long academyId, String title, Pageable pageable, String account) {
 
@@ -222,6 +217,4 @@ public class AnnouncementService {
                 .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
         return employee;
     }
-
-
 }

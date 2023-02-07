@@ -16,6 +16,7 @@ import com.project.myacademy.domain.waitinglist.dto.DeleteWaitinglistResponse;
 import com.project.myacademy.domain.waitinglist.dto.ReadAllWaitinglistResponse;
 import com.project.myacademy.global.exception.AppException;
 import com.project.myacademy.global.exception.ErrorCode;
+import com.project.myacademy.global.util.EmailUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -54,6 +55,8 @@ class WaitinglistServiceTest {
     private EnrollmentRepository enrollmentRepository;
     @Mock
     private WaitinglistRepository waitinglistRepository;
+    @Mock
+    private EmailUtil emailUtil;
     @InjectMocks
     private WaitinglistService waitinglistService;
 
@@ -80,8 +83,8 @@ class WaitinglistServiceTest {
         employee = Employee.builder().id(1L).name("staff").email("email").account("account").password("password").employeeRole(EmployeeRole.ROLE_STAFF).academy(academy).build();
         teacher = Employee.builder().id(2L).name("teacher").email("email1").account("account1").employeeRole(EmployeeRole.ROLE_USER).academy(academy).build();
         lecture = Lecture.builder().id(1L).name("lecture").price(10000).employee(teacher).minimumCapacity(5).maximumCapacity(10).build();
-        student = Student.builder().id(1L).name("student").academyId(academy.getId()).build();
-        student2 = Student.builder().id(2L).name("student2").academyId(academy.getId()).build();
+        student = Student.builder().id(1L).name("student").academyId(academy.getId()).email("email").build();
+        student2 = Student.builder().id(2L).name("student2").academyId(academy.getId()).email("email2").build();
         enrollment = Enrollment.builder().id(1L).student(student).lecture(lecture).build();
         waitinglist = Waitinglist.builder().id(1L).student(student).lecture(lecture).build();
         waitinglist2 = Waitinglist.builder().id(2L).student(student2).lecture(lecture).build();
@@ -238,6 +241,7 @@ class WaitinglistServiceTest {
             given(enrollmentRepository.findByStudentAndLecture(any(Student.class), any(Lecture.class))).willReturn(Optional.empty());
             given(waitinglistRepository.findByStudentAndLecture(any(Student.class), any(Lecture.class))).willReturn(Optional.empty());
             given(waitinglistRepository.saveAndFlush(any(Waitinglist.class))).willReturn(waitinglist);
+            willDoNothing().given(emailUtil).sendEmail(anyString(), anyString(), anyString());
 
             CreateWaitinglistResponse savedWaitingList = waitinglistService.createWaitinglist(academy.getId(), student.getId(), lecture.getId(), employee.getAccount());
             assertThat(savedWaitingList.getWaitinglistId()).isEqualTo(1L);
@@ -252,6 +256,7 @@ class WaitinglistServiceTest {
             then(enrollmentRepository).should(times(1)).findByStudentAndLecture(any(Student.class), any(Lecture.class));
             then(waitinglistRepository).should(times(1)).findByStudentAndLecture(any(Student.class), any(Lecture.class));
             then(waitinglistRepository).should(times(1)).saveAndFlush(any(Waitinglist.class));
+            then(emailUtil).should(times(1)).sendEmail(anyString(),anyString(),anyString());
         }
 
         @Test
@@ -454,6 +459,7 @@ class WaitinglistServiceTest {
             given(lectureRepository.findById(anyLong())).willReturn(Optional.of(mockLecture));
             given(waitinglistRepository.findById(anyLong())).willReturn(Optional.of(waitinglist));
             given(mockEmployee.getEmployeeRole()).willReturn(EmployeeRole.ROLE_STAFF);
+            willDoNothing().given(emailUtil).sendEmail(anyString(), anyString(), anyString());
 
             DeleteWaitinglistResponse deletedWaitinglist = waitinglistService.deleteWaitinglist(academy.getId(), student.getId(), lecture.getId(), waitinglist.getId(), employee.getAccount());
             assertThat(deletedWaitinglist.getWaitinglistId()).isEqualTo(1L);
@@ -465,6 +471,7 @@ class WaitinglistServiceTest {
             then(lectureRepository).should(times(1)).findById(anyLong());
             then(waitinglistRepository).should(times(1)).findById(anyLong());
             then(mockEmployee).should(times(1)).getEmployeeRole();
+            then(emailUtil).should(times(1)).sendEmail(anyString(),anyString(),anyString());
         }
 
         @Test
