@@ -195,7 +195,16 @@
                                                 <span class=" text font-weight-bold" style="font-size: small"
                                                       th:text="${lecture.currentEnrollmentNumber}"></span>
                                             </th>
-
+                                            <td class="align-middle">
+                                                <a
+                                                        th:onclick="|register.delete(${academy.academyId},${lecture.lectureId},${teacher.id})|"
+                                                        type="button"
+                                                        class="text-danger font-weight-bold text-xs"
+                                                        data-toggle="tooltip"
+                                                        data-original-title="delete-academy">
+                                                    delete
+                                                </a>
+                                            </td>
                                         </tr>
                                     </div>
                                     </tbody>
@@ -231,19 +240,22 @@
                     <div class="row">
                         <div class="col-1">
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="일" id="Sun" th:checked="false" name="lectureDay">
+                                <input class="form-check-input" type="checkbox" value="일" id="Sun" th:checked="false"
+                                       name="lectureDay">
                                 <label class="custom-control-label" for="Sun">일</label>
                             </div>
                         </div>
                         <div class="col-1">
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="월" id="Mon" th:checked="false" name="lectureDay">
+                                <input class="form-check-input" type="checkbox" value="월" id="Mon" th:checked="false"
+                                       name="lectureDay">
                                 <label class="custom-control-label" for="Mon">월</label>
                             </div>
                         </div>
                         <div class="col-1">
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="화" id="Tue" th:checked="false" name="lectureDay">
+                                <input class="form-check-input" type="checkbox" value="화" id="Tue" th:checked="false"
+                                       name="lectureDay">
                                 <label class="custom-control-label" for="Tue">화</label>
                             </div>
                         </div>
@@ -251,7 +263,8 @@
                         <div class="col-1">
 
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="수" id="Wed" th:checked="false" name="lectureDay">
+                                <input class="form-check-input" type="checkbox" value="수" id="Wed" th:checked="false"
+                                       name="lectureDay">
                                 <label class="custom-control-label" for="Wed">수</label>
                             </div>
                         </div>
@@ -259,7 +272,8 @@
                         <div class="col-1">
 
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="목" id="Thu" th:checked="false" name="lectureDay">
+                                <input class="form-check-input" type="checkbox" value="목" id="Thu" th:checked="false"
+                                       name="lectureDay">
                                 <label class="custom-control-label" for="Thu">목</label>
                             </div>
                         </div>
@@ -267,7 +281,8 @@
                         <div class="col-1">
 
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="금" id="Fri" th:checked="false" name="lectureDay">
+                                <input class="form-check-input" type="checkbox" value="금" id="Fri" th:checked="false"
+                                       name="lectureDay">
                                 <label class="custom-control-label" for="Fri">금</label>
                             </div>
                         </div>
@@ -275,7 +290,8 @@
                         <div class="col-1">
 
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="토" id="Sat" th:checked="false" name="lectureDay">
+                                <input class="form-check-input" type="checkbox" value="토" id="Sat" th:checked="false"
+                                       name="lectureDay">
                                 <label class="custom-control-label" for="Sat">토</label>
                             </div>
                         </div>
@@ -349,7 +365,7 @@
             selectedEls.forEach((el) => {
                 result += el.value + ', ';
             });
-            let day = result.substring(0, result.length-2);
+            let day = result.substring(0, result.length - 2);
 
             console.log(result);
             console.log(day);
@@ -383,7 +399,26 @@
                 }
             });
 
-        }
+        },
+
+        delete: function (academyId,lectureId,teacherId) {
+
+            const con_check = confirm("삭제하시겠습니까?");
+
+            if (con_check === true) {
+                axios.delete("/api/v1/academies/" + academyId + "/lectures/" + lectureId,
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    }
+                ).then((response) => {
+                    alert("강의 삭제 성공");
+                    window.location.href = '/academy/lecture/register?teacherId='+teacherId;
+                }).catch((error) => {
+                });
+            }
+        },
     };
 
     register.init();

@@ -13,6 +13,7 @@ import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.domain.employee.EmployeeRepository;
 import com.project.myacademy.domain.file.announcementfile.dto.CreateAnnouncementFileResponse;
 import com.project.myacademy.domain.file.announcementfile.dto.DeleteAnnoucementFileResponse;
+import com.project.myacademy.domain.file.announcementfile.dto.ReadAnnouncementFilesResponse;
 import com.project.myacademy.global.exception.AppException;
 import com.project.myacademy.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -203,6 +205,19 @@ public class AnnouncementFileS3UploadService {
         httpHeaders.setContentDispositionFormData("attachment",encodedFileName);
 
         return new ResponseEntity<>(bytes, httpHeaders, HttpStatus.OK);
+    }
+
+
+    /**
+     * s3 버킷에 저장된 프로필 객체 url 가져오는 메서드
+     * @param announcementId 찾고자 하는 직원의 id
+     */
+    @Transactional(readOnly = true)
+    public List<ReadAnnouncementFilesResponse> getStoredUrls(Long announcementId) {
+
+        return announcementFileRepository.findByAnnouncement_Id(announcementId)
+                .stream().map(announcementFile -> new ReadAnnouncementFilesResponse(announcementFile.getStoredFileUrl(),announcementFile.getUploadFileName())).collect(Collectors.toList());
+
     }
 
     private Academy validateAcademy(Long academyId) {
