@@ -1,5 +1,6 @@
 package com.project.myacademy.global.configuration.filter;
 
+import com.project.myacademy.global.exception.AppException;
 import com.project.myacademy.global.exception.ErrorCode;
 import com.project.myacademy.global.exception.ExceptionManager;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -38,7 +39,7 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
             sendMessage(response);
 
 
-        }catch (ArrayIndexOutOfBoundsException e) {
+        } catch (ArrayIndexOutOfBoundsException e) {
 
             log.error("토큰을 추출할 수 없습니다.");
             sendMessage(response);
@@ -46,9 +47,10 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
 
         } catch (NullPointerException e) {
 
-            filterChain.doFilter(request, response);
             sendMessage(response);
 
+        } catch (AppException e) {
+            sendMessage(response);
         }
     }
 
@@ -61,7 +63,7 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
 
         response.setContentType("text/html; charset=utf-8");
         PrintWriter writer = response.getWriter();
-        writer.println("<script>alert('토큰이 유효하지 않아 토큰을 삭제합니다. 다시 로그인해주세요');  location.reload();</script>");
+        writer.println("<script>alert('다시 로그인해주세요');  location.reload();</script>");
         writer.flush();
     }
 }
