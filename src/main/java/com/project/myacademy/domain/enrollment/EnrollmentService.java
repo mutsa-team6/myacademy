@@ -38,6 +38,7 @@ public class EnrollmentService {
     private final LectureRepository lectureRepository;
     private final WaitinglistRepository waitinglistRepository;
     private final EmailUtil emailUtil;
+
     /**
      * @param academyId 직원의 소속 학원 id
      * @param studentId 학생 id

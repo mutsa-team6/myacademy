@@ -3,7 +3,6 @@ package com.project.myacademy.domain.employee;
 import com.project.myacademy.domain.academy.Academy;
 import com.project.myacademy.domain.academy.AcademyRepository;
 import com.project.myacademy.domain.employee.dto.*;
-import com.project.myacademy.domain.student.dto.UpdateStudentResponse;
 import com.project.myacademy.global.exception.AppException;
 import com.project.myacademy.global.exception.ErrorCode;
 import com.project.myacademy.global.util.EmailUtil;
@@ -12,9 +11,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.MockedStatic;
-import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -27,36 +28,41 @@ import static com.project.myacademy.domain.employee.EmployeeRole.ROLE_USER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.*;
+import static org.mockito.BDDMockito.willDoNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 
-
+@ExtendWith(MockitoExtension.class)
 class EmployeeServiceTest {
-    private EmployeeService employeeService;
-    BCryptPasswordEncoder bCryptPasswordEncoder = Mockito.mock(BCryptPasswordEncoder.class);
-    EmailUtil emailUtil;
 
-    EmployeeRepository employeeRepository = Mockito.mock(EmployeeRepository.class);
-
-    AcademyRepository academyRepository = Mockito.mock(AcademyRepository.class);
-
+    @Mock
+    private EmployeeRepository employeeRepository;
+    @Mock
+    private AcademyRepository academyRepository;
+    @Mock
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    @Mock
+    private EmailUtil emailUtil;
     @InjectMocks
+    private EmployeeService employeeService;
     private Academy academy;
     private Employee employeeADMIN, employeeSTAFF, employeeUSER, employeeUSER2;
     private Pageable pageable;
+    private Employee mockEmployee;
     @Value("${jwt.token.secret}")
     String secretKey;
 
     @BeforeEach
     void setUp() {
-        employeeService = new EmployeeService(employeeRepository, academyRepository, bCryptPasswordEncoder, emailUtil);
         academy = Academy.builder().id(1L).name("학원").owner("원장").build();
         employeeADMIN = Employee.builder().id(1L).name("원장").account("admin").password("password").phoneNum("010-0000-0000").email("employeeADMIN@gmail.com").academy(academy).subject("원장과목").employeeRole(EmployeeRole.ROLE_ADMIN).build();
         employeeSTAFF = Employee.builder().id(2L).name("직원").account("staff").password("password").phoneNum("010-0000-0001").email("employeeSTAFF@gmail.com").academy(academy).subject("직원").employeeRole(ROLE_STAFF).build();
         employeeUSER = Employee.builder().id(3L).name("강사").account("user").password("password").phoneNum("010-0000-0002").email("employeeUSER@gmail.com").academy(academy).subject("수학").employeeRole(ROLE_USER).build();
-        employeeUSER = Employee.builder().id(4L).name("강사2").account("user2").password("password").phoneNum("010-0000-0012").email("employeeUSER2@gmail.com").academy(academy).subject("과학").employeeRole(ROLE_USER).build();
+        employeeUSER2 = Employee.builder().id(4L).name("강사2").account("user2").password("password").phoneNum("010-0000-0012").email("employeeUSER2@gmail.com").academy(academy).subject("과학").employeeRole(ROLE_USER).build();
         pageable = PageRequest.of(0, 20, Sort.Direction.DESC, "id");
+        mockEmployee = mock(Employee.class);
     }
 
     @Nested
@@ -204,13 +210,12 @@ class EmployeeServiceTest {
         @Test
         @DisplayName("강사 등록 실패")
         void create_employee_user_fail1() {
+
             CreateEmployeeRequest emptySubRequestUSER = new CreateEmployeeRequest("강사", "강사주소", "010-0000-0003", "강사@gmail.com", "user", "password", "USER", "");
 
             given(academyRepository.findById(any())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.empty());
             given(employeeRepository.findByNameAndEmail(any(), any())).willReturn(Optional.empty());
-            given(bCryptPasswordEncoder.encode(any())).willReturn(emptySubRequestUSER.getPassword());
-            given(employeeRepository.save(any())).willReturn(employeeUSER);
 
             AppException appException = assertThrows(AppException.class,
                     () -> employeeService.createEmployee(emptySubRequestUSER, academy.getId()));
@@ -315,24 +320,31 @@ class EmployeeServiceTest {
 
 //    @Nested
 //    @DisplayName("비밀번호 찾기(임시비밀번호로 변경해 이메일로 전송해줌)")
-//    class ChangePasswordEmployee {
-//        ChangePasswordEmployeeRequest request = new ChangePasswordEmployeeRequest("원장", "admin", "employeeADMIN@gmail.com");
+//    class FindPasswordEmployee {
+//        FindPasswordEmployeeRequest request = new FindPasswordEmployeeRequest("원장", "admin", "employeeADMIN@gmail.com");
+//        String tempPassword = employeeService.getTempPassword();
 //
 //        @Test
 //        @DisplayName("비밀번호 찾기 성공")
 //        void change_password_employee_success() {
-//            given(employeeRepository.findByAccount(any())).willReturn(Optional.of(employeeADMIN));
-//            given(employeeRepository.findByNameAndEmail(any(), any())).willReturn(Optional.of(employeeADMIN));
-//            given(bCryptPasswordEncoder.encode(any())).willReturn("암호화된임시비밀번호");
-//            ChangePasswordEmployeeResponse response = employeeService.changePasswordEmployee(request);
 //
-//            assertThat(response.getAccount().equals("admin"));
+//            given(employeeRepository.findByAccount(any())).willReturn(Optional.of(mockEmployee));
+//            given(employeeRepository.findByNameAndEmail(any(), any())).willReturn(Optional.of(mockEmployee));
+//            given(bCryptPasswordEncoder.encode(any())).willReturn(tempPassword);
+//            willDoNothing().given(mockEmployee).updatePasswordOnly(any());
+//            given(employeeRepository.save(any())).willReturn(mockEmployee);
+//            willDoNothing().given(emailUtil).sendEmail(anyString(),anyString(),anyString());
+//
+//            FindPasswordEmployeeResponse response = employeeService.findPasswordEmployee(request);
+//
+//            assertThat(response.getAccount()).isEqualTo("admin");
 //        }
 //    }
 
     @Nested
     @DisplayName("직원 비밀번호 변경")
     class ChangePasswordEmployee {
+
         @Test
         @DisplayName("비밀번호 변경 성공")
         void change_password_success(){
@@ -708,13 +720,35 @@ class EmployeeServiceTest {
         void update_employee_success() {
             given(academyRepository.findById(any())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeADMIN));
-            given(bCryptPasswordEncoder.encode(any())).willReturn("복호화된비밀번호");
 
             UpdateEmployeeResponse response = employeeService.updateEmployee(request, employeeADMIN.getAccount(), employeeSTAFF.getId());
 
             assertThat(response.getEmployeeId().equals(2L));
         }
+
+        @Test
+        @DisplayName("직원 수정 실패(1) - 일치하는 학원 정보 없음")
+        public void update_employee_fail1() {
+
+            given(academyRepository.findById(any())).willReturn(Optional.empty());
+
+            AppException appException = assertThrows(AppException.class,
+                    () -> employeeService.updateEmployee(request, employeeADMIN.getAccount(), employeeSTAFF.getId()));
+
+            assertThat(appException.getErrorCode().equals(ErrorCode.ACADEMY_NOT_FOUND));
+        }
+
+        @Test
+        @DisplayName("직원 수정 실패(2) - 일치하는 직원 정보 없음")
+        public void update_employee_fail2() {
+
+            given(academyRepository.findById(any())).willReturn(Optional.of(academy));
+            given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.empty());
+
+            AppException appException = assertThrows(AppException.class,
+                    () -> employeeService.updateEmployee(request, employeeADMIN.getAccount(), employeeSTAFF.getId()));
+
+            assertThat(appException.getErrorCode().equals(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND));
+        }
     }
-
-
 }
