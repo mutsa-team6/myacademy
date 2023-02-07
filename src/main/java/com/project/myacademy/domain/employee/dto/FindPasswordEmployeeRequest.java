@@ -11,6 +11,5 @@ import lombok.NoArgsConstructor;
 @Builder
 public class FindPasswordEmployeeRequest {
     private String name;
-    private String account;
     private String email;
 }

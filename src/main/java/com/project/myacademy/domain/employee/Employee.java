@@ -2,6 +2,7 @@ package com.project.myacademy.domain.employee;
 
 import com.project.myacademy.domain.BaseEntity;
 import com.project.myacademy.domain.academy.Academy;
+import com.project.myacademy.domain.employee.dto.CreateEmployeeRequest;
 import com.project.myacademy.domain.employee.dto.EmployeeDto;
 import com.project.myacademy.domain.employee.dto.UpdateEmployeeRequest;
 import lombok.*;
@@ -83,5 +84,52 @@ public class Employee extends BaseEntity {
     public static boolean isTeacherAuthority(Employee employee) {
         if (employee.getEmployeeRole().equals(ROLE_USER)) return true;
         else return false;
+    }
+
+    // ADMIN 권한 직원 등록
+    public static Employee createAdminEmployee(CreateEmployeeRequest request, Academy foundAcademy, String encryptedPassword) {
+        return Employee.builder()
+                .name(request.getName())
+                .employeeRole(EmployeeRole.ROLE_ADMIN)
+                .account("admin")
+                .phoneNum(request.getPhoneNum())
+                .email(request.getEmail())
+                .address(request.getAddress())
+                .academy(foundAcademy)
+                .password(encryptedPassword)
+                .subject(request.getSubject())
+                .build();
+    }
+
+    // USER 권한 직원 등록
+    // 직원인 경우 과목칸에 뭘 적거나 적지 않아도 그냥 "직원"으로 데이터가 입력
+    public static Employee createStaffEmployee(CreateEmployeeRequest request, Academy foundAcademy, String encryptedPassword) {
+        return Employee.builder()
+                .name(request.getName())
+                .employeeRole(EmployeeRole.ROLE_STAFF)
+                .account(request.getAccount())
+                .subject("직원")
+                .phoneNum(request.getPhoneNum())
+                .email(request.getEmail())
+                .address(request.getAddress())
+                .academy(foundAcademy)
+                .password(encryptedPassword)
+                .build();
+
+    }
+
+    // USER 권한 직원 등록
+    public static Employee createUserEmployee(CreateEmployeeRequest request, Academy foundAcademy, String encryptedPassword) {
+        return Employee.builder()
+                .name(request.getName())
+                .employeeRole(EmployeeRole.ROLE_USER)
+                .account(request.getAccount())
+                .subject(request.getSubject())
+                .phoneNum(request.getPhoneNum())
+                .email(request.getEmail())
+                .address(request.getAddress())
+                .academy(foundAcademy)
+                .password(encryptedPassword)
+                .build();
     }
 }

@@ -65,7 +65,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         String email = JwtTokenUtil.getEmail(token,secretKey);
 
         //계정에 맞는 권한 부여
-        Employee found = employeeService.findByAccountAndEmail(account, email);
+        Employee found = employeeService.findByEmail(email);
         String employeeRole = found.getEmployeeRole().name();
 
         String employeeInfo = account + "@" + found.getAcademy().getId();
