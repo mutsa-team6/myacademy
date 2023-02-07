@@ -59,10 +59,6 @@ public class EmployeeRestController {
 
         LoginEmployeeResponse response = employeeService.loginEmployee(request, academyId);
 
-        if (response.getJwt() != null) {
-            HttpSession session = httpRequest.getSession(true);
-            session.setAttribute("name", response.getEmployeeName());
-        }
         String token = response.getJwt();
         CookieGenerator cookieGenerator = new CookieGenerator();
         cookieGenerator.setCookieName("token");

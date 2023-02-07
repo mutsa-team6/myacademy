@@ -1,11 +1,13 @@
 package com.project.myacademy.global.configuration;
 
+import com.project.myacademy.domain.employee.EmployeeRepository;
 import com.project.myacademy.domain.employee.EmployeeService;
 import com.project.myacademy.global.configuration.filter.ExceptionHandlerFilter;
 import com.project.myacademy.global.configuration.filter.JwtTokenFilter;
 import com.project.myacademy.global.configuration.oauth.CustomOAuth2UserService;
 import com.project.myacademy.global.configuration.oauth.Oauth2FailureHandler;
 import com.project.myacademy.global.configuration.oauth.Oauth2SuccessHandler;
+import com.project.myacademy.global.configuration.refreshToken.RefreshTokenRepository;
 import com.project.myacademy.global.configuration.security.CustomAccessDeniedHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,7 +27,8 @@ public class SecurityConfig {
     private String secretKey;
 
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
-    private final EmployeeService employeeService;
+    private final EmployeeRepository employeeRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     private final Oauth2SuccessHandler oauth2SuccessHandler;
     private final Oauth2FailureHandler oauth2FailureHandler;
@@ -68,7 +71,7 @@ public class SecurityConfig {
                 .accessDeniedHandler(customAccessDeniedHandler)
 
                 .and()
-                .addFilterBefore(new JwtTokenFilter(employeeService,secretKey), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtTokenFilter(employeeRepository,refreshTokenRepository,secretKey), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new ExceptionHandlerFilter(), JwtTokenFilter.class)
                 .build();
 
