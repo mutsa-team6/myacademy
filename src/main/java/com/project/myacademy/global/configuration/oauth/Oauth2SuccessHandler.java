@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 @Component
 @Slf4j
@@ -58,11 +59,11 @@ public class Oauth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             String foundAccount = foundEmployee.get().getAccount();
             log.info("🌈 소셜 로그인 인증한 계정명 [{}]", foundAccount);
             // 회원 계정으로 토큰 생성 후 쿼리 파라미터로 보냄
-            String token = JwtTokenUtil.createToken(foundAccount, email, key, 1000 * 60 * 60);
+            String token = JwtTokenUtil.createToken(foundAccount, email, key);
+            String refreshToken = JwtTokenUtil.createRefreshToken(key);
 
-            response.sendRedirect("/oauth2/redirect" + "?token=" + token);
+            response.sendRedirect("/oauth2/redirect" + "?token=" + token + "&refreshToken=" + refreshToken+"&employeeId="+foundEmployee.get().getId());
         } else {
-//            String encodedRealName = URLEncoder.encode(realName, "UTF-8");
             HttpSession session = request.getSession(true);
             session.setAttribute("realName", realName);
             session.setAttribute("email", email);

@@ -3,6 +3,8 @@ package com.project.myacademy.domain.employee;
 import com.project.myacademy.domain.academy.Academy;
 import com.project.myacademy.domain.academy.AcademyRepository;
 import com.project.myacademy.domain.employee.dto.*;
+import com.project.myacademy.global.configuration.refreshToken.RefreshToken;
+import com.project.myacademy.global.configuration.refreshToken.RefreshTokenRepository;
 import com.project.myacademy.global.exception.AppException;
 import com.project.myacademy.global.exception.ErrorCode;
 import com.project.myacademy.global.util.EmailUtil;
@@ -17,6 +19,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -28,9 +32,11 @@ public class EmployeeService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final EmailUtil emailUtil;
 
+    private final RefreshTokenRepository refreshTokenRepository;
+
     @Value("${jwt.token.secret}")
     private String secretKey;
-    private long expiredTimeMs = 1000 * 60 * 60;
+    private long expiredTimeMs = 1000 * 60 * 30;
 
     /**
      * 직원 등록
@@ -131,7 +137,14 @@ public class EmployeeService {
             throw new AppException(ErrorCode.INVALID_PASSWORD);
         }
 
-        return new LoginEmployeeResponse(JwtTokenUtil.createToken(requestAccount, requestEmployee.getEmail(), secretKey, expiredTimeMs), requestEmployee.getName());
+        //리프레시 토큰은 난수로 생성, access 토큰은, 사용자 정보로 생성
+        String accessToken = JwtTokenUtil.createToken(requestAccount, requestEmployee.getEmail(), secretKey);
+        String refreshToken = JwtTokenUtil.createRefreshToken(secretKey);
+
+        //레디스에 저장 Refresh 토큰을 저장한다. (사용자 기본키 Id, refresh 토큰, access 토큰 저장)
+        refreshTokenRepository.save(new RefreshToken(String.valueOf(requestEmployee.getId()), refreshToken, accessToken));
+
+        return new LoginEmployeeResponse(accessToken, requestEmployee.getName());
     }
 
     /**

@@ -11,6 +11,7 @@ import com.project.myacademy.domain.enrollment.dto.FindStudentInfoFromEnrollment
 import com.project.myacademy.domain.file.employeeprofile.EmployeeProfileS3UploadService;
 import com.project.myacademy.domain.lecture.LectureService;
 import com.project.myacademy.domain.lecture.dto.ReadAllLectureResponse;
+import com.project.myacademy.global.configuration.refreshToken.RefreshTokenService;
 import com.project.myacademy.global.util.AuthenticationUtil;
 import com.project.myacademy.global.util.SessionUtil;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.util.CookieGenerator;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -39,6 +41,7 @@ public class EmployeeController {
     private final LectureService lectureService;
     private final AcademyService academyService;
     private final EnrollmentService enrollmentService;
+    private final RefreshTokenService refreshTokenService;
 
     private final EmployeeProfileS3UploadService employeeProfileS3UploadService;
 
@@ -93,7 +96,7 @@ public class EmployeeController {
             lectures.stream().forEach(readAllLectureResponse ->
                     readAllLectureResponse
                             .setCompletePaymentNumber(enrollmentService
-                                    .findStudentInfoFromEnrollmentByLecture(academyId,requestAccount,readAllLectureResponse.getLectureId(),pageable).getTotalElements()));
+                                    .findStudentInfoFromEnrollmentByLecture(academyId, requestAccount, readAllLectureResponse.getLectureId(), pageable).getTotalElements()));
         }
         FindAcademyResponse academy = academyService.findAcademyById(academyId);
         model.addAttribute("academy", academy);
@@ -179,6 +182,20 @@ public class EmployeeController {
 
     @GetMapping("/logoutEmployee")
     public String logout(HttpServletRequest request, HttpServletResponse response) {
+
+        Cookie[] list = request.getCookies();
+
+        String token = null;
+        for (Cookie cookie : list) {
+            if (cookie.getName().equals("token")) {
+                token = cookie.getValue();
+
+            }
+        }
+        if (token != null) {
+            refreshTokenService.removeRefreshToken(token);
+        }
+
         CookieGenerator cookieGenerator = new CookieGenerator();
         cookieGenerator.setCookieName("token");
         cookieGenerator.addCookie(response, "deleted");
@@ -190,7 +207,10 @@ public class EmployeeController {
     }
 
     @GetMapping("/oauth2/redirect")
-    public String login(@RequestParam String token, HttpServletResponse response) {
+    public String login(@RequestParam String token, @RequestParam String refreshToken, @RequestParam Long employeeId, HttpServletResponse response) {
+
+        refreshTokenService.saveTokenInfo(employeeId, refreshToken, token);
+
         CookieGenerator cookieGenerator = new CookieGenerator();
         cookieGenerator.setCookieName("token");
         cookieGenerator.setCookieHttpOnly(true);

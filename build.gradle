@@ -80,6 +80,9 @@ dependencies {
 	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
 	implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
 
+	//redis 추가
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
 	jar {
 		enabled = false
 	}

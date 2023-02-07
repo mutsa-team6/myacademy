@@ -43,7 +43,7 @@ public class JwtTokenUtil {
                 .get("email", String.class);
     }
 
-    public static String createToken(String account, String email, String key, long expireTime) {
+    public static String createToken(String account, String email, String key) {
         Claims claims = Jwts
                 .claims(); //key-value형태
 
@@ -57,7 +57,20 @@ public class JwtTokenUtil {
                 .builder()
                 .setClaims(claims) //map같은 형태로 정보를 넣어주면 된다.
                 .setIssuedAt(new Date(System.currentTimeMillis())) //발행된 시간
-                .setExpiration(new Date(System.currentTimeMillis() + expireTime))//유효시간
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 30))//유효시간 (30분)
+                .signWith(SignatureAlgorithm.HS256, key) //HS256알고리즘으로 key를 암호화 해줄것이다.
+                .compact(); //토큰에 필요한 모든 정보
+    }
+
+    public static String createRefreshToken(String key) {
+        Claims claims = Jwts
+                .claims(); //key-value형태
+
+        return Jwts
+                .builder()
+                .setClaims(claims) //map같은 형태로 정보를 넣어주면 된다.
+                .setIssuedAt(new Date(System.currentTimeMillis())) //발행된 시간
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 3))//유효시간 (3일)
                 .signWith(SignatureAlgorithm.HS256, key) //HS256알고리즘으로 key를 암호화 해줄것이다.
                 .compact(); //토큰에 필요한 모든 정보
     }
