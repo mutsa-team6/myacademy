@@ -181,7 +181,7 @@ public class EmployeeService {
         String email = request.getEmail();
 
         // 이름으로 직원을 조회 - 없을시 EMPLOYEE_NAME_NOT_FOUND 에러발생
-       validateEmployeeByName(name);
+        validateEmployeeByName(name);
 
         // 이메일로 직원을 조회 - 없을시 EMAIL_NOT_FOUND 에러발생
         Employee foundEmployee = validateEmployeeByEmail(email);
@@ -499,7 +499,7 @@ public class EmployeeService {
     // 이메일로 직원을 조회 - 없을시 EMPLOYEE_NOT_FOUND 에러발생
     private Employee validateEmployeeByEmail(String email) {
         Employee foundEmployee = employeeRepository.findByEmail(email)
-                .orElseThrow(() -> new AppException(ErrorCode.EMAIL_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
         return foundEmployee;
     }
 
