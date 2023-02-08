@@ -64,7 +64,7 @@ class ParentServiceTest {
             when(parentRepository.save(any())).thenReturn(parent1);
 
             AppException appException = assertThrows(AppException.class, () -> parentService.createParent(1L, request, "admin"));
-            assertThat(appException.getErrorCode().equals(ErrorCode.ACADEMY_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACADEMY_NOT_FOUND);
         }
 
         @Test
@@ -76,7 +76,7 @@ class ParentServiceTest {
             when(parentRepository.save(any())).thenReturn(parent1);
 
             AppException appException = assertThrows(AppException.class, () -> parentService.createParent(1L, request, "admin"));
-            assertThat(appException.getErrorCode().equals(ErrorCode.ACCOUNT_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND);
         }
 
         @Test
@@ -88,7 +88,7 @@ class ParentServiceTest {
             when(mockEmployee.getEmployeeRole()).thenReturn(EmployeeRole.ROLE_USER);
 
             AppException appException = assertThrows(AppException.class, () -> parentService.createParent(1L, request, "user"));
-            assertThat(appException.getErrorCode().equals(ErrorCode.INVALID_PERMISSION));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.INVALID_PERMISSION);
         }
 
         @Test
@@ -101,7 +101,7 @@ class ParentServiceTest {
             when(parentRepository.save(any())).thenReturn(parent1);
 
             AppException appException = assertThrows(AppException.class, () -> parentService.createParent(1L, request, "admin"));
-            assertThat(appException.getErrorCode().equals(ErrorCode.DUPLICATED_PARENT));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.DUPLICATED_PARENT);
         }
     }
 
@@ -121,7 +121,7 @@ class ParentServiceTest {
             when(employeeRepository.findByAccountAndAcademy(any(), any())).thenReturn(Optional.of(employee1));
             when(parentRepository.findByIdAndAcademyId(any(), any())).thenReturn(Optional.of(parent1));
 
-            assertEquals("name", parentService.readParent(1L, 1L,"admin").getName());
+            assertEquals("name", parentService.readParent(1L, 1L, "admin").getName());
         }
 
         @Test
@@ -131,8 +131,8 @@ class ParentServiceTest {
             when(employeeRepository.findByAccountAndAcademy(any(), any())).thenReturn(Optional.of(employee1));
             when(parentRepository.findByIdAndAcademyId(any(), any())).thenReturn(Optional.of(parent1));
 
-            AppException appException = assertThrows(AppException.class, () -> parentService.readParent(1L, 1L,"admin"));
-            assertThat(appException.getErrorCode().equals(ErrorCode.ACADEMY_NOT_FOUND));
+            AppException appException = assertThrows(AppException.class, () -> parentService.readParent(1L, 1L, "admin"));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACADEMY_NOT_FOUND);
         }
 
         @Test
@@ -142,8 +142,8 @@ class ParentServiceTest {
             when(academyRepository.findById(any())).thenReturn(Optional.of(academy1));
             when(parentRepository.findByIdAndAcademyId(any(), any())).thenReturn(Optional.of(parent1));
 
-            AppException appException = assertThrows(AppException.class, () -> parentService.readParent(1L, 1L,"admin"));
-            assertThat(appException.getErrorCode().equals(ErrorCode.ACCOUNT_NOT_FOUND));
+            AppException appException = assertThrows(AppException.class, () -> parentService.readParent(1L, 1L, "admin"));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND);
         }
 
         @Test
@@ -154,8 +154,8 @@ class ParentServiceTest {
             when(employeeRepository.findByAccountAndAcademy(any(), any())).thenReturn(Optional.of(mockEmployee));
             when(mockEmployee.getEmployeeRole()).thenReturn(EmployeeRole.ROLE_USER);
 
-            AppException appException = assertThrows(AppException.class, () -> parentService.readParent(1L, 1L,"user"));
-            assertThat(appException.getErrorCode().equals(ErrorCode.INVALID_PERMISSION));
+            AppException appException = assertThrows(AppException.class, () -> parentService.readParent(1L, 1L, "user"));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.INVALID_PERMISSION);
         }
 
 
@@ -166,8 +166,8 @@ class ParentServiceTest {
             when(academyRepository.findById(any())).thenReturn(Optional.of(academy1));
             when(employeeRepository.findByAccountAndAcademy(any(), any())).thenReturn(Optional.of(employee1));
 
-            AppException appException = assertThrows(AppException.class, () -> parentService.readParent(1L, 1L,"admin"));
-            assertThat(appException.getErrorCode().equals(ErrorCode.PARENT_NOT_FOUND));
+            AppException appException = assertThrows(AppException.class, () -> parentService.readParent(1L, 1L, "admin"));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.PARENT_NOT_FOUND);
         }
     }
 
@@ -199,7 +199,7 @@ class ParentServiceTest {
             when(parentRepository.findByIdAndAcademyId(any(), any())).thenReturn(Optional.of(parent1));
 
             AppException appException = assertThrows(AppException.class, () -> parentService.updateParent(1L, 1L, request, "admin"));
-            assertThat(appException.getErrorCode().equals(ErrorCode.ACADEMY_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACADEMY_NOT_FOUND);
         }
 
         @Test
@@ -210,7 +210,7 @@ class ParentServiceTest {
             when(parentRepository.findByIdAndAcademyId(any(), any())).thenReturn(Optional.of(parent1));
 
             AppException appException = assertThrows(AppException.class, () -> parentService.updateParent(1L, 1L, request, "admin"));
-            assertThat(appException.getErrorCode().equals(ErrorCode.ACCOUNT_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND);
         }
 
         @Test
@@ -222,7 +222,7 @@ class ParentServiceTest {
             when(mockEmployee.getEmployeeRole()).thenReturn(EmployeeRole.ROLE_USER);
 
             AppException appException = assertThrows(AppException.class, () -> parentService.updateParent(1L, 1L, request, "user"));
-            assertThat(appException.getErrorCode().equals(ErrorCode.INVALID_PERMISSION));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.INVALID_PERMISSION);
         }
 
         @Test
@@ -233,7 +233,7 @@ class ParentServiceTest {
             when(employeeRepository.findByAccountAndAcademy(any(), any())).thenReturn(Optional.of(employee1));
 
             AppException appException = assertThrows(AppException.class, () -> parentService.updateParent(1L, 1L, request, "admin"));
-            assertThat(appException.getErrorCode().equals(ErrorCode.PARENT_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.PARENT_NOT_FOUND);
         }
     }
 
@@ -264,7 +264,7 @@ class ParentServiceTest {
             when(parentRepository.findByIdAndAcademyId(any(), any())).thenReturn(Optional.of(parent1));
 
             AppException appException = assertThrows(AppException.class, () -> parentService.deleteParent(1L, 1L, "admin"));
-            assertThat(appException.getErrorCode().equals(ErrorCode.ACADEMY_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACADEMY_NOT_FOUND);
         }
 
         @Test
@@ -275,7 +275,7 @@ class ParentServiceTest {
             when(parentRepository.findByIdAndAcademyId(any(), any())).thenReturn(Optional.of(parent1));
 
             AppException appException = assertThrows(AppException.class, () -> parentService.deleteParent(1L, 1L, "admin"));
-            assertThat(appException.getErrorCode().equals(ErrorCode.ACCOUNT_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND);
         }
 
         @Test
@@ -287,7 +287,7 @@ class ParentServiceTest {
             when(mockEmployee.getEmployeeRole()).thenReturn(EmployeeRole.ROLE_USER);
 
             AppException appException = assertThrows(AppException.class, () -> parentService.deleteParent(1L, 1L, "admin"));
-            assertThat(appException.getErrorCode().equals(ErrorCode.INVALID_PERMISSION));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.INVALID_PERMISSION);
         }
 
         @Test
@@ -298,7 +298,7 @@ class ParentServiceTest {
             when(employeeRepository.findByAccountAndAcademy(any(), any())).thenReturn(Optional.of(employee1));
 
             AppException appException = assertThrows(AppException.class, () -> parentService.deleteParent(1L, 1L, "admin"));
-            assertThat(appException.getErrorCode().equals(ErrorCode.PARENT_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.PARENT_NOT_FOUND);
         }
     }
 
