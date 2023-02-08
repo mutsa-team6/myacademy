@@ -3,6 +3,7 @@ package com.project.myacademy.domain.employee;
 import com.project.myacademy.domain.academy.Academy;
 import com.project.myacademy.domain.academy.AcademyRepository;
 import com.project.myacademy.domain.employee.dto.*;
+import com.project.myacademy.global.configuration.refreshToken.RefreshTokenRepository;
 import com.project.myacademy.global.exception.AppException;
 import com.project.myacademy.global.exception.ErrorCode;
 import com.project.myacademy.global.util.EmailUtil;
@@ -44,6 +45,8 @@ class EmployeeServiceTest {
     @Mock
     private BCryptPasswordEncoder bCryptPasswordEncoder;
     @Mock
+    private RefreshTokenRepository refreshTokenRepository;
+    @Mock
     private EmailUtil emailUtil;
     @InjectMocks
     private EmployeeService employeeService;
@@ -76,19 +79,18 @@ class EmployeeServiceTest {
 
             given(academyRepository.findById(any())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.empty());
-            given(employeeRepository.findByNameAndEmail(any(), any())).willReturn(Optional.empty());
             given(bCryptPasswordEncoder.encode(any())).willReturn(requestADMIN.getPassword());
             given(employeeRepository.save(any())).willReturn(employeeADMIN);
 
             CreateEmployeeResponse response = employeeService.createEmployee(requestADMIN, academy.getId());
 
-            assertThat(response.getName().equals("원장"));
-            assertThat(response.getAccount().equals("admin"));
+            assertThat(response.getName()).isEqualTo("원장");
+            assertThat(response.getAccount()).isEqualTo("admin");
         }
 
         @Test
-        @DisplayName("원장 등록 실패5 - 계정 중복")
-        void create_employee_admin_fail5() {
+        @DisplayName("원장 등록 실패1 - 계정 중복")
+        void create_employee_admin_fail1() {
             CreateEmployeeRequest requestADMIN = new CreateEmployeeRequest("원장", "원장주소", "010-0000-0001", "원장@gmail.com", "admin", "password", "1", "과목");
 
             given(academyRepository.findById(any())).willReturn(Optional.of(academy));
@@ -97,22 +99,7 @@ class EmployeeServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> employeeService.createEmployee(requestADMIN, academy.getId()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.DUPLICATED_ACCOUNT));
-        }
-
-        @Test
-        @DisplayName("원장 등록 실패4 - 이메일 중복")
-        void create_employee_admin_fail4() {
-            CreateEmployeeRequest requestADMIN = new CreateEmployeeRequest("원장", "원장주소", "010-0000-0001", "원장@gmail.com", "admin", "password", "1", "과목");
-
-            given(academyRepository.findById(any())).willReturn(Optional.of(academy));
-            given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.empty());
-            given(employeeRepository.findByNameAndEmail(any(), any())).willReturn(Optional.of(employeeADMIN));
-
-            AppException appException = assertThrows(AppException.class,
-                    () -> employeeService.createEmployee(requestADMIN, academy.getId()));
-
-            assertThat(appException.getErrorCode().equals(ErrorCode.DUPLICATED_EMAIL));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.DUPLICATED_ACCOUNT);
         }
 
         @Test
@@ -122,45 +109,42 @@ class EmployeeServiceTest {
 
             given(academyRepository.findById(any())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.empty());
-            given(employeeRepository.findByNameAndEmail(any(), any())).willReturn(Optional.empty());
             given(bCryptPasswordEncoder.encode(any())).willReturn(requestADMIN.getPassword());
 
             AppException appException = assertThrows(AppException.class,
                     () -> employeeService.createEmployee(requestADMIN, academy.getId()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.NOT_MATCH_OWNER));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.NOT_MATCH_OWNER);
         }
 
         @Test
-        @DisplayName("원장 등록 실패2 - 직원유형 입력안함")
-        void create_employee_admin_fail2() {
+        @DisplayName("원장 등록 실패4 - 직원유형 입력안함")
+        void create_employee_admin_fail4() {
             CreateEmployeeRequest requestADMIN = new CreateEmployeeRequest("원장", "원장주소", "010-0000-0001", "원장@gmail.com", "admin", "password", "0", "코딩");
 
             given(academyRepository.findById(any())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.empty());
-            given(employeeRepository.findByNameAndEmail(any(), any())).willReturn(Optional.empty());
             given(bCryptPasswordEncoder.encode(any())).willReturn(requestADMIN.getPassword());
 
             AppException appException = assertThrows(AppException.class,
                     () -> employeeService.createEmployee(requestADMIN, academy.getId()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.EMPTY_SUBJECT_FORBIDDEN));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.EMPTY_EMPLOYEE_TYPE);
         }
 
         @Test
-        @DisplayName("원장 등록 실패1 - 과목입력 안함")
-        void create_employee_admin_fail1() {
+        @DisplayName("원장 등록 실패5 - 과목입력 안함")
+        void create_employee_admin_fail5() {
             CreateEmployeeRequest requestADMIN = new CreateEmployeeRequest("원장", "원장주소", "010-0000-0001", "원장@gmail.com", "admin", "password", "1", "");
 
             given(academyRepository.findById(any())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.empty());
-            given(employeeRepository.findByNameAndEmail(any(), any())).willReturn(Optional.empty());
             given(bCryptPasswordEncoder.encode(any())).willReturn(requestADMIN.getPassword());
 
             AppException appException = assertThrows(AppException.class,
                     () -> employeeService.createEmployee(requestADMIN, academy.getId()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.EMPTY_EMPLOYEE_TYPE));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.EMPTY_SUBJECT_FORBIDDEN);
         }
     }
 
@@ -175,14 +159,13 @@ class EmployeeServiceTest {
 
             given(academyRepository.findById(any())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.empty());
-            given(employeeRepository.findByNameAndEmail(any(), any())).willReturn(Optional.empty());
             given(bCryptPasswordEncoder.encode(any())).willReturn(requestSTAFF.getPassword());
             given(employeeRepository.save(any())).willReturn(employeeSTAFF);
 
             CreateEmployeeResponse response = employeeService.createEmployee(requestSTAFF, academy.getId());
 
-            assertThat(response.getName().equals("강사"));
-            assertThat(response.getAccount().equals("staff"));
+            assertThat(response.getName()).isEqualTo("직원");
+            assertThat(response.getAccount()).isEqualTo("staff");
         }
     }
 
@@ -197,14 +180,13 @@ class EmployeeServiceTest {
 
             given(academyRepository.findById(any())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.empty());
-            given(employeeRepository.findByNameAndEmail(any(), any())).willReturn(Optional.empty());
             given(bCryptPasswordEncoder.encode(any())).willReturn(requestUSER.getPassword());
             given(employeeRepository.save(any())).willReturn(employeeUSER);
 
             CreateEmployeeResponse response = employeeService.createEmployee(requestUSER, academy.getId());
 
-            assertThat(response.getName().equals("강사"));
-            assertThat(response.getAccount().equals("user"));
+            assertThat(response.getName()).isEqualTo("강사");
+            assertThat(response.getAccount()).isEqualTo("user");
         }
 
         @Test
@@ -215,12 +197,11 @@ class EmployeeServiceTest {
 
             given(academyRepository.findById(any())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.empty());
-            given(employeeRepository.findByNameAndEmail(any(), any())).willReturn(Optional.empty());
 
             AppException appException = assertThrows(AppException.class,
                     () -> employeeService.createEmployee(emptySubRequestUSER, academy.getId()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.EMPTY_SUBJECT_FORBIDDEN));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.EMPTY_SUBJECT_FORBIDDEN);
         }
     }
 
@@ -234,18 +215,18 @@ class EmployeeServiceTest {
         @DisplayName("로그인 성공")
         void login_employee_success() {
 
-
             MockedStatic<JwtTokenUtil> jwtTokenUtilMockedStatic = mockStatic(JwtTokenUtil.class);
 
             given(academyRepository.findById(any())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeADMIN));
             given(bCryptPasswordEncoder.matches(any(), any())).willReturn(true);
-            given(JwtTokenUtil.createToken(employeeADMIN.getAccount(), employeeADMIN.getEmail(), secretKey, 1000 * 60 * 60)).willReturn("token");
+            given(JwtTokenUtil.createToken(employeeADMIN.getAccount(), employeeADMIN.getEmail(), secretKey)).willReturn("AccessToken");
+            given(JwtTokenUtil.createRefreshToken(secretKey)).willReturn("refreshToken");
 
             LoginEmployeeResponse response = employeeService.loginEmployee(request, academy.getId());
 
-            assertThat(response.getJwt().equals("token"));
-            assertThat(response.getEmployeeName().equals("원장"));
+            assertThat(response.getJwt()).isEqualTo("AccessToken");
+            assertThat(response.getEmployeeName()).isEqualTo("원장");
 
             jwtTokenUtilMockedStatic.close();
         }
@@ -259,7 +240,7 @@ class EmployeeServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> employeeService.loginEmployee(request, academy.getId()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.ACADEMY_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACADEMY_NOT_FOUND);
         }
 
         @Test
@@ -272,7 +253,7 @@ class EmployeeServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> employeeService.loginEmployee(request, academy.getId()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.EMPLOYEE_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND);
         }
 
         @Test
@@ -286,7 +267,7 @@ class EmployeeServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> employeeService.loginEmployee(request, academy.getId()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.INVALID_PASSWORD));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.INVALID_PASSWORD);
         }
     }
 
@@ -298,23 +279,23 @@ class EmployeeServiceTest {
         @Test
         @DisplayName("계정 찾기 성공")
         void find_account_employee_success() {
-            given(employeeRepository.findByNameAndEmail(any(), any())).willReturn(Optional.of(employeeADMIN));
+            given(employeeRepository.findByEmail(any())).willReturn(Optional.of(employeeADMIN));
 
             FindAccountEmployeeResponse response = employeeService.findAccountEmployee(request);
 
-            assertThat(response.getEmployeeId().equals(1L));
-            assertThat(response.getAccount().equals("admin"));
+            assertThat(response.getEmployeeId()).isEqualTo(1L);
+            assertThat(response.getAccount()).isEqualTo("admin");
         }
 
         @Test
         @DisplayName("계정 찾기 실패 - 일치하는 직원 정보 없음")
         void find_account_employee_fail() {
-            given(employeeRepository.findByNameAndEmail(any(), any())).willReturn(Optional.empty());
+            given(employeeRepository.findByEmail(any())).willReturn(Optional.empty());
 
             AppException appException = assertThrows(AppException.class,
                     () -> employeeService.findAccountEmployee(request));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.EMPLOYEE_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.EMPLOYEE_NOT_FOUND);
         }
     }
 
@@ -357,7 +338,7 @@ class EmployeeServiceTest {
 
             ChangePasswordEmployeeResponse response = employeeService.changePasswordEmployee(request, academy.getId(), employeeADMIN.getAccount());
 
-            assertThat(response.getAccount().equals("admin"));
+            assertThat(response.getAccount()).isEqualTo("admin");
         }
 
         @Test
@@ -371,7 +352,7 @@ class EmployeeServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> employeeService.changePasswordEmployee(request, academy.getId(), employeeADMIN.getAccount()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.INVALID_PASSWORD));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.INVALID_PASSWORD);
         }
 
         @Test
@@ -385,7 +366,7 @@ class EmployeeServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> employeeService.changePasswordEmployee(request, academy.getId(), employeeADMIN.getAccount()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.SAME_PASSWORD));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.SAME_PASSWORD);
         }
     }
 
@@ -402,7 +383,7 @@ class EmployeeServiceTest {
 
             DeleteEmployeeResponse response = employeeService.deleteEmployee(employeeADMIN.getAccount(), academy.getId(), employeeSTAFF.getId());
 
-            assertThat(response.getEmployeeId().equals(employeeSTAFF.getId()));
+            assertThat(response.getEmployeeId()).isEqualTo(employeeSTAFF.getId());
         }
 
         @Test
@@ -413,7 +394,7 @@ class EmployeeServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> employeeService.deleteEmployee(employeeADMIN.getAccount(), academy.getId(), employeeSTAFF.getId()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.ACADEMY_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACADEMY_NOT_FOUND);
         }
 
         @Test
@@ -425,7 +406,7 @@ class EmployeeServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> employeeService.deleteEmployee(employeeADMIN.getAccount(), academy.getId(), employeeSTAFF.getId()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND);
         }
 
         @Test
@@ -438,7 +419,7 @@ class EmployeeServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> employeeService.deleteEmployee(employeeADMIN.getAccount(), academy.getId(), employeeSTAFF.getId()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.EMPLOYEE_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.EMPLOYEE_NOT_FOUND);
         }
 
         @Test
@@ -451,20 +432,33 @@ class EmployeeServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> employeeService.deleteEmployee(employeeADMIN.getAccount(), academy.getId(), employeeADMIN.getId()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.BAD_DELETE_REQUEST));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.BAD_DELETE_REQUEST);
         }
 
         @Test
         @DisplayName("직원 삭제 실패5 - 삭제하려는 계정이 ADMIN인경우")
         void delete_employee_fail5() {
             given(academyRepository.findById(any())).willReturn(Optional.of(academy));
-            given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeSTAFF));
+            given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeADMIN));
             given(employeeRepository.findByIdAndAcademy(any(), any())).willReturn(Optional.of(employeeADMIN));
 
             AppException appException = assertThrows(AppException.class,
-                    () -> employeeService.deleteEmployee(employeeSTAFF.getAccount(), academy.getId(), employeeADMIN.getId()));
+                    () -> employeeService.deleteEmployee(employeeADMIN.getAccount(), academy.getId(), employeeADMIN.getId()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.NOT_ALLOWED_CHANGE));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.BAD_DELETE_REQUEST);
+        }
+
+        @Test
+        @DisplayName("직원 삭제 실패6 - 권한이 ADMIN이 아닌경우 ")
+        void delete_employee_fail6() {
+            given(academyRepository.findById(any())).willReturn(Optional.of(academy));
+            given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeSTAFF));
+            given(employeeRepository.findByIdAndAcademy(any(), any())).willReturn(Optional.of(employeeSTAFF));
+
+            AppException appException = assertThrows(AppException.class,
+                    () -> employeeService.deleteEmployee(employeeSTAFF.getAccount(), academy.getId(), employeeSTAFF.getId()));
+
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.INVALID_PERMISSION);
         }
 
         @Test
@@ -475,7 +469,7 @@ class EmployeeServiceTest {
 
             DeleteEmployeeResponse response = employeeService.selfDeleteEmployee(employeeSTAFF.getAccount(), academy.getId());
 
-            assertThat(response.getEmployeeId().equals(2L));
+            assertThat(response.getEmployeeId()).isEqualTo(2L);
         }
 
         @Test
@@ -487,7 +481,7 @@ class EmployeeServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> employeeService.selfDeleteEmployee(employeeADMIN.getAccount(), academy.getId()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.NOT_ALLOWED_CHANGE));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.NOT_ALLOWED_CHANGE);
         }
     }
 
@@ -502,9 +496,9 @@ class EmployeeServiceTest {
 
             ReadEmployeeResponse response = employeeService.readEmployee(academy.getId(), employeeADMIN.getAccount());
 
-            assertThat(response.getId().equals(1l));
-            assertThat(response.getName().equals("원장"));
-            assertThat(response.getAccount().equals("admin"));
+            assertThat(response.getId()).isEqualTo(1l);
+            assertThat(response.getName()).isEqualTo("원장");
+            assertThat(response.getAccount()).isEqualTo("admin");
         }
 
         @Test
@@ -515,7 +509,7 @@ class EmployeeServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> employeeService.readEmployee(academy.getId(), employeeADMIN.getAccount()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.ACADEMY_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACADEMY_NOT_FOUND);
         }
 
         @Test
@@ -527,7 +521,7 @@ class EmployeeServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> employeeService.readEmployee(academy.getId(), employeeADMIN.getAccount()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.EMPLOYEE_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND);
         }
     }
 
@@ -537,22 +531,22 @@ class EmployeeServiceTest {
         @Test
         @DisplayName("Account와 Email로 직원찾기 성공")
         void find_by_account_email_success() {
-            given(employeeRepository.findByAccountAndEmail(any(), any())).willReturn(Optional.of(employeeADMIN));
+            given(employeeRepository.findByEmail(any())).willReturn(Optional.of(employeeADMIN));
 
-            Employee employee = employeeService.findByAccountAndEmail(employeeADMIN.getAccount(), employeeADMIN.getEmail());
+            Employee employee = employeeService.findByEmail(employeeADMIN.getEmail());
 
-            assertThat(employee.equals(employeeADMIN));
+            assertThat(employee).isEqualTo(employeeADMIN);
         }
 
         @Test
         @DisplayName("Account와 Email로 직원찾기 실패 - 일치하는 계정 정보 없음")
         void find_by_account_email_fail() {
-            given(employeeRepository.findByAccountAndEmail(any(), any())).willReturn(Optional.empty());
+            given(employeeRepository.findByEmail(any())).willReturn(Optional.empty());
 
             AppException appException = assertThrows(AppException.class,
-                    () -> employeeService.findByAccountAndEmail(employeeADMIN.getAccount(), employeeADMIN.getEmail()));
+                    () -> employeeService.findByEmail(employeeADMIN.getEmail()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.EMPLOYEE_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.EMPLOYEE_NOT_FOUND);
         }
 
         @Test
@@ -580,7 +574,7 @@ class EmployeeServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> employeeService.readAllEmployees(employeeADMIN.getAccount(), academy.getId(), pageable));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.ACADEMY_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACADEMY_NOT_FOUND);
         }
 
         @Test
@@ -593,7 +587,7 @@ class EmployeeServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> employeeService.readAllEmployees(employeeADMIN.getAccount(), academy.getId(), pageable));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND);
         }
 
         @Test
@@ -606,7 +600,7 @@ class EmployeeServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> employeeService.readAllEmployees(employeeSTAFF.getAccount(), academy.getId(), pageable));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.NOT_ALLOWED_ROLE));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.NOT_ALLOWED_ROLE);
         }
 
         @Test
@@ -634,8 +628,8 @@ class EmployeeServiceTest {
 
             ReadEmployeeResponse response = employeeService.findOneTeacher(employeeADMIN.getAccount(), academy.getId(), employeeUSER.getId());
 
-            assertThat(response.getAccount().equals(employeeUSER.getAccount()));
-            assertThat(response.getEmployeeRole().equals(ROLE_USER));
+            assertThat(response.getAccount()).isEqualTo(employeeUSER.getAccount());
+            assertThat(response.getEmployeeRole()).isEqualTo(ROLE_USER);
         }
 
         @Test
@@ -648,7 +642,7 @@ class EmployeeServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> employeeService.findOneTeacher(employeeADMIN.getAccount(), academy.getId(), employeeSTAFF.getId()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.NOT_TEACHER));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.NOT_TEACHER);
         }
     }
 
@@ -665,8 +659,8 @@ class EmployeeServiceTest {
 
             ChangeRoleEmployeeResponse response = employeeService.changeRoleEmployee(employeeADMIN.getAccount(), academy.getId(), employeeUSER.getId());
 
-            assertThat(response.getEmployeeId().equals(employeeUSER.getId()));
-            assertThat(response.getMessage().equals(employeeUSER.getAccount() + " 계정의 권한을 " + ROLE_STAFF + "로 변경했습니다"));
+            assertThat(response.getEmployeeId()).isEqualTo(employeeUSER.getId());
+            assertThat(response.getMessage()).isEqualTo(employeeUSER.getAccount() + " 계정의 권한을 " + ROLE_STAFF + "로 변경했습니다");
         }
 
         @Test
@@ -678,8 +672,8 @@ class EmployeeServiceTest {
 
             ChangeRoleEmployeeResponse response = employeeService.changeRoleEmployee(employeeADMIN.getAccount(), academy.getId(), employeeSTAFF.getId());
 
-            assertThat(response.getEmployeeId().equals(employeeSTAFF.getId()));
-            assertThat(response.getMessage().equals(employeeSTAFF.getAccount() + " 계정의 권한을 " + ROLE_USER + "로 변경했습니다"));
+            assertThat(response.getEmployeeId()).isEqualTo(employeeSTAFF.getId());
+            assertThat(response.getMessage()).isEqualTo(employeeSTAFF.getAccount() + " 계정의 권한을 " + ROLE_USER + "로 변경했습니다");
         }
 
         @Test
@@ -692,7 +686,7 @@ class EmployeeServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> employeeService.changeRoleEmployee(employeeSTAFF.getAccount(), academy.getId(), employeeADMIN.getId()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.NOT_ALLOWED_CHANGE));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.NOT_ALLOWED_CHANGE);
         }
 
         @Test
@@ -705,7 +699,7 @@ class EmployeeServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> employeeService.changeRoleEmployee(employeeSTAFF.getAccount(), academy.getId(), employeeADMIN.getId()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.BAD_CHANGE_REQUEST));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.BAD_CHANGE_REQUEST);
         }
     }
 
@@ -721,9 +715,9 @@ class EmployeeServiceTest {
             given(academyRepository.findById(any())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeADMIN));
 
-            UpdateEmployeeResponse response = employeeService.updateEmployee(request, employeeADMIN.getAccount(), employeeSTAFF.getId());
+            UpdateEmployeeResponse response = employeeService.updateEmployee(request, employeeADMIN.getAccount(), academy.getId());
 
-            assertThat(response.getEmployeeId().equals(2L));
+            assertThat(response.getEmployeeId()).isEqualTo(1L);
         }
 
         @Test
@@ -733,9 +727,9 @@ class EmployeeServiceTest {
             given(academyRepository.findById(any())).willReturn(Optional.empty());
 
             AppException appException = assertThrows(AppException.class,
-                    () -> employeeService.updateEmployee(request, employeeADMIN.getAccount(), employeeSTAFF.getId()));
+                    () -> employeeService.updateEmployee(request, employeeADMIN.getAccount(), academy.getId()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.ACADEMY_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACADEMY_NOT_FOUND);
         }
 
         @Test
@@ -746,9 +740,9 @@ class EmployeeServiceTest {
             given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.empty());
 
             AppException appException = assertThrows(AppException.class,
-                    () -> employeeService.updateEmployee(request, employeeADMIN.getAccount(), employeeSTAFF.getId()));
+                    () -> employeeService.updateEmployee(request, employeeADMIN.getAccount(), academy.getId()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND);
         }
     }
 }
