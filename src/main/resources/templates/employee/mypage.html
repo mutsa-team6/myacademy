@@ -49,9 +49,9 @@
                             <br>
                             <br>
                             <input type="text" class="form-control" id="employeeId"
-                                   placeholder="강좌 이름" th:value="${employeeId}" hidden>
+                                   placeholder="강좌 이름" th:value="${employee.id}" hidden>
                             <input type="text" class="form-control" id="academyId"
-                                   placeholder="강좌 이름" th:value="${academyId}" hidden>
+                                   placeholder="강좌 이름" th:value="${academy.academyId}" hidden>
                             <div class="row">
                                 <div class="col-3">
                                 </div>
@@ -59,7 +59,6 @@
                                     <div class="d-flex justify-content-center mb-3">
                                         <div class="col-4 col-lg-4 order-lg-2">
                                             <div class="mt-n4 mt-lg-n6 mb-4 mb-lg-0">
-                                                <a href="javascript:;">
                                                     <th:block th:if="${imageUrl =='null'}">
                                                         <img src="https://raw.githubusercontent.com/buinq/imageServer/main/img/image-20230204013043779.png"
                                                              class="rounded-circle img-fluid border border-2 border-white">
@@ -68,7 +67,6 @@
                                                         <img th:src="${imageUrl}"
                                                              class="rounded-circle img-fluid border border-2 border-white">
                                                     </th:block>
-                                                </a>
                                             </div>
                                         </div>
                                     </div>
@@ -332,7 +330,7 @@
                                 data-bs-dismiss="modal">닫기
                         </button>
                         <button type="button" class="btn btn-primary"
-                                th:onclick="|mypage.changePassword(${academyId})|"
+                                th:onclick="|mypage.changePassword(${academy.academyId})|"
                         >비밀번호 변경
                         </button>
                     </div>

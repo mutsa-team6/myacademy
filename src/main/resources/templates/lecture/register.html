@@ -326,7 +326,7 @@
                 <!--                            th:onclick="|register.registerLecture(this.getAttribute('data-parameter1'),this.getAttribute('data-parameter2'))|" type="button"-->
                 <div class="text-center">
                     <button
-                            th:onclick="|register.registerLecture(${academyId},${teacherEmployeeId})|" type="button"
+                            th:onclick="|register.registerLecture(${academy.academyId},${teacher.id})|" type="button"
                             class="btn btn-lg bg-gradient-primary btn-lg w-100 mt-4 mb-0">강좌 등록
                     </button>
                 </div>

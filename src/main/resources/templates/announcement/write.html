@@ -90,7 +90,7 @@
                                     class="btn btn-lg bg-gradient-danger btn-lg mb-0">작성 취소
                             </button>
                         </form>
-                        <button type="submit" th:onclick="|announcement.create(${academyId})|"
+                        <button type="submit" th:onclick="|announcement.create(${academy.academyId})|"
                                 class="btn btn-lg bg-gradient-primary btn-lg mb-0 mx-2">게시글 작성
                         </button>
                     </div>
@@ -171,27 +171,30 @@
                 alert("작성 성공");
                 var frm = new FormData();
                 var uploadFile = document.getElementById("input-file");
-                console.log(uploadFile.files.length);
+                if (uploadFile.files.length != 0) {
 
-                for (var i = 0; i < uploadFile.files.length; i++) {
+                    for (var i = 0; i < uploadFile.files.length; i++) {
 
-                    frm.append("multipartFile", uploadFile.files[i]);
-                }
+                        frm.append("multipartFile", uploadFile.files[i]);
+                    }
 
 
-                axios.post("/api/v1/academies/" + academyId + "/announcements/" + response.data.result["id"] + "/files/upload",
-                    frm, {
-                        headers: {
-                            'Content-Type': 'multipart/form-data'
-                        }
-                    }).then((response) => {
-                    console.log(response);
+                    axios.post("/api/v1/academies/" + academyId + "/announcements/" + response.data.result["id"] + "/files/upload",
+                        frm, {
+                            headers: {
+                                'Content-Type': 'multipart/form-data'
+                            }
+                        }).then((response) => {
+                        console.log(response);
+                        window.location.href = '/academy/announcements';
+
+                    }).catch((error) => {
+                        console.log(error);
+
+                    });
+                } else {
                     window.location.href = '/academy/announcements';
-
-                }).catch((error) => {
-                    console.log(error);
-
-                });
+                }
 
             }).catch((error) => {
                 console.log(error);

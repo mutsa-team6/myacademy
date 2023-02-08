@@ -180,9 +180,6 @@ public class EmployeeService {
         String name = request.getName();
         String email = request.getEmail();
 
-        // 이름으로 직원을 조회 - 없을시 EMPLOYEE_NAME_NOT_FOUND 에러발생
-        validateEmployeeByName(name);
-
         // 이메일로 직원을 조회 - 없을시 EMAIL_NOT_FOUND 에러발생
         Employee foundEmployee = validateEmployeeByEmail(email);
 

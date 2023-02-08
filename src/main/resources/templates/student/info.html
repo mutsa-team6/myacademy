@@ -173,7 +173,7 @@
                                             <td class="align-middle text-center">
 
                                                 <a href="javascript:;"
-                                                   th:onclick="|student.delete(${academyId},${student.id},${uniqueness.uniquenessId})|"
+                                                   th:onclick="|student.delete(${academy.academyId},${student.id},${uniqueness.uniquenessId})|"
                                                    type="button"
                                                    class="text-danger font-weight-bold text-xs"
                                                    data-toggle="tooltip"
@@ -186,7 +186,17 @@
                                     </tbody>
                                 </table>
                             </div>
+                            <br>
 
+                            <ul class="pagination justify-content-center">
+
+                                <li class="page-item"><a class="page-link"
+                                                         th:href="@{/academy/student/info(studentId=${student.id},page=${previous})}">◀</a>
+                                </li>
+                                <li class="page-item"><a class="page-link"
+                                                         th:href="@{/academy/student/info(studentId=${student.id},page=${next})}">▶</a>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -265,7 +275,17 @@
                                     </tbody>
                                 </table>
                             </div>
+                            <br>
 
+                            <ul class="pagination justify-content-center">
+
+                                <li class="page-item"><a class="page-link"
+                                                         th:href="@{/academy/student/info(studentId=${student.id},page=${previous})}">◀</a>
+                                </li>
+                                <li class="page-item"><a class="page-link"
+                                                         th:href="@{/academy/student/info(studentId=${student.id},page=${next})}">▶</a>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -338,7 +358,16 @@
                                     </tbody>
                                 </table>
                             </div>
+                            <br>
+                            <ul class="pagination justify-content-center">
 
+                                <li class="page-item"><a class="page-link"
+                                                         th:href="@{/academy/student/info(studentId=${student.id},page=${previous})}">◀</a>
+                                </li>
+                                <li class="page-item"><a class="page-link"
+                                                         th:href="@{/academy/student/info(studentId=${student.id},page=${next})}">▶</a>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -361,7 +390,7 @@
 
                         <div class="align-middle text-center">
                             <div class="text-center">
-                                <button th:onclick="|student.uniqueness(${academyId},${student.id})|"
+                                <button th:onclick="|student.uniqueness(${academy.academyId},${student.id})|"
                                         type="button"
                                         class="btn btn-sm bg-gradient-primary w-100 mt-4 mb-0">특이사항 등록
                                 </button>

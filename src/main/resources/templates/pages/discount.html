@@ -87,7 +87,7 @@
                                                 <th class="align-middle text-center">
 
                                                 <a href="javascript:;"
-                                                   th:onclick="|discount.deleteDiscount(${academyId},${discount.discountId})|" type="button"
+                                                   th:onclick="|discount.deleteDiscount(${academy.academyId},${discount.discountId})|" type="button"
                                                    class="text-danger font-weight-bold text-xs">
                                                     delete
                                                 </a>
@@ -126,7 +126,7 @@
                     </div>
                     <div class="text-center">
                         <button
-                                th:onclick="|discount.registerDiscount(${academyId})|" type="button"
+                                th:onclick="|discount.registerDiscount(${academy.academyId})|" type="button"
                                 class="btn btn-lg bg-gradient-primary btn-lg w-100 mt-4 mb-0">할인 정책 등록
                         </button>
                     </div>

@@ -94,17 +94,17 @@
                                         class="btn btn-sm bg-gradient-info">게시글 수정
                                 </button>
                             </form>
-                            <button th:onclick="|announcement.delete(${academyId},${announcement.id})|"
+                            <button th:onclick="|announcement.delete(${academy.academyId},${announcement.id})|"
                                     type="button"
                                     class="btn btn-sm bg-gradient-danger mx-2">게시글 삭제
                             </button>
                         </div>
                         <div style="overflow: hidden">
-                            <div style="float: right;">
-                                <div class="mb-3"
-                                     style="border: 1px solid #E0E0E0;border-width: 1px; border-radius: 5px;">
-                                    <div class="mx-3 my-3">
-                                        <th:block th:if="${files != null}">
+                            <th:block th:if="${!files.isEmpty()}">
+                                <div style="float: right;">
+                                    <div class="mb-3"
+                                         style="border: 1px solid #E0E0E0;border-width: 1px; border-radius: 5px;">
+                                        <div class="mx-3 my-3">
                                             <th class="align-middle text-center">
                                                 <span class=" text-sm font-weight-bold" style="color: #5A2082"
                                                 >첨부파일 목록</span>
@@ -120,10 +120,10 @@
                                                 </div>
                                             </tr>
 
-                                        </th:block>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            </th:block>
                             <div style="clear: both"></div>
                             <div style="border: 1px solid #E0E0E0;border-width: 1px; border-radius: 5px;float: none">
                                 <div class="mx-5">
@@ -184,14 +184,14 @@
                     }
                 ).then((response) => {
                     alert("게시글 삭제 성공");
-                    window.location.href = '/academy/main';
+                    window.location.href = '/academy/announcements';
                 }).catch((error) => {
                 });
             }
         }
     };
 
-    academy.init();
+    announcement.init();
 
 </script>
 </body>
