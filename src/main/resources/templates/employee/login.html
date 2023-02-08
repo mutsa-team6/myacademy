@@ -19,17 +19,9 @@
 
 
 <body class="bg-gray-200">
-<div class="container position-sticky z-index-sticky top-0">
-    <div class="row">
-        <div class="col-12">
-
-        </div>
-    </div>
-</div>
 <main class="main-content  mt-0">
     <div class="page-header align-items-start min-vh-100"
-         style="background-image: url('https://images.unsplash.com/photo-1497294815431-9365093b7331?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1950&q=80');"
-    >
+         style="background-image: url('https://images.unsplash.com/photo-1497294815431-9365093b7331?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1950&q=80');">
         <span class="mask bg-gradient-dark opacity-6"></span>
         <div class="container my-auto">
             <div class="row">
@@ -55,7 +47,6 @@
                             <form role="form">
                                 <div class="row ">
                                     <div class="col-12 align-self-center">
-
                                         <div class="input-group input-group-outline  ">
                                             <label class="form-label">학원 이름</label>
                                             <input type="text" class="form-control"
@@ -82,10 +73,6 @@
                                     <label class="form-label">비밀번호</label>
                                     <input type="password" class="form-control" id="input-employeePassword" name = "password">
                                 </div>
-<!--                                <div class="form-check form-switch d-flex align-items-center mb-3">-->
-<!--                                    <input class="form-check-input" type="checkbox" id="remember-me" name = "remember-me" checked>-->
-<!--                                    <label class="form-check-label mb-0 ms-3" for="remember-me">Remember me</label>-->
-<!--                                </div>-->
                                 <div class="text-center">
                                     <button th:onclick="|login.loginEmployee()|" type="button" class="btn bg-gradient-primary w-100 my-4 mb-2" id = "btn-login">로그인</button>
                                 </div>
@@ -116,9 +103,7 @@
                                     계정이 없으십니까?
                                     <a th:href="@{/join}" class="text-primary text-gradient font-weight-bold">회원가입</a>
                                 </p>
-
                             </form>
-
                         </div>
                     </div>
                 </div>
@@ -143,7 +128,7 @@
         let data = {
             name: document.querySelector('#input-academyName').value.trim()
         };
-        console.log(data);
+
         axios.post("/academies/check",
             JSON.stringify(data), {
                 headers: {
@@ -151,19 +136,16 @@
                 }
             }
         ).then((response) => {
-            console.log(response);
-            if  (response.data["isExist"] == true) {
+            if (response.data["isExist"] == true) {
                 show('academy-pass');
                 hide('academy-fail');
-
                 academyId = response.data["academyId"];
+
+            } else{
+                show('academy-fail');
+                hide('academy-pass');
             }
-
         }).catch((error) => {
-            console.log(error);
-            hide('academy-pass');
-            show('academy-fail');
-
         });
     }
 
@@ -185,14 +167,11 @@
             var _this = this;
         },
 
-
-
         loginEmployee: function () {
             let data = {
                 account: document.querySelector('#input-employeeAccount').value.trim(),
                 password: document.querySelector('#input-employeePassword').value.trim(),
             };
-            console.log(data);
 
             axios.post("/api/v1/academies/" + academyId + "/employees/login",
                 JSON.stringify(data), {
@@ -212,13 +191,8 @@
                 }else if(error.response.data.result["errorCode"] == "INVALID_PASSWORD"){
                     alert("비밀번호가 일치하지 않습니다.");
                 }
-                console.log(academyId);
-                console.log(error);
-
             });
-
         }
-
     };
 
     login.init();

@@ -46,14 +46,7 @@ public class EmployeeController {
     private final EmployeeProfileS3UploadService employeeProfileS3UploadService;
 
     @GetMapping("/join")
-    public String join(@RequestParam(required = false) String realName, @RequestParam(required = false) String email, Model model) {
-
-        if (realName != null && email != null) {
-            model.addAttribute("realName", realName);
-            model.addAttribute("email", email);
-        }
-
-
+    public String join() {
         return "employee/join";
     }
 
@@ -77,38 +70,41 @@ public class EmployeeController {
     @GetMapping("/academy/mypage")
     public String mypage(HttpServletRequest request, Model model, Authentication authentication, Pageable pageable) {
 
-        String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
         Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
-        log.info("🔎 마이페이지 조회한 사용자의 학원 id [{}] || 요청한 사용자의 계정 [{}]", academyId, requestAccount);
 
-        //회원 이름 표시
-        ReadEmployeeResponse employee = employeeService.readEmployee(academyId, requestAccount);
-        SessionUtil.setSessionNameAndRole(request, employee);
+        // 직원 정보, 학원 정보 세션에 저장 및 model로 넘기는 메서드
+        ReadEmployeeResponse requestEmployee = setSessionEmployeeInfo(request, model, authentication, academyId);
+        setSessionAcademyInfo(request, model, academyId);
+        String requestAccount = requestEmployee.getAccount();
 
 
-        String storedUrl = employeeProfileS3UploadService.getStoredUrl(employee.getId());
+        //회원 프로필 사진 넘겨주기
+        String storedUrl = employeeProfileS3UploadService.getStoredUrl(requestEmployee.getId());
         model.addAttribute("imageUrl", storedUrl);
 
-        model.addAttribute("employee", employee);
         Page<ReadAllLectureResponse> lectures = null;
-        if (!employee.getEmployeeRole().equals(EmployeeRole.ROLE_STAFF)) {
-            lectures = lectureService.readAllLecturesByTeacherId(academyId, requestAccount, employee.getId(), pageable);
+
+        // 만약 마이페이지를 조회한 회원이 일반 직원이 아닌, 수업을 맡는 강사나 원장인 경우, 자신의 강의 정보를 보여준다.
+        if (!requestEmployee.getEmployeeRole().equals(EmployeeRole.ROLE_STAFF)) {
+            lectures = lectureService.readAllLecturesByTeacherId(academyId,requestAccount, requestEmployee.getId(), pageable);
+
+            //자신의 강의를 수강하는 (단순히 수강신청이 아닌) 결제까지 완료한 학생의 수를 넣어준다.
             lectures.stream().forEach(readAllLectureResponse ->
                     readAllLectureResponse
                             .setCompletePaymentNumber(enrollmentService
-                                    .findStudentInfoFromEnrollmentByLecture(academyId, requestAccount, readAllLectureResponse.getLectureId(), pageable).getTotalElements()));
+                                    .findStudentInfoFromEnrollmentByLecture(academyId, requestAccount, readAllLectureResponse.getLectureId(), pageable)
+                                    .getTotalElements()));
         }
-        FindAcademyResponse academy = academyService.findAcademyById(academyId);
-        model.addAttribute("academy", academy);
-        model.addAttribute("account", requestAccount);
-        model.addAttribute("academyId", academyId);
-        model.addAttribute("employeeId", employee.getId());
         model.addAttribute("lectures", lectures);
+
+
         model.addAttribute("previous", pageable.previousOrFirst().getPageNumber());
         model.addAttribute("next", pageable.next().getPageNumber());
 
         return "employee/mypage";
     }
+
+
 
     /**
      * 원장만 가능
@@ -116,24 +112,21 @@ public class EmployeeController {
     @GetMapping("/academy/employees")
     public String manageEmployee(HttpServletRequest request, Model model, Authentication authentication, Pageable pageable) {
 
-        String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
         Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
-        log.info("🔎 마이페이지 조회한 사용자의 학원 id [{}] || 요청한 사용자의 계정 [{}]", academyId, requestAccount);
 
+        // 직원 정보, 학원 정보 세션에 저장 및 model로 넘기는 메서드
+        ReadEmployeeResponse requestEmployee = setSessionEmployeeInfo(request, model, authentication, academyId);
+        FindAcademyResponse academy = setSessionAcademyInfo(request, model, academyId);
+        String requestAccount = requestEmployee.getAccount();
 
-        //회원 이름 표시
-        ReadEmployeeResponse requestEmployee = employeeService.readEmployee(academyId, requestAccount);
-        SessionUtil.setSessionNameAndRole(request, requestEmployee);
+        // 해당 학원에 존재하는 모든 직원 정보 조회 (학원 원장 데이터는 제외, 자기 자신이므로)
+        Page<ReadAllEmployeeResponse> foundEmployees = employeeService.readAllEmployees(requestAccount, academyId, pageable);
 
-        FindAcademyResponse academy = academyService.findAcademyById(academyId);
-        model.addAttribute("academy", academy);
-
-        Page<ReadAllEmployeeResponse> employees = employeeService.readAllEmployees(requestAccount, academyId, pageable);
-        for (ReadAllEmployeeResponse employee : employees) {
+        // 직원의 이미지 사진도 보여주기 위해, 작업
+        for (ReadAllEmployeeResponse employee : foundEmployees) {
             employee.setImageUrl(employeeProfileS3UploadService.getStoredUrl(employee.getId()));
         }
-        model.addAttribute("employees", employees);
-        model.addAttribute("account", requestAccount);
+        model.addAttribute("employees", foundEmployees);
 
 
         model.addAttribute("previous", pageable.previousOrFirst().getPageNumber());
@@ -145,27 +138,19 @@ public class EmployeeController {
     @GetMapping("/academy/mypage/attendance")
     public String attendance(@RequestParam Long lectureId, HttpServletRequest request, Model model, Authentication authentication, Pageable pageable) {
 
-        String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
         Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
-        log.info("🔎 마이페이지 조회한 사용자의 학원 id [{}] || 요청한 사용자의 계정 [{}]", academyId, requestAccount);
 
-        //회원 이름 표시
-        ReadEmployeeResponse employee = employeeService.readEmployee(academyId, requestAccount);
-        SessionUtil.setSessionNameAndRole(request, employee);
+        // 직원 정보, 학원 정보 세션에 저장 및 model로 넘기는 메서드
+        ReadEmployeeResponse requestEmployee = setSessionEmployeeInfo(request, model, authentication, academyId);
+        setSessionAcademyInfo(request, model, academyId);
+        String requestAccount = requestEmployee.getAccount();
 
 
-        Page<FindStudentInfoFromEnrollmentByLectureResponse> studentsInfo = enrollmentService.findStudentInfoFromEnrollmentByLecture(academyId, requestAccount, lectureId, pageable);
-
+        //특정 강의의 lectureId를 파라미터로 받아서, 해당 강의를 결제한 학생을 구하기 위해 사용한 메서드
+        Page<FindStudentInfoFromEnrollmentByLectureResponse> studentsInfo
+                = enrollmentService.findStudentInfoFromEnrollmentByLecture(academyId, requestAccount, lectureId, pageable);
         model.addAttribute("studentsInfo", studentsInfo);
 
-
-        model.addAttribute("employee", employee);
-
-        FindAcademyResponse academy = academyService.findAcademyById(academyId);
-        model.addAttribute("academy", academy);
-        model.addAttribute("account", requestAccount);
-        model.addAttribute("academyId", academyId);
-        model.addAttribute("employeeId", employee.getId());
         model.addAttribute("previous", pageable.previousOrFirst().getPageNumber());
         model.addAttribute("next", pageable.next().getPageNumber());
 
@@ -218,5 +203,22 @@ public class EmployeeController {
         cookieGenerator.setCookieMaxAge(60 * 60);//1시간
         log.info("🍪 쿠키에 저장한 토큰 {}", token);
         return "redirect:/academy/main";
+    }
+
+    private FindAcademyResponse setSessionAcademyInfo(HttpServletRequest request, Model model, Long academyId) {
+        FindAcademyResponse academy = academyService.findAcademyById(academyId);
+        SessionUtil.setSessionAcademyName(request,academy);
+        model.addAttribute("academy", academy);
+        return academy;
+    }
+
+    private ReadEmployeeResponse setSessionEmployeeInfo(HttpServletRequest request, Model model, Authentication authentication, Long academyId) {
+        String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
+
+        //view 에 회원 계정, 회원 직책 세션에 저장
+        ReadEmployeeResponse employee = employeeService.readEmployee(academyId, requestAccount);
+        SessionUtil.setSessionEmployeeNameAndRole(request, employee);
+        model.addAttribute("employee", employee);
+        return employee;
     }
 }

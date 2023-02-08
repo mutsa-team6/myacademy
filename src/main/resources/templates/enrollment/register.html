@@ -229,7 +229,7 @@
                                             <th:block
                                                     th:if="${lecture.currentEnrollmentNumber <lecture.maximumCapacity}">
                                                 <th class="align-middle text-center">
-                                                    <button th:data-parameter1="${academyId}"
+                                                    <button th:data-parameter1="${academy.academyId}"
                                                             th:data-parameter2="${student.id}"
                                                             th:data-parameter3="${lecture.lectureId}"
                                                             th:onclick="|register.registerEnrollment(this.getAttribute('data-parameter1'),this.getAttribute('data-parameter2'),this.getAttribute('data-parameter3'))|"
@@ -242,7 +242,7 @@
                                             <th:block
                                                     th:if="${lecture.currentEnrollmentNumber >= lecture.maximumCapacity}">
                                                 <th class="align-middle text-center">
-                                                    <button th:data-parameter1="${academyId}"
+                                                    <button th:data-parameter1="${academy.academyId}"
                                                             th:data-parameter2="${student.id}"
                                                             th:data-parameter3="${lecture.lectureId}"
                                                             th:onclick="|register.registerWaiting(this.getAttribute('data-parameter1'),this.getAttribute('data-parameter2'),this.getAttribute('data-parameter3'))|"
@@ -365,7 +365,7 @@
                                                             <td class="align-middle">
 
                                                                 <a href="javascript:;"
-                                                                   th:onclick="|register.deleteWaiting(${academyId},${student.studentId},${student.lectureId},${student.waitingId})|"
+                                                                   th:onclick="|register.deleteWaiting(${academy.academyId},${student.studentId},${student.lectureId},${student.waitingId})|"
                                                                    type="button"
                                                                    class="text-danger font-weight-bold text-xs"
                                                                    data-toggle="tooltip"

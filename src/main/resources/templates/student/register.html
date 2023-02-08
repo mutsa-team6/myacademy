@@ -79,7 +79,7 @@
                             </form>
 
                             <div class="text-center">
-                                <button th:onclick="|register.registerParent(${academyId})|" type="button"
+                                <button th:onclick="|register.registerParent(${academy.academyId})|" type="button"
                                         class="btn btn-lg bg-gradient-primary btn-lg w-100 mt-4 mb-0"> 부모 등록
                                 </button>
                             </div>
@@ -124,7 +124,7 @@
                     </div>
 
                     <div class="text-center">
-                        <button th:onclick="|register.registerStudent(${academyId})|" type="button"
+                        <button th:onclick="|register.registerStudent(${academy.academyId})|" type="button"
                                 class="btn btn-lg bg-gradient-primary btn-lg w-100 mt-4 mb-0">학생 등록
                         </button>
                     </div>
@@ -168,19 +168,15 @@
                 show('parent-pass');
                 hide('parent-fail');
                 hide('parent-info');
-
                 academyId = response.data["academyId"];
-            }else{
+
+            } else{
                 hide('parent-pass');
                 show('parent-fail');
                 show('parent-info');
             }
 
         }).catch((error) => {
-            console.log(error);
-            hide('parent-pass');
-            show('parent-fail');
-            show('parent-info');
         });
     }
 

@@ -42,24 +42,23 @@ public class EnrollmentController {
     public String studentListForEnrollment(@RequestParam(required = false) String studentName, HttpServletRequest request, Model model, Pageable pageable, Authentication authentication) {
 
         Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
-        String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
 
-        //회원 이름 표시
-        ReadEmployeeResponse employee = employeeService.readEmployee(academyId, requestAccount);
-        SessionUtil.setSessionNameAndRole(request,employee);
+        // 직원 정보, 학원 정보 세션에 저장 및 model로 넘기는 메서드
+        ReadEmployeeResponse requestEmployee = setSessionEmployeeInfo(request, model, authentication, academyId);
+        setSessionAcademyInfo(request, model, academyId);
+        String requestAccount = requestEmployee.getAccount();
 
 
+        // 수강신청시, 학생 이름으로 검색하는 경우
         if (studentName != null) {
-            Page<ReadAllStudentResponse> searchStudents = studentService.findStudentForStudentList(academyId, studentName,pageable);
+            Page<ReadAllStudentResponse> searchStudents = studentService.findStudentForStudentList(academyId, studentName, pageable);
             model.addAttribute("students", searchStudents);
 
         } else {
             Page<ReadAllStudentResponse> studentList = studentService.readAllStudent(academyId, pageable, requestAccount);
             model.addAttribute("students", studentList);
         }
-        FindAcademyResponse academy = academyService.findAcademyById(academyId);
-        model.addAttribute("academy", academy);
-        model.addAttribute("account", requestAccount);
+
         model.addAttribute("previous", pageable.previousOrFirst().getPageNumber());
         model.addAttribute("next", pageable.next().getPageNumber());
 
@@ -71,31 +70,48 @@ public class EnrollmentController {
     public String lectureRegister(@RequestParam(required = false) Long studentId,HttpServletRequest request ,Model model, Pageable pageable, Authentication authentication) {
 
         Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
-        String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
 
-        //회원 이름 표시
-        ReadEmployeeResponse employee = employeeService.readEmployee(academyId, requestAccount);
-        SessionUtil.setSessionNameAndRole(request,employee);
+        // 직원 정보, 학원 정보 세션에 저장 및 model로 넘기는 메서드
+        ReadEmployeeResponse requestEmployee = setSessionEmployeeInfo(request, model, authentication, academyId);
+        setSessionAcademyInfo(request, model, academyId);
+        String requestAccount = requestEmployee.getAccount();
 
         ReadStudentResponse foundStudent = null;
+
+        // 수강 신청 전에, 선책한 학생 정보를 보여주기 위함
         if (studentId != null) {
             foundStudent = studentService.readStudent(academyId, studentId, requestAccount);
         }
+        model.addAttribute("student", foundStudent);
 
+        // 강의 종료일이 지나지 않은 강의 목록만 가져온다.
         Page<ReadAllLectureResponse> lectures = lectureService.readAllLecturesForEnrollment(academyId, requestAccount, pageable);
+
+        // 해당 강의의 대기 인원이 나오고, 어떤 학생이 대기중인지, 어떤 학생이 등록했는지 보여주기 위함
         for (ReadAllLectureResponse lecture : lectures) {
             lecture.setWaitingNum(waitinglistService.countWaitingListByLecture(academyId, lecture.getLectureId(), requestAccount));
             lecture.setRegisteredStudent(enrollmentService.findAllStudentInfoFromEnrollmentByLecture(academyId, requestAccount, lecture.getLectureId()));
             lecture.setWaitingStudent(waitinglistService.findWaitingStudentByLecture(academyId, lecture.getLectureId(), requestAccount));
         }
-        FindAcademyResponse academy = academyService.findAcademyById(academyId);
-        model.addAttribute("academy", academy);
-        model.addAttribute("account", requestAccount);
         model.addAttribute("lectures", lectures);
-        model.addAttribute("student", foundStudent);
-        model.addAttribute("academyId", academyId);
-
 
         return "enrollment/register";
+    }
+
+    private FindAcademyResponse setSessionAcademyInfo(HttpServletRequest request, Model model, Long academyId) {
+        FindAcademyResponse academy = academyService.findAcademyById(academyId);
+        SessionUtil.setSessionAcademyName(request,academy);
+        model.addAttribute("academy", academy);
+        return academy;
+    }
+
+    private ReadEmployeeResponse setSessionEmployeeInfo(HttpServletRequest request, Model model, Authentication authentication, Long academyId) {
+        String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
+
+        //view 에 회원 계정, 회원 직책 세션에 저장
+        ReadEmployeeResponse employee = employeeService.readEmployee(academyId, requestAccount);
+        SessionUtil.setSessionEmployeeNameAndRole(request, employee);
+        model.addAttribute("employee", employee);
+        return employee;
     }
 }

@@ -1,11 +1,9 @@
 package com.project.myacademy.controller;
 
-import com.project.myacademy.domain.academy.Academy;
 import com.project.myacademy.domain.academy.AcademyService;
 import com.project.myacademy.domain.academy.dto.FindAcademyResponse;
 import com.project.myacademy.domain.announcement.AnnouncementService;
 import com.project.myacademy.domain.announcement.dto.ReadAnnouncementResponse;
-import com.project.myacademy.domain.employee.EmployeeRole;
 import com.project.myacademy.domain.employee.EmployeeService;
 import com.project.myacademy.domain.employee.dto.ReadEmployeeResponse;
 import com.project.myacademy.global.util.AuthenticationUtil;
@@ -16,10 +14,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.util.List;
 
 @Controller
@@ -35,26 +31,37 @@ public class IndexController {
     public String main(HttpServletRequest request, Model model, Authentication authentication) {
 
         Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
-        String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
-        log.info("⭐ 메인 요청한 사용자의 학원 id [{}] || 요청한 사용자의 계정 [{}]", academyId, requestAccount);
 
-
-        //회원 이름 표시
-        ReadEmployeeResponse employee = employeeService.readEmployee(academyId, requestAccount);
-        SessionUtil.setSessionNameAndRole(request,employee);
+        // 직원 정보, 학원 정보 세션에 저장 및 model로 넘기는 메서드
+        ReadEmployeeResponse requestEmployee = setSessionEmployeeInfo(request, model, authentication, academyId);
+        setSessionAcademyInfo(request, model, academyId);
+        String requestAccount = requestEmployee.getAccount();
 
         List<ReadAnnouncementResponse> announcements = announcementService.readAnnouncementForMain(academyId, requestAccount);
-        List<ReadAnnouncementResponse> admissions = announcementService.readAdmissionForMain(academyId, requestAccount);
-
-
-        FindAcademyResponse academy = academyService.findAcademyById(academyId);
         model.addAttribute("announcements", announcements);
+
+
+        List<ReadAnnouncementResponse> admissions = announcementService.readAdmissionForMain(academyId, requestAccount);
         model.addAttribute("admissions", admissions);
-        model.addAttribute("academy", academy);
-        model.addAttribute("account", requestAccount);
+
 
         return "pages/main";
     }
+    private FindAcademyResponse setSessionAcademyInfo(HttpServletRequest request, Model model, Long academyId) {
+        FindAcademyResponse academy = academyService.findAcademyById(academyId);
+        SessionUtil.setSessionAcademyName(request,academy);
+        model.addAttribute("academy", academy);
+        return academy;
+    }
 
+    private ReadEmployeeResponse setSessionEmployeeInfo(HttpServletRequest request, Model model, Authentication authentication, Long academyId) {
+        String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
+
+        //view 에 회원 계정, 회원 직책 세션에 저장
+        ReadEmployeeResponse employee = employeeService.readEmployee(academyId, requestAccount);
+        SessionUtil.setSessionEmployeeNameAndRole(request, employee);
+        model.addAttribute("employee", employee);
+        return employee;
+    }
 
 }

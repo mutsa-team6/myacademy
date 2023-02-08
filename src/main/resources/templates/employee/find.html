@@ -18,13 +18,6 @@
 <th:block th:replace="layout/header :: headerFragment"></th:block>
 
 <body class="bg-gray-200">
-<div class="container position-sticky z-index-sticky top-0">
-    <div class="row">
-        <div class="col-12">
-
-        </div>
-    </div>
-</div>
 <main class="main-content  mt-0">
     <div class="page-header align-items-start min-vh-100"
          style="background-image: url('https://images.unsplash.com/photo-1497294815431-9365093b7331?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1950&q=80');"
@@ -60,10 +53,6 @@
                                     <label class="form-label">이메일</label>
                                     <input type="email" class="form-control" id="input-employeeEmail">
                                 </div>
-                                <!--                                <div class="form-check form-switch d-flex align-items-center mb-3">-->
-                                <!--                                    <input class="form-check-input" type="checkbox" id="remember-me" name = "remember-me" checked>-->
-                                <!--                                    <label class="form-check-label mb-0 ms-3" for="remember-me">Remember me</label>-->
-                                <!--                                </div>-->
                                 <div class="text-center">
                                     <button th:onclick="|find.findEmployeeAccount()|" type="button"
                                             class="btn bg-gradient-primary w-100 my-4 mb-2">아이디 찾기
@@ -75,7 +64,6 @@
                                     <a th:href="@{/find/password}"
                                        class="text-info text-gradient font-weight-bold opacity-5">비밀번호 찾기</a>
                                 </p>
-
                             </form>
                         </div>
                     </div>
@@ -99,14 +87,11 @@
             var _this = this;
         },
 
-
         findEmployeeAccount: function () {
             let data = {
-
                 name: document.querySelector('#input-employeeName').value.trim(),
                 email: document.querySelector('#input-employeeEmail').value.trim(),
             };
-            console.log(data);
 
             axios.post("/api/v1/academies/employee/findAccount",
                 JSON.stringify(data), {
@@ -115,26 +100,17 @@
                     }
                 }
             ).then((response) => {
-                console.log(response.data.result.account);
                 let account = response.data.result.account;
                 let name = document.querySelector('#input-employeeName').value.trim();
                 alert(name + "님의 계정은 " + "[" + account + "] 입니다.");
                 window.location.href = '/login';
-
             }).catch((error) => {
-                if (error.response.data.result["errorCode"] == "ACADEMY_NOT_FOUND") {
-                    alert("등록된 학원이 아닙니다. 등록 후 진행해주세요");
-                } else if (error.response.data.result["errorCode"] == "EMPLOYEE_NOT_FOUND") {
-                    alert("가입되어있지 않은 회원입니다.");
+                if (error.response.data.result["errorCode"] == "EMPLOYEE_NOT_FOUND") {
+                    alert("해당 이메일로 가입한 회원을 찾을 수 없습니다.");
                 }
-                console.log(error);
-
             });
-
         }
-
     };
-
     find.init();
 
 </script>
