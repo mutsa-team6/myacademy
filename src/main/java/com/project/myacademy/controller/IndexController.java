@@ -16,6 +16,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Controller
@@ -51,6 +52,7 @@ public class IndexController {
         FindAcademyResponse academy = academyService.findAcademyById(academyId);
         SessionUtil.setSessionAcademyName(request,academy);
         model.addAttribute("academy", academy);
+        model.addAttribute("localDateTime",LocalDateTime.now());
         return academy;
     }
 

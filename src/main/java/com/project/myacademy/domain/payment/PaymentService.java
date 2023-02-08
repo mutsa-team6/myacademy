@@ -137,12 +137,6 @@ public class PaymentService {
         //저장
         Payment savedPayment = paymentRepository.save(request.toEntity(foundEmployee, foundStudent, studentEnrollment, academy));
 
-        // 학생의 이메일로 메시지 전송
-        String email = foundStudent.getEmail();
-        String subject = String.format("MyAcademy 결제 완료 안내 메일");
-        String body = String.format("%s님의 %s 결제가 정상적으로 완료되었습니다.%n%n감사합니다.", foundStudent.getName(), foundLecture.getName());
-        emailUtil.sendEmail(email, subject, body);
-
         CreatePaymentResponse response = CreatePaymentResponse.of(savedPayment);
         response.setSuccessUrl(successCallbackUrl);
         response.setFailUrl(failCallbackUrl);
@@ -196,6 +190,12 @@ public class PaymentService {
 
         //결제 여부 false로 변경
         enrollment.updatePaymentTrue();
+
+        // 학생의 이메일로 메시지 전송
+        String email = enrollment.getStudent().getEmail();
+        String subject = String.format("MyAcademy 결제 완료 안내 메일");
+        String body = String.format("%s님의 %d원 %s 결제가 정상적으로 완료되었습니다.%n%n감사합니다.", enrollment.getStudent().getName(),amount ,enrollment.getLecture().getName());
+        emailUtil.sendEmail(email, subject, body);
 
         RestTemplate rest = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();

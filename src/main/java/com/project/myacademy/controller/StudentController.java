@@ -30,6 +30,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
 
 @Controller
 @Slf4j
@@ -128,13 +129,17 @@ public class StudentController {
         Page<FindEnrollmentResponse> enrollments = enrollmentService.findEnrollmentByStudentId(academyId, studentId, pageable);
         model.addAttribute("enrollments", enrollments);
 
+
         // 학생의 결제 완료된 내역 보여주기
         Page<CompletePaymentResponse> payments = paymentService.findAllCompletePaymentByStudent(academyId, requestAccount, studentId, pageable);
         model.addAttribute("payments", payments);
 
+
         // 학생 특이 사항
         Page<ReadAllUniquenessResponse> uniquenesses = uniquenessService.readAllUniqueness(academyId, studentId, pageable, requestAccount);
         model.addAttribute("uniquenesses", uniquenesses);
+        model.addAttribute("previous", pageable.previousOrFirst().getPageNumber());
+        model.addAttribute("next", pageable.next().getPageNumber());
 
         return "student/info";
     }
@@ -143,6 +148,8 @@ public class StudentController {
         FindAcademyResponse academy = academyService.findAcademyById(academyId);
         SessionUtil.setSessionAcademyName(request, academy);
         model.addAttribute("academy", academy);
+        model.addAttribute("localDateTime", LocalDateTime.now());
+
         return academy;
     }
 

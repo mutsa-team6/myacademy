@@ -1,26 +1,30 @@
 <th:block th:fragment="navbarFragment">
-    <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl" id="navbarBlur"
+
+    <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl"
          data-scroll="true">
-        <div class="container-fluid py-1 px-3">
+        <div class="container-fluid py-1 px-3"  style="border: #E0E0E0 solid 1px;border-radius: 20px; box-shadow: 2.5px 2.5px 2.5px #E0E0E0;">
+            <div class="d-flex justify-content-center">
+            <nav>
+                <h3 style="font-family: 'Jua', sans-serif;; font-size: 3.5rem; font-weight: lighter;color: #5A2082" th:text="${academy.academyName}"></h3>
 
-            <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
-                <div class="ms-md-auto pe-md-3 d-flex align-items-center">
-
-
-
-                </div>
-                <ul class="navbar-nav  justify-content-end">
-
-                    <li class="nav-item d-flex align-items-center" style="margin-left: 5px">
+            </nav>
+            </div>
+                <ul class="justify-content-end" >
+                    <li class="nav-item d-flex align-items-center" style="margin-left: 5px;">
                         <a href="/academy/mypage" class="nav-link text-body font-weight-bold px-0">
                             <i class="fa fa-user me-sm-1" style="color:#5A2082;"></i>
-                            <span class="d-sm-inline d-none" th:text="|${session.name} [ ${session.role} ] 님이 로그인 중입니다.|">Sign In</span>
+                            <span class="d-sm-inline d-none" style="color: #0d6efd" th:text="|${session.name} [ ${session.role} ] 님이 로그인 중입니다.|">Sign In</span>
                         </a>
                     </li>
-
+                    <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 ">
+                        <i class="far fa-calendar-alt me-sm-1" style="color:#5A2082;"></i>
+                        <li class="breadcrumb-item text-xs font-weight-bold"
+                            th:text="| 오늘은 ${#temporals.year(localDateTime)}년 ${#temporals.monthName(localDateTime)} ${#temporals.day(localDateTime)}일
+                             ${#temporals.dayOfWeekName(localDateTime)}입니다.|"></li>
+                    </ol>
                 </ul>
-            </div>
         </div>
+
     </nav>
 
     <br>

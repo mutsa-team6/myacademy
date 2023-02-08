@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
 
 @Controller
 @Slf4j
@@ -156,6 +157,8 @@ public class PaymentController {
         FindAcademyResponse academy = academyService.findAcademyById(academyId);
         SessionUtil.setSessionAcademyName(request,academy);
         model.addAttribute("academy", academy);
+        model.addAttribute("localDateTime", LocalDateTime.now());
+
         return academy;
     }
 

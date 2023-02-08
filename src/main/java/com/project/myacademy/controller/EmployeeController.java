@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.LocalDateTime;
 
 @Controller
 @Slf4j
@@ -209,6 +210,8 @@ public class EmployeeController {
         FindAcademyResponse academy = academyService.findAcademyById(academyId);
         SessionUtil.setSessionAcademyName(request,academy);
         model.addAttribute("academy", academy);
+        model.addAttribute("localDateTime", LocalDateTime.now());
+
         return academy;
     }
 

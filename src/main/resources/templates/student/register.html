@@ -155,7 +155,6 @@
         let data = {
             phoneNum: document.querySelector('#input-parentPhoneNum').value.trim()
         };
-        console.log(data);
         axios.post("/academy/student/parentCheck",
             JSON.stringify(data), {
                 headers: {
@@ -163,7 +162,6 @@
                 }
             }
         ).then((response) => {
-            console.log(response);
             if (response.data["isExist"] == true) {
                 show('parent-pass');
                 hide('parent-fail');
@@ -206,7 +204,6 @@
                 address: document.querySelector("#address_kakao").value.trim() + "  " + document.querySelector("#address_detail_kakao").value.trim(),
                 phoneNum: document.querySelector('#input-parentPhoneNum').value.trim(),
             };
-            console.log(data);
 
             axios.post("/api/v1/academies/" + academyId + "/parents",
                 JSON.stringify(data), {
@@ -235,7 +232,6 @@
                 birth: document.querySelector('#input-studentBirth').value.trim(),
                 parentPhoneNum: document.querySelector('#input-parentPhoneNum').value.trim(),
             };
-            console.log(data);
 
             axios.post("/api/v1/academies/" + academyId + "/students",
                 JSON.stringify(data), {
@@ -250,6 +246,10 @@
             }).catch((error) => {
                 if (error.response.data.result["errorCode"] == "INVALID_PERMISSION") {
                     alert("강사는 접근할 수 없습니다.");
+                }else if(error.response.data.result["errorCode"] == "DUPLICATED_STUDENT"){
+                    alert("해당 전화번호로 저장된 학생이 이미 존재합니다.");
+                }else if(error.response.data.result["errorCode"] == "DUPLICATED_EMAIL"){
+                    alert("해당 이메일로 저장된 학생이 이미 존재합니다.");
                 }
             });
 
