@@ -94,7 +94,7 @@ class AnnouncementServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> announcementService.createAnnouncement(academy.getId(), employeeSTAFF.getAccount(), request));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.ACADEMY_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACADEMY_NOT_FOUND);
 
             then(academyRepository).should(times(1)).findById(anyLong());
         }
@@ -109,7 +109,7 @@ class AnnouncementServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> announcementService.createAnnouncement(academy.getId(), employeeSTAFF.getAccount(), request));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.EMPLOYEE_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND);
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
@@ -125,7 +125,7 @@ class AnnouncementServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> announcementService.createAnnouncement(academy.getId(), employeeUSER.getAccount(), request));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.INVALID_PERMISSION));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.INVALID_PERMISSION);
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
@@ -165,7 +165,7 @@ class AnnouncementServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> announcementService.readAnnouncement(academy.getId(), announcement1.getId(), employeeSTAFF.getAccount()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.ACADEMY_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACADEMY_NOT_FOUND);
 
             then(academyRepository).should(times(1)).findById(anyLong());
         }
@@ -180,7 +180,7 @@ class AnnouncementServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> announcementService.readAnnouncement(academy.getId(), announcement1.getId(), employeeSTAFF.getAccount()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.EMPLOYEE_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND);
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
@@ -197,7 +197,7 @@ class AnnouncementServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> announcementService.readAnnouncement(academy.getId(), announcement1.getId(), employeeSTAFF.getAccount()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.ANNOUNCEMENT_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ANNOUNCEMENT_NOT_FOUND);
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
@@ -240,7 +240,7 @@ class AnnouncementServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> announcementService.readAllAnnouncement(academy.getId(), pageable, employeeSTAFF.getAccount()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.ACADEMY_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACADEMY_NOT_FOUND);
 
             then(academyRepository).should(times(1)).findById(anyLong());
         }
@@ -255,7 +255,7 @@ class AnnouncementServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> announcementService.readAllAnnouncement(academy.getId(), pageable, employeeSTAFF.getAccount()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.EMPLOYEE_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND);
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
@@ -318,7 +318,7 @@ class AnnouncementServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> announcementService.updateAnnouncement(academy.getId(), announcement1.getId(), request, employeeSTAFF.getAccount()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.ACADEMY_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACADEMY_NOT_FOUND);
 
             then(academyRepository).should(times(1)).findById(anyLong());
 
@@ -334,7 +334,7 @@ class AnnouncementServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> announcementService.updateAnnouncement(academy.getId(), announcement1.getId(), request, employeeSTAFF.getAccount()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.EMPLOYEE_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND);
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
@@ -351,7 +351,7 @@ class AnnouncementServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> announcementService.updateAnnouncement(academy.getId(), announcement1.getId(), request, employeeSTAFF.getAccount()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.INVALID_PERMISSION));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.INVALID_PERMISSION);
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
@@ -370,7 +370,7 @@ class AnnouncementServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> announcementService.updateAnnouncement(academy.getId(), announcement1.getId(), request, employeeSTAFF.getAccount()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.ANNOUNCEMENT_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ANNOUNCEMENT_NOT_FOUND);
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
@@ -410,7 +410,7 @@ class AnnouncementServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> announcementService.deleteAnnouncement(academy.getId(), announcement1.getId(), employeeSTAFF.getAccount()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.ACADEMY_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACADEMY_NOT_FOUND);
 
             then(academyRepository).should(times(1)).findById(anyLong());
         }
@@ -425,7 +425,7 @@ class AnnouncementServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> announcementService.deleteAnnouncement(academy.getId(), announcement1.getId(), employeeSTAFF.getAccount()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.EMPLOYEE_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND);
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
@@ -442,7 +442,7 @@ class AnnouncementServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> announcementService.deleteAnnouncement(academy.getId(), announcement1.getId(), employeeSTAFF.getAccount()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.INVALID_PERMISSION));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.INVALID_PERMISSION);
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
@@ -461,7 +461,7 @@ class AnnouncementServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> announcementService.deleteAnnouncement(academy.getId(), announcement1.getId(), employeeSTAFF.getAccount()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.ANNOUNCEMENT_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ANNOUNCEMENT_NOT_FOUND);
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
@@ -472,7 +472,7 @@ class AnnouncementServiceTest {
 
     @Nested
     @DisplayName("UI용 메서드")
-    class ui{
+    class ui {
 
         @Test
         @DisplayName("메인에 공지사항 5개 보여주기 성공")
@@ -511,7 +511,7 @@ class AnnouncementServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> announcementService.readAnnouncementForMain(academy.getId(), employeeSTAFF.getAccount()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.ACADEMY_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACADEMY_NOT_FOUND);
 
             then(academyRepository).should(times(1)).findById(anyLong());
         }
@@ -526,7 +526,7 @@ class AnnouncementServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> announcementService.readAnnouncementForMain(academy.getId(), employeeSTAFF.getAccount()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.EMPLOYEE_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND);
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
@@ -568,7 +568,7 @@ class AnnouncementServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> announcementService.readAdmissionForMain(academy.getId(), employeeSTAFF.getAccount()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.ACADEMY_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACADEMY_NOT_FOUND);
 
             then(academyRepository).should(times(1)).findById(anyLong());
         }
@@ -583,7 +583,7 @@ class AnnouncementServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> announcementService.readAdmissionForMain(academy.getId(), employeeSTAFF.getAccount()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.EMPLOYEE_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND);
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
@@ -625,7 +625,7 @@ class AnnouncementServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> announcementService.searchAnnouncement(academy.getId(), "제목", pageable, employeeSTAFF.getAccount()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.ACADEMY_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACADEMY_NOT_FOUND);
 
             then(academyRepository).should(times(1)).findById(anyLong());
         }
@@ -640,7 +640,7 @@ class AnnouncementServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> announcementService.searchAnnouncement(academy.getId(), "제목", pageable, employeeSTAFF.getAccount()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.EMPLOYEE_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND);
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));

@@ -2,9 +2,9 @@ package com.project.myacademy.domain.student;
 
 import com.project.myacademy.domain.student.dto.*;
 import com.project.myacademy.global.Response;
+import com.project.myacademy.global.util.AuthenticationUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import com.project.myacademy.global.util.AuthenticationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -62,9 +62,9 @@ public class StudentRestController {
      */
     @Operation(summary = "학생 수정", description = "ADMIN,STAFF 회원만 수정이 가능합니다.")
     @PutMapping("/{academyId}/students/{studentId}")
-    public ResponseEntity<Response<UpdateStudentResponse>> update(@PathVariable Long academyId, @PathVariable Long studentId,@RequestBody UpdateStudentRequest request, Authentication authentication) {
+    public ResponseEntity<Response<UpdateStudentResponse>> update(@PathVariable Long academyId, @PathVariable Long studentId, @RequestBody UpdateStudentRequest request, Authentication authentication) {
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
-        UpdateStudentResponse response = studentService.updateStudent(academyId,studentId, request, requestAccount);
+        UpdateStudentResponse response = studentService.updateStudent(academyId, studentId, request, requestAccount);
         return ResponseEntity.ok().body(Response.success(response));
     }
 
@@ -75,7 +75,7 @@ public class StudentRestController {
     @DeleteMapping("/{academyId}/students/{studentId}")
     public ResponseEntity<Response<DeleteStudentResponse>> delete(@PathVariable Long academyId, @PathVariable Long studentId, Authentication authentication) {
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
-        DeleteStudentResponse response = studentService.deleteStudent(academyId, studentId,requestAccount);
+        DeleteStudentResponse response = studentService.deleteStudent(academyId, studentId, requestAccount);
         return ResponseEntity.ok().body(Response.success(response));
     }
 }

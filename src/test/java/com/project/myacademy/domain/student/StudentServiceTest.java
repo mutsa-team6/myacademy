@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
 
@@ -93,7 +92,7 @@ class StudentServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> studentService.createStudent(academy.getId(), request, employeeSTAFF.getAccount()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.ACADEMY_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACADEMY_NOT_FOUND);
         }
 
         @Test
@@ -106,7 +105,7 @@ class StudentServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> studentService.createStudent(academy.getId(), request, employeeSTAFF.getAccount()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.EMPLOYEE_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND);
         }
 
         @Test
@@ -120,7 +119,7 @@ class StudentServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> studentService.createStudent(academy.getId(), request, employeeSTAFF.getAccount()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.PARENT_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.PARENT_NOT_FOUND);
         }
 
         @Test
@@ -135,7 +134,7 @@ class StudentServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> studentService.createStudent(academy.getId(), request, employeeSTAFF.getAccount()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.DUPLICATED_PHONENUM));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.DUPLICATED_STUDENT);
         }
 
         @Test
@@ -151,7 +150,7 @@ class StudentServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> studentService.createStudent(academy.getId(), request, employeeSTAFF.getAccount()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.DUPLICATED_EMAIL));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.DUPLICATED_EMAIL);
         }
 
         @Test
@@ -164,7 +163,7 @@ class StudentServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> studentService.createStudent(academy.getId(), request, employeeSTAFF.getAccount()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.INVALID_PERMISSION));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.INVALID_PERMISSION);
         }
     }
 
@@ -197,7 +196,7 @@ class StudentServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> studentService.readStudent(academy.getId(), student1.getId(), employeeUSER.getAccount()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.ACADEMY_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACADEMY_NOT_FOUND);
         }
 
         @Test
@@ -210,7 +209,7 @@ class StudentServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> studentService.readStudent(academy.getId(), student1.getId(), employeeUSER.getAccount()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.EMPLOYEE_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND);
         }
 
         @Test
@@ -224,7 +223,7 @@ class StudentServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> studentService.readStudent(academy.getId(), student1.getId(), employeeUSER.getAccount()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.STUDENT_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.STUDENT_NOT_FOUND);
         }
     }
 
@@ -257,7 +256,7 @@ class StudentServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> studentService.readAllStudent(academy.getId(), pageable, employeeUSER.getAccount()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.ACADEMY_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACADEMY_NOT_FOUND);
         }
 
         @Test
@@ -270,16 +269,16 @@ class StudentServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> studentService.readAllStudent(academy.getId(), pageable, employeeUSER.getAccount()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.EMPLOYEE_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND);
         }
 
         @Test
         @DisplayName("학생 이름으로 전체 조회")
         void read_by_name_students_success() {
 
-            Page<Student> studentList = new PageImpl<>(List.of(student1,student3));
+            Page<Student> studentList = new PageImpl<>(List.of(student1, student3));
 
-            given(studentRepository.findByAcademyIdAndName(any(), any(),any())).willReturn(studentList);
+            given(studentRepository.findByAcademyIdAndName(any(), any(), any())).willReturn(studentList);
 
             Page<ReadAllStudentResponse> studentListResponse = studentService.findStudentForStudentList(academy.getId(), student1.getName(), pageable);
 
@@ -359,7 +358,7 @@ class StudentServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> studentService.updateStudent(academy.getId(), student1.getId(), request, employeeSTAFF.getAccount()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.ACADEMY_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACADEMY_NOT_FOUND);
         }
 
         @Test
@@ -372,7 +371,7 @@ class StudentServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> studentService.updateStudent(academy.getId(), student1.getId(), request, employeeSTAFF.getAccount()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.EMPLOYEE_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND);
         }
 
         @Test
@@ -386,7 +385,7 @@ class StudentServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> studentService.updateStudent(academy.getId(), student1.getId(), request, employeeSTAFF.getAccount()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.STUDENT_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.STUDENT_NOT_FOUND);
         }
 
         @Test
@@ -403,7 +402,7 @@ class StudentServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> studentService.updateStudent(academy.getId(), student1.getId(), sameEmailRequest, employeeSTAFF.getAccount()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.DUPLICATED_EMAIL));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.DUPLICATED_EMAIL);
         }
 
         @Test
@@ -421,7 +420,7 @@ class StudentServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> studentService.updateStudent(academy.getId(), student1.getId(), samePhoneNumRequest, employeeSTAFF.getAccount()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.DUPLICATED_PHONENUM));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.DUPLICATED_PHONENUM);
         }
 
         @Test
@@ -434,7 +433,7 @@ class StudentServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> studentService.updateStudent(academy.getId(), student1.getId(), request, employeeUSER.getAccount()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.INVALID_PERMISSION));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.INVALID_PERMISSION);
         }
     }
 
@@ -465,7 +464,7 @@ class StudentServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> studentService.deleteStudent(academy.getId(), student1.getId(), employeeSTAFF.getAccount()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.ACADEMY_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACADEMY_NOT_FOUND);
         }
 
         @Test
@@ -478,7 +477,7 @@ class StudentServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> studentService.deleteStudent(academy.getId(), student1.getId(), employeeSTAFF.getAccount()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.EMPLOYEE_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND);
         }
 
         @Test
@@ -492,7 +491,7 @@ class StudentServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> studentService.deleteStudent(academy.getId(), student1.getId(), employeeSTAFF.getAccount()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.STUDENT_NOT_FOUND));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.STUDENT_NOT_FOUND);
         }
 
         @Test
@@ -505,7 +504,7 @@ class StudentServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> studentService.deleteStudent(academy.getId(), student1.getId(), employeeUSER.getAccount()));
 
-            assertThat(appException.getErrorCode().equals(ErrorCode.INVALID_PERMISSION));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.INVALID_PERMISSION);
         }
     }
 }
