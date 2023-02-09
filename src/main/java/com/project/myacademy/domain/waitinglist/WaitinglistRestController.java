@@ -54,7 +54,7 @@ public class WaitinglistRestController {
 
     @Operation(summary = "대기번호 삭제", description = "ADMIN, STAFF 회원만 대기번호 삭제 가능합니다.")
     @DeleteMapping("/{academyId}/students/{studentId}/lectures/{lectureId}/waitinglists/{waitinglistId}")
-    public ResponseEntity<Response<DeleteWaitinglistResponse>> create(@PathVariable("academyId") Long academyId,
+    public ResponseEntity<Response<DeleteWaitinglistResponse>> delete(@PathVariable("academyId") Long academyId,
                                                                       @PathVariable("studentId") Long studentId,
                                                                       @PathVariable("lectureId") Long lectureId,
                                                                       @PathVariable("waitinglistId") Long waitinglistId,
