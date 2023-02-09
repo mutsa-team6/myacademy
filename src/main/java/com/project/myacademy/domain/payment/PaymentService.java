@@ -6,6 +6,7 @@ import com.project.myacademy.domain.discount.Discount;
 import com.project.myacademy.domain.discount.DiscountRepository;
 import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.domain.employee.EmployeeRepository;
+import com.project.myacademy.domain.employee.EmployeeRole;
 import com.project.myacademy.domain.enrollment.Enrollment;
 import com.project.myacademy.domain.enrollment.EnrollmentRepository;
 import com.project.myacademy.domain.lecture.Lecture;
@@ -79,6 +80,8 @@ public class PaymentService {
         Academy academy = validateAcademyById(academyId);
         // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
         Employee foundEmployee = validateRequestEmployeeByAcademy(account, academy);
+        // 해당 직원의 권한 체크 - USER 이면 INVALID_PERMISSION 에러발생
+        validateAuthorityUser(foundEmployee);
         // 학생 Id로 학생을 조회 - 없을시 STUDENT_NOT_FOUND 에러발생
         Student foundStudent = validateStudentById(studentId);
         // 강좌 Id로 강좌를 조회 - 없을시 LECTURE_NOT_FOUND 에러발생
@@ -237,6 +240,8 @@ public class PaymentService {
      *
      * @param paymentKey   토스측 결제 키
      * @param cancelReason 결제 취소 사유
+     * @param account 요청하는 직원 계정
+     * @param academyId 학원 Id
      */
     public ApprovePaymentResponse cancelPayment(String paymentKey, String cancelReason, String account, Long academyId) {
 
@@ -244,6 +249,8 @@ public class PaymentService {
         Academy academy = validateAcademyById(academyId);
         // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
         Employee foundEmployee = validateRequestEmployeeByAcademy(account, academy);
+        // 해당 직원의 권한 체크 - USER 이면 INVALID_PERMISSION 에러발생
+        validateAuthorityUser(foundEmployee);
         // paymetKey로 결제내역 조회 - 없으면 PAYMENT_NOT_FOUND 에러발생
         Payment selcetedPayment = paymentRepository.findByPaymentKey(paymentKey)
                 .orElseThrow(() -> new AppException(ErrorCode.PAYMENT_NOT_FOUND));
@@ -498,5 +505,12 @@ public class PaymentService {
         Student validateStudent = studentRepository.findByAcademyIdAndId(academyId, studentId)
                 .orElseThrow(() -> new AppException(ErrorCode.STUDENT_NOT_FOUND));
         return validateStudent;
+    }
+
+    // 해당 직원의 권한 체크 - USER 이면 INVALID_PERMISSION 에러발생
+    public void validateAuthorityUser(Employee employee) {
+        if(employee.getEmployeeRole().equals(EmployeeRole.ROLE_USER)) {
+            throw new AppException(ErrorCode.INVALID_PERMISSION);
+        }
     }
 }
