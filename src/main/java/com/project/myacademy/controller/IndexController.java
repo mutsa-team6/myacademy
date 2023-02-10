@@ -7,6 +7,7 @@ import com.project.myacademy.domain.announcement.dto.ReadAnnouncementResponse;
 import com.project.myacademy.domain.employee.EmployeeService;
 import com.project.myacademy.domain.employee.dto.ReadEmployeeResponse;
 import com.project.myacademy.domain.enrollment.EnrollmentService;
+import com.project.myacademy.domain.file.academyprofile.AcademyProfileS3UploadService;
 import com.project.myacademy.domain.lecture.LectureService;
 import com.project.myacademy.domain.lecture.dto.ReadAllLectureResponse;
 import com.project.myacademy.domain.student.StudentService;
@@ -37,6 +38,7 @@ public class IndexController {
 
     private final StudentService studentService;
     private final EnrollmentService enrollmentService;
+    private final AcademyProfileS3UploadService academyProfileS3UploadService;
     @GetMapping("/academy/main")
     public String main(HttpServletRequest request, Model model, Authentication authentication, Pageable pageable) {
 
@@ -62,6 +64,10 @@ public class IndexController {
 
         List<ReadAllLectureResponse> lectures = lectureService.readAllTodayLectures(academyId, requestAccount, pageable);
         model.addAttribute("lectures",lectures);
+
+        String imageUrl = academyProfileS3UploadService.getStoredUrl(academyId);
+        model.addAttribute("imageUrl", imageUrl);
+
 
         // 강의 종료일이 지나지 않은 강의 목록만 가져온다.
         // 해당 강의의 대기 인원이 나오고, 어떤 학생이 대기중인지, 어떤 학생이 등록했는지 보여주기 위함

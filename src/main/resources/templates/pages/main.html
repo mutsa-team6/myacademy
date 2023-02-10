@@ -38,9 +38,17 @@
         <div class="row mb-4 mx-2">
             <div class="col-lg-4 col-md-6 mb-md-0 mb-4">
                 <div style="border-radius: 10px; ">
-                    <img src="https://raw.githubusercontent.com/buinq/imageServer/main/img/cambridge-at-night-cambridgeshire-england-uk.png"
-                         alt="img-blur-shadow" class="img-fluid shadow border-radius-lg"
-                         style="height: 300px">
+                    <th:block th:if="${imageUrl =='null'}">
+                        <img src="https://raw.githubusercontent.com/buinq/imageServer/main/img/image-20230210213531339.png"
+                             alt="img-blur-shadow" class="img-fluid shadow border-radius-lg"
+                             style="height: 300px">
+                    </th:block>
+                    <th:block th:if="${imageUrl != 'null'}">
+                        <img th:src="${imageUrl}"
+                             alt="img-blur-shadow" class="img-fluid shadow border-radius-lg"
+                             style="height: 300px">
+                    </th:block>
+
                 </div>
             </div>
             <div class="col-lg-6 col-md-6 mb-md-0 mb-4 mx-auto">
