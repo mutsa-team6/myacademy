@@ -117,6 +117,12 @@
                 return;
             }
 
+            if (regExp.test(document.querySelector('#input-academybusinessNum').value.trim().length) == 10) {
+                alert('학원 사업자 등록번호는 10자리 숫자입니다.');
+                document.querySelector("input[name=academybusinessNum]").focus();
+                return;
+            }
+
             axios.post("https://api.odcloud.kr/api/nts-businessman/v1/status?serviceKey=gwWHo3wdrtSmrSA3XKwtebZwcULcFUiaspzDlATw1W2vzvQEg4RlHgXQLCdj//M0CHkuQWekdG1tXT07kz87lg==",
                 JSON.stringify({b_no: [document.querySelector('#input-academybusinessNum').value.trim()]}),
                 {
