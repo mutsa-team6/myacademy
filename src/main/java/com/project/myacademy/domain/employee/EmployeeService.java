@@ -53,11 +53,12 @@ public class EmployeeService {
         String requestAccount = request.getAccount();
         String requestEmail = request.getEmail();
         String requestRealName = request.getName();
-
         log.info("⭐ 회원가입 요청한 사용자의 계정 [{}] || 이메일 [{}]", requestAccount, requestEmail);
 
         // 가입을 요청한 계정과 학원으로 직원을 조회 - 있을시 DUPLICATED_ACCOUNT 에러발생
         ifPresentAccountInAcademy(requestAccount, foundAcademy);
+        // 이메일로 직원을 조회 - 있을시 DUPLICATED_EMAIL 에러발생
+        ifPresentEmailInEmployee(requestEmail);
 
         // 계정명이 admin 이고 학원 대표자명과 회원가입을 요청한 실명이 동일하면 admin 계정을 준다.
         String ownerName = foundAcademy.getOwner();
@@ -498,6 +499,14 @@ public class EmployeeService {
         Employee foundEmployee = employeeRepository.findByEmail(email)
                 .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
         return foundEmployee;
+    }
+
+    // 이메일로 직원을 조회 - 있을시 DUPLICATED_EMAIL 에러발생
+    private void ifPresentEmailInEmployee(String email) {
+        employeeRepository.findByEmail(email)
+                .ifPresent(employee -> {
+                    throw new AppException(ErrorCode.DUPLICATED_EMAIL);
+                });
     }
 
     public String getTempPassword() {
