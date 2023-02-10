@@ -41,6 +41,7 @@ public enum ErrorCode {
     ANNOUNCEMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 공지사항을 찾을 수 없습니다."),
     ENROLLMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 수강 이력을 찾을 수 없습니다."),
     WAITINGLIST_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 대기번호를 찾을 수 없습니다."),
+    ACADEMY_PROFILE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 학원 파일을 찾을 수 없습니다."),
     EMPLOYEE_PROFILE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 직원 파일을 찾을 수 없습니다."),
     ANNOUNCEMENT_FILE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 공지사항 파일을 찾을 수 없습니다."),
     DISCOUNT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 할인정책을 찾을 수 없습니다."),

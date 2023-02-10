@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "01. 학원", description = "학원 등록, 조회, 삭제")
+@Tag(name = "01-1. 학원", description = "학원 등록, 조회, 삭제")
 @Slf4j
 @RestController
 @RequiredArgsConstructor
