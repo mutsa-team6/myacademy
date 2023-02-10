@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Configuration;
         info = @Info(
                 title = "\uD83C\uDF31My Academy\uD83C\uDF31",
                 description = "안녕하세요 멋사2기 6조 인규와 아이들 입니다😁 \n" +
-                        "\n배포링크 👉 [클릭](http://ec2-3-39-187-138.ap-northeast-2.compute.amazonaws.com:8080/)\n" +
+                        "\n배포링크 👉 [클릭](http://ec2-13-209-97-187.ap-northeast-2.compute.amazonaws.com/)\n" +
                         "\n👀Swagger 사용 방법👀 \n" +
                         "1. 학원 등록 : 학원 탭에서 가입 \n" +
                         "2. admin 계정 생성 : 직원 회원가입에서 계정명=\"admin\" / 이름=\"대표자명\" 으로 가입 \n" +
