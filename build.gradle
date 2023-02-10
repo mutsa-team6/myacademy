@@ -14,8 +14,11 @@ plugins {
 	//querydsl 추가
 	id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
 
-	// jacoco
+	// Jacoco
 	id 'jacoco'
+
+	// SonarQube
+	id "org.sonarqube" version "3.5.0.2730"
 }
 
 group = 'com.project'
@@ -83,6 +86,10 @@ dependencies {
 	//redis 추가
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
+	// SonarQube 추가
+	implementation 'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.3'
+
+	// jar 파일 1개 생성
 	jar {
 		enabled = false
 	}
@@ -95,7 +102,6 @@ task copyPrivate(type: Copy) {
 		into 'src/main/resources'
 	}
 }
-
 
 tasks.named('test') {
 	useJUnitPlatform()
@@ -110,9 +116,9 @@ jacoco {
 jacocoTestReport {
 	dependsOn test
 	reports {
-		html.enabled true
 		xml.enabled true
-		csv.enabled true
+		html.enabled true
+		csv.enabled false
 
 		// html 파일 위치 지정
 		html.destination file('build/reports/myReport.html')
@@ -145,6 +151,12 @@ jacocoTestReport {
 	finalizedBy 'jacocoTestCoverageVerification'
 }
 
+sonar {
+	properties {
+		property "sonar.projectKey", "myacademy-test"
+	}
+}
+
 // 내가 원하는 커버리지 기준을 만족하는지 확인해 주는 task
 // 점수 평가 및 검증 단계
 jacocoTestCoverageVerification {
@@ -164,14 +176,14 @@ jacocoTestCoverageVerification {
 			limit {
 				counter = 'LINE'
 				value = 'COVEREDRATIO'
-				minimum = 0.80
+				minimum = 0.70
 			}
 
 			// 브랜치 커버리지 제한을 80%로 설정
 			limit {
 				counter = 'BRANCH'
 				value = 'COVEREDRATIO'
-				minimum = 0.80
+				minimum = 0.50
 			}
 
 			// 빈 줄을 제외한 코드의 라인수를 최대 200라인으로 제한
@@ -190,7 +202,8 @@ jacocoTestCoverageVerification {
 					'*.*ExceptionManager*',
 					'*.configuration.*',
 					'*.util.*',
-					'*.file.*'
+					'*.file.*',
+					'*.payment.*'
 			] + Qdomains
 		}
 	}

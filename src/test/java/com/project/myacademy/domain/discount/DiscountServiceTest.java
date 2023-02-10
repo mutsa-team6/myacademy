@@ -124,8 +124,8 @@ class DiscountServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> discountService.getAllDiscounts(academy.getId(), employee.getAccount(), pageable));
 
-            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACCOUNT_NOT_FOUND);
-            assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 계정명을 찾을 수 없습니다.");
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND);
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("요청한 직원을 해당 학원에서 찾을 수 없습니다.");
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
@@ -175,8 +175,8 @@ class DiscountServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> discountService.getAppliedDiscount(academy.getId(), enrollment.getId(), employee.getAccount()));
 
-            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACCOUNT_NOT_FOUND);
-            assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 계정명을 찾을 수 없습니다.");
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND);
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("요청한 직원을 해당 학원에서 찾을 수 없습니다.");
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
@@ -283,8 +283,8 @@ class DiscountServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> discountService.checkDiscount(academy.getId(), checkDiscountRequest, employee.getAccount()));
 
-            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACCOUNT_NOT_FOUND);
-            assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 계정명을 찾을 수 없습니다.");
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND);
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("요청한 직원을 해당 학원에서 찾을 수 없습니다.");
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
@@ -443,8 +443,8 @@ class DiscountServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> discountService.createDiscount(academy.getId(), createDiscountRequest, employee.getAccount()));
 
-            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACCOUNT_NOT_FOUND);
-            assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 계정명을 찾을 수 없습니다.");
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND);
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("요청한 직원을 해당 학원에서 찾을 수 없습니다.");
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
@@ -539,8 +539,8 @@ class DiscountServiceTest {
 
             AppException appException = assertThrows(AppException.class,
                     () -> discountService.deleteDiscount(academy.getId(), discount.getId(), employee.getAccount()));
-            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACCOUNT_NOT_FOUND);
-            assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 계정명을 찾을 수 없습니다.");
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND);
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("요청한 직원을 해당 학원에서 찾을 수 없습니다.");
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));

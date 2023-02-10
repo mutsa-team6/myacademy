@@ -6,6 +6,7 @@ import com.project.myacademy.domain.discount.Discount;
 import com.project.myacademy.domain.discount.DiscountRepository;
 import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.domain.employee.EmployeeRepository;
+import com.project.myacademy.domain.employee.EmployeeRole;
 import com.project.myacademy.domain.enrollment.Enrollment;
 import com.project.myacademy.domain.enrollment.EnrollmentRepository;
 import com.project.myacademy.domain.lecture.Lecture;
@@ -67,31 +68,28 @@ public class PaymentService {
     /**
      * 결제할 상품 가격,지불 방법, 수업 이름 체크
      *
-     * @param request   수업 가격, 지불방법, 수업이름
-     * @param academyId
-     * @param studentId
-     * @param account
+     * @param request   수업 가격, 지불방법, 수업이름이 담긴 request
+     * @param academyId 학원 Id
+     * @param studentId 학생 Id
+     * @param account   요청하는 직원 계정
      */
     @Transactional
     public CreatePaymentResponse createPayment(CreatePaymentRequest request, Long academyId, Long studentId, String account) {
-        //학원이 존재하는지 여부
-        Academy academy = validateAcademy(academyId);
 
-        //학원에 근무하는 직원이 맞는지 확인
-        Employee foundEmployee = validateAcademyEmployee(account, academy);
+        // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+        Academy academy = validateAcademyById(academyId);
+        // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
+        Employee foundEmployee = validateRequestEmployeeByAcademy(account, academy);
+        // 해당 직원의 권한 체크 - USER 이면 INVALID_PERMISSION 에러발생
+        validateAuthorityUser(foundEmployee);
+        // 학생 Id로 학생을 조회 - 없을시 STUDENT_NOT_FOUND 에러발생
+        Student foundStudent = validateStudentById(studentId);
+        // 강좌 Id로 강좌를 조회 - 없을시 LECTURE_NOT_FOUND 에러발생
+        Lecture foundLecture = validateLectureById(request.getLectureId());
+        // 학생과 강좌로 수강이력을 조회 - 없을시 ENROLLMENT_NOT_FOUND 에러발생
+        Enrollment studentEnrollment = validateEnrollmentByStudentAndLecture(foundStudent, foundLecture);
 
-        //결제할 학생 조회
-        Student foundStudent = studentRepository.findById(studentId)
-                .orElseThrow(() -> new AppException(ErrorCode.STUDENT_NOT_FOUND));
-
-        Lecture foundLecture = lectureRepository.findById(request.getLectureId())
-                .orElseThrow(() -> new AppException(ErrorCode.LECTURE_NOT_FOUND));
-
-        //결제할 학생이 수강신청한 수업
-        Enrollment studentEnrollment = enrollmentRepository.findByStudentAndLecture(foundStudent, foundLecture)
-                .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
-
-        //수강 결제가 된거면 중복 결제안되도록 막기
+        //결제 여부 확인 - 이미결제가 되어있을시 DUPLICATED_PAYMENT 에러발생
         if (studentEnrollment.getPaymentYN() != false) {
             throw new AppException(ErrorCode.DUPLICATED_PAYMENT);
         }
@@ -170,20 +168,19 @@ public class PaymentService {
     /**
      * 토스 측에 최종 결제 승인 요청
      *
-     * @param paymentKey
-     * @param orderId
-     * @param amount
-     * @return
+     * @param paymentKey 결제 키값
+     * @param orderId    주문 Id
+     * @param amount     결제될 금액
      */
     @Transactional
     public ApprovePaymentResponse successApprovePayment(String paymentKey, String orderId, Integer amount) {
-        //이미 결제되있는지 확인
-        Payment selcetedPayment = paymentRepository.findByOrderId(orderId)
-                .orElseThrow(() -> new AppException(ErrorCode.PAYMENT_NOT_FOUND));
 
-        Enrollment enrollment = enrollmentRepository.findByStudentAndLecture(selcetedPayment.getStudent(), selcetedPayment.getLecture())
-                .orElseThrow(() -> new AppException(ErrorCode.ENROLLMENT_NOT_FOUND));
+        // 주문Id로 Payment 조회 - 없을시 PAYMENT_NOT_FOUND 에러발생
+        Payment selcetedPayment = validatePaymentByOrderId(orderId);
+        // 학생과 강좌로 수강이력을 조회 - 없을시 ENROLLMENT_NOT_FOUND 에러발생
+        Enrollment enrollment = validateEnrollmentByStudentAndLecture(selcetedPayment.getStudent(), selcetedPayment.getLecture());
 
+        // 결제 여부 확인
         if (enrollment.getPaymentYN() == true) {
             throw new AppException(ErrorCode.ALREADY_PAYMENT);
         }
@@ -194,7 +191,7 @@ public class PaymentService {
         // 학생의 이메일로 메시지 전송
         String email = enrollment.getStudent().getEmail();
         String subject = String.format("MyAcademy 결제 완료 안내 메일");
-        String body = String.format("%s님의 %d원 %s 결제가 정상적으로 완료되었습니다.%n%n감사합니다.", enrollment.getStudent().getName(),amount ,enrollment.getLecture().getName());
+        String body = String.format("%s님의 %d원 %s 결제가 정상적으로 완료되었습니다.%n%n감사합니다.", enrollment.getStudent().getName(), amount, enrollment.getLecture().getName());
         emailUtil.sendEmail(email, subject, body);
 
         RestTemplate rest = new RestTemplate();
@@ -223,15 +220,13 @@ public class PaymentService {
     /**
      * 토스 측에 최종 결제 실패 요청
      *
-     * @param errorCode
-     * @param errorMsg
-     * @param orderId
-     * @return
+     * @param errorCode 토스에서 받아온 에러코드
+     * @param errorMsg  토스에서 방아온 에러메시지
+     * @param orderId   주문 Id
      */
     public FailApprovePaymentResponse failApprovePayment(String errorCode, String errorMsg, String orderId) {
 
-        Payment payment = paymentRepository.findByOrderId(orderId)
-                .orElseThrow(() -> new AppException(ErrorCode.PAYMENT_NOT_FOUND));
+        Payment payment = validatePaymentByOrderId(orderId);
 
         return FailApprovePaymentResponse.builder()
                 .orderId(orderId)
@@ -245,21 +240,22 @@ public class PaymentService {
      *
      * @param paymentKey   토스측 결제 키
      * @param cancelReason 결제 취소 사유
-     * @return
+     * @param account 요청하는 직원 계정
+     * @param academyId 학원 Id
      */
     public ApprovePaymentResponse cancelPayment(String paymentKey, String cancelReason, String account, Long academyId) {
-        //학원이 존재하는지 여부
-        Academy academy = validateAcademy(academyId);
 
-        //학원에 근무하는 직원이 맞는지 확인
-        Employee foundEmployee = validateAcademyEmployee(account, academy);
-
-        //payment 결제된 내역이 있는지 확인
+        // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+        Academy academy = validateAcademyById(academyId);
+        // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
+        Employee foundEmployee = validateRequestEmployeeByAcademy(account, academy);
+        // 해당 직원의 권한 체크 - USER 이면 INVALID_PERMISSION 에러발생
+        validateAuthorityUser(foundEmployee);
+        // paymetKey로 결제내역 조회 - 없으면 PAYMENT_NOT_FOUND 에러발생
         Payment selcetedPayment = paymentRepository.findByPaymentKey(paymentKey)
                 .orElseThrow(() -> new AppException(ErrorCode.PAYMENT_NOT_FOUND));
-
-        Enrollment enrollment = enrollmentRepository.findByStudentAndLecture(selcetedPayment.getStudent(), selcetedPayment.getLecture())
-                .orElseThrow(() -> new AppException(ErrorCode.ENROLLMENT_NOT_FOUND));
+        // 학생과 강좌로 수강이력을 조회 - 없을시 ENROLLMENT_NOT_FOUND 에러발생
+        Enrollment enrollment = validateEnrollmentByStudentAndLecture(selcetedPayment.getStudent(), selcetedPayment.getLecture());
 
         //결제 여부 false로 변경
         enrollment.updatePaymentFalse();
@@ -306,11 +302,15 @@ public class PaymentService {
     }
 
     /**
-     * 결제 성공 후, 결제 정보를 보여주기 위해 만든 메서드 (UI 용)
+     * UI용 메서드
+     * 결제 성공 후, 결제 정보를 보여주기
+     *
+     * @param orderId 주문 Id
      */
     public SuccessPaymentResponse findPayment(String orderId) {
-        Payment foundPayment = paymentRepository.findByOrderId(orderId)
-                .orElseThrow(() -> new AppException(ErrorCode.PAYMENT_NOT_FOUND));
+
+        // 주문Id로 Payment 조회 - 없을시 PAYMENT_NOT_FOUND 에러발생
+        Payment foundPayment = validatePaymentByOrderId(orderId);
 
         Long discountId = foundPayment.getDiscountId();
         log.info("💲 결제 완료 후 discountId [{}]", discountId);
@@ -330,14 +330,18 @@ public class PaymentService {
     }
 
     /**
-     * 해당 학원의 결제 완료한 내역들을 가져오기 위해 만든 메서드 (UI 용)
+     * UI용 메서드
+     * 해당 학원의 결제 완료한 내역들 가져오기
+     *
+     * @param academyId      학원 Id
+     * @param requestAccount 요청하는 직원 계정
      */
     public Page<CompletePaymentResponse> findAllCompletePayment(Long academyId, String requestAccount, Pageable pageable) {
 
-        //학원 체크
-        Academy foundAcademy = validateAcademy(academyId);
-        //요청한 직원 체크
-        validateAcademyEmployee(requestAccount, foundAcademy);
+        // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+        Academy foundAcademy = validateAcademyById(academyId);
+        // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
+        validateRequestEmployeeByAcademy(requestAccount, foundAcademy);
 
         List<CompletePaymentResponse> foundPayments = new ArrayList<>();
 
@@ -363,14 +367,20 @@ public class PaymentService {
     }
 
     /**
-     * 해당 학원에 특정 학생의 결제 내역을 가져오기 위해 만든 메서드 // 학생 이름 검색용 메서드(UI 용)
+     * UI용 메서드
+     * 해당 학원에 특정 학생의 결제 내역 가져오기
+     * (학생이름으로 검색)
+     *
+     * @param academyId      학원 Id
+     * @param requestAccount 요청하는 직원 계정
+     * @param studentName    학생 이름
      */
     public Page<CompletePaymentResponse> findAllCompletePaymentByStudent(Long academyId, String requestAccount, String studentName, Pageable pageable) {
 
-        //학원 체크
-        Academy foundAcademy = validateAcademy(academyId);
-        //요청한 직원 체크
-        validateAcademyEmployee(requestAccount, foundAcademy);
+        // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+        Academy foundAcademy = validateAcademyById(academyId);
+        // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
+        validateRequestEmployeeByAcademy(requestAccount, foundAcademy);
 
         Page<Student> foundStudents = studentRepository.findByAcademyIdAndName(academyId, studentName, pageable);
 
@@ -401,18 +411,22 @@ public class PaymentService {
     }
 
     /**
-     * 해당 학원에 특정 학생 (id로 찾기) 의 결제 완료 내역을 가져오기 위해 만든 메서드 학생 상세페이지용 (UI 용)
+     * UI용 메서드
+     * 해당 학원에 특정 학생의 결제 완료 내역 가져오기
+     * (id로 조회)
+     *
+     * @param academyId      학원 Id
+     * @param requestAccount 요청하는 직원 계정
+     * @param studentId      학생 Id
      */
     public Page<CompletePaymentResponse> findAllCompletePaymentByStudent(Long academyId, String requestAccount, Long studentId, Pageable pageable) {
 
-        //학원 체크
-        Academy foundAcademy = validateAcademy(academyId);
-        //요청한 직원 체크
-        validateAcademyEmployee(requestAccount, foundAcademy);
-
-        //학생 유효성 검사
-        Student foundStudent = studentRepository.findByAcademyIdAndId(academyId, studentId)
-                .orElseThrow(() -> new AppException(ErrorCode.STUDENT_NOT_FOUND));
+        // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+        Academy foundAcademy = validateAcademyById(academyId);
+        // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
+        validateRequestEmployeeByAcademy(requestAccount, foundAcademy);
+        // 학생Id와 학원 Id로 학생을 조회 - 없으면 STUDENT_NOT_FOUND 에러발생
+        Student foundStudent = validateStudentByIdAndAcademyId(academyId, studentId);
 
         // 아래 컬렉션에 정보를 담을 것임
         List<CompletePaymentResponse> foundPayments = new ArrayList<>();
@@ -440,21 +454,63 @@ public class PaymentService {
             }
         }
 
-
         return new PageImpl<>(foundPayments);
     }
 
-    private Academy validateAcademy(Long academyId) {
-        // 학원 존재 유무 확인
+
+    // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+    private Academy validateAcademyById(Long academyId) {
         Academy validatedAcademy = academyRepository.findById(academyId)
                 .orElseThrow(() -> new AppException(ErrorCode.ACADEMY_NOT_FOUND));
         return validatedAcademy;
     }
 
-    private Employee validateAcademyEmployee(String account, Academy academy) {
-        // 해당 학원 소속 직원 맞는지 확인
+    // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
+    public Employee validateRequestEmployeeByAcademy(String account, Academy academy) {
         Employee employee = employeeRepository.findByAccountAndAcademy(account, academy)
-                .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND));
         return employee;
+    }
+
+    // 학생 Id로 학생을 조회 - 없을시 STUDENT_NOT_FOUND 에러발생
+    public Student validateStudentById(Long studentId) {
+        Student validateStudent = studentRepository.findById(studentId)
+                .orElseThrow(() -> new AppException(ErrorCode.STUDENT_NOT_FOUND));
+        return validateStudent;
+    }
+
+    // 강좌 Id로 강좌를 조회 - 없을시 LECTURE_NOT_FOUND 에러발생
+    public Lecture validateLectureById(Long lectureId) {
+        Lecture validateLecture = lectureRepository.findById(lectureId)
+                .orElseThrow(() -> new AppException(ErrorCode.LECTURE_NOT_FOUND));
+        return validateLecture;
+    }
+
+    // 학생과 강좌로 수강이력을 조회 - 없을시 ENROLLMENT_NOT_FOUND 에러발생
+    public Enrollment validateEnrollmentByStudentAndLecture(Student foundStudent, Lecture foundLecture) {
+        Enrollment validateEnrollment = enrollmentRepository.findByStudentAndLecture(foundStudent, foundLecture)
+                .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
+        return validateEnrollment;
+    }
+
+    // 주문Id로 Payment 조회 - 없을시 PAYMENT_NOT_FOUND 에러발생
+    public Payment validatePaymentByOrderId(String orderId) {
+        Payment validatePayment = paymentRepository.findByOrderId(orderId)
+                .orElseThrow(() -> new AppException(ErrorCode.PAYMENT_NOT_FOUND));
+        return validatePayment;
+    }
+
+    // 학생Id와 학원 Id로 학생을 조회 - 없으면 STUDENT_NOT_FOUND 에러발생
+    public Student validateStudentByIdAndAcademyId(Long academyId, Long studentId) {
+        Student validateStudent = studentRepository.findByAcademyIdAndId(academyId, studentId)
+                .orElseThrow(() -> new AppException(ErrorCode.STUDENT_NOT_FOUND));
+        return validateStudent;
+    }
+
+    // 해당 직원의 권한 체크 - USER 이면 INVALID_PERMISSION 에러발생
+    public void validateAuthorityUser(Employee employee) {
+        if(employee.getEmployeeRole().equals(EmployeeRole.ROLE_USER)) {
+            throw new AppException(ErrorCode.INVALID_PERMISSION);
+        }
     }
 }

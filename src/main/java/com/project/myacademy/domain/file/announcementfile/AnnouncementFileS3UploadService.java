@@ -11,6 +11,7 @@ import com.project.myacademy.domain.announcement.Announcement;
 import com.project.myacademy.domain.announcement.AnnouncementRepository;
 import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.domain.employee.EmployeeRepository;
+import com.project.myacademy.domain.employee.EmployeeRole;
 import com.project.myacademy.domain.file.announcementfile.dto.CreateAnnouncementFileResponse;
 import com.project.myacademy.domain.file.announcementfile.dto.DeleteAnnoucementFileResponse;
 import com.project.myacademy.domain.file.announcementfile.dto.ReadAnnouncementFilesResponse;
@@ -51,29 +52,25 @@ public class AnnouncementFileS3UploadService {
     private String bucket;
 
     /**
-     * @param academyId         학원 id
-     * @param announcementId    파일 업로드 대상인 공지사항 id
-     * @param multipartFile     파일 업로드를 위한 객체
-     * @param account           파일 업로드 진행하는 직원 계정
+     * 공지사항 첨부파일 업로드
+     *
+     * @param academyId      학원 id
+     * @param announcementId 파일 업로드 대상인 공지사항 id
+     * @param multipartFile  파일 업로드를 위한 객체
+     * @param account        파일 업로드 진행하는 직원 계정
      */
     public CreateAnnouncementFileResponse UploadAnnouncementFile(Long academyId, Long announcementId, List<MultipartFile> multipartFile, String account) {
 
-        // 파일이 들어있는지 확인
+        // 빈 파일이 아닌지 확인, 파일 자체를 첨부안하거나 첨부해도 내용이 비어있는지 확인 - 비어있으면 FILE_NOT_EXISTS 에러발생
         validateFileExists(multipartFile);
-
-        // 학원 존재 유무 확인
-        Academy academy = validateAcademy(academyId);
-
-        // 업로드를 진행하는 직원이 해당 학원 소속 직원인지 확인
-        Employee employee = validateAcademyEmployee(account, academy);
-
-        // 직원이 공지사항 파일 업로드할 권한이 있는지 확인 (강사 외 모든 직원 가능)
-        if(Employee.isTeacherAuthority(employee)) {
-            throw new AppException(ErrorCode.INVALID_PERMISSION);
-        }
-
-        // 파일 업로드 대상인 공지사항 존재 유무 확인
-        Announcement announcement = validateAnnouncement(announcementId);
+        // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+        Academy academy = validateAcademyById(academyId);
+        // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
+        Employee employee = validateRequestEmployeeByAcademy(account, academy);
+        // 해당 직원의 권한 체크 - USER 이면 INVALID_PERMISSION 에러발생
+        validateAuthorityUser(employee);
+        //공지사항 Id로 공지사항 조회 - 없으면 ANNOUNCEMENT_NOT_FOUND 에러발생
+        Announcement announcement = validateAnnouncementById(announcementId);
 
         // 원본 파일 이름, S3에 저장될 파일 이름 리스트
         List<String> originalFileNameList = new ArrayList<>();
@@ -123,30 +120,26 @@ public class AnnouncementFileS3UploadService {
     }
 
     /**
-     * @param academyId             학원 id
-     * @param announcementId        파일 업로드 대상인 공지사항 id
-     * @param announcementFileId    공지사항 파일 id
-     * @param filePath              S3버킷 폴더 이하의 디렉토리 경로
-     * @param account               파일 삭제 진행하는 직원 계정
+     * 공지사항 첨부파일 삭제
+     *
+     * @param academyId          학원 id
+     * @param announcementId     파일 업로드 대상인 공지사항 id
+     * @param announcementFileId 공지사항 파일 id
+     * @param filePath           S3버킷 폴더 이하의 디렉토리 경로
+     * @param account            파일 삭제 진행하는 직원 계정
      */
     public DeleteAnnoucementFileResponse deleteAnnouncementFile(Long academyId, Long announcementId, Long announcementFileId, String filePath, String account) {
 
-        // 학원 존재 유무 확인
-        Academy academy = validateAcademy(academyId);
-
-        // 파일 삭제를 진행하는 직원이 해당 학원 소속 직원인지 확인
-        Employee employee = validateAcademyEmployee(account, academy);
-
-        // 직원이 공지사항 파일 삭제할 권한이 있는지 확인 (강사 외 모든 직원 가능)
-        if(Employee.isTeacherAuthority(employee)) {
-            throw new AppException(ErrorCode.INVALID_PERMISSION);
-        }
-
-        // 파일 업로드 대상인 공지사항 존재 유무 확인
-        validateAnnouncement(announcementId);
-
-        // 파일 존재 유무 확인
-        AnnouncementFile announcementFile = validateAnnouncementFile(announcementFileId);
+        // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+        Academy academy = validateAcademyById(academyId);
+        // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
+        Employee employee = validateRequestEmployeeByAcademy(account, academy);
+        // 해당 직원의 권한 체크 - USER 이면 INVALID_PERMISSION 에러발생
+        validateAuthorityUser(employee);
+        // 공지사항 Id로 공지사항 조회 - 없으면 ANNOUNCEMENT_NOT_FOUND 에러발생
+        validateAnnouncementById(announcementId);
+        // 공지사항파일 Id로 공지사항파일 조회 - 없으면 ANNOUNCEMENT_FILE_NOT_FOUND 에러발생
+        AnnouncementFile announcementFile = validateAnnouncementFileById(announcementFileId);
 
         try {
             // S3 업로드 파일 삭제
@@ -159,26 +152,27 @@ public class AnnouncementFileS3UploadService {
         } catch (SdkClientException e) {
             e.printStackTrace();
         }
+
         return DeleteAnnoucementFileResponse.of(employee);
     }
 
     /**
-     * @param academyId         학원 id
-     * @param announcementId    파일 업로드 대상인 공지사항 id
-     * @param fileUrl           S3버킷에 저장된 객체의 전체 URL
-     * @param account           파일 다운로드 진행하는 직원 계정
+     * 공지사항 첨부파일 다운로드
+     *
+     * @param academyId      학원 id
+     * @param announcementId 파일 업로드 대상인 공지사항 id
+     * @param fileUrl        S3버킷에 저장된 객체의 전체 URL
+     * @param account        파일 다운로드 진행하는 직원 계정
      */
     @Transactional(readOnly = true)
     public ResponseEntity<byte[]> downloadAnnouncementFile(Long academyId, Long announcementId, String fileUrl, String account) throws IOException {
 
-        // 학원 존재 유무 확인
-        Academy academy = validateAcademy(academyId);
-
-        // 업로드를 진행하는 직원이 해당 학원 소속 직원인지 확인
-        validateAcademyEmployee(account, academy);
-
-        // 파일 업로드 대상인 공지사항 존재 유무 확인
-        validateAnnouncement(announcementId);
+        // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+        Academy academy = validateAcademyById(academyId);
+        // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
+        validateRequestEmployeeByAcademy(account, academy);
+        // 공지사항 Id로 공지사항 조회 - 없으면 ANNOUNCEMENT_NOT_FOUND 에러발생
+        validateAnnouncementById(announcementId);
 
         // S3 객체 추출해서 byte 배열로 변환
         S3Object s3Object = amazonS3Client.getObject(new GetObjectRequest(bucket, fileUrl));
@@ -202,7 +196,7 @@ public class AnnouncementFileS3UploadService {
         String encodedFileName = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
         log.info("encodedFileName : {}", encodedFileName);
 
-        httpHeaders.setContentDispositionFormData("attachment",encodedFileName);
+        httpHeaders.setContentDispositionFormData("attachment", encodedFileName);
 
         return new ResponseEntity<>(bytes, httpHeaders, HttpStatus.OK);
     }
@@ -210,48 +204,58 @@ public class AnnouncementFileS3UploadService {
 
     /**
      * s3 버킷에 저장된 프로필 객체 url 가져오는 메서드
+     *
      * @param announcementId 찾고자 하는 직원의 id
      */
     @Transactional(readOnly = true)
     public List<ReadAnnouncementFilesResponse> getStoredUrls(Long announcementId) {
 
         return announcementFileRepository.findByAnnouncement_Id(announcementId)
-                .stream().map(announcementFile -> new ReadAnnouncementFilesResponse(announcementFile.getStoredFileUrl(),announcementFile.getUploadFileName())).collect(Collectors.toList());
+                .stream().map(announcementFile -> new ReadAnnouncementFilesResponse(announcementFile.getStoredFileUrl(), announcementFile.getUploadFileName())).collect(Collectors.toList());
 
     }
 
-    private Academy validateAcademy(Long academyId) {
-        // 학원 존재 유무 확인
+    // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+    private Academy validateAcademyById(Long academyId) {
         Academy validatedAcademy = academyRepository.findById(academyId)
                 .orElseThrow(() -> new AppException(ErrorCode.ACADEMY_NOT_FOUND));
         return validatedAcademy;
     }
 
-    private Employee validateAcademyEmployee(String account, Academy academy) {
-        // 해당 학원 소속 직원 맞는지 확인
+    // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
+    public Employee validateRequestEmployeeByAcademy(String account, Academy academy) {
         Employee employee = employeeRepository.findByAccountAndAcademy(account, academy)
-                .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND));
         return employee;
     }
 
-    private Announcement validateAnnouncement(Long announcementId) {
+    // 공지사항 Id로 공지사항 조회 - 없으면 ANNOUNCEMENT_NOT_FOUND 에러발생
+    private Announcement validateAnnouncementById(Long announcementId) {
         Announcement validatedAnnouncement = announcementRepository.findById(announcementId)
                 .orElseThrow(() -> new AppException(ErrorCode.ANNOUNCEMENT_NOT_FOUND));
         return validatedAnnouncement;
     }
 
-    private AnnouncementFile validateAnnouncementFile(Long announcementFileId) {
+    // 공지사항파일 Id로 공지사항파일 조회 - 없으면 ANNOUNCEMENT_FILE_NOT_FOUND 에러발생
+    private AnnouncementFile validateAnnouncementFileById(Long announcementFileId) {
         AnnouncementFile validatedAnnouncementFile = announcementFileRepository.findById(announcementFileId)
                 .orElseThrow(() -> new AppException(ErrorCode.ANNOUNCEMENT_FILE_NOT_FOUND));
         return validatedAnnouncementFile;
     }
 
-    // 빈 파일이 아닌지 확인, 파일 자체를 첨부안하거나 첨부해도 내용이 비어있으면 에러 발생
+    // 빈 파일이 아닌지 확인, 파일 자체를 첨부안하거나 첨부해도 내용이 비어있는지 확인 - 비어있으면 FILE_NOT_EXISTS 에러발생
     private void validateFileExists(List<MultipartFile> multipartFile) {
-        for(MultipartFile mf : multipartFile) {
+        for (MultipartFile mf : multipartFile) {
             if (mf.isEmpty()) {
                 throw new AppException(ErrorCode.FILE_NOT_EXISTS);
             }
+        }
+    }
+
+    // 해당 직원의 권한 체크 - USER 이면 INVALID_PERMISSION 에러발생
+    public void validateAuthorityUser(Employee employee) {
+        if (employee.getEmployeeRole().equals(EmployeeRole.ROLE_USER)) {
+            throw new AppException(ErrorCode.INVALID_PERMISSION);
         }
     }
 
