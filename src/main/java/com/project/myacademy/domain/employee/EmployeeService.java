@@ -19,8 +19,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.mail.MessagingException;
-
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -319,6 +317,7 @@ public class EmployeeService {
 
         return employeeRepository.findAllEmployee(foundAcademy, pageable).map(ReadAllEmployeeResponse::of);
     }
+
 
 
     /**
