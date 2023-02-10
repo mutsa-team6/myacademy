@@ -14,14 +14,19 @@ import com.project.myacademy.domain.waitinglist.WaitinglistRepository;
 import com.project.myacademy.global.exception.AppException;
 import com.project.myacademy.global.exception.ErrorCode;
 import com.project.myacademy.global.util.EmailUtil;
+import com.sun.mail.smtp.SMTPAddressFailedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.mail.MailException;
+import org.springframework.mail.MailSendException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.mail.MessagingException;
+import javax.mail.SendFailedException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -85,9 +90,16 @@ public class EnrollmentService {
 
         // 학생의 이메일로 메시지 전송
         String email = student.getEmail();
-        String subject = String.format("MyAcademy 수강 등록 안내 메일");
+        String subject = "MyAcademy 수강 등록 안내 메일";
         String body = String.format("%s님의 %s 수강 등록이 정상적으로 완료되었습니다.%n%n감사합니다.", student.getName(), lecture.getName());
-        emailUtil.sendEmail(email, subject, body);
+
+        try {
+            emailUtil.sendEmail(email, subject, body);
+        } catch (MailException e2){
+            log.info("이메일 전송 에러 발생 [{}]", e2.getMessage());
+        } catch (MessagingException e) {
+            log.info("이메일 전송 에러 발생 [{}]", e.getMessage());
+        }
 
         return CreateEnrollmentResponse.of(savedEnrollment.getId());
     }
@@ -179,8 +191,13 @@ public class EnrollmentService {
         String email = student.getEmail();
         String subject = String.format("MyAcademy 수강 취소 안내 메일");
         String body = String.format("%s님의 %s 수강 취소 신청이 정상적으로 처리되었습니다.%n%n감사합니다.", student.getName(), lecture.getName());
-        emailUtil.sendEmail(email, subject, body);
-
+        try {
+            emailUtil.sendEmail(email, subject, body);
+        } catch (MailException e2){
+            log.info("이메일 전송 에러 발생 [{}]", e2.getMessage());
+        } catch (MessagingException e) {
+            log.info("이메일 전송 에러 발생 [{}]", e.getMessage());
+        }
         // 현재 등록인원 -1
         lecture.minusCurrentEnrollmentNumber();
 
@@ -348,7 +365,7 @@ public class EnrollmentService {
 
     // 해당 직원의 권한 체크 - USER 이면 INVALID_PERMISSION 에러발생
     public void validateAuthorityUser(Employee employee) {
-        if(employee.getEmployeeRole().equals(EmployeeRole.ROLE_USER)) {
+        if (employee.getEmployeeRole().equals(EmployeeRole.ROLE_USER)) {
             throw new AppException(ErrorCode.INVALID_PERMISSION);
         }
     }
