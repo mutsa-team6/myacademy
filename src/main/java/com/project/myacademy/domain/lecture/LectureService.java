@@ -15,7 +15,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.format.TextStyle;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
@@ -180,6 +186,34 @@ public class LectureService {
         return foundLectures.map(ReadAllLectureResponse::of);
     }
 
+    public List<ReadAllLectureResponse> readAllTodayLectures(Long academyId, String account, Pageable pageable) {
+
+        // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+        Academy academy = validateAcademyById(academyId);
+        // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
+        validateRequestEmployeeByAcademy(account, academy);
+
+        LocalDate today = LocalDate.now();
+        DayOfWeek dayOfWeek = today.getDayOfWeek();
+        String koreanDay = dayOfWeek.getDisplayName(TextStyle.NARROW, Locale.KOREA);
+
+        List<ReadAllLectureResponse> lecturesList = new ArrayList<>();
+        Page<Lecture> foundLectures = lectureRepository.findByAcademyIdAndFinishDateGreaterThanOrderByCreatedAtDesc(academyId, LocalDate.now(), pageable);
+        for (Lecture foundLecture : foundLectures) {
+
+            String lectureDay = foundLecture.getLectureDay();
+
+            if (lectureDay.length() == 1 && lectureDay.equals(koreanDay)) {
+                lecturesList.add(ReadAllLectureResponse.of(foundLecture));
+            } else {
+                if (Arrays.asList(lectureDay.split(",")).contains(koreanDay)) {
+                    lecturesList.add(ReadAllLectureResponse.of(foundLecture));
+                }
+            }
+        }
+
+        return lecturesList;
+    }
 
     // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
     private Academy validateAcademyById(Long academyId) {

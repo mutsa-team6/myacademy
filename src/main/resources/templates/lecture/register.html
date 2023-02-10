@@ -20,8 +20,8 @@
 <!-- header -->
 <th:block th:replace="layout/header :: headerFragment"></th:block>
 
+<th:block th:replace="layout/bodyStyle :: bodyStyleFragment"></th:block>
 
-<body class="g-sidenav-show  bg-gray-100">
 
 <!-- side bar -->
 <th:block th:replace="layout/aside :: asideFragment"></th:block>
@@ -363,9 +363,9 @@
                 document.querySelectorAll(query);
             let result = '';
             selectedEls.forEach((el) => {
-                result += el.value + ', ';
+                result += el.value + ',';
             });
-            let day = result.substring(0, result.length - 2);
+            let day = result.substring(0, result.length - 1);
 
             console.log(result);
             console.log(day);

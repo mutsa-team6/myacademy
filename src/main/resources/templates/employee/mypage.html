@@ -5,7 +5,7 @@
 <th:block th:replace="layout/header :: headerFragment"></th:block>
 
 
-<body class="g-sidenav-show  bg-gray-100">
+<th:block th:replace="layout/bodyStyle :: bodyStyleFragment"></th:block>
 
 <!-- side bar -->
 <th:block th:replace="layout/aside :: asideFragment"></th:block>
@@ -86,26 +86,33 @@
                                             aria-controls="collapseExample">
                                         프로필 사진 변경
                                     </button>
+                                    <th:block th:if="${employee.account =='admin'}">
+
+                                    <button class="btn btn-info" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapseExample1" aria-expanded="false"
+                                            aria-controls="collapseExample1">
+                                        학원 프로필 사진 변경
+                                    </button>
+                                    </th:block>
                                     <div class="collapse" id="collapseExample">
                                         <div class="text-center">
                                             <div class="filebox">
                                                 <div class="row">
-                                                    <div class="col-3">
+                                                    <div class="col-2">
                                                     </div>
                                                     <div class="col-4">
-                                                        <input type="text" class="form-control mt-1" value="첨부파일"
-                                                               placeholder="첨부파일"
+                                                        <input type="text" class="form-control mt-1" value="프로필 사진 첨부파일"
+                                                               placeholder="프로필 사진 첨부파일"
                                                                aria-label="Username" aria-describedby="basic-addon1"
                                                                id="input-fileName" readonly>
                                                     </div>
-                                                    <div class="col-2">
+                                                    <div class="col-4">
                                                         <div class="mt-2">
                                                             <label for="input-file"
                                                                    style="margin-top: auto">파일찾기</label>
                                                         </div>
                                                     </div>
-                                                    <div class="col-3">
-                                                    </div>
+
 
                                                     <input type="file" id="input-file">
                                                 </div>
@@ -117,6 +124,37 @@
                                         </div>
                                     </div>
 
+                                    <th:block th:if="${employee.account =='admin'}">
+                                    <div class="collapse" id="collapseExample1">
+                                        <div class="text-center">
+                                            <div class="filebox">
+                                                <div class="row">
+                                                    <div class="col-2">
+                                                    </div>
+                                                    <div class="col-4">
+                                                        <input type="text" class="form-control mt-1" value="학원 프로필 사진 첨부파일"
+                                                               placeholder="학원 프로필 사진 첨부파일"
+                                                               aria-label="Username" aria-describedby="basic-addon1"
+                                                               id="input-fileName2" readonly>
+                                                    </div>
+                                                    <div class="col-4">
+                                                        <div class="mt-2">
+                                                            <label for="input-file2"
+                                                                   style="margin-top: auto">파일찾기</label>
+                                                        </div>
+                                                    </div>
+
+
+                                                    <input type="file" id="input-file2">
+                                                </div>
+                                            </div>
+                                            <button type="button" class="btn btn-primary btn-sm"
+                                                    th:onclick="|mypage.fileUploadAcademy()|"
+                                            >이미지 업로드
+                                            </button>
+                                        </div>
+                                    </div>
+                                    </th:block>
                                 </div>
                                 <div class="col-md-2">
                                 </div>
@@ -352,6 +390,10 @@
             $("#input-fileName").val(fileName);
         });
 
+        $("#input-file2").on('change', function () {
+            var fileName2 = $("#input-file2").val();
+            $("#input-fileName2").val(fileName2);
+        });
         let employeeId = document.getElementById('employeeId').value;
         let academyId = document.getElementById('academyId').value;
         console.log('academyId' + academyId);
@@ -412,6 +454,32 @@
                 }).catch((error) => {
                     console.log(error);
 
+                });
+
+            },
+
+            fileUploadAcademy: function () {
+                let data = {
+                    multipartFile: document.querySelector("#input-file2").value.trim(),
+                };
+
+                console.log(data);
+                var frm = new FormData();
+                var image = document.getElementById("input-file2");
+                frm.append("multipartFile", image.files[0]);
+
+
+                axios.post("/api/v1/academies/" + academyId + "/files/upload",
+                    frm, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data'
+                        }
+                    }).then((response) => {
+                    console.log(response);
+                    alert("학원 프로필 이미지 업로드 성공");
+                    window.location.reload();
+                }).catch((error) => {
+                    console.log(error);
                 });
 
             },

@@ -19,8 +19,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
-
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -315,12 +313,11 @@ public class EmployeeService {
     }
 
 
-
     /**
      * ADMIN 회원은 본인 탈퇴 불가
      *
      * @param requestAccount 탈퇴 요청한 계정명
-     * @param academyId 학원 Id
+     * @param academyId      학원 Id
      */
     @Transactional
     public DeleteEmployeeResponse selfDeleteEmployee(String requestAccount, Long academyId) {
@@ -350,7 +347,7 @@ public class EmployeeService {
      * 계정명, 등급은 본인이 변경 불가
      *
      * @param requestAccount 정보변경을 요청한 직원 계정
-     * @param academyId 학원 Id
+     * @param academyId      학원 Id
      */
     @Transactional
     public UpdateEmployeeResponse updateEmployee(UpdateEmployeeRequest request, String requestAccount, Long academyId) {
@@ -457,6 +454,15 @@ public class EmployeeService {
 
         return new ChangeRoleEmployeeResponse(employeeId, foundEmployee.getAccount() + " 계정의 권한을 " + changedRole + "로 변경했습니다");
 
+    }
+
+    /**
+     * 학원 별, 직원 수 구하는 메서드 (UI 용)
+     */
+
+    public Long countEmployeesByAcademy(Long academyId) {
+        Academy academy = validateAcademyById(academyId);
+        return employeeRepository.countByAcademy(academy);
     }
 
     // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
