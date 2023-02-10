@@ -102,7 +102,7 @@
                                     <br>
                                     <p class="mb-0" style="font-weight: bold;color: #5A2060">③ 사용할 계정명과 비밀번호를 입력해주세요.</p>
                                     <p class="text-uppercase text-secondary text-xs font-weight-bolder "
-                                       style="font-weight: bold;color: #5A2060">비밀번호는 최소 8자, 하나 이상의 문자와 하나의 숫자를 포함해야합니다.</p>
+                                       style="font-weight: bold;color: #5A2060">비밀번호는 최소 8자, 하나 이상의 문자와 숫자를 포함해야합니다.</p>
                                     <br>
                                     <div class="card-body">
                                         <div class="input-group input-group-outline mb-3">
@@ -315,7 +315,7 @@
                 return;
             }
             if (password_pattern.test(data.password) == false) {
-                alert('비밀번호는 최소 8자, 하나 이상의 문자와 하나의 숫자를 포함해야합니다.');
+                alert('비밀번호는 최소 8자, 하나 이상의 문자와 숫자를 포함해야합니다.');
                 document.querySelector("input[name=employeePassword]").focus();
                 return;
             }

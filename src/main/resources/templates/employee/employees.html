@@ -108,8 +108,10 @@
                                                       th:text="${employee.account}"></span>
                                             </th>
                                             <th class="align-middle text-center">
+                                                <a th:href="@{/academy/lecture/register(teacherId=${employee.id})}">
                                                 <span class=" text font-weight-bold"
                                                       th:text="${employee.name}"></span>
+                                                </a>
                                             </th>
                                             <th class="align-middle text-center">
                                                 <span class=" text font-weight-bold"
@@ -147,7 +149,7 @@
                                             <th:block th:if="${employee.subject =='직원'}">
                                                 <th class="align-middle text-center">
                                                 <span class=" text font-weight-bold"
-                                                      > </span>
+                                                > </span>
                                                 </th>
 
                                             </th:block>
