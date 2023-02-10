@@ -176,6 +176,11 @@ public class StudentService {
 
     }
 
+    public Long countStudentByAcademy(Long academyId) {
+        validateAcademyById(academyId);
+        return studentRepository.countStudentByAcademyId(academyId);
+    }
+
     // 학생이 등록되어 있는지 확인 - 없으면 STUDENT_NOT_FOUND 에러발생
     private Student validateStudentById(Long academyId, Long studentId) {
         Student student = studentRepository.findByAcademyIdAndId(academyId, studentId)

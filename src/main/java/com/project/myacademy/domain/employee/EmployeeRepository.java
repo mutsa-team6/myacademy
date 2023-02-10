@@ -22,4 +22,6 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     Page<Employee> findAllTeacher(@Param("academy") Academy academy, Pageable pageable);
 
     Optional<Employee> findByEmail(String requestEmployeeEmail);
+
+    Long countByAcademy(Academy academy);
 }
