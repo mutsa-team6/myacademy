@@ -51,7 +51,7 @@ public class EmployeeRestController {
 
     @Tag(name = "02-2. 직원", description = "직원 로그인,계정 및 비밀번호 찾기, 변경")
     @Operation(summary = "직원 로그인", description =
-            "회원가입된 계정과 비밀번호로 로그인합니다. \n\n 로그인시 쿠키에 토큰이 담김니다.")
+            "회원가입된 계정과 비밀번호로 로그인합니다. \n\n 로그인시 쿠키에 토큰이 저장됩니다.")
     @PostMapping("/{academyId}/employees/login")
     public ResponseEntity login(@PathVariable Long academyId, @RequestBody LoginEmployeeRequest request, HttpServletRequest httpRequest, HttpServletResponse httpServletResponse) {
 
