@@ -15,9 +15,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.mail.MailException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.mail.MessagingException;
 
 @Service
 @RequiredArgsConstructor
@@ -195,9 +198,10 @@ public class EmployeeService {
 
         try {
             emailUtil.sendEmail(email, title, body);
-        }catch (MessagingException e) {
+        } catch (MailException e2){
+            log.info("이메일 전송 에러 발생 [{}]", e2.getMessage());
+        } catch (MessagingException e) {
             log.info("이메일 전송 에러 발생 [{}]", e.getMessage());
-
         }
 
         return FindPasswordEmployeeResponse.of(changedEmployee);
