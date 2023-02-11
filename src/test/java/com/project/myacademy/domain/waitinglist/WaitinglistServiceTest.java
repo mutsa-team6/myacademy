@@ -103,7 +103,7 @@ class WaitinglistServiceTest {
 
         @Test
         @DisplayName("대기번호 리스트 조회 성공")
-        public void readAllWaitingList_success() {
+        void readAllWaitingList_success() {
 
             PageImpl<Waitinglist> waitingLists = new PageImpl<>(List.of(waitinglist, waitinglist2));
 
@@ -124,7 +124,7 @@ class WaitinglistServiceTest {
 
         @Test
         @DisplayName("대기번호 리스트 조회 실패(1) - 학원이 존재하지 않을 때")
-        public void readAllWaitingList_fail1() {
+        void readAllWaitingList_fail1() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.empty());
 
@@ -139,7 +139,7 @@ class WaitinglistServiceTest {
 
         @Test
         @DisplayName("대기번호 리스트 조회 실패(2) - 조회 진행하는 직원이 해당 학원 소속이 아닐 때")
-        public void readAllWaitingList_fail2() {
+        void readAllWaitingList_fail2() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.empty());
@@ -156,7 +156,7 @@ class WaitinglistServiceTest {
 
         @Test
         @DisplayName("강좌의 대기번호 수 조회 성공")
-        public void countWaitingList_ByLecture_success() {
+        void countWaitingList_ByLecture_success() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(employee));
@@ -175,7 +175,7 @@ class WaitinglistServiceTest {
 
         @Test
         @DisplayName("강좌의 대기번호 수 조회 실패(1) - 학원이 존재하지 않을 때")
-        public void countWaitingList_ByLecture_fail1() {
+        void countWaitingList_ByLecture_fail1() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.empty());
 
@@ -190,7 +190,7 @@ class WaitinglistServiceTest {
 
         @Test
         @DisplayName("강좌의 대기번호 수 조회 실패(2) - 조회 진행하는 직원이 해당 학원 소속이 아닐 때")
-        public void countWaitingList_ByLecture_fail2() {
+        void countWaitingList_ByLecture_fail2() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.empty());
@@ -207,7 +207,7 @@ class WaitinglistServiceTest {
 
         @Test
         @DisplayName("강좌의 대기번호 수 조회 실패(3) - 대기번호 조회 대상인 강좌가 존재하지 않을 때")
-        public void countWaitingList_ByLecture_fail3() {
+        void countWaitingList_ByLecture_fail3() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(employee));
@@ -231,7 +231,7 @@ class WaitinglistServiceTest {
 
         @Test
         @DisplayName("등록 성공")
-        public void createWaitingList_success() throws MessagingException {
+        void createWaitingList_success() throws MessagingException {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
@@ -262,7 +262,7 @@ class WaitinglistServiceTest {
 
         @Test
         @DisplayName("등록 실패(1) - 학원이 존재하지 않을 때")
-        public void createWaitingList_fail1() {
+        void createWaitingList_fail1() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.empty());
 
@@ -277,7 +277,7 @@ class WaitinglistServiceTest {
 
         @Test
         @DisplayName("등록 실패(2) - 등록 진행하는 직원이 해당 학원 소속이 아닐 때")
-        public void createWaitingList_fail2() {
+        void createWaitingList_fail2() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.empty());
@@ -294,7 +294,7 @@ class WaitinglistServiceTest {
 
         @Test
         @DisplayName("등록 실패(3) - 대기번호에 등록될 학생이 존재하지 않을 때")
-        public void createWaitingList_fail3() {
+        void createWaitingList_fail3() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
@@ -313,7 +313,7 @@ class WaitinglistServiceTest {
 
         @Test
         @DisplayName("등록 실패(4) - 대기번호에 등록될 강좌가 존재하지 않을 때")
-        public void createWaitingList_fail4() {
+        void createWaitingList_fail4() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
@@ -334,7 +334,7 @@ class WaitinglistServiceTest {
 
         @Test
         @DisplayName("등록 실패(5) - 직원이 대기번호를 등록할 권한이 아닐 때")
-        public void createWaitingList_fail5() {
+        void createWaitingList_fail5() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
@@ -357,7 +357,7 @@ class WaitinglistServiceTest {
 
 //        @Test
 //        @DisplayName("등록 실패(6) - 최대 수강 정원보다 적어서 수강 등록으로 진행해야 할 때")
-//        public void createWaitingList_fail6() {
+//        void createWaitingList_fail6() {
 //
 ////            ReflectionTestUtils.setField(mockLecture, Lecture.class, "currentEnrollmentNumber", 15, Integer.class);
 ////            ReflectionTestUtils.setField(lecture, Lecture.class, "maximumCapacity", 10, Integer.class);
@@ -391,7 +391,7 @@ class WaitinglistServiceTest {
 
         @Test
         @DisplayName("등록 실패(7) - 이미 수강 등록 되어 있는 경우")
-        public void createWaitingList_fail7() {
+        void createWaitingList_fail7() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
@@ -418,7 +418,7 @@ class WaitinglistServiceTest {
 
         @Test
         @DisplayName("등록 실패(8) - 대기번호가 중복 등록되어 있는 경우")
-        public void createWaitingList_fail8() {
+        void createWaitingList_fail8() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
@@ -452,7 +452,7 @@ class WaitinglistServiceTest {
 
         @Test
         @DisplayName("삭제 성공")
-        public void deleteWaitinglist_success() throws MessagingException {
+        void deleteWaitinglist_success() throws MessagingException {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
@@ -477,7 +477,7 @@ class WaitinglistServiceTest {
 
         @Test
         @DisplayName("삭제 실패(1) - 학원이 존재하지 않을 때")
-        public void deleteWaitinglist_fail1() {
+        void deleteWaitinglist_fail1() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.empty());
 
@@ -492,7 +492,7 @@ class WaitinglistServiceTest {
 
         @Test
         @DisplayName("삭제 실패(2) - 삭제 진행하는 직원이 해당 학원 소속이 아닐 때")
-        public void deleteWaitinglist_fail2() {
+        void deleteWaitinglist_fail2() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.empty());
@@ -509,7 +509,7 @@ class WaitinglistServiceTest {
 
         @Test
         @DisplayName("삭제 실패(3) - 학생이 존재하지 않을 때")
-        public void deleteWaitinglist_fail3() {
+        void deleteWaitinglist_fail3() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
@@ -528,7 +528,7 @@ class WaitinglistServiceTest {
 
         @Test
         @DisplayName("삭제 실패(4) - 강좌가 존재하지 않을 때")
-        public void deleteWaitinglist_fail4() {
+        void deleteWaitinglist_fail4() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
@@ -549,7 +549,7 @@ class WaitinglistServiceTest {
 
         @Test
         @DisplayName("삭제 실패(5) - 삭제할 대기번호가 존재하지 않을 때")
-        public void deleteWaitinglist_fail5() {
+        void deleteWaitinglist_fail5() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
@@ -572,7 +572,7 @@ class WaitinglistServiceTest {
 
         @Test
         @DisplayName("삭제 실패(6) - 직원이 대기번호를 삭제할 권한이 아닐 때")
-        public void deleteWaitinglist_fail6() {
+        void deleteWaitinglist_fail6() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
@@ -602,7 +602,7 @@ class WaitinglistServiceTest {
 
 //        @Test
 //        @DisplayName("성공")
-//        public void ui_success() {
+//        void ui_success() {
 //
 //            ReflectionTestUtils.setField(waitinglist, BaseEntity.class, "createdAt", LocalDateTime.of(2021, 12, 6, 12, 0), LocalDateTime.class);
 //            ReflectionTestUtils.setField(waitinglist2, BaseEntity.class, "createdAt", LocalDateTime.of(2021, 12, 6, 13, 0), LocalDateTime.class);
@@ -640,7 +640,7 @@ class WaitinglistServiceTest {
 
         @Test
         @DisplayName("실패(1) - 학원이 존재하지 않을 때")
-        public void ui_fail1() {
+        void ui_fail1() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.empty());
 
@@ -655,7 +655,7 @@ class WaitinglistServiceTest {
 
         @Test
         @DisplayName("실패(2) - 직원이 해당 학원 소속이 아닐 때")
-        public void ui_fail2() {
+        void ui_fail2() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.empty());
@@ -672,7 +672,7 @@ class WaitinglistServiceTest {
 
         @Test
         @DisplayName("실패(3) - 강좌가 존재하지 않을 때")
-        public void ui_fail3() {
+        void ui_fail3() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
