@@ -32,8 +32,9 @@ public class Uniqueness extends BaseEntity {
     private Student student;
 
     private String author;
-    public void updateUniqueness(UpdateUniquenessRequest request) {
-        this.body = request.getBody();
+
+    public void updateUniqueness(String body) {
+        this.body = body;
     }
 
     public static Uniqueness toUniqueness(CreateUniquenessRequest request, Student student,String author) {

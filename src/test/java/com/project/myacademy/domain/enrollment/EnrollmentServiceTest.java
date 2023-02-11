@@ -169,7 +169,7 @@ class EnrollmentServiceTest {
             willDoNothing().given(emailUtil).sendEmail(anyString(), anyString(), anyString());
 
             CreateEnrollmentResponse savedEnrollment = enrollmentService.createEnrollment(academy.getId(), student.getId(), lecture.getId(), employee.getAccount());
-            assertThat(savedEnrollment.getEnrollmentIdId()).isEqualTo(1L);
+            assertThat(savedEnrollment.getEnrollmentId()).isEqualTo(1L);
             assertThat(savedEnrollment.getMessage()).isEqualTo("수강 등록 완료");
 
             then(academyRepository).should(times(1)).findById(anyLong());
