@@ -71,8 +71,7 @@ public class Employee extends BaseEntity {
 
     // 등록, 수정, 삭제 작업을 진행하는 직원의 권한을 확인하는 메서드
     public static boolean isTeacherAuthority(Employee employee) {
-        if (employee.getEmployeeRole().equals(ROLE_USER)) return true;
-        else return false;
+        return employee.getEmployeeRole().equals(ROLE_USER);
     }
 
     // ADMIN 권한 직원 등록
