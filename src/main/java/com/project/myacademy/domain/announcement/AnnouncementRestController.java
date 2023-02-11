@@ -2,6 +2,8 @@ package com.project.myacademy.domain.announcement;
 
 import com.project.myacademy.domain.announcement.dto.*;
 import com.project.myacademy.global.Response;
+import com.project.myacademy.global.exception.BindingException;
+import com.project.myacademy.global.exception.ErrorCode;
 import com.project.myacademy.global.util.AuthenticationUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -12,6 +14,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "03-1. 학원 공지사항", description = "학원 공지사항 작성,수정,조회")
@@ -28,7 +32,12 @@ public class AnnouncementRestController {
      */
     @Operation(summary = "공지사항 작성", description = "ADMIN,STAFF 회원만 작성이 가능합니다. \n\n TYPE 종류, 1. 일반 공지사항 = ANNOUNCEMENT, 2. 입시 정보 = ADMISSION")
     @PostMapping("/{academyId}/announcements")
-    public ResponseEntity<Response<CreateAnnouncementResponse>> create(@PathVariable Long academyId, @RequestBody CreateAnnouncementRequest request, Authentication authentication) {
+    public ResponseEntity<Response<CreateAnnouncementResponse>> create(@PathVariable Long academyId, @Validated @RequestBody CreateAnnouncementRequest request, BindingResult bindingResult, Authentication authentication) {
+
+        if (bindingResult.hasErrors()) {
+            throw new BindingException(ErrorCode.BINDING_ERROR, bindingResult.getFieldError().getDefaultMessage());
+        }
+
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
         CreateAnnouncementResponse response = announcementService.createAnnouncement(academyId, requestAccount, request);
         return ResponseEntity.ok().body(Response.success(response));
@@ -74,7 +83,12 @@ public class AnnouncementRestController {
      */
     @Operation(summary = "공지사항 수정", description = "ADMIN,STAFF 회원만 수정이 가능합니다.")
     @PutMapping("/{academyId}/announcements/{announcementId}")
-    public ResponseEntity<Response<UpdateAnnouncementResponse>> update(@PathVariable Long academyId, @PathVariable Long announcementId,@RequestBody UpdateAnnouncementRequest request, Authentication authentication) {
+    public ResponseEntity<Response<UpdateAnnouncementResponse>> update(@PathVariable Long academyId, @PathVariable Long announcementId, @Validated @RequestBody UpdateAnnouncementRequest request, BindingResult bindingResult, Authentication authentication) {
+
+        if (bindingResult.hasErrors()) {
+            throw new BindingException(ErrorCode.BINDING_ERROR, bindingResult.getFieldError().getDefaultMessage());
+        }
+
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
         UpdateAnnouncementResponse response = announcementService.updateAnnouncement(academyId, announcementId, request, requestAccount);
         return ResponseEntity.ok().body(Response.success(response));

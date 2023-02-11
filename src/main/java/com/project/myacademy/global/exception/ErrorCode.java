@@ -70,6 +70,8 @@ public enum ErrorCode {
     CANNOT_REGISTER_WAITINGLIST(HttpStatus.BAD_REQUEST, "아직 수강 정원이 다 차지 않아 수강 등록으로 진행해야 합니다."),
 
 
+    BINDING_ERROR(HttpStatus.FORBIDDEN,"유효하지 않은 Request Body 필드가 있습니다."),
+
     BLANK_NOT_ALLOWED(HttpStatus.FORBIDDEN,"NULL 값은 허용되지 않습니다."),
     EMPTY_SUBJECT_FORBIDDEN(HttpStatus.FORBIDDEN,"원장 · 강사 로 회원가입 시 담당 과목명을 입력해주세요."),
     EMPTY_EMPLOYEE_TYPE(HttpStatus.FORBIDDEN,"회원가입 시 사용자 유형 선택은 필수 입니다."),

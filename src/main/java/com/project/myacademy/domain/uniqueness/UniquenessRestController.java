@@ -30,6 +30,7 @@ public class UniquenessRestController {
     @PostMapping("/{academyId}/students/{studentId}/uniqueness")
     public ResponseEntity<Response<CreateUniquenessResponse>> create(@PathVariable Long academyId,
                                                                      @PathVariable Long studentId, @RequestBody CreateUniquenessRequest request, Authentication authentication) {
+
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
         CreateUniquenessResponse response = uniquenessService.createUniqueness(academyId, studentId, request, requestAccount);
         return ResponseEntity.ok().body(Response.success(response));

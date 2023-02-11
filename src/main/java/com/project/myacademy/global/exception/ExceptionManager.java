@@ -37,6 +37,13 @@ public class ExceptionManager {
                 .body(Response.error("ERROR", errorResponse));
     }
 
+    @ExceptionHandler(BindingException.class)
+    public ResponseEntity<?> bindingExceptionHandler(BindingException e) {
+        log.error("AppException : {}",e.getErrorCode());
+        ErrorResponse errorResponse = new ErrorResponse(e.getErrorCode(), e.getMessage());
+        return ResponseEntity.status(e.getErrorCode().getHttpStatus())
+                .body(Response.error("ERROR", errorResponse));
+    }
 
     /**
      * Security Chain 에서 발생하는 에러 응답 구성
