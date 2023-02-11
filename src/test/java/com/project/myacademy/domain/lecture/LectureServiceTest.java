@@ -1,5 +1,6 @@
 package com.project.myacademy.domain.lecture;
 
+import com.project.myacademy.domain.BaseEntity;
 import com.project.myacademy.domain.academy.Academy;
 import com.project.myacademy.domain.academy.AcademyRepository;
 import com.project.myacademy.domain.employee.Employee;
@@ -20,9 +21,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.test.util.ReflectionTestUtils;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.TextStyle;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -50,15 +56,19 @@ class LectureServiceTest {
     private Lecture lecture;
     private Employee mockEmployee;
     private Employee mockTeacher;
+    private Lecture mockLecture1;
+    private Lecture mockLecture2;
 
     @BeforeEach
     void setup() {
         academy = Academy.builder().id(1L).name("academy").owner("owner").build();
         employee = Employee.builder().id(1L).name("staff").email("email").account("account").password("password").employeeRole(EmployeeRole.ROLE_STAFF).academy(academy).build();
         teacher = Employee.builder().id(2L).name("teacher").email("email1").account("account1").employeeRole(EmployeeRole.ROLE_USER).academy(academy).build();
-        lecture = Lecture.builder().id(1L).name("lecture").price(10000).employee(teacher).build();
+        lecture = Lecture.builder().id(1L).name("lecture").price(10000).LectureDay("월").finishDate(LocalDate.now().plusDays(3)).employee(teacher).build();
         mockEmployee = mock(Employee.class);
         mockTeacher = mock(Employee.class);
+        mockLecture1 = mock(Lecture.class);
+        mockLecture2 = mock(Lecture.class);
     }
 
     @Nested
@@ -251,6 +261,58 @@ class LectureServiceTest {
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
         }
+
+//        @Test
+//        @DisplayName("금일 강좌 전체 조회 성공")
+//        public void readAllTodayLectures_success() {
+//
+//            Lecture lecture2 = Lecture.builder().id(2L).name("lecture2").price(10000).LectureDay("월").finishDate(LocalDate.now().plusDays(3)).employee(teacher).build();
+//            Page<Lecture> lectures = new PageImpl<>(List.of(lecture,lecture2));
+////            Page<Lecture> lectures = new PageImpl<>(List.of(mockLecture1,mockLecture2));
+//
+////            ReflectionTestUtils.setField(lecture, BaseEntity.class, "createdAt", LocalDateTime.of(2021, 12, 6, 12, 0), LocalDateTime.class);
+////            ReflectionTestUtils.setField(lecture2, BaseEntity.class, "createdAt", LocalDateTime.of(2021, 12, 6, 13, 0), LocalDateTime.class);
+//            ReflectionTestUtils.setField(mockLecture1, Lecture.class, "academyId", 1L, Long.class);
+//            ReflectionTestUtils.setField(mockLecture1, BaseEntity.class, "createdAt", LocalDateTime.of(2021, 12, 6, 12, 0), LocalDateTime.class);
+//            ReflectionTestUtils.setField(mockLecture1, Lecture.class, "LectureDay", "월",String.class);
+//            ReflectionTestUtils.setField(mockLecture1, Lecture.class, "finishDate", LocalDate.now().plusDays(3),LocalDate.class);
+//
+//            ReflectionTestUtils.setField(mockLecture2, Lecture.class, "academyId", 1L, Long.class);
+//            ReflectionTestUtils.setField(mockLecture2, BaseEntity.class, "createdAt", LocalDateTime.of(2021, 12, 6, 13, 0), LocalDateTime.class);
+//            ReflectionTestUtils.setField(mockLecture1, Lecture.class, "LectureDay", "월",String.class);
+//            ReflectionTestUtils.setField(mockLecture2, Lecture.class, "finishDate", LocalDate.now().plusDays(3),LocalDate.class);
+//
+//            LocalDate today = LocalDate.now();
+//            DayOfWeek dayOfWeek = today.getDayOfWeek();
+//            String koreanDay = dayOfWeek.getDisplayName(TextStyle.NARROW, Locale.KOREA);
+//
+//            given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
+//            given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(employee));
+//            given(lectureRepository.findByAcademyIdAndFinishDateGreaterThanOrderByCreatedAtDesc(academy.getId(), LocalDate.now(), pageable))
+//                    .willReturn(new PageImpl<>(List.of(mockLecture1, mockLecture2)));
+//
+//            given(mockLecture1.getLectureDay().length()).willReturn(1);
+//            given(mockLecture1.getLectureDay()).willReturn(koreanDay);
+//            given(mockLecture2.getLectureDay().length()).willReturn(1);
+//            given(mockLecture2.getLectureDay()).willReturn(koreanDay);
+//
+//
+//            List<ReadAllLectureResponse> response = lectureService.readAllTodayLectures(academy.getId(), employee.getAccount(), pageable);
+//
+//            assertThat(response.size()).isEqualTo(2);
+//        }
+//
+//        @Test
+//        @DisplayName("금일 강좌 전체 조회 실패(1) - 학원이 존재하지 않을 때")
+//        public void readAllTodayLectures_fail1() {
+//
+//        }
+//
+//        @Test
+//        @DisplayName("금일 강좌 전체 조회 실패(2) - 조회 진행하는 직원이 해당 학원 소속이 아닐 때")
+//        public void readAllTodayLectures_fail2() {
+//
+//        }
     }
 
     @Nested

@@ -32,11 +32,10 @@ public class EmployeeService {
     private final AcademyRepository academyRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final EmailUtil emailUtil;
-
     private final RefreshTokenRepository refreshTokenRepository;
-
     @Value("${jwt.token.secret}")
     private String secretKey;
+
     private long expiredTimeMs = 1000 * 60 * 30;
 
     /**
@@ -470,7 +469,6 @@ public class EmployeeService {
     /**
      * 학원 별, 직원 수 구하는 메서드 (UI 용)
      */
-
     public Long countEmployeesByAcademy(Long academyId) {
         Academy academy = validateAcademyById(academyId);
         return employeeRepository.countByAcademy(academy);
@@ -495,12 +493,6 @@ public class EmployeeService {
         Employee validateEmployee = employeeRepository.findByIdAndAcademy(employeeId, academy)
                 .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
         return validateEmployee;
-    }
-
-    // 계정이 등록된 계정인지 확인 - 없을시 NAME_NOT_FOUND 에러발생
-    private void validateEmployeeByName(String name) {
-        employeeRepository.findByName(name)
-                .orElseThrow(() -> new AppException(ErrorCode.NAME_NOT_FOUND));
     }
 
     // 가입을 요청한 계정과 학원으로 직원을 조회 - 있을시 DUPLICATED_ACCOUNT 에러발생

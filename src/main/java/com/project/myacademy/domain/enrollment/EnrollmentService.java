@@ -55,18 +55,20 @@ public class EnrollmentService {
      */
     public CreateEnrollmentResponse createEnrollment(Long academyId, Long studentId, Long lectureId, String account) {
 
-        // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+        // 등록하는 직원 존재 유무 확인(학원 존재 유무, 해당 학원 직원인지 확인)
         Academy academy = validateAcademyById(academyId);
-        // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
         Employee employee = validateRequestEmployeeByAcademy(account, academy);
-        // 학생 Id로 학생을 조회 - 없을시 STUDENT_NOT_FOUND 에러발생
-        Student student = validateStudentById(studentId);
-        // 강좌 Id로 강좌를 조회 - 없을시 LECTURE_NOT_FOUND 에러발생
-        Lecture lecture = validateLectureById(lectureId);
-        // 해당 직원의 권한 체크 - USER 이면 INVALID_PERMISSION 에러발생
-        validateAuthorityUser(employee);
 
-        // 학생과 강좌로 수강이력이 존재하는지 확인 - 있으면 DUPLICATED_ENROLLMENT 에러발생
+        // 학생, 강좌 존재 유무 확인
+        Student student = validateStudentById(studentId);
+        Lecture lecture = validateLectureById(lectureId);
+
+        // 직원이 수강을 개설할 권한이 있는지 확인(강사만 불가능)
+        if (Employee.isTeacherAuthority(employee)) {
+            throw new AppException(ErrorCode.INVALID_PERMISSION);
+        }
+
+        // 수강 이력 중복 확인
         enrollmentRepository.findByStudentAndLecture(student, lecture)
                 .ifPresent((enrollment -> {
                     throw new AppException(ErrorCode.DUPLICATED_ENROLLMENT);
@@ -113,9 +115,8 @@ public class EnrollmentService {
     @Transactional(readOnly = true)
     public Page<ReadAllEnrollmentResponse> readAllEnrollments(Long academyId, String account, Pageable pageable) {
 
-        // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+        // 조회 주체 권한 확인(학원 존재 유무, 해당 학원 직원인지 확인)
         Academy academy = validateAcademyById(academyId);
-        // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
         validateRequestEmployeeByAcademy(account, academy);
 
         Page<Enrollment> enrollments = enrollmentRepository.findAll(pageable);
@@ -135,18 +136,18 @@ public class EnrollmentService {
      */
     public UpdateEnrollmentResponse updateEnrollment(Long academyId, Long studentId, Long lectureId, Long enrollmentId, UpdateEnrollmentRequest request, String account) {
 
-        // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+        // 수정 진행하는 직원 유무 존재(학원 존재 유무, 해당 학원 직원인지 확인)
         Academy academy = validateAcademyById(academyId);
-        // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
         Employee employee = validateRequestEmployeeByAcademy(account, academy);
         // 학생 Id로 학생을 조회 - 없을시 STUDENT_NOT_FOUND 에러발생재 유무 확인
         validateStudentById(studentId);
-        // 강좌 Id로 강좌를 조회 - 없을시 LECTURE_NOT_FOUND 에러발생
         validateLectureById(lectureId);
-        // 수강이력 Id로 수강이력을 조회 - 없을시 ENROLLMENT_NOT_FOUND 에러발생
         Enrollment enrollment = validateEnrollmentById(enrollmentId);
-        // 해당 직원의 권한 체크 - USER 이면 INVALID_PERMISSION 에러발생
-        validateAuthorityUser(employee);
+
+        // 직원이 수강을 수정할 권한이 있는지 확인(강사만 불가능)
+        if (Employee.isTeacherAuthority(employee)) {
+            throw new AppException(ErrorCode.INVALID_PERMISSION);
+        }
 
         // 수강 이력 정보 수정
         enrollment.updateEnrollment(employee, request);
@@ -165,18 +166,19 @@ public class EnrollmentService {
      */
     public DeleteEnrollmentResponse deleteEnrollment(Long academyId, Long studentId, Long lectureId, Long enrollmentId, CreateEnrollmentRequest request, String account) {
 
-        // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+        // 삭제 진행하는 직원 권한 확인(학원 존재 유무, 해당 학원 직원인지 확인)
         Academy academy = validateAcademyById(academyId);
-        // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
         Employee employee = validateRequestEmployeeByAcademy(account, academy);
-        // 학생 Id로 학생을 조회 - 없을시 STUDENT_NOT_FOUND 에러발생
+
+        // 학생, 강좌, 수강 존재 유무 확인
         Student student = validateStudentById(studentId);
-        // 강좌 Id로 강좌를 조회 - 없을시 LECTURE_NOT_FOUND 에러발생
         Lecture lecture = validateLectureById(lectureId);
-        // 수강이력 Id로 수강이력을 조회 - 없을시 ENROLLMENT_NOT_FOUND 에러발생
         Enrollment enrollment = validateEnrollmentById(enrollmentId);
-        // 해당 직원의 권한 체크 - USER 이면 INVALID_PERMISSION 에러발생
-        validateAuthorityUser(employee);
+
+        // 직원이 수강 삭제, 대기번호 -> 수강등록을 진행할 권한이 있는지 확인(강사만 불가능)
+        if (Employee.isTeacherAuthority(employee)) {
+            throw new AppException(ErrorCode.INVALID_PERMISSION);
+        }
 
         // 마지막 수정 직원 필드 -> 수강내역 삭제 직원으로 업데이트
         // 현재 등록 인원수 1명 down
@@ -214,13 +216,12 @@ public class EnrollmentService {
     // 대기번호 -> 수강등록으로 이동하게 하는 메서드
     private void createEnrollmentFromWaitinglist(Long academyId, Long studentId, Long lectureId, String account) {
 
-        // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+        // 등록 주체 권한 확인(학원 존재 유무, 해당 학원 직원인지 확인)
         Academy academy = validateAcademyById(academyId);
-        // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
         Employee employee = validateRequestEmployeeByAcademy(account, academy);
-        // 학생 Id로 학생을 조회 - 없을시 STUDENT_NOT_FOUND 에러발생
+
+        // 학생, 강좌 존재 유무 확인
         Student student = validateStudentById(studentId);
-        // 강좌 Id로 강좌를 조회 - 없을시 LECTURE_NOT_FOUND 에러발생
         Lecture lecture = validateLectureById(lectureId);
 
         // 수강 이력 중복 확인
@@ -264,12 +265,13 @@ public class EnrollmentService {
      */
     public Page<FindEnrollmentResponse> findEnrollmentByStudentId(Long academyId, Long studentId, Pageable pageable) {
 
-        // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+        // 학원 존재 유무 확인
         validateAcademyById(academyId);
-        // 학생 Id로 학생을 조회 - 없을시 STUDENT_NOT_FOUND 에러발생
+
+        // 학생 존재 유무 확인
         Student foundStudent = validateStudentById(studentId);
 
-        return enrollmentRepository.findByStudentAndPaymentYNIsTrue(foundStudent, pageable).map(enrollment -> new FindEnrollmentResponse(enrollment));
+        return enrollmentRepository.findByStudentAndPaymentYNIsTrue(foundStudent, pageable).map(FindEnrollmentResponse::new);
     }
 
     /**
@@ -301,15 +303,14 @@ public class EnrollmentService {
      */
     public Page<FindStudentInfoFromEnrollmentByLectureResponse> findStudentInfoFromEnrollmentByLecture(Long academyId, String requestAccount, Long lectureId, Pageable pageable) {
 
-        // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+        // 조회 진행하는 직원 권한 확인(학원 존재 유무, 해당 학원 직원인지 확인)
         Academy academy = validateAcademyById(academyId);
-        // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
-        Employee employee = validateRequestEmployeeByAcademy(requestAccount, academy);
-        // 강좌 Id로 강좌를 조회 - 없을시 LECTURE_NOT_FOUND 에러발생
+        validateRequestEmployeeByAcademy(requestAccount, academy);
+
+        // 강좌 존재 유무 확인
         Lecture foundLecture = validateLectureById(lectureId);
 
-        return enrollmentRepository.findByLectureAndPaymentYNIsTrue(foundLecture, pageable).map(enrollment -> new FindStudentInfoFromEnrollmentByLectureResponse(enrollment));
-
+        return enrollmentRepository.findByLectureAndPaymentYNIsTrue(foundLecture, pageable).map(FindStudentInfoFromEnrollmentByLectureResponse::new);
     }
 
     /**
@@ -317,15 +318,14 @@ public class EnrollmentService {
      */
     public List<FindStudentInfoFromEnrollmentByLectureResponse> findAllStudentInfoFromEnrollmentByLecture(Long academyId, String requestAccount, Long lectureId) {
 
-        // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+        // 조회 진행하는 직원 권한 확인(학원 존재 유무, 해당 학원 직원인지 확인)
         Academy academy = validateAcademyById(academyId);
-        // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
-        Employee employee = validateRequestEmployeeByAcademy(requestAccount, academy);
-        // 강좌 Id로 강좌를 조회 - 없을시 LECTURE_NOT_FOUND 에러발생
+        validateRequestEmployeeByAcademy(requestAccount, academy);
+
+        // 강좌 존재 유무 확인
         Lecture foundLecture = validateLectureById(lectureId);
 
-        return enrollmentRepository.findByLecture(foundLecture).stream().map(enrollment -> new FindStudentInfoFromEnrollmentByLectureResponse(enrollment)).collect(Collectors.toList());
-
+        return enrollmentRepository.findByLecture(foundLecture).stream().map(FindStudentInfoFromEnrollmentByLectureResponse::new).collect(Collectors.toList());
     }
 
     // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
@@ -365,7 +365,7 @@ public class EnrollmentService {
 
     // 해당 직원의 권한 체크 - USER 이면 INVALID_PERMISSION 에러발생
     public void validateAuthorityUser(Employee employee) {
-        if (employee.getEmployeeRole().equals(EmployeeRole.ROLE_USER)) {
+        if(employee.getEmployeeRole().equals(EmployeeRole.ROLE_USER)) {
             throw new AppException(ErrorCode.INVALID_PERMISSION);
         }
     }

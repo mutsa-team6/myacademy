@@ -186,7 +186,7 @@ public class AnnouncementFileS3UploadService {
 
         // 버킷 폴더 추출
         String[] bucketFolder = fileUrl.split("/");
-        log.info("bucketFolder : {}", bucketFolder);
+//        log.info("bucketFolder : {}", bucketFolder);
 
         // 버킷 폴더에 저장된 해당 파일명 추출
         String fileName = bucketFolder[bucketFolder.length - 1];
@@ -262,7 +262,7 @@ public class AnnouncementFileS3UploadService {
     // 저장된 파일 확장자 별로 구분하여 저장
     private MediaType contentType(String keyname) {
         String[] arr = keyname.split("\\.");
-        log.info("arr : {}", arr);
+//        log.info("arr : {}", arr);
         String fileExtension = arr[arr.length - 1];
         switch (fileExtension) {
             case "txt":

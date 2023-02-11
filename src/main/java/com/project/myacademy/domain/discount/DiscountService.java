@@ -5,13 +5,8 @@ import com.project.myacademy.domain.academy.AcademyRepository;
 import com.project.myacademy.domain.discount.dto.*;
 import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.domain.employee.EmployeeRepository;
-import com.project.myacademy.domain.employee.EmployeeRole;
 import com.project.myacademy.domain.enrollment.Enrollment;
 import com.project.myacademy.domain.enrollment.EnrollmentRepository;
-import com.project.myacademy.domain.lecture.Lecture;
-import com.project.myacademy.domain.lecture.LectureRepository;
-import com.project.myacademy.domain.student.Student;
-import com.project.myacademy.domain.student.StudentRepository;
 import com.project.myacademy.global.exception.AppException;
 import com.project.myacademy.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -42,21 +37,23 @@ public class DiscountService {
      */
     public CheckDiscountResponse checkDiscount(Long academyId, CheckDiscountRequest request, String account) {
 
-        // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+        // 작업 진행하는 직원 존재 유무 확인(학원 존재 유무, 해당 학원 직원인지 확인)
         Academy academy = validateAcademyById(academyId);
-        // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
         Employee employee = validateRequestEmployeeByAcademy(account, academy);
-        // 해당 직원의 권한 체크 - USER 이면 INVALID_PERMISSION 에러발생
-        validateAuthorityUser(employee);
 
-        // 적용하려는 할인 정책 조회 - 없을시 DISCOUNT_NOT_FOUND 에러발생
+        // 작업을 수행할 권한이 있는지 확인 (강사만 불가능)
+        if (Employee.isTeacherAuthority(employee)) {
+            throw new AppException(ErrorCode.INVALID_PERMISSION);
+        }
+
+        // 적용하려는 할인 정책 조회
         Discount discount = discountRepository.findByDiscountNameAndAcademy(request.getDiscountName(), academy)
                 .orElseThrow(() -> new AppException(ErrorCode.DISCOUNT_NOT_FOUND));
 
-        // 수강 Id로 수강 조회 - 없을시 ENROLLMENT_NOT_FOUND 에러발생
+        // 요청 DTO의 수강 id로 수강이력 존재 유무 확인
         Enrollment enrollment = validateEnrollment(request.getEnrollmentId());
 
-        // 요청 DTO에 해당하는 수강 내역이 이미 결제된 수강 이력인지 확인 - 이미 결제되었으면 ALREADY_PAYMENT 에러발생
+        // 요청 DTO에 해당하는 수강 내역이 이미 결제된 수강 이력인지 확인
         if (enrollment.getPaymentYN().equals(true)) {
             throw new AppException(ErrorCode.ALREADY_PAYMENT);
         }
@@ -74,14 +71,16 @@ public class DiscountService {
      */
     public CreateDiscountResponse createDiscount(Long academyId, CreateDiscountRequest request, String account) {
 
-        // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+        // 등록하는 직원 존재 유무 확인(학원 존재 유무, 해당 학원 직원인지 확인)
         Academy academy = validateAcademyById(academyId);
-        // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
         Employee employee = validateRequestEmployeeByAcademy(account, academy);
-        // 해당 직원의 권한 체크 - USER 이면 INVALID_PERMISSION 에러발생
-        validateAuthorityUser(employee);
 
-        // 할인 정책이름으로 등록되어있는지 확인함 - 있으면 DUPLICATED_DISCOUNT 에러 발생
+        // 할인 정책을 등록할 권한이 있는지 확인 (강사만 불가능)
+        if (Employee.isTeacherAuthority(employee)) {
+            throw new AppException(ErrorCode.INVALID_PERMISSION);
+        }
+
+        // 해당 학원의 할인 정책 중복 확인
         discountRepository.findByDiscountNameAndAcademy(request.getDiscountName(), academy)
                 .ifPresent((discount -> {
                     throw new AppException(ErrorCode.DUPLICATED_DISCOUNT);
@@ -99,9 +98,8 @@ public class DiscountService {
      */
     public Page<GetDiscountResponse> getAllDiscounts(Long academyId, String account, Pageable pageable) {
 
-        // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+        // 조회하는 직원 존재 유무 확인(학원 존재 유무, 해당 학원 직원인지 확인)
         Academy academy = validateAcademyById(academyId);
-        // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
         validateRequestEmployeeByAcademy(account, academy);
 
         //해당 학원에 존재하는 정책들 가져옴
@@ -119,18 +117,19 @@ public class DiscountService {
      */
     public GetAppliedDiscountResponse getAppliedDiscount(Long academyId, Long enrollmentId, String account) {
 
-        // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+        // 등록하는 직원 존재 유무 확인(학원 존재 유무, 해당 학원 직원인지 확인)
         Academy academy = validateAcademyById(academyId);
-        // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
         validateRequestEmployeeByAcademy(account, academy);
-        // 수강 Id로 수강 조회 - 없을시 ENROLLMENT_NOT_FOUND 에러발생
+
+        // 할인이 적용될 수강 이력 존재 유무 확인
         Enrollment enrollment = validateEnrollment(enrollmentId);
 
         // 수강 이력에서 할인 정책 id 찾아오기
         Long discountId = enrollment.getDiscountId();
 
-        // 해당 할인 정책 Id로 할인정책 조회 - 없을시 DISCOUNT_NOT_FOUND 에러발생
-        Discount discount = validateDiscountById(discountId);
+        // 해당 할인 정책 id가 유효한 할인 정책인지 확인
+        Discount discount = discountRepository.findById(discountId)
+                .orElseThrow(() -> new AppException(ErrorCode.DISCOUNT_NOT_FOUND));
 
         return GetAppliedDiscountResponse.of(discount);
     }
@@ -144,19 +143,21 @@ public class DiscountService {
      */
     public DeleteDiscountResponse deleteDiscount(Long academyId, Long discountId, String account) {
 
-        // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+        // 등록하는 직원 존재 유무 확인(학원 존재 유무, 해당 학원 직원인지 확인)
         Academy academy = validateAcademyById(academyId);
-        // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
         Employee employee = validateRequestEmployeeByAcademy(account, academy);
-        // 해당 할인 정책 Id로 할인정책 조회 - 없을시 DISCOUNT_NOT_FOUND 에러발생
-        Discount discount = validateDiscountById(discountId);
-        // 해당 직원의 권한 체크 - USER 이면 INVALID_PERMISSION 에러발생
-        validateAuthorityUser(employee);
+
+        Discount discount = discountRepository.findById(discountId)
+                .orElseThrow(() -> new AppException(ErrorCode.DISCOUNT_NOT_FOUND));
+
+        // 할인 정책을 등록할 권한이 있는지 확인 (강사만 불가능)
+        if (Employee.isTeacherAuthority(employee)) {
+            throw new AppException(ErrorCode.INVALID_PERMISSION);
+        }
 
         discountRepository.delete(discount);
         return DeleteDiscountResponse.of(discountId);
     }
-
 
     // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
     private Academy validateAcademyById(Long academyId) {
@@ -176,18 +177,5 @@ public class DiscountService {
     private Enrollment validateEnrollment(Long enrollmentId) {
         return enrollmentRepository.findById(enrollmentId)
                 .orElseThrow(() -> new AppException(ErrorCode.ENROLLMENT_NOT_FOUND));
-    }
-
-    // 해당 직원의 권한 체크 - USER 이면 INVALID_PERMISSION 에러발생
-    public void validateAuthorityUser(Employee employee) {
-        if (employee.getEmployeeRole().equals(EmployeeRole.ROLE_USER)) {
-            throw new AppException(ErrorCode.INVALID_PERMISSION);
-        }
-    }
-
-    // 해당 할인 정책 Id로 할인정책 조회 - 없을시 DISCOUNT_NOT_FOUND 에러발생
-    public Discount validateDiscountById(Long discountId) {
-        return discountRepository.findById(discountId)
-                .orElseThrow(() -> new AppException(ErrorCode.DISCOUNT_NOT_FOUND));
     }
 }
