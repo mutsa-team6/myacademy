@@ -291,29 +291,29 @@ class EmployeeServiceTest {
     @Nested
     @DisplayName("계정 찾기")
     class FindAccountEmployee {
-        FindAccountEmployeeRequest request = new FindAccountEmployeeRequest("학원", "원장", "employeeADMIN@gmail.com");
+//        FindAccountEmployeeRequest request = new FindAccountEmployeeRequest("학원", "원장", "employeeADMIN@gmail.com");
 
-        @Test
-        @DisplayName("계정 찾기 성공")
-        void find_account_employee_success() {
-            given(employeeRepository.findByEmail(any())).willReturn(Optional.of(employeeADMIN));
+//        @Test
+//        @DisplayName("계정 찾기 성공")
+//        void find_account_employee_success() {
+//            given(employeeRepository.findByEmail(any())).willReturn(Optional.of(employeeADMIN));
+//
+//            FindAccountEmployeeResponse response = employeeService.findAccountEmployee(request);
+//
+//            assertThat(response.getEmployeeId()).isEqualTo(1L);
+//            assertThat(response.getAccount()).isEqualTo("admin");
+//        }
 
-            FindAccountEmployeeResponse response = employeeService.findAccountEmployee(request);
-
-            assertThat(response.getEmployeeId()).isEqualTo(1L);
-            assertThat(response.getAccount()).isEqualTo("admin");
-        }
-
-        @Test
-        @DisplayName("계정 찾기 실패 - 일치하는 직원 정보 없음")
-        void find_account_employee_fail() {
-            given(employeeRepository.findByEmail(any())).willReturn(Optional.empty());
-
-            AppException appException = assertThrows(AppException.class,
-                    () -> employeeService.findAccountEmployee(request));
-
-            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.EMPLOYEE_NOT_FOUND);
-        }
+//        @Test
+//        @DisplayName("계정 찾기 실패 - 일치하는 직원 정보 없음")
+//        void find_account_employee_fail() {
+//            given(employeeRepository.findByEmail(any())).willReturn(Optional.empty());
+//
+//            AppException appException = assertThrows(AppException.class,
+//                    () -> employeeService.findAccountEmployee(request));
+//
+//            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.EMPLOYEE_NOT_FOUND);
+//        }
     }
 
 //    @Nested

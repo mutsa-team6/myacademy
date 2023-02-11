@@ -30,7 +30,7 @@ public class EmployeeProfileController {
     public ResponseEntity<Response<CreateEmployeeProfileResponse>> upload(@PathVariable("academyId") Long academyId,
                                                                           @PathVariable("employeeId") Long employeeId,
                                                                           @RequestPart MultipartFile multipartFile,
-                                                                          Authentication authentication) throws IOException {
+                                                                          Authentication authentication) {
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
         CreateEmployeeProfileResponse profileResponse = employeeProfileS3UploadService.uploadEmployeeProfile(academyId, employeeId, multipartFile, requestAccount);
         return ResponseEntity.ok().body(Response.success(profileResponse));

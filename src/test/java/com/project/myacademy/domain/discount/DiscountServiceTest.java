@@ -81,7 +81,7 @@ class DiscountServiceTest {
 
         @Test
         @DisplayName("할인정책 전체 조회 성공")
-        public void getAllDiscounts_success() {
+        void getAllDiscounts_success() {
 
             PageImpl<Discount> discountList = new PageImpl<>(List.of(discount, discount2));
 
@@ -101,7 +101,7 @@ class DiscountServiceTest {
 
         @Test
         @DisplayName("할인정책 전체 조회 실패(1) = 학원이 존재하지 않을 때")
-        public void getAllDiscounts_fail1() {
+        void getAllDiscounts_fail1() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.empty());
 
@@ -116,7 +116,7 @@ class DiscountServiceTest {
 
         @Test
         @DisplayName("할인정책 전체 조회 실패(2) - 조회 진행하는 직원이 해당 학원 소속이 아닐 때")
-        public void getAllDiscounts_fail2() {
+        void getAllDiscounts_fail2() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.empty());
@@ -133,7 +133,7 @@ class DiscountServiceTest {
 
         @Test
         @DisplayName("수강이력에 적용된 할인정책 조회 성공")
-        public void getAppliedDiscount_success() {
+        void getAppliedDiscount_success() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(employee));
@@ -152,7 +152,7 @@ class DiscountServiceTest {
 
         @Test
         @DisplayName("수강이력에 적용된 할인정책 조회 실패(1) - 학원이 존재하지 않을 때")
-        public void getAppliedDiscount_fail1() {
+        void getAppliedDiscount_fail1() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.empty());
 
@@ -167,7 +167,7 @@ class DiscountServiceTest {
 
         @Test
         @DisplayName("수강이력에 적용된 할인정책 조회 실패(2) - 조회 진행하는 직원이 해당 학원 소속이 아닐 때")
-        public void getAppliedDiscount_fail2() {
+        void getAppliedDiscount_fail2() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.empty());
@@ -184,7 +184,7 @@ class DiscountServiceTest {
 
         @Test
         @DisplayName("수강이력에 적용된 할인정책 조회 실패(3) - 할인이 적용된 수강 이력이 존재하지 않을 때")
-        public void getAppliedDiscount_fail3() {
+        void getAppliedDiscount_fail3() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(employee));
@@ -203,7 +203,7 @@ class DiscountServiceTest {
 
         @Test
         @DisplayName("수강이력에 적용된 할인정책 조회 실패(4) - 수강 이력에 적용된 할인 정책이 존재하지 않을 때")
-        public void getAppliedDiscount_fail4() {
+        void getAppliedDiscount_fail4() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(employee));
@@ -231,7 +231,7 @@ class DiscountServiceTest {
 
         @Test
         @DisplayName("할인정책 적용 성공")
-        public void checkDiscount_success() {
+        void checkDiscount_success() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
@@ -260,7 +260,7 @@ class DiscountServiceTest {
 
         @Test
         @DisplayName("할인정책 적용 실패(1) - 학원이 존재하지 않을 때")
-        public void checkDiscount_fail1() {
+        void checkDiscount_fail1() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.empty());
 
@@ -275,7 +275,7 @@ class DiscountServiceTest {
 
         @Test
         @DisplayName("할인정책 적용 실패(2) - 적용 진행하는 직원이 해당 학원 소속이 아닐 때")
-        public void checkDiscount_fail2() {
+        void checkDiscount_fail2() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.empty());
@@ -292,7 +292,7 @@ class DiscountServiceTest {
 
         @Test
         @DisplayName("할인정책 적용 실패(3) - 직원이 적용을 진행할 권한이 아닐 때")
-        public void checkDiscount_fail3() {
+        void checkDiscount_fail3() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
@@ -310,7 +310,7 @@ class DiscountServiceTest {
 
         @Test
         @DisplayName("할인정책 적용 실패(4) - 적용 요청할 할인 정책이 존재하지 않을 때")
-        public void checkDiscount_fail4() {
+        void checkDiscount_fail4() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
@@ -331,7 +331,7 @@ class DiscountServiceTest {
 
         @Test
         @DisplayName("할인정책 적용 실패(5) - 할인정책이 적용될 수강 내역이 존재하지 않을 때")
-        public void checkDiscount_fail5() {
+        void checkDiscount_fail5() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
@@ -354,19 +354,19 @@ class DiscountServiceTest {
 
 //        @Test
 //        @DisplayName("할인정책 적용 실패(6) - 할인정책에 적용할 수강 내역에 학생이 존재하지 않을 때")
-//        public void checkDiscount_fail6() {
+//        void checkDiscount_fail6() {
 //
 //        }
 //
 //        @Test
 //        @DisplayName("할인정책 적용 실패(7) - 할인정책에 적용할 수강 내역에 강좌가 존재하지 않을 때")
-//        public void checkDiscount_fail7() {
+//        void checkDiscount_fail7() {
 //
 //        }
 
         @Test
         @DisplayName("할인정책 적용 실패(6) - 할인정책을 적용할 수강 내역이 이미 결제된 상태일 때")
-        public void checkDiscount_fail6() {
+        void checkDiscount_fail6() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
@@ -399,7 +399,7 @@ class DiscountServiceTest {
 
         @Test
         @DisplayName("등록 성공")
-        public void createDiscount_success() {
+        void createDiscount_success() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
@@ -420,7 +420,7 @@ class DiscountServiceTest {
 
         @Test
         @DisplayName("등록 실패(1) - 학원이 존재하지 않을 때")
-        public void createDiscount_fail1() {
+        void createDiscount_fail1() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.empty());
 
@@ -435,7 +435,7 @@ class DiscountServiceTest {
 
         @Test
         @DisplayName("등록 실패(2) - 등록 진행하는 직원이 해당 학원 소속이 아닐 때")
-        public void createDiscount_fail2() {
+        void createDiscount_fail2() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.empty());
@@ -452,7 +452,7 @@ class DiscountServiceTest {
 
         @Test
         @DisplayName("등록 실패(3) - 직원이 할인정책을 등록할 권한이 아닐 때")
-        public void createDiscount_fail3() {
+        void createDiscount_fail3() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
@@ -471,7 +471,7 @@ class DiscountServiceTest {
 
         @Test
         @DisplayName("등록 실패(4) - 할인정책이 중복 등록되어 있는 경우")
-        public void createDiscount_fail4() {
+        void createDiscount_fail4() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
@@ -498,7 +498,7 @@ class DiscountServiceTest {
 
         @Test
         @DisplayName("삭제 성공")
-        public void deleteDiscount_success() {
+        void deleteDiscount_success() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
@@ -517,7 +517,7 @@ class DiscountServiceTest {
 
         @Test
         @DisplayName("삭제 실패(1) - 학원이 존재하지 않을 때")
-        public void deleteDiscount_fail1() {
+        void deleteDiscount_fail1() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.empty());
 
@@ -532,7 +532,7 @@ class DiscountServiceTest {
 
         @Test
         @DisplayName("삭제 실패(2) - 삭제 진행하는 직원이 해당 학원 소속이 아닐 때")
-        public void deleteDiscount_fail2() {
+        void deleteDiscount_fail2() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.empty());
@@ -548,7 +548,7 @@ class DiscountServiceTest {
 
         @Test
         @DisplayName("삭제 실패(3) - 삭제할 할인정책이 존재하지 않을 때")
-        public void deleteDiscount_fail3() {
+        void deleteDiscount_fail3() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
@@ -567,7 +567,7 @@ class DiscountServiceTest {
 
         @Test
         @DisplayName("삭제 실패(4) - 직원이 할인정책을 삭제할 권한이 아닐 때")
-        public void deleteDiscount_fail4() {
+        void deleteDiscount_fail4() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
