@@ -22,7 +22,7 @@ public class AcademyRestController {
 
     @Operation(summary = "학원 등록", description = "학원을 등록합니다. \n\n 같은 이름의 학원은 등록이 불가합니다.")
     @PostMapping("")
-    public ResponseEntity create(@RequestBody CreateAcademyRequest request) {
+    public ResponseEntity<Response<CreateAcademyResponse>> create(@RequestBody CreateAcademyRequest request) {
 
         CreateAcademyResponse response = academyService.createAcademy(request);
 
@@ -31,7 +31,7 @@ public class AcademyRestController {
 
     @Operation(summary = "학원 삭제", description = "학원을 soft-delete 합니다.")
     @DeleteMapping("/{academyId}/delete")
-    public ResponseEntity delete(@PathVariable Long academyId) {
+    public ResponseEntity<Response<DeleteAcademyResponse>> delete(@PathVariable Long academyId) {
 
         Long deletedAcademyId = academyService.deleteAcademy(academyId);
 
