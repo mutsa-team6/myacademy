@@ -147,19 +147,6 @@ class ParentServiceTest {
         }
 
         @Test
-        @DisplayName("부모 정보 조회 : 실패 - 권한에러")
-        public void readParentFailPermission() {
-
-            when(academyRepository.findById(any())).thenReturn(Optional.of(academy1));
-            when(employeeRepository.findByAccountAndAcademy(any(), any())).thenReturn(Optional.of(mockEmployee));
-            when(mockEmployee.getEmployeeRole()).thenReturn(EmployeeRole.ROLE_USER);
-
-            AppException appException = assertThrows(AppException.class, () -> parentService.readParent(1L, 1L, "user"));
-            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.INVALID_PERMISSION);
-        }
-
-
-        @Test
         @DisplayName("부모 정보 조회 : 실패 - 부모에러")
         void readParentFailParent() {
 

@@ -79,6 +79,7 @@ public class SecurityConfig {
     public static final String[] AUTH_API_URL_POST = {
             "/api/v1/academies/**/employee/changePassword"
             , "/api/v1/academies/**/employees/**/files/upload"
+            , "/api/v1/academies/**/students/**/uniqueness"
     };
     public static final String[] AUTH_API_URL_PUT = {"/api/v1/academies/**"};
 
@@ -88,7 +89,6 @@ public class SecurityConfig {
             , "/api/v1/academies/**/announcements/**/files/upload"
             , "/api/v1/academies/**/parents"
             , "/api/v1/academies/**/students"
-            , "/api/v1/academies/**/students/**/uniqueness"
             , "/api/v1/academies/**/employees/**/lectures"
             , "/api/v1/academies/**/students/**/lectures/**/enrollments/**"
             , "/api/v1/academies/**/students/**/lectures/**/enrollments"
@@ -113,7 +113,6 @@ public class SecurityConfig {
             , "/api/v1/academies/**/announcements/**/announcementFiles/**/files"
             , "/api/v1/academies/**/parents/**"
             , "/api/v1/academies/**/students/**"
-            , "/api/v1/academies/**/students/**/uniqueness/**"
             , "/api/v1/academies/**/lectures/**"
             , "/api/v1/academies/**/students/**/lectures/**/waitinglists/**"
             , "/api/v1/academies/**/discounts/**"
@@ -121,6 +120,8 @@ public class SecurityConfig {
 
 
     public static final String[] ONLY_ADMIN_API_URL_POST = {"/api/v1/academies/**/files/upload"};
+
+    public static final String[] AUTH_API_URL_DELETE = {"/api/v1/academies/**/students/**/uniqueness/**"};
     public static final String[] ONLY_ADMIN_API_URL_DELETE = {
             "/api/v1/academies/**/academyProfiles/**/files"
             , "/api/v1/academies/**/employees/**"
@@ -153,6 +154,7 @@ public class SecurityConfig {
                 .antMatchers(HttpMethod.GET, AUTH_API_URL_GET).authenticated()
                 .antMatchers(HttpMethod.POST, AUTH_API_URL_POST).authenticated()
                 .antMatchers(HttpMethod.PUT, AUTH_API_URL_PUT).authenticated()
+                .antMatchers(HttpMethod.DELETE, AUTH_API_URL_DELETE).authenticated()
 
                 .antMatchers(HttpMethod.POST, REFUSED_USER_API_URL_POST).hasAnyRole("ADMIN", "STAFF")
                 .antMatchers(HttpMethod.PUT, REFUSED_USER_API_URL_PUT).hasAnyRole("ADMIN", "STAFF")
