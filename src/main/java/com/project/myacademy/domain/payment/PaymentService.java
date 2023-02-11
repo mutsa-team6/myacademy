@@ -503,7 +503,7 @@ public class PaymentService {
     // 학생과 강좌로 수강이력을 조회 - 없을시 ENROLLMENT_NOT_FOUND 에러발생
     public Enrollment validateEnrollmentByStudentAndLecture(Student foundStudent, Lecture foundLecture) {
         Enrollment validateEnrollment = enrollmentRepository.findByStudentAndLecture(foundStudent, foundLecture)
-                .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.ENROLLMENT_NOT_FOUND));
         return validateEnrollment;
     }
 

@@ -235,8 +235,9 @@ public class EmployeeService {
         String encodedNewPassword = bCryptPasswordEncoder.encode(request.getNewPassword());
 
         employee.updatePasswordOnly(encodedNewPassword);
+        String message = String.format("%n 님의 비밀번호 변경을 성공했습니다.",employee.getAccount());
 
-        return new ChangePasswordEmployeeResponse(employee.getAccount(), "%n 님의 비밀번호 변경을 성공했습니다.");
+        return new ChangePasswordEmployeeResponse(employee.getAccount(), message);
     }
 
     /**
