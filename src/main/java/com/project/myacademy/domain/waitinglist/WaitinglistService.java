@@ -4,7 +4,6 @@ import com.project.myacademy.domain.academy.Academy;
 import com.project.myacademy.domain.academy.AcademyRepository;
 import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.domain.employee.EmployeeRepository;
-import com.project.myacademy.domain.employee.EmployeeRole;
 import com.project.myacademy.domain.enrollment.EnrollmentRepository;
 import com.project.myacademy.domain.enrollment.dto.FindStudentInfoFromEnrollmentByLectureResponse;
 import com.project.myacademy.domain.lecture.Lecture;
@@ -37,7 +36,6 @@ public class WaitinglistService {
     private final EmployeeRepository employeeRepository;
     private final StudentRepository studentRepository;
     private final LectureRepository lectureRepository;
-
     private final EnrollmentRepository enrollmentRepository;
     private final WaitinglistRepository waitinglistRepository;
     private final EmailUtil emailUtil;
@@ -50,9 +48,8 @@ public class WaitinglistService {
      */
     public Page<ReadAllWaitinglistResponse> readAllWaitinglists(Long academyId, String account, Pageable pageable) {
 
-        // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+        // 조회하는 직원 존재 유무 확인(학원 존재 유무, 해당 학원 직원인지 확인)
         Academy academy = validateAcademyById(academyId);
-        // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
         validateRequestEmployeeByAcademy(account, academy);
 
         Page<Waitinglist> waitinglists = waitinglistRepository.findAll(pageable);
@@ -71,18 +68,20 @@ public class WaitinglistService {
      */
     public CreateWaitinglistResponse createWaitinglist(Long academyId, Long studentId, Long lectureId, String account) {
 
-        // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+        // 등록하는 직원 존재 유무 확인(학원 존재 유무, 해당 학원 직원인지 확인)
         Academy academy = validateAcademyById(academyId);
-        // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
         Employee employee = validateRequestEmployeeByAcademy(account, academy);
-        // 학생 Id로 학생을 조회 - 없을시 STUDENT_NOT_FOUND 에러발생
-        Student student = validateStudentById(studentId);
-        // 강좌 Id로 강좌를 조회 - 없을시 LECTURE_NOT_FOUND 에러발생
-        Lecture lecture = validateLectureById(lectureId);
-        // 해당 직원의 권한 체크 - USER 이면 INVALID_PERMISSION 에러발생
-        validateAuthorityUser(employee);
 
-        // 현재 수강 등록 인원이 최대 수강 정원보다 적으면 대기 등록이 아니라 수강 등록으로 진행해야 함
+        // 학생, 강좌 존재 유무 확인
+        Student student = validateStudentById(studentId);
+        Lecture lecture = validateLectureById(lectureId);
+
+        // 직원이 대기번호를 등록할 권한이 있는지 확인(강사만 불가능)
+        if (Employee.isTeacherAuthority(employee)) {
+            throw new AppException(ErrorCode.INVALID_PERMISSION);
+        }
+
+        // 현재 수강 등록 인원이 최대 수강 정원보다 적으면 대기 등록이 아니라 수강 등록으로 진행
         if (lecture.getCurrentEnrollmentNumber() < lecture.getMaximumCapacity()) {
             throw new AppException(ErrorCode.CANNOT_REGISTER_WAITINGLIST);
         }
@@ -122,18 +121,19 @@ public class WaitinglistService {
      */
     public DeleteWaitinglistResponse deleteWaitinglist(Long academyId, Long studentId, Long lectureId, Long waitinglistId, String account) {
 
-        // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+        // 등록하는 직원 존재 유무 확인(학원 존재 유무, 해당 학원 직원인지 확인)
         Academy academy = validateAcademyById(academyId);
-        // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
         Employee employee = validateRequestEmployeeByAcademy(account, academy);
-        // 학생 Id로 학생을 조회 - 없을시 STUDENT_NOT_FOUND 에러발생
+
+        // 학생, 강좌, 대기번호 존재 유무 확인
         Student student = validateStudentById(studentId);
-        // 강좌 Id로 강좌를 조회 - 없을시 LECTURE_NOT_FOUND 에러발생
         Lecture lecture = validateLectureById(lectureId);
-        // 수강대기 Id로 수강대기를 조회 - 없을시 WAITINGLIST_NOT_FOUND 에러발생
         Waitinglist waitinglist = validateWaitinglistById(waitinglistId);
-        // 해당 직원의 권한 체크 - USER 이면 INVALID_PERMISSION 에러발생
-        validateAuthorityUser(employee);
+
+        // 직원이 대기번호를 삭제할 권한이 있는지 확인(강사만 불가능)
+        if (Employee.isTeacherAuthority(employee)) {
+            throw new AppException(ErrorCode.INVALID_PERMISSION);
+        }
 
         // 대기번호 삭제
         waitinglistRepository.delete(waitinglist);
@@ -157,11 +157,11 @@ public class WaitinglistService {
      */
     public List<FindStudentInfoFromEnrollmentByLectureResponse> findWaitingStudentByLecture(Long academyId, Long lectureId, String requestAccount) {
 
-        // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+        // 조회하는 직원 존재 유무 확인(학원 존재 유무, 해당 학원 직원인지 확인)
         Academy academy = validateAcademyById(academyId);
-        // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
-        Employee employee = validateRequestEmployeeByAcademy(requestAccount, academy);
-        // 강좌 Id로 강좌를 조회 - 없을시 LECTURE_NOT_FOUND 에러발생
+        validateRequestEmployeeByAcademy(requestAccount, academy);
+
+        // 강좌 존재 유무 확인
         Lecture foundLecture = validateLectureById(lectureId);
 
         List<FindStudentInfoFromEnrollmentByLectureResponse> waitingStudents = waitinglistRepository.findByLectureOrderByCreatedAtAsc(foundLecture)
@@ -172,7 +172,6 @@ public class WaitinglistService {
         }
 
         return waitingStudents;
-
     }
 
     /**
@@ -185,16 +184,15 @@ public class WaitinglistService {
      */
     public Long countWaitingListByLecture(Long academyId, Long lectureId, String requestAccount) {
 
-        // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+        // 조회하는 직원 존재 유무 확인(학원 존재 유무, 해당 학원 직원인지 확인)
         Academy academy = validateAcademyById(academyId);
-        // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
-        Employee employee = validateRequestEmployeeByAcademy(requestAccount, academy);
-        // 강좌 Id로 강좌를 조회 - 없을시 LECTURE_NOT_FOUND 에러발생
+        validateRequestEmployeeByAcademy(requestAccount, academy);
+
+        // 강좌 존재 유무 확인
         Lecture lecture = validateLectureById(lectureId);
 
         return waitinglistRepository.countWaitinglistByLecture(lecture);
     }
-
 
     // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
     private Academy validateAcademyById(Long academyId) {
@@ -229,12 +227,5 @@ public class WaitinglistService {
         Waitinglist validatedWaitinglist = waitinglistRepository.findById(waitinglistId)
                 .orElseThrow(() -> new AppException(ErrorCode.WAITINGLIST_NOT_FOUND));
         return validatedWaitinglist;
-    }
-
-    // 해당 직원의 권한 체크 - USER 이면 INVALID_PERMISSION 에러발생
-    public void validateAuthorityUser(Employee employee) {
-        if (employee.getEmployeeRole().equals(EmployeeRole.ROLE_USER)) {
-            throw new AppException(ErrorCode.INVALID_PERMISSION);
-        }
     }
 }

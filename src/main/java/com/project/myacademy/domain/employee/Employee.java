@@ -3,7 +3,6 @@ package com.project.myacademy.domain.employee;
 import com.project.myacademy.domain.BaseEntity;
 import com.project.myacademy.domain.academy.Academy;
 import com.project.myacademy.domain.employee.dto.CreateEmployeeRequest;
-import com.project.myacademy.domain.employee.dto.EmployeeDto;
 import com.project.myacademy.domain.employee.dto.UpdateEmployeeRequest;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
@@ -54,16 +53,6 @@ public class Employee extends BaseEntity {
     private Academy academy;
 
     private String subject;
-
-    public EmployeeDto toEmployeeDto() {
-        return EmployeeDto.builder()
-                .id(this.id)
-                .name(this.name)
-                .account(this.account)
-                .build();
-    }
-
-
 
     public void updateEmployeeInfo(UpdateEmployeeRequest request) {
         this.address = request.getAddress();
