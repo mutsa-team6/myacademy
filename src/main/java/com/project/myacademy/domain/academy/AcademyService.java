@@ -65,9 +65,7 @@ public class AcademyService {
         // 학원 이름으로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
         Academy academy = validateAcademyByName(request.getName());
 
-        FindAcademyResponse response = new FindAcademyResponse(academy);
-
-        return response;
+        return new FindAcademyResponse(academy);
     }
 
     /**
@@ -76,6 +74,7 @@ public class AcademyService {
      * @param academyName 학원이름
      */
     public boolean checkExistByAcademyName(String academyName) {
+
         // 해당이름의 학원이 존재하면 true 없으면 false 반환
         return academyRepository.existsByName(academyName);
     }
@@ -90,9 +89,7 @@ public class AcademyService {
         // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
         Academy academy = validateAcademyById(academyId);
 
-        FindAcademyResponse response = new FindAcademyResponse(academy);
-
-        return response;
+        return new FindAcademyResponse(academy);
     }
 
     /**
@@ -100,21 +97,19 @@ public class AcademyService {
      */
     public Page<ReadAcademyResponse> readAllAcademies(Pageable pageable) {
 
-        return academyRepository.findAll(pageable).map(academy -> new ReadAcademyResponse(academy));
+        return academyRepository.findAll(pageable).map(ReadAcademyResponse::new);
     }
 
     //학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
     private Academy validateAcademyById(Long academyId) {
-        Academy validateAcademy = academyRepository.findById(academyId)
+        return academyRepository.findById(academyId)
                 .orElseThrow(() -> new AppException(ErrorCode.ACADEMY_NOT_FOUND));
-        return validateAcademy;
     }
 
     //학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
     private Academy validateAcademyByName(String academyName) {
-        Academy validateAcademy = academyRepository.findByName(academyName)
+        return academyRepository.findByName(academyName)
                 .orElseThrow(() -> new AppException(ErrorCode.ACADEMY_NOT_FOUND));
-        return validateAcademy;
     }
 
     //학원 이름으로 학원을 조회 - 없을시 DUPLICATED_ACADEMY 에러발생
