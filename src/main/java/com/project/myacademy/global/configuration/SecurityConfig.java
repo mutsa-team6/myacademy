@@ -35,6 +35,100 @@ public class SecurityConfig {
 
     private final CustomOAuth2UserService customOAuth2UserService;
 
+    public static final String[] PERMIT_ALL_CONTROLLER_URL = {"/", "/join", "/login", "/find/account", "/find/password", "/academies", "/swagger-ui/**"};
+    public static final String[] REFUSED_USER_CONTROLLER_URL
+            = {"/academy/announcements/write",
+            "/academy/announcements/edit/**",
+            "/academy/student/register",
+            "/academy/lecture/register/**",
+            "/academy/enrollment/**",
+            "/academy/payment/**",
+            "/academy/discount"
+    };
+    public static final String[] ONLY_ADMIN_CONTROLLER_URL = {"/academy/employees"};
+
+
+    public static final String[] PERMIT_ALL_API_URL_GET = {"/api/v1/academies/employees/logout"
+    };
+    public static final String[] PERMIT_ALL_API_URL_POST = {
+            "/api/v1/academies"
+            , "/api/v1/academies/**/employees/signup"
+            , "/api/v1/academies/**/employees/login"
+            , "/api/v1/academies/employee/findAccount"};
+    public static final String[] PERMIT_ALL_API_URL_PUT = {"/api/v1/academies/employee/findPassword"
+    };
+
+    public static final String[] AUTH_API_URL_GET = {
+            "/api/v1/academies/**/my"
+            , "/api/v1/academies/**/employees/**/files/download"
+            , "/api/v1/academies/**/announcements/**"
+            , "/api/v1/academies/**/announcements"
+            , "/api/v1/academies/**/announcements/type/**"
+            , "/api/v1/academies/**/announcements/**/files/download"
+            , "/api/v1/academies/**/parents/**"
+            , "/api/v1/academies/**/students/**"
+            , "/api/v1/academies/**/students"
+            , "/api/v1/academies/**/students/**/uniqueness"
+            , "/api/v1/academies/**/lectures"
+            , "/api/v1/academies/**/enrollments"
+            , "/api/v1/academies/**/waitinglists"
+            , "/api/v1/academies/**/discounts"
+            , "/api/v1/academies/**/enrollments/**/discounts"
+            , "/api/v1/payments/success"
+            , "/api/v1/payments/fail"};
+    public static final String[] AUTH_API_URL_POST = {
+            "/api/v1/academies/**/employee/changePassword"
+            , "/api/v1/academies/**/employees/**/files/upload"
+    };
+    public static final String[] AUTH_API_URL_PUT = {"/api/v1/academies/**"};
+
+
+    public static final String[] REFUSED_USER_API_URL_POST = {
+            "/api/v1/academies/**/announcements"
+            , "/api/v1/academies/**/announcements/**/files/upload"
+            , "/api/v1/academies/**/parents"
+            , "/api/v1/academies/**/students"
+            , "/api/v1/academies/**/students/**/uniqueness"
+            , "/api/v1/academies/**/employees/**/lectures"
+            , "/api/v1/academies/**/students/**/lectures/**/enrollments/**"
+            , "/api/v1/academies/**/students/**/lectures/**/enrollments"
+            , "/api/v1/academies/**/students/**/lectures/**/waitinglists"
+            , "/api/v1/academies/**/discounts"
+            , "/api/v1/academies/**/discounts/check"
+            , "/api/v1/payments/students/**"
+            , "/api/v1/payments/cancel"
+    };
+    public static final String[] REFUSED_USER_API_URL_PUT = {
+            "/api/v1/academies/**/announcements/**"
+            , "/api/v1/academies/**/parents/**"
+            , "/api/v1/academies/**/students/**"
+            , "/api/v1/academies/**/students/**/uniqueness/**"
+            , "/api/v1/academies/**/lectures/**"
+            , "/api/v1/academies/**/students/**/lectures/**/enrollments/**"
+
+    };
+    public static final String[] REFUSED_USER_API_URL_DELETE = {
+            "/api/v1/academies/**/employees/**/employeeProfiles/**/files"
+            , "/api/v1/academies/**/announcements/**"
+            , "/api/v1/academies/**/announcements/**/announcementFiles/**/files"
+            , "/api/v1/academies/**/parents/**"
+            , "/api/v1/academies/**/students/**"
+            , "/api/v1/academies/**/students/**/uniqueness/**"
+            , "/api/v1/academies/**/lectures/**"
+            , "/api/v1/academies/**/students/**/lectures/**/waitinglists/**"
+            , "/api/v1/academies/**/discounts/**"
+    };
+
+
+    public static final String[] ONLY_ADMIN_API_URL_POST = {"/api/v1/academies/**/files/upload"};
+    public static final String[] ONLY_ADMIN_API_URL_DELETE = {
+            "/api/v1/academies/**/academyProfiles/**/files"
+            , "/api/v1/academies/**/employees/**"
+            };
+    public static final String[] ONLY_ADMIN_API_URL_GET = {
+            "/api/v1/academies/**/files/upload"
+            , "/api/v1/academies/**/employees"};
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
@@ -47,14 +141,27 @@ public class SecurityConfig {
 
 
                 .authorizeRequests()
-                .antMatchers("/api/v1/academies/**/employees/signup", "/api/v1/academies/**/employees/login", "/api/v1/employees/findaccount", "/swagger-ui/**").permitAll()
-                .antMatchers(HttpMethod.DELETE, "/api/v1/academies/**/employees/**").hasAnyRole("ADMIN","STAFF")
-                .antMatchers(HttpMethod.PUT, "/api/v1/academies/**/changeRole/**").hasAnyRole("ADMIN","STAFF")
-                .antMatchers(HttpMethod.GET, "/api/v1/academies/**/employees").hasAnyRole("ADMIN")
-                .antMatchers("/academy/employees").hasRole("ADMIN")
-                .antMatchers( "/academy/students/list").hasAnyRole("ADMIN","STAFF")
-                .antMatchers("api/v1/academies/**").authenticated()
+                .antMatchers(PERMIT_ALL_CONTROLLER_URL).permitAll()
+                .antMatchers(ONLY_ADMIN_CONTROLLER_URL).hasRole("ADMIN")
+                .antMatchers(REFUSED_USER_CONTROLLER_URL).hasAnyRole("ADMIN", "STAFF")
                 .antMatchers("/academy/**").authenticated()
+
+                .antMatchers(HttpMethod.GET, PERMIT_ALL_API_URL_GET).permitAll()
+                .antMatchers(HttpMethod.POST, PERMIT_ALL_API_URL_POST).permitAll()
+                .antMatchers(HttpMethod.PUT, PERMIT_ALL_API_URL_PUT).permitAll()
+
+                .antMatchers(HttpMethod.GET, AUTH_API_URL_GET).authenticated()
+                .antMatchers(HttpMethod.POST, AUTH_API_URL_POST).authenticated()
+                .antMatchers(HttpMethod.PUT, AUTH_API_URL_PUT).authenticated()
+
+                .antMatchers(HttpMethod.POST, REFUSED_USER_API_URL_POST).hasAnyRole("ADMIN", "STAFF")
+                .antMatchers(HttpMethod.PUT, REFUSED_USER_API_URL_PUT).hasAnyRole("ADMIN", "STAFF")
+                .antMatchers(HttpMethod.DELETE, REFUSED_USER_API_URL_DELETE).hasAnyRole("ADMIN", "STAFF")
+
+                .antMatchers(HttpMethod.GET, ONLY_ADMIN_API_URL_GET).hasRole("ADMIN")
+                .antMatchers(HttpMethod.POST, ONLY_ADMIN_API_URL_POST).hasRole("ADMIN")
+                .antMatchers(HttpMethod.DELETE, ONLY_ADMIN_API_URL_DELETE).hasRole("ADMIN")
+
                 .and()
 
                 .oauth2Login().loginPage("/login")
@@ -71,7 +178,7 @@ public class SecurityConfig {
                 .accessDeniedHandler(customAccessDeniedHandler)
 
                 .and()
-                .addFilterBefore(new JwtTokenFilter(employeeRepository,refreshTokenRepository,secretKey), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtTokenFilter(employeeRepository, refreshTokenRepository, secretKey), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new ExceptionHandlerFilter(), JwtTokenFilter.class)
                 .build();
 
