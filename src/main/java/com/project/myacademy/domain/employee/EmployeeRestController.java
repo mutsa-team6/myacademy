@@ -4,7 +4,6 @@ import com.project.myacademy.domain.employee.dto.*;
 import com.project.myacademy.global.Response;
 import com.project.myacademy.global.exception.BindingException;
 import com.project.myacademy.global.exception.ErrorCode;
-import com.project.myacademy.global.exception.ErrorDto;
 import com.project.myacademy.global.util.AuthenticationUtil;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,7 +22,6 @@ import org.springframework.web.util.CookieGenerator;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 @RestController
 @RequestMapping("/api/v1/academies/")
@@ -73,7 +71,7 @@ public class EmployeeRestController {
     @Tag(name = "0. 로그아웃", description = "스웨거용 API")
     @Operation(summary = "직원 로그아웃", description = "스웨거용 ENDPOINT. \n\n 로그아웃시 쿠키가 삭제됩니다.")
     @PostMapping("/employees/logout")
-    public ResponseEntity<Response> logout(Authentication authentication, HttpServletResponse httpServletResponse) {
+    public ResponseEntity<Response<LogoutEmployeeResponse>> logout(Authentication authentication, HttpServletResponse httpServletResponse) {
 
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
         log.info("🔑 로그아웃을 요청한 계정 [{}]", requestAccount);
@@ -82,8 +80,9 @@ public class EmployeeRestController {
         cookieGenerator.addCookie(httpServletResponse, "deleted");
         cookieGenerator.setCookieMaxAge(0);
 
+        LogoutEmployeeResponse response = new LogoutEmployeeResponse();
 
-        return ResponseEntity.ok(Response.success("로그아웃 성공"));
+        return ResponseEntity.ok(Response.success(response));
     }
 
     @Tag(name = "02-1. 직원", description = "직원 회원 가입 및 정보 수정,조회")
