@@ -92,7 +92,7 @@ public class PaymentService {
         Enrollment studentEnrollment = validateEnrollmentByStudentAndLecture(foundStudent, foundLecture);
 
         //결제 여부 확인 - 이미결제가 되어있을시 DUPLICATED_PAYMENT 에러발생
-        if (studentEnrollment.getPaymentYN() != false) {
+        if (studentEnrollment.getPaymentYN()) {
             throw new AppException(ErrorCode.DUPLICATED_PAYMENT);
         }
 
@@ -183,7 +183,7 @@ public class PaymentService {
         Enrollment enrollment = validateEnrollmentByStudentAndLecture(selcetedPayment.getStudent(), selcetedPayment.getLecture());
 
         // 결제 여부 확인
-        if (enrollment.getPaymentYN() == true) {
+        if (enrollment.getPaymentYN()) {
             throw new AppException(ErrorCode.ALREADY_PAYMENT);
         }
 
@@ -192,7 +192,7 @@ public class PaymentService {
 
         // 학생의 이메일로 메시지 전송
         String email = enrollment.getStudent().getEmail();
-        String subject = String.format("MyAcademy 결제 완료 안내 메일");
+        String subject = "MyAcademy 결제 완료 안내 메일";
         String body = String.format("%s님의 %d원 %s 결제가 정상적으로 완료되었습니다.%n%n감사합니다.", enrollment.getStudent().getName(), amount, enrollment.getLecture().getName());
         try {
             emailUtil.sendEmail(email, subject, body);
@@ -232,7 +232,7 @@ public class PaymentService {
      */
     public FailApprovePaymentResponse failApprovePayment(String errorCode, String errorMsg, String orderId) {
 
-        Payment payment = validatePaymentByOrderId(orderId);
+        validatePaymentByOrderId(orderId);
 
         return FailApprovePaymentResponse.builder()
                 .orderId(orderId)
@@ -296,7 +296,7 @@ public class PaymentService {
         Student foundStudent = enrollment.getStudent();
         Lecture foundLecture = enrollment.getLecture();
         String email = foundStudent.getEmail();
-        String subject = String.format("MyAcademy 결제 취소 안내 메일");
+        String subject = "MyAcademy 결제 취소 안내 메일";
         String body = String.format("%s님의 %s 결제 취소가 정상적으로 처리되었습니다.%n%n감사합니다.", foundStudent.getName(), foundLecture.getName());
         try {
             emailUtil.sendEmail(email, subject, body);
@@ -363,13 +363,11 @@ public class PaymentService {
             CompletePaymentResponse completePayment = new CompletePaymentResponse(payment);
 
             discountRepository.findById(payment.getDiscountId()).ifPresent(
-                    discount -> {
-                        completePayment.setDiscountName(discount.getDiscountName());
-                    }
+                    discount -> completePayment.setDiscountName(discount.getDiscountName())
             );
 
             Optional<CancelPayment> foundCancelPayment = cancelPaymentRepository.findByPayment(payment);
-            foundCancelPayment.ifPresent(cancelPayment -> completePayment.setDeletedAt(cancelPayment));
+            foundCancelPayment.ifPresent(completePayment::setDeletedAt);
 
             foundPayments.add(completePayment);
         }
@@ -406,13 +404,11 @@ public class PaymentService {
                 CompletePaymentResponse completePayment = new CompletePaymentResponse(payment);
 
                 discountRepository.findById(payment.getDiscountId()).ifPresent(
-                        discount -> {
-                            completePayment.setDiscountName(discount.getDiscountName());
-                        }
+                        discount -> completePayment.setDiscountName(discount.getDiscountName())
                 );
 
                 Optional<CancelPayment> foundCancelPayment = cancelPaymentRepository.findByPayment(payment);
-                foundCancelPayment.ifPresent(cancelPayment -> completePayment.setDeletedAt(cancelPayment));
+                foundCancelPayment.ifPresent(completePayment::setDeletedAt);
 
                 foundPayments.add(completePayment);
             }
@@ -431,7 +427,7 @@ public class PaymentService {
      * @param requestAccount 요청하는 직원 계정
      * @param studentId      학생 Id
      */
-    public Page<CompletePaymentResponse> findAllCompletePaymentByStudent(Long academyId, String requestAccount, Long studentId, Pageable pageable) {
+    public Page<CompletePaymentResponse> findAllCompletePaymentByStudent(Long academyId, String requestAccount, Long studentId) {
 
         // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
         Academy foundAcademy = validateAcademyById(academyId);
@@ -450,17 +446,16 @@ public class PaymentService {
             Enrollment foundEnrollment = enrollmentRepository.findByLecture_IdAndStudent_Id(payment.getLecture().getId(), payment.getStudent().getId())
                     .orElseThrow(() -> new AppException(ErrorCode.ENROLLMENT_NOT_FOUND));
 
-            if (foundEnrollment.getPaymentYN() == true) {
+            if (foundEnrollment.getPaymentYN()) {
 
                 CompletePaymentResponse completePayment = new CompletePaymentResponse(payment);
 
                 discountRepository.findById(payment.getDiscountId()).ifPresent(
-                        discount -> {
-                            completePayment.setDiscountName(discount.getDiscountName());
-                        }
+                        discount -> completePayment.setDiscountName(discount.getDiscountName())
                 );
+
                 Optional<CancelPayment> foundCancelPayment = cancelPaymentRepository.findByPayment(payment);
-                foundCancelPayment.ifPresent(cancelPayment -> completePayment.setDeletedAt(cancelPayment));
+                foundCancelPayment.ifPresent(completePayment::setDeletedAt);
 
                 foundPayments.add(completePayment);
             }
@@ -472,51 +467,44 @@ public class PaymentService {
 
     // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
     private Academy validateAcademyById(Long academyId) {
-        Academy validatedAcademy = academyRepository.findById(academyId)
+        return academyRepository.findById(academyId)
                 .orElseThrow(() -> new AppException(ErrorCode.ACADEMY_NOT_FOUND));
-        return validatedAcademy;
     }
 
     // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
     public Employee validateRequestEmployeeByAcademy(String account, Academy academy) {
-        Employee employee = employeeRepository.findByAccountAndAcademy(account, academy)
+        return employeeRepository.findByAccountAndAcademy(account, academy)
                 .orElseThrow(() -> new AppException(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND));
-        return employee;
     }
 
     // 학생 Id로 학생을 조회 - 없을시 STUDENT_NOT_FOUND 에러발생
     public Student validateStudentById(Long studentId) {
-        Student validateStudent = studentRepository.findById(studentId)
+        return studentRepository.findById(studentId)
                 .orElseThrow(() -> new AppException(ErrorCode.STUDENT_NOT_FOUND));
-        return validateStudent;
     }
 
     // 강좌 Id로 강좌를 조회 - 없을시 LECTURE_NOT_FOUND 에러발생
     public Lecture validateLectureById(Long lectureId) {
-        Lecture validateLecture = lectureRepository.findById(lectureId)
+        return lectureRepository.findById(lectureId)
                 .orElseThrow(() -> new AppException(ErrorCode.LECTURE_NOT_FOUND));
-        return validateLecture;
     }
 
     // 학생과 강좌로 수강이력을 조회 - 없을시 ENROLLMENT_NOT_FOUND 에러발생
     public Enrollment validateEnrollmentByStudentAndLecture(Student foundStudent, Lecture foundLecture) {
-        Enrollment validateEnrollment = enrollmentRepository.findByStudentAndLecture(foundStudent, foundLecture)
+        return enrollmentRepository.findByStudentAndLecture(foundStudent, foundLecture)
                 .orElseThrow(() -> new AppException(ErrorCode.ENROLLMENT_NOT_FOUND));
-        return validateEnrollment;
     }
 
     // 주문Id로 Payment 조회 - 없을시 PAYMENT_NOT_FOUND 에러발생
     public Payment validatePaymentByOrderId(String orderId) {
-        Payment validatePayment = paymentRepository.findByOrderId(orderId)
+        return paymentRepository.findByOrderId(orderId)
                 .orElseThrow(() -> new AppException(ErrorCode.PAYMENT_NOT_FOUND));
-        return validatePayment;
     }
 
     // 학생Id와 학원 Id로 학생을 조회 - 없으면 STUDENT_NOT_FOUND 에러발생
     public Student validateStudentByIdAndAcademyId(Long academyId, Long studentId) {
-        Student validateStudent = studentRepository.findByAcademyIdAndId(academyId, studentId)
+        return studentRepository.findByAcademyIdAndId(academyId, studentId)
                 .orElseThrow(() -> new AppException(ErrorCode.STUDENT_NOT_FOUND));
-        return validateStudent;
     }
 
     // 해당 직원의 권한 체크 - USER 이면 INVALID_PERMISSION 에러발생
