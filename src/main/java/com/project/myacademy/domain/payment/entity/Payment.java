@@ -2,7 +2,6 @@ package com.project.myacademy.domain.payment.entity;
 
 import com.project.myacademy.domain.BaseEntity;
 import com.project.myacademy.domain.academy.Academy;
-import com.project.myacademy.domain.discount.Discount;
 import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.domain.lecture.Lecture;
 import com.project.myacademy.domain.payment.PayType;

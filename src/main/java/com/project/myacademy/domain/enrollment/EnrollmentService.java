@@ -282,7 +282,7 @@ public class EnrollmentService {
         //해당 학원의 모든 수강 신청 내역을 page 로 가져온다.
         Page<Enrollment> foundAllEnrollments = enrollmentRepository.findAllByAcademyIdAndPaymentYNIsFalseOrderByCreatedAtDesc(academyId, pageable);
 
-        return foundAllEnrollments.map(enrollment -> new FindEnrollmentResponse(enrollment));
+        return foundAllEnrollments.map(FindEnrollmentResponse::new);
     }
 
     /**
@@ -330,36 +330,31 @@ public class EnrollmentService {
 
     // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
     private Academy validateAcademyById(Long academyId) {
-        Academy validatedAcademy = academyRepository.findById(academyId)
+        return academyRepository.findById(academyId)
                 .orElseThrow(() -> new AppException(ErrorCode.ACADEMY_NOT_FOUND));
-        return validatedAcademy;
     }
 
     // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
     public Employee validateRequestEmployeeByAcademy(String account, Academy academy) {
-        Employee employee = employeeRepository.findByAccountAndAcademy(account, academy)
+        return employeeRepository.findByAccountAndAcademy(account, academy)
                 .orElseThrow(() -> new AppException(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND));
-        return employee;
     }
 
     // 학생 Id로 학생을 조회 - 없을시 STUDENT_NOT_FOUND 에러발생
     private Student validateStudentById(Long studentId) {
-        Student validatedStudent = studentRepository.findById(studentId)
+        return studentRepository.findById(studentId)
                 .orElseThrow(() -> new AppException(ErrorCode.STUDENT_NOT_FOUND));
-        return validatedStudent;
     }
 
     // 강좌 Id로 강좌를 조회 - 없을시 LECTURE_NOT_FOUND 에러발생
     private Lecture validateLectureById(Long lectureId) {
-        Lecture validatedLecture = lectureRepository.findById(lectureId)
+        return lectureRepository.findById(lectureId)
                 .orElseThrow(() -> new AppException(ErrorCode.LECTURE_NOT_FOUND));
-        return validatedLecture;
     }
 
     // 수강이력 Id로 수강이력을 조회 - 없을시 ENROLLMENT_NOT_FOUND 에러발생
     private Enrollment validateEnrollmentById(Long enrollmentId) {
-        Enrollment validatedEnrollment = enrollmentRepository.findById(enrollmentId)
+        return enrollmentRepository.findById(enrollmentId)
                 .orElseThrow(() -> new AppException(ErrorCode.ENROLLMENT_NOT_FOUND));
-        return validatedEnrollment;
     }
 }

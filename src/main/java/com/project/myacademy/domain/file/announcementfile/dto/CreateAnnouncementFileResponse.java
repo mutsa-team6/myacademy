@@ -14,13 +14,13 @@ import java.util.List;
 public class CreateAnnouncementFileResponse {
 
     private List<String> uploadFileName;
-    private List<String> S3StoredFileName;
+    private List<String> s3StoredFileName;
     private String message;
 
     public static CreateAnnouncementFileResponse of(List<String> original, List<String> stored ) {
         return CreateAnnouncementFileResponse.builder()
                 .uploadFileName(original)
-                .S3StoredFileName(stored)
+                .s3StoredFileName(stored)
                 .message("파일 첨부 완료")
                 .build();
     }
