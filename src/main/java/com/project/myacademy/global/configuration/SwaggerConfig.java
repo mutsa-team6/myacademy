@@ -3,11 +3,7 @@ package com.project.myacademy.global.configuration;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.models.security.SecurityRequirement;
-import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springdoc.core.GroupedOpenApi;
-import org.springdoc.core.customizers.OpenApiCustomiser;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -29,7 +25,7 @@ import org.springframework.context.annotation.Configuration;
 public class SwaggerConfig {
 
     @Bean
-    public GroupedOpenApi FirstOpenApi() {
+    public GroupedOpenApi firstOpenApi() {
         String[] paths = {
                 "com.project.myacademy.domain.academy",
                 "com.project.myacademy.domain.employee",
@@ -46,7 +42,7 @@ public class SwaggerConfig {
     }
 
     @Bean
-    public GroupedOpenApi SecondOpenApi() {
+    public GroupedOpenApi secondOpenApi() {
         String[] paths = {
                 "com.project.myacademy.domain.parent",
                 "com.project.myacademy.domain.student",
@@ -61,7 +57,7 @@ public class SwaggerConfig {
     }
 
     @Bean
-    public GroupedOpenApi ThirdOpenApi() {
+    public GroupedOpenApi thirdOpenApi() {
         String[] paths = {
                 "com.project.myacademy.domain.teacher",
                 "com.project.myacademy.domain.lecture",
@@ -80,7 +76,7 @@ public class SwaggerConfig {
     }
 
     @Bean
-    public GroupedOpenApi SecurityGroupOpenApi() {
+    public GroupedOpenApi securityGroupOpenApi() {
         String[] paths = {"/api/v1/**"};
 
         return GroupedOpenApi

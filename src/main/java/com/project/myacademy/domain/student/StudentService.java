@@ -78,7 +78,7 @@ public class StudentService {
         // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
         Academy academy = validateAcademyById(academyId);
         // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
-        Employee employee = validateRequestEmployeeByAcademy(account, academy);
+        validateRequestEmployeeByAcademy(account, academy);
         // 학생이 등록되어 있는지 확인 - 없으면 STUDENT_NOT_FOUND 에러발생
         Student student = validateStudentById(academyId, studentId);
 
@@ -96,7 +96,7 @@ public class StudentService {
         // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
         Academy academy = validateAcademyById(academyId);
         // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
-        Employee employee = validateRequestEmployeeByAcademy(account, academy);
+        validateRequestEmployeeByAcademy(account, academy);
 
         return studentRepository.findAllByAcademyId(pageable, academyId).map(ReadAllStudentResponse::of);
     }
@@ -121,14 +121,14 @@ public class StudentService {
         // 학생이 등록되어 있는지 확인 - 없으면 STUDENT_NOT_FOUND 에러발생
         Student existStudent = validateStudentById(academyId, studentId);
 
-        //변경될 Email이 기존에 있으면 에러처리;
+        //변경될 이메일이 기존에 있으면 에러처리;
         Optional<Student> sameEmailStudent = Optional.of(studentRepository.findByEmailAndAcademyId(request.getEmail(), academyId)
                 .orElseGet(() -> existStudent));
         if (sameEmailStudent.get() != existStudent) {
             throw new AppException(ErrorCode.DUPLICATED_EMAIL);
         }
 
-        //변경될 PhonNum이 기존에 있으면 에러처리
+        //변경될 핸드폰번호가 기존에 있으면 에러처리
         Optional<Student> samePhoneNumStudent = Optional.of(studentRepository.findByPhoneNumAndAcademyId(request.getPhoneNum(), academyId)
                 .orElseGet(() -> existStudent));
         if (samePhoneNumStudent.get() != existStudent) {
@@ -171,7 +171,7 @@ public class StudentService {
 
         Page<Student> foundStudents = studentRepository.findByAcademyIdAndName(academyId, studentName, pageable);
 
-        return foundStudents.map(student -> ReadAllStudentResponse.of(student));
+        return foundStudents.map(ReadAllStudentResponse::of);
 
     }
 
@@ -182,31 +182,27 @@ public class StudentService {
 
     // 학생이 등록되어 있는지 확인 - 없으면 STUDENT_NOT_FOUND 에러발생
     private Student validateStudentById(Long academyId, Long studentId) {
-        Student student = studentRepository.findByAcademyIdAndId(academyId, studentId)
+        return studentRepository.findByAcademyIdAndId(academyId, studentId)
                 .orElseThrow(() -> new AppException(ErrorCode.STUDENT_NOT_FOUND));
-        return student;
     }
 
     // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
     public Academy validateAcademyById(Long academyId) {
 
-        Academy validateAcademy = academyRepository.findById(academyId)
+        return academyRepository.findById(academyId)
                 .orElseThrow(() -> new AppException(ErrorCode.ACADEMY_NOT_FOUND));
-        return validateAcademy;
     }
 
     // 학원 Id와 부모 전화번호로 부모 조회 - 없을시 PARENT_NOT_FOUND 에러발생
     private Parent validateParentByPhoneNum(Long academyId, String phoneNum) {
-        Parent parent = parentRepository.findByPhoneNumAndAcademyId(phoneNum, academyId)
+        return parentRepository.findByPhoneNumAndAcademyId(phoneNum, academyId)
                 .orElseThrow(() -> new AppException(ErrorCode.PARENT_NOT_FOUND));
-        return parent;
     }
 
     // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
     public Employee validateRequestEmployeeByAcademy(String account, Academy academy) {
-        Employee employee = employeeRepository.findByAccountAndAcademy(account, academy)
+        return employeeRepository.findByAccountAndAcademy(account, academy)
                 .orElseThrow(() -> new AppException(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND));
-        return employee;
     }
 
     // 해당 직원의 권한 체크 - USER 이면 INVALID_PERMISSION 에러발생

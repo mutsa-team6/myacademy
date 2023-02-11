@@ -63,9 +63,9 @@ public class AnnouncementService {
         // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
         Academy academy = validateAcademyById(academyId);
         // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
-        Employee employee = validateRequestEmployeeByAcademy(account, academy);
+        validateRequestEmployeeByAcademy(account, academy);
 
-        return announcementRepository.findAllByAcademyOrderByCreatedAtDesc(academy, pageable).map(announcement -> ReadAllAnnouncementResponse.of(announcement));
+        return announcementRepository.findAllByAcademyOrderByCreatedAtDesc(academy, pageable).map(ReadAllAnnouncementResponse::of);
     }
 
     /**
@@ -81,11 +81,11 @@ public class AnnouncementService {
         // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
         Academy academy = validateAcademyById(academyId);
         // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
-        Employee employee = validateRequestEmployeeByAcademy(account, academy);
+        validateRequestEmployeeByAcademy(account, academy);
 
         AnnouncementType announcementType = AnnouncementType.valueOf(type);
 
-        return announcementRepository.findAllByTypeAndAcademy(announcementType, academy, pageable).map(announcement -> ReadAllAnnouncementResponse.of(announcement));
+        return announcementRepository.findAllByTypeAndAcademy(announcementType, academy, pageable).map(ReadAllAnnouncementResponse::of);
     }
 
 
@@ -102,7 +102,7 @@ public class AnnouncementService {
         // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
         Academy academy = validateAcademyById(academyId);
         // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
-        Employee employee = validateRequestEmployeeByAcademy(account, academy);
+        validateRequestEmployeeByAcademy(account, academy);
 
         //announcementId에 해당하는 특이사항이 있는 지확인하고 있으면 가져옴
         Announcement announcement = announcementRepository.findById(announcementId)
@@ -171,12 +171,11 @@ public class AnnouncementService {
         // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
         Academy academy = validateAcademyById(academyId);
         // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
-        Employee employee = validateRequestEmployeeByAcademy(account, academy);
+        validateRequestEmployeeByAcademy(account, academy);
 
         List<Announcement> announcements = announcementRepository.findTop5ByTypeAndAcademyOrderByCreatedAtDesc(AnnouncementType.ANNOUNCEMENT, academy);
 
-        return announcements.stream().map(announcement ->
-                ReadAnnouncementResponse.of(announcement)).collect(Collectors.toList());
+        return announcements.stream().map(ReadAnnouncementResponse::of).collect(Collectors.toList());
     }
 
     /**
@@ -188,10 +187,9 @@ public class AnnouncementService {
         // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
         Academy academy = validateAcademyById(academyId);
         // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
-        Employee employee = validateRequestEmployeeByAcademy(account, academy);
+        validateRequestEmployeeByAcademy(account, academy);
 
-        return announcementRepository.findTop5ByTypeAndAcademyOrderByCreatedAtDesc(AnnouncementType.ADMISSION, academy).stream().map(announcement ->
-                ReadAnnouncementResponse.of(announcement)).collect(Collectors.toList());
+        return announcementRepository.findTop5ByTypeAndAcademyOrderByCreatedAtDesc(AnnouncementType.ADMISSION, academy).stream().map(ReadAnnouncementResponse::of).collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
@@ -200,24 +198,22 @@ public class AnnouncementService {
         // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
         Academy academy = validateAcademyById(academyId);
         // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
-        Employee employee = validateRequestEmployeeByAcademy(account, academy);
+        validateRequestEmployeeByAcademy(account, academy);
 
-        return announcementRepository.findAllByAcademyAndTitleContainingOrderByCreatedAtDesc(academy, title, pageable).map(announcement -> ReadAllAnnouncementResponse.of(announcement));
+        return announcementRepository.findAllByAcademyAndTitleContainingOrderByCreatedAtDesc(academy, title, pageable).map(ReadAllAnnouncementResponse::of);
     }
 
 
     // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
     public Academy validateAcademyById(Long academyId) {
-
         return academyRepository.findById(academyId)
                 .orElseThrow(() -> new AppException(ErrorCode.ACADEMY_NOT_FOUND));
     }
 
     // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
     public Employee validateRequestEmployeeByAcademy(String account, Academy academy) {
-        Employee employee = employeeRepository.findByAccountAndAcademy(account, academy)
+        return employeeRepository.findByAccountAndAcademy(account, academy)
                 .orElseThrow(() -> new AppException(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND));
-        return employee;
     }
 
     // 해당 직원의 권한 체크 - USER 이면 INVALID_PERMISSION 에러발생
