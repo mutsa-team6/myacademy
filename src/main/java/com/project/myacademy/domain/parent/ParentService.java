@@ -64,8 +64,6 @@ public class ParentService {
         Academy academy = validateAcademyById(academyId);
         // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
         Employee employee = validateRequestEmployeeByAcademy(account, academy);
-        // 해당 직원의 권한 체크 - USER 이면 INVALID_PERMISSION 에러발생
-        validateAuthorityUser(employee);
 
         //parentId와 academyId에 해당하는 부모 정보가 존재하는지 확인
         Parent parent = validateParent(parentId, academyId);

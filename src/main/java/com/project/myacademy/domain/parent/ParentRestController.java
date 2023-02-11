@@ -36,7 +36,7 @@ public class ParentRestController {
     /**
      * 부모 정보 단건 조회
      */
-    @Operation(summary = "학부모 조회", description = "ADMIN,STAFF 회원만 조회가 가능합니다.")
+    @Operation(summary = "학부모 조회", description = "부모 정보를 조회합니다.")
     @GetMapping("/{academyId}/parents/{parentId}")
     public ResponseEntity<Response<ReadParentResponse>> read(@PathVariable Long academyId, @PathVariable Long parentId, Authentication authentication) {
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
