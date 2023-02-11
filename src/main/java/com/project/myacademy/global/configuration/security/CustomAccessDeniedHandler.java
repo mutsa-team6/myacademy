@@ -29,7 +29,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
         response.setContentType("text/html; charset=utf-8");
         PrintWriter writer = response.getWriter();
-        writer.println("<script>alert('특정 권한의 회원만 접근할 수 있습니다.');  location.href='/academy/main'</script>");
+        writer.println("<script>alert('특정 권한의 회원만 접근할 수 있습니다.');  history.back();</script>");
         writer.flush();
 
         ExceptionManager.setErrorResponse(response, errorCode);
