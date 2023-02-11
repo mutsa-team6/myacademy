@@ -156,7 +156,6 @@ public class StudentService {
         Employee employee = validateRequestEmployeeByAcademy(account, academy);
         // 해당 직원의 권한 체크 - USER 이면 INVALID_PERMISSION 에러발생
         validateAuthorityUser(employee);
-
         // 학생이 등록되어 있는지 확인 - 없으면 STUDENT_NOT_FOUND 에러발생
         Student student = validateStudentById(academyId, studentId);
 

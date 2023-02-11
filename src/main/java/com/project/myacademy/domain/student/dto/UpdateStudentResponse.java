@@ -21,7 +21,6 @@ public class UpdateStudentResponse {
     private String phoneNum;
     //학생 이메일
     private String email;
-
     //학생 정보 마지막 수정 일시
     private LocalDateTime lastModifiedAt;
 
@@ -32,6 +31,7 @@ public class UpdateStudentResponse {
                 .birth(student.getBirth())
                 .phoneNum(student.getPhoneNum())
                 .email(student.getEmail())
+                .lastModifiedAt(student.getLastModifiedAt())
                 .build();
 
     }
