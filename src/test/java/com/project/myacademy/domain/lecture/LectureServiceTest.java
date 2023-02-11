@@ -1,6 +1,5 @@
 package com.project.myacademy.domain.lecture;
 
-import com.project.myacademy.domain.BaseEntity;
 import com.project.myacademy.domain.academy.Academy;
 import com.project.myacademy.domain.academy.AcademyRepository;
 import com.project.myacademy.domain.employee.Employee;
@@ -21,14 +20,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.test.util.ReflectionTestUtils;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.TextStyle;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -64,7 +58,7 @@ class LectureServiceTest {
         academy = Academy.builder().id(1L).name("academy").owner("owner").build();
         employee = Employee.builder().id(1L).name("staff").email("email").account("account").password("password").employeeRole(EmployeeRole.ROLE_STAFF).academy(academy).build();
         teacher = Employee.builder().id(2L).name("teacher").email("email1").account("account1").employeeRole(EmployeeRole.ROLE_USER).academy(academy).build();
-        lecture = Lecture.builder().id(1L).name("lecture").price(10000).LectureDay("월").finishDate(LocalDate.now().plusDays(3)).employee(teacher).build();
+        lecture = Lecture.builder().id(1L).name("lecture").price(10000).lectureDay("월").finishDate(LocalDate.now().plusDays(3)).employee(teacher).build();
         mockEmployee = mock(Employee.class);
         mockTeacher = mock(Employee.class);
         mockLecture1 = mock(Lecture.class);

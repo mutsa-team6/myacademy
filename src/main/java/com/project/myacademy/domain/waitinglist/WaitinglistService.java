@@ -105,7 +105,7 @@ public class WaitinglistService {
 
         // 학생의 이메일로 메시지 전송
         String email = student.getEmail();
-        String subject = String.format("MyAcademy 대기 신청 완료 안내 메일");
+        String subject = "MyAcademy 대기 신청 완료 안내 메일";
         String body = String.format("%s님의 %s 대기 신청이 정상적으로 완료되었습니다.%n%n감사합니다.", student.getName(), lecture.getName());
         try {
             emailUtil.sendEmail(email, subject, body);
@@ -146,7 +146,7 @@ public class WaitinglistService {
 
         // 학생의 이메일로 메시지 전송
         String email = student.getEmail();
-        String subject = String.format("MyAcademy 대기 신청 취소 안내 메일");
+        String subject = "MyAcademy 대기 신청 취소 안내 메일";
         String body = String.format("%s님의 %s 대기 신청 취소가 정상적으로 처리되었습니다.%n%n감사합니다.", student.getName(), lecture.getName());
         try {
             emailUtil.sendEmail(email, subject, body);
@@ -214,9 +214,8 @@ public class WaitinglistService {
 
     // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
     public Employee validateRequestEmployeeByAcademy(String account, Academy academy) {
-        Employee employee = employeeRepository.findByAccountAndAcademy(account, academy)
+        return employeeRepository.findByAccountAndAcademy(account, academy)
                 .orElseThrow(() -> new AppException(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND));
-        return employee;
     }
 
     // 학생 Id로 학생을 조회 - 없을시 STUDENT_NOT_FOUND 에러발생
