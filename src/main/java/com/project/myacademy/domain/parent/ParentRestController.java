@@ -2,6 +2,8 @@ package com.project.myacademy.domain.parent;
 
 import com.project.myacademy.domain.parent.dto.*;
 import com.project.myacademy.global.Response;
+import com.project.myacademy.global.exception.BindingException;
+import com.project.myacademy.global.exception.ErrorCode;
 import com.project.myacademy.global.util.AuthenticationUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -9,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "04. 학부모", description = "학부모 등록,수정,조회")
@@ -25,7 +29,11 @@ public class ParentRestController {
      */
     @Operation(summary = "학부모 등록", description = "ADMIN,STAFF 회원만 등록이 가능합니다.")
     @PostMapping("/{academyId}/parents")
-    public ResponseEntity<Response<CreateParentResponse>> create(@PathVariable Long academyId, @RequestBody CreateParentRequest request, Authentication authentication) {
+    public ResponseEntity<Response<CreateParentResponse>> create(@PathVariable Long academyId, @Validated @RequestBody CreateParentRequest request, BindingResult bindingResult, Authentication authentication) {
+
+        if (bindingResult.hasErrors()) {
+            throw new BindingException(ErrorCode.BINDING_ERROR, bindingResult.getFieldError().getDefaultMessage());
+        }
 
         log.info("✨ 부모 전화번호 [{}] || 학원 id [{}]", request.getPhoneNum(), academyId);
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);

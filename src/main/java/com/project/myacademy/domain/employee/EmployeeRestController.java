@@ -2,6 +2,7 @@ package com.project.myacademy.domain.employee;
 
 import com.project.myacademy.domain.employee.dto.*;
 import com.project.myacademy.global.Response;
+import com.project.myacademy.global.exception.BindingException;
 import com.project.myacademy.global.exception.ErrorCode;
 import com.project.myacademy.global.exception.ErrorDto;
 import com.project.myacademy.global.util.AuthenticationUtil;
@@ -35,13 +36,12 @@ public class EmployeeRestController {
     @Tag(name = "02-1. 직원", description = "직원 회원 가입 및 정보 수정,조회")
     @Operation(summary = "직원 회원가입", description = "직원이 회원 가입을 합니다.")
     @PostMapping("/{academyId}/employees/signup")
-    public ResponseEntity create(@PathVariable Long academyId, @Validated @RequestBody CreateEmployeeRequest request, BindingResult br) {
+    public ResponseEntity create(@PathVariable Long academyId, @Validated @RequestBody CreateEmployeeRequest request, BindingResult bindingResult) {
 
         log.info("⭐ 회원가입 요청한 id [{}] 요청한 사용자 계정 [{}]", academyId, request.getAccount());
 
-        if (br.hasErrors()) {
-            ErrorCode e = ErrorCode.BLANK_NOT_ALLOWED;
-            return ResponseEntity.status(e.getHttpStatus()).body(Response.error("ERROR", new ErrorDto(e.toString(), e.getMessage())));
+        if (bindingResult.hasErrors()) {
+            throw new BindingException(ErrorCode.BINDING_ERROR, bindingResult.getFieldError().getDefaultMessage());
         }
         CreateEmployeeResponse response = employeeService.createEmployee(request, academyId);
 
@@ -91,8 +91,11 @@ public class EmployeeRestController {
     @Tag(name = "02-1. 직원", description = "직원 회원 가입 및 정보 수정,조회")
     @Operation(summary = "직원 수정", description = "ADMIN 회원 및 본인 만 수정이 가능합니다.")
     @PutMapping("/{academyId}")
-    public ResponseEntity update(Authentication authentication, @PathVariable Long academyId, @RequestBody UpdateEmployeeRequest request) {
+    public ResponseEntity update(Authentication authentication, @PathVariable Long academyId, @Validated @RequestBody UpdateEmployeeRequest request,BindingResult bindingResult) {
 
+        if (bindingResult.hasErrors()) {
+            throw new BindingException(ErrorCode.BINDING_ERROR, bindingResult.getFieldError().getDefaultMessage());
+        }
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
         log.info(" 🛠 본인 정보 수정을 요청한 사용자 계정 [{}] || 학원 아이디 [{}] ", requestAccount, academyId);
 
@@ -125,7 +128,11 @@ public class EmployeeRestController {
     @Tag(name = "02-2. 직원", description = "직원 로그인,계정 및 비밀번호 찾기, 변경")
     @Operation(summary = "직원 계정찾기", description = "직원 계정을 찾습니다.")
     @PostMapping("employee/findAccount")
-    public ResponseEntity findAccount(@RequestBody FindAccountEmployeeRequest request) {
+    public ResponseEntity findAccount(@Validated @RequestBody FindAccountEmployeeRequest request,BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors()) {
+            throw new BindingException(ErrorCode.BINDING_ERROR, bindingResult.getFieldError().getDefaultMessage());
+        }
 
         FindAccountEmployeeResponse response = employeeService.findAccountEmployee(request);
 
@@ -138,7 +145,11 @@ public class EmployeeRestController {
     @Tag(name = "02-2. 직원", description = "직원 로그인,계정 및 비밀번호 찾기, 변경")
     @Operation(summary = "직원 계정 비밀번호 변경", description = "비밀번호를 변경합니다.")
     @PostMapping("{academyId}/employee/changePassword")
-    public ResponseEntity changePassword(@PathVariable Long academyId, @RequestBody ChangePasswordEmployeeRequest request, Authentication authentication) {
+    public ResponseEntity changePassword(@PathVariable Long academyId, @Validated @RequestBody ChangePasswordEmployeeRequest request, BindingResult bindingResult, Authentication authentication) {
+
+        if (bindingResult.hasErrors()) {
+            throw new BindingException(ErrorCode.BINDING_ERROR, bindingResult.getFieldError().getDefaultMessage());
+        }
 
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
         ChangePasswordEmployeeResponse response = employeeService.changePasswordEmployee(request, academyId, requestAccount);
@@ -155,7 +166,11 @@ public class EmployeeRestController {
     @Tag(name = "02-2. 직원", description = "직원 로그인,계정 및 비밀번호 찾기, 변경")
     @Operation(summary = "직원 비밀번호 찾기", description = "이메일로 임시 비밀번호가 발송됩니다.")
     @PutMapping("/employee/findPassword")
-    public ResponseEntity findPassword(@RequestBody FindPasswordEmployeeRequest request) {
+    public ResponseEntity findPassword(@Validated @RequestBody FindPasswordEmployeeRequest request,BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors()) {
+            throw new BindingException(ErrorCode.BINDING_ERROR, bindingResult.getFieldError().getDefaultMessage());
+        }
         FindPasswordEmployeeResponse response = employeeService.findPasswordEmployee(request);
         return ResponseEntity.ok(Response.success(response));
     }
