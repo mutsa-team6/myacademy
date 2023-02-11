@@ -88,9 +88,9 @@ public class EmployeeService {
             }
 
             //ADMIN 권한의 Employee 객체 생성
-            Employee AdminEmployee = Employee.createAdminEmployee(request, foundAcademy, encryptedPassword);
+            Employee adminEmployee = Employee.createAdminEmployee(request, foundAcademy, encryptedPassword);
 
-            Employee saved = employeeRepository.save(AdminEmployee);
+            Employee saved = employeeRepository.save(adminEmployee);
             return new CreateEmployeeResponse(saved, foundAcademy.getName());
         }
         //그 외는 일반 USER 등급 && 요청한 아이디로 가입
@@ -102,9 +102,9 @@ public class EmployeeService {
                 throw new AppException(ErrorCode.EMPTY_SUBJECT_FORBIDDEN);
             }
             //USER 권한의 Employee 객체 생성
-            Employee UserEmployee = Employee.createUserEmployee(request, foundAcademy, encryptedPassword);
+            Employee userEmployee = Employee.createUserEmployee(request, foundAcademy, encryptedPassword);
 
-            Employee saved = employeeRepository.save(UserEmployee);
+            Employee saved = employeeRepository.save(userEmployee);
             return new CreateEmployeeResponse(saved, foundAcademy.getName());
         }
 
@@ -288,9 +288,9 @@ public class EmployeeService {
         Academy foundAcademy = validateAcademyById(academyId);
 
         // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
-        Employee RequestEmployee = validateRequestEmployeeByAccount(requestAccount, foundAcademy);
+        Employee requestEmployee = validateRequestEmployeeByAccount(requestAccount, foundAcademy);
 
-        return new ReadEmployeeResponse(RequestEmployee);
+        return new ReadEmployeeResponse(requestEmployee);
     }
 
     /**
