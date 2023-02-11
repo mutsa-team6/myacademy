@@ -361,9 +361,8 @@
                 } else if (error.response.data.result["errorCode"] == "EMPTY_EMPLOYEE_TYPE") {
                     alert("유형 선택은 필수입니다.");
                     document.querySelector("input[name=employeeType]").focus();
-                } else if (error.response.data.result["errorCode"] == "BINDING_ERROR") {
-                    alert("입력되지 않은 정보가 있습니다! 입력해주세요.");
-                    document.querySelector("input[name=employeeType]").focus();
+                }else if (error.response.data.result["errorCode"] == "BINDING_ERROR") {
+                    alert(error.response.data.result["message"]);
                 }
 
             });
