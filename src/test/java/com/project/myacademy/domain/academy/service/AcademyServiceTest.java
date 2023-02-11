@@ -77,7 +77,7 @@ class AcademyServiceTest {
 
         @Test
         @DisplayName("학원 등록 실패 - 사업자번호 중복")
-        public void create_academy_fail2() {
+         void create_academy_fail2() {
 
             given(academyRepository.findByName(anyString())).willReturn(Optional.empty());
             given(academyRepository.findByBusinessRegistrationNumber(anyString())).willReturn(Optional.of(academy1));
@@ -172,7 +172,7 @@ class AcademyServiceTest {
 
         @Test
         @DisplayName("학원 id로 학원 조회 성공")
-        public void  find_acdemyById_success() {
+         void  find_acdemyById_success() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy1));
 
@@ -186,7 +186,7 @@ class AcademyServiceTest {
 
         @Test
         @DisplayName("학원 id로 학원 조회 실패")
-       public void find_acdemyById_fail1() {
+        void find_acdemyById_fail1() {
 
             given(academyRepository.findById(any())).willReturn(Optional.empty());
 

@@ -115,7 +115,7 @@ class UniquenessServiceTest {
 
         @Test
         @DisplayName("특이사항 조회 : 성공")
-        public void readUniquenessSuccess() {
+        void readUniquenessSuccess() {
 
             ReflectionTestUtils.setField(uniqueness1, BaseEntity.class, "createdAt", LocalDateTime.of(2021, 12, 6, 12, 0), LocalDateTime.class);
             ReflectionTestUtils.setField(uniqueness2, BaseEntity.class, "createdAt", LocalDateTime.of(2021, 12, 6, 13, 0), LocalDateTime.class);
@@ -131,7 +131,7 @@ class UniquenessServiceTest {
 
         @Test
         @DisplayName("특이사항 조회 : 실패 - 학원에러")
-        public void readUniquenessFailAcademy() {
+        void readUniquenessFailAcademy() {
 
             when(employeeRepository.findByAccountAndAcademy(any(), any())).thenReturn(Optional.of(employee1));
             when(studentRepository.findById(any())).thenReturn(Optional.of(student1));
@@ -143,7 +143,7 @@ class UniquenessServiceTest {
 
         @Test
         @DisplayName("특이사항 조회 : 실패 - 학생에러")
-        public void readUniquenessFailStudent() {
+        void readUniquenessFailStudent() {
 
             when(academyRepository.findById(any())).thenReturn(Optional.of(academy1));
             when(employeeRepository.findByAccountAndAcademy(any(), any())).thenReturn(Optional.of(mockEmployee));
@@ -167,7 +167,7 @@ class UniquenessServiceTest {
 
         @Test
         @DisplayName("특이사항 수정 : 성공")
-        public void updateUniquenessSuccess() {
+        void updateUniquenessSuccess() {
 
             when(academyRepository.findById(any())).thenReturn(Optional.of(academy1));
             when(employeeRepository.findByAccountAndAcademy(any(), any())).thenReturn(Optional.of(employee1));
@@ -179,7 +179,7 @@ class UniquenessServiceTest {
 
         @Test
         @DisplayName("특이사항 수정 : 실패 - 학원에러")
-        public void updateUniquenessFailAcademy() {
+        void updateUniquenessFailAcademy() {
 
             when(employeeRepository.findByAccountAndAcademy(any(), any())).thenReturn(Optional.of(employee1));
             when(studentRepository.findById(any())).thenReturn(Optional.of(student1));
@@ -191,7 +191,7 @@ class UniquenessServiceTest {
 
         @Test
         @DisplayName("특이사항 수정 : 실패 - 직원에러")
-        public void updateUniquenessFailEmployee() {
+        void updateUniquenessFailEmployee() {
 
             when(academyRepository.findById(any())).thenReturn(Optional.of(academy1));
             when(studentRepository.findById(any())).thenReturn(Optional.of(student1));
@@ -203,7 +203,7 @@ class UniquenessServiceTest {
 
         @Test
         @DisplayName("특이사항 수정 : 실패 - 학생에러")
-        public void updateUniquenessFailStudent() {
+        void updateUniquenessFailStudent() {
 
             when(academyRepository.findById(any())).thenReturn(Optional.of(academy1));
             when(employeeRepository.findByAccountAndAcademy(any(), any())).thenReturn(Optional.of(employee1));
@@ -215,7 +215,7 @@ class UniquenessServiceTest {
 
         @Test
         @DisplayName("특이사항 수정 : 실패 - 특이사항에러")
-        public void updateUniquenessFailUniqueness() {
+        void updateUniquenessFailUniqueness() {
 
             when(academyRepository.findById(any())).thenReturn(Optional.of(academy1));
             when(employeeRepository.findByAccountAndAcademy(any(), any())).thenReturn(Optional.of(employee1));
@@ -237,7 +237,7 @@ class UniquenessServiceTest {
 
         @Test
         @DisplayName("특이사항 삭제 : 성공")
-        public void deleteUniquenessSuccess() {
+        void deleteUniquenessSuccess() {
 
             when(academyRepository.findById(any())).thenReturn(Optional.of(academy1));
             when(employeeRepository.findByAccountAndAcademy(any(), any())).thenReturn(Optional.of(employee1));
@@ -249,7 +249,7 @@ class UniquenessServiceTest {
 
         @Test
         @DisplayName("특이사항 삭제 : 실패 - 학원에러")
-        public void deleteUniquenessFailAcademy() {
+        void deleteUniquenessFailAcademy() {
 
             when(employeeRepository.findByAccountAndAcademy(any(), any())).thenReturn(Optional.of(employee1));
             when(studentRepository.findById(any())).thenReturn(Optional.of(student1));
@@ -261,7 +261,7 @@ class UniquenessServiceTest {
 
         @Test
         @DisplayName("특이사항 삭제 : 실패 - 직원에러")
-        public void deleteUniquenessFailEmployee() {
+        void deleteUniquenessFailEmployee() {
 
             when(academyRepository.findById(any())).thenReturn(Optional.of(academy1));
             when(studentRepository.findById(any())).thenReturn(Optional.of(student1));
@@ -273,7 +273,7 @@ class UniquenessServiceTest {
 
         @Test
         @DisplayName("특이사항 삭제 : 실패 - 학생에러")
-        public void deleteUniquenessFailStudent() {
+        void deleteUniquenessFailStudent() {
 
             when(academyRepository.findById(any())).thenReturn(Optional.of(academy1));
             when(employeeRepository.findByAccountAndAcademy(any(), any())).thenReturn(Optional.of(employee1));
@@ -285,7 +285,7 @@ class UniquenessServiceTest {
 
         @Test
         @DisplayName("특이사항 삭제 : 실패 - 특이사항에러")
-        public void deleteUniquenessFailUniqueness() {
+        void deleteUniquenessFailUniqueness() {
 
             when(academyRepository.findById(any())).thenReturn(Optional.of(academy1));
             when(employeeRepository.findByAccountAndAcademy(any(), any())).thenReturn(Optional.of(employee1));

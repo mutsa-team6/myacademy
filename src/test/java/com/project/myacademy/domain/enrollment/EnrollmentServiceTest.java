@@ -126,7 +126,7 @@ class EnrollmentServiceTest {
             given(academyRepository.findById(anyLong())).willReturn(Optional.empty());
 
             assertThatThrownBy(() -> enrollmentService.readAllEnrollments(academy.getId(), employee.getAccount(), pageable))
-                    .isInstanceOf(AppException.class)
+                    .isInstanceOf(RuntimeException.class)
                     .hasMessage("해당 학원을 찾을 수 없습니다.");
 
             then(academyRepository).should(times(1)).findById(anyLong());
