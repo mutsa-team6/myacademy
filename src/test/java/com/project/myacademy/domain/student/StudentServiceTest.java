@@ -314,7 +314,7 @@ class StudentServiceTest {
 
         @Test
         @DisplayName("학생 수정 성공(2) - 변경될 이메일이 없는 경우")
-        public void update_student_success2() {
+        void update_student_success2() {
 
             given(academyRepository.findById(any())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeSTAFF));
@@ -333,7 +333,7 @@ class StudentServiceTest {
 
         @Test
         @DisplayName("학생 수정 성공(3) - 변경될 전화번호가 없는 경우")
-        public void update_student_success3() {
+        void update_student_success3() {
 
             given(academyRepository.findById(any())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.of(employeeSTAFF));
@@ -515,7 +515,7 @@ class StudentServiceTest {
 
         @Test
         @DisplayName("학원 별 학생 수 조회 성공")
-        public void countStudent_byAcademy_success() {
+        void countStudent_byAcademy_success() {
 
             given(academyRepository.findById(any())).willReturn(Optional.of(academy));
             given(studentRepository.countStudentByAcademyId(any())).willReturn(1L);
@@ -527,7 +527,7 @@ class StudentServiceTest {
 
         @Test
         @DisplayName("학원 별 학생 수 조회 실패(1) - 일치하는 학원 정보 없음")
-        public void countStudent_byAcademy_fail1() {
+        void countStudent_byAcademy_fail1() {
 
             given(academyRepository.findById(any())).willReturn(Optional.empty());
 

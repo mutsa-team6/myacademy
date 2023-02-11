@@ -768,7 +768,7 @@ class EmployeeServiceTest {
 
         @Test
         @DisplayName("직원 수정 실패(1) - 일치하는 학원 정보 없음")
-        public void update_employee_fail1() {
+        void update_employee_fail1() {
 
             given(academyRepository.findById(any())).willReturn(Optional.empty());
 
@@ -780,7 +780,7 @@ class EmployeeServiceTest {
 
         @Test
         @DisplayName("직원 수정 실패(2) - 일치하는 직원 정보 없음")
-        public void update_employee_fail2() {
+        void update_employee_fail2() {
 
             given(academyRepository.findById(any())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.empty());
@@ -798,7 +798,7 @@ class EmployeeServiceTest {
 
         @Test
         @DisplayName("학원 별 직원 수 조회 성공")
-        public void countEmployees_byAcademy_success() {
+        void countEmployees_byAcademy_success() {
 
             given(academyRepository.findById(any())).willReturn(Optional.of(academy));
             given(employeeRepository.countByAcademy(any(Academy.class))).willReturn(1L);
@@ -810,7 +810,7 @@ class EmployeeServiceTest {
 
         @Test
         @DisplayName("학원 별 직원 수 조회 실패(1) - 일치하는 학원 정보 없음")
-        public void countEmployees_byAcademy_fail1() {
+        void countEmployees_byAcademy_fail1() {
 
             given(academyRepository.findById(any())).willReturn(Optional.empty());
 

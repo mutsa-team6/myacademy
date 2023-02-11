@@ -81,7 +81,7 @@ class ParentServiceTest {
 
         @Test
         @DisplayName("부모 정보 등록 : 실패 - 권한에러")
-        public void createParentFailPermission() {
+        void createParentFailPermission() {
 
             when(academyRepository.findById(any())).thenReturn(Optional.of(academy1));
             when(employeeRepository.findByAccountAndAcademy(any(), any())).thenReturn(Optional.of(mockEmployee));
@@ -202,7 +202,7 @@ class ParentServiceTest {
 
         @Test
         @DisplayName("부모 정보 수정 : 실패 - 권한에러")
-        public void updateParentFailPermission() {
+        void updateParentFailPermission() {
 
             when(academyRepository.findById(any())).thenReturn(Optional.of(academy1));
             when(employeeRepository.findByAccountAndAcademy(any(), any())).thenReturn(Optional.of(mockEmployee));
@@ -267,7 +267,7 @@ class ParentServiceTest {
 
         @Test
         @DisplayName("부모 정보 삭제 : 실패 - 권한에러")
-        public void deleteParentFailPermission() {
+        void deleteParentFailPermission() {
 
             when(academyRepository.findById(any())).thenReturn(Optional.of(academy1));
             when(employeeRepository.findByAccountAndAcademy(any(), any())).thenReturn(Optional.of(mockEmployee));
@@ -291,7 +291,7 @@ class ParentServiceTest {
 
     @Test
     @DisplayName("부모의 전화번호와 등록된 학원으로 부모가 존재하는지 찾아오기")
-    public void checkExistByPhoneAndAcademy_success() {
+    void checkExistByPhoneAndAcademy_success() {
 
         Parent parent1 = ParentFixtureUtil.PARENT1.init();
 
