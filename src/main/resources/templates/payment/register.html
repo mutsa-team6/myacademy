@@ -96,9 +96,6 @@
                                         할인된 가격
                                     </th>
                                     <th class="text-center text-uppercase  font-weight-bolder">
-                                        결제 여부
-                                    </th>
-                                    <th class="text-center text-uppercase  font-weight-bolder">
                                         수강신청 일시
                                     </th>
 
@@ -107,7 +104,7 @@
                                 <tbody>
                                 <tr th:each="enrollment : ${enrollments}">
                                     <th class="align-middle text-center">
-                                                <span class=" text-xs font-weight-bold"
+                                                <span class=" text-sm font-weight-bold" style="color: #0d6efd"
                                                       th:text="${enrollment.studentName}"></span>
                                     </th>
                                     <td class="align-middle text-center">
@@ -148,10 +145,6 @@
                                                    style="border-color: white; width: 5px;text-align: center;color: red"
                                                    th:text="원" th:id="'discount'+${enrollment.enrollmentId}" readonly>
                                         </div>
-                                    </td>
-                                    <td class="align-middle text-center">
-                                                <span class=" text-xs font-weight-bold"
-                                                      th:text="${enrollment.paymentYN}"></span>
                                     </td>
                                     <td class="align-middle text-center">
                                                 <span class=" text-xs font-weight-bold"
