@@ -1,9 +1,7 @@
 package com.project.myacademy.domain.academy;
 
 import com.project.myacademy.domain.BaseEntity;
-import com.project.myacademy.domain.academy.dto.AcademyDto;
 import com.project.myacademy.domain.academy.dto.CreateAcademyRequest;
-import com.project.myacademy.domain.academy.dto.UpdateAcademyReqeust;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
