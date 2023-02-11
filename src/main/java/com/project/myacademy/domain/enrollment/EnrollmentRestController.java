@@ -49,10 +49,10 @@ public class EnrollmentRestController {
         return ResponseEntity.ok().body(Response.success(enrollments));
     }
 
-    // 수강 수정
-    @Operation(summary = "수강 수정", description = "ADMIN,STAFF 회원만 수정이 가능합니다.")
+    // 수강 메모
+    @Operation(summary = "수강 메모", description = "수강 신청에 대한 메모를 작성합니다.")
     @PutMapping("/{academyId}/students/{studentId}/lectures/{lectureId}/enrollments/{enrollmentId}")
-    public ResponseEntity<Response<UpdateEnrollmentResponse>> update(@PathVariable("academyId") Long academyId,
+    public ResponseEntity<Response<UpdateEnrollmentResponse>> memo(@PathVariable("academyId") Long academyId,
                                                                      @PathVariable("studentId") Long studentId,
                                                                      @PathVariable("lectureId") Long lectureId,
                                                                      @PathVariable("enrollmentId") Long enrollmentId,

@@ -9,7 +9,7 @@ import lombok.Getter;
 @Builder
 public class CreateEnrollmentResponse {
 
-    private Long enrollmentIdId;
+    private Long enrollmentId;
     private String message;
 
     public static CreateEnrollmentResponse of(Long enrollmentIdId) {
