@@ -362,11 +362,4 @@ public class EnrollmentService {
                 .orElseThrow(() -> new AppException(ErrorCode.ENROLLMENT_NOT_FOUND));
         return validatedEnrollment;
     }
-
-    // 해당 직원의 권한 체크 - USER 이면 INVALID_PERMISSION 에러발생
-    public void validateAuthorityUser(Employee employee) {
-        if(employee.getEmployeeRole().equals(EmployeeRole.ROLE_USER)) {
-            throw new AppException(ErrorCode.INVALID_PERMISSION);
-        }
-    }
 }

@@ -16,6 +16,7 @@ import com.project.myacademy.domain.waitinglist.WaitinglistRepository;
 import com.project.myacademy.global.exception.AppException;
 import com.project.myacademy.global.exception.ErrorCode;
 import com.project.myacademy.global.util.EmailUtil;
+import groovy.util.logging.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -29,8 +30,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.mail.MailException;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import javax.mail.MessagingException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +45,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@Slf4j
 class EnrollmentServiceTest {
 
     @Mock
@@ -153,7 +157,7 @@ class EnrollmentServiceTest {
 
         @Test
         @DisplayName("등록 성공")
-        public void createEnrollment_success() {
+        public void createEnrollment_success() throws MessagingException {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
@@ -486,7 +490,7 @@ class EnrollmentServiceTest {
 
         @Test
         @DisplayName("삭제 성공")
-        public void deleteEnrollment_success() {
+        public void deleteEnrollment_success() throws MessagingException {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
@@ -638,7 +642,7 @@ class EnrollmentServiceTest {
 
         @Test
         @DisplayName("삭제 실패(7) - 대기번호를 수강등록으로 변경하려고 할 때 이미 해당 수강이력이 있는 경우")
-        public void deleteEnrollment_fail8() {
+        public void deleteEnrollment_fail8() throws MessagingException {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));

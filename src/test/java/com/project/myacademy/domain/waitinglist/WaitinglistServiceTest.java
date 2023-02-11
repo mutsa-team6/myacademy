@@ -31,6 +31,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
+import javax.mail.MessagingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -230,7 +231,7 @@ class WaitinglistServiceTest {
 
         @Test
         @DisplayName("등록 성공")
-        public void createWaitingList_success() {
+        public void createWaitingList_success() throws MessagingException {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
@@ -451,7 +452,7 @@ class WaitinglistServiceTest {
 
         @Test
         @DisplayName("삭제 성공")
-        public void deleteWaitinglist_success() {
+        public void deleteWaitinglist_success() throws MessagingException {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
