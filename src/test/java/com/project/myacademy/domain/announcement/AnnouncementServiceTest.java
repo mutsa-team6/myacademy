@@ -476,7 +476,7 @@ class AnnouncementServiceTest {
 
         @Test
         @DisplayName("메인에 공지사항 5개 보여주기 성공")
-        public void readAnnouncement_forMain_success() {
+        void readAnnouncement_forMain_success() {
 
             Announcement announcement4 = Announcement.builder().id(4L).academy(academy).employee(employeeSTAFF).title("제목4").body("내용4").type(AnnouncementType.ANNOUNCEMENT).build();
             Announcement announcement5 = Announcement.builder().id(5L).academy(academy).employee(employeeSTAFF).title("제목5").body("내용5").type(AnnouncementType.ANNOUNCEMENT).build();
@@ -504,7 +504,7 @@ class AnnouncementServiceTest {
 
         @Test
         @DisplayName("메인에 공지사항 5개 보여주기 실패(1) - 일치하는 학원 정보 없음")
-        public void readAnnouncement_forMain_fail1() {
+        void readAnnouncement_forMain_fail1() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.empty());
 
@@ -518,7 +518,7 @@ class AnnouncementServiceTest {
 
         @Test
         @DisplayName("메인에 공지사항 5개 보여주기 실패(2) - 일치하는 직원 정보 없음")
-        public void readAnnouncement_forMain_fail2() {
+        void readAnnouncement_forMain_fail2() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.empty());
@@ -534,7 +534,7 @@ class AnnouncementServiceTest {
 
         @Test
         @DisplayName("메인에 입시정보 5개 보여주기 성공")
-        public void readAdmission_forMain_success() {
+        void readAdmission_forMain_success() {
 
             Announcement announcement4 = Announcement.builder().id(4L).academy(academy).employee(employeeSTAFF).title("제목4").body("내용4").type(AnnouncementType.ADMISSION).build();
             Announcement announcement5 = Announcement.builder().id(5L).academy(academy).employee(employeeSTAFF).title("제목5").body("내용5").type(AnnouncementType.ADMISSION).build();
@@ -561,7 +561,7 @@ class AnnouncementServiceTest {
 
         @Test
         @DisplayName("메인에 입시정보 5개 보여주기 실패(1) - 일치하는 학원 정보 없음")
-        public void readAdmission_forMain_fail1() {
+        void readAdmission_forMain_fail1() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.empty());
 
@@ -575,7 +575,7 @@ class AnnouncementServiceTest {
 
         @Test
         @DisplayName("메인에 입시정보 5개 보여주기 실패(2) - 일치하는 직원 정보 없음")
-        public void readAdmission_forMain_fail2() {
+        void readAdmission_forMain_fail2() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.empty());
@@ -591,7 +591,7 @@ class AnnouncementServiceTest {
 
         @Test
         @DisplayName("공지사항 검색 성공")
-        public void searchAnnouncement_success() {
+        void searchAnnouncement_success() {
 
             Announcement announcement4 = Announcement.builder().id(4L).academy(academy).employee(employeeSTAFF).title("제목").body("내용4").type(AnnouncementType.ADMISSION).build();
             Announcement announcement5 = Announcement.builder().id(5L).academy(academy).employee(employeeSTAFF).title("제목").body("내용5").type(AnnouncementType.ADMISSION).build();
@@ -618,7 +618,7 @@ class AnnouncementServiceTest {
 
         @Test
         @DisplayName("공지사항 검색 실패(1) - 일치하는 학원 정보 없음")
-        public void searchAnnouncement_fail1() {
+        void searchAnnouncement_fail1() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.empty());
 
@@ -632,7 +632,7 @@ class AnnouncementServiceTest {
 
         @Test
         @DisplayName("공지사항 검색 실패(2) - 일치하는 직원 정보 없음")
-        public void searchAnnouncement_fail2() {
+        void searchAnnouncement_fail2() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.empty());

@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.mail.MessagingException;
+import java.security.SecureRandom;
 
 @Service
 @RequiredArgsConstructor
@@ -185,6 +186,7 @@ public class EmployeeService {
         Employee foundEmployee = validateEmployeeByEmail(email);
 
         String tempPassword = getTempPassword();
+        log.info("tempPassword : {}",tempPassword);
         String encodedTempPassword = bCryptPasswordEncoder.encode(tempPassword);
 
         foundEmployee.updatePasswordOnly(encodedTempPassword);
@@ -509,10 +511,11 @@ public class EmployeeService {
                 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
 
         String str = "";
+        SecureRandom random = new SecureRandom();
 
         int idx = 0;
         for (int i = 0; i < 10; i++) {
-            idx = (int) (charSet.length * Math.random());
+            idx = random.nextInt(charSet.length);
             str += charSet[idx];
         }
         return str;

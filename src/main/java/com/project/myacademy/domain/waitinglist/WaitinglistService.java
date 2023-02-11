@@ -109,9 +109,7 @@ public class WaitinglistService {
         String body = String.format("%s님의 %s 대기 신청이 정상적으로 완료되었습니다.%n%n감사합니다.", student.getName(), lecture.getName());
         try {
             emailUtil.sendEmail(email, subject, body);
-        } catch (MailException e2){
-            log.info("이메일 전송 에러 발생 [{}]", e2.getMessage());
-        } catch (MessagingException e) {
+        } catch (MailException | MessagingException e){
             log.info("이메일 전송 에러 발생 [{}]", e.getMessage());
         }
 

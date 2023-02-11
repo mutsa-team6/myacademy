@@ -97,9 +97,7 @@ public class EnrollmentService {
 
         try {
             emailUtil.sendEmail(email, subject, body);
-        } catch (MailException e2){
-            log.info("이메일 전송 에러 발생 [{}]", e2.getMessage());
-        } catch (MessagingException e) {
+        } catch (MailException | MessagingException e){
             log.info("이메일 전송 에러 발생 [{}]", e.getMessage());
         }
 
@@ -191,7 +189,7 @@ public class EnrollmentService {
 
         // 학생의 이메일로 메시지 전송
         String email = student.getEmail();
-        String subject = String.format("MyAcademy 수강 취소 안내 메일");
+        String subject = "MyAcademy 수강 취소 안내 메일";
         String body = String.format("%s님의 %s 수강 취소 신청이 정상적으로 처리되었습니다.%n%n감사합니다.", student.getName(), lecture.getName());
         try {
             emailUtil.sendEmail(email, subject, body);

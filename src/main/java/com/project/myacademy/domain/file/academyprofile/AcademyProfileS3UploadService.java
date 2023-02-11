@@ -80,7 +80,7 @@ public class AcademyProfileS3UploadService {
         int index;
         try {
             index = originalFilename.lastIndexOf(".");
-        } catch (StringIndexOutOfBoundsException e) {
+        } catch (NullPointerException | StringIndexOutOfBoundsException e) {
             throw new AppException(ErrorCode.WRONG_FILE_FORMAT);
         }
 
@@ -166,7 +166,7 @@ public class AcademyProfileS3UploadService {
             academyProfileRepository.delete(academyProfile);
             log.info("파일 삭제 성공");
         } catch (SdkClientException e) {
-            e.printStackTrace();
+            log.error("파일 삭제 실패");
         }
         return DeleteAcademyProfileResponse.of(academy);
     }
