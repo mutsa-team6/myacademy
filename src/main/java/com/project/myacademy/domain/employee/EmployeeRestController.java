@@ -36,7 +36,7 @@ public class EmployeeRestController {
     @Tag(name = "02-1. 직원", description = "직원 회원 가입 및 정보 수정,조회")
     @Operation(summary = "직원 회원가입", description = "직원이 회원 가입을 합니다.")
     @PostMapping("/{academyId}/employees/signup")
-    public ResponseEntity create(@PathVariable Long academyId, @Validated @RequestBody CreateEmployeeRequest request, BindingResult bindingResult) {
+    public ResponseEntity<Response<CreateEmployeeResponse>> create(@PathVariable Long academyId, @Validated @RequestBody CreateEmployeeRequest request, BindingResult bindingResult) {
 
         log.info("⭐ 회원가입 요청한 id [{}] 요청한 사용자 계정 [{}]", academyId, request.getAccount());
 
@@ -53,7 +53,7 @@ public class EmployeeRestController {
     @Operation(summary = "직원 로그인", description =
             "회원가입된 계정과 비밀번호로 로그인합니다. \n\n 로그인시 쿠키에 토큰이 저장됩니다.")
     @PostMapping("/{academyId}/employees/login")
-    public ResponseEntity login(@PathVariable Long academyId, @RequestBody LoginEmployeeRequest request, HttpServletRequest httpRequest, HttpServletResponse httpServletResponse) {
+    public ResponseEntity<Response<LoginEmployeeResponse>> login(@PathVariable Long academyId, @RequestBody LoginEmployeeRequest request, HttpServletRequest httpRequest, HttpServletResponse httpServletResponse) {
 
         log.info("✨ 로그인 요청한 학원 id [{}] 요청한 사용자 계정 [{}]", academyId, request.getAccount());
 
@@ -70,11 +70,10 @@ public class EmployeeRestController {
         return ResponseEntity.ok(Response.success(response));
     }
 
-    // 로그아웃
     @Tag(name = "0. 로그아웃", description = "스웨거용 API")
     @Operation(summary = "직원 로그아웃", description = "스웨거용 ENDPOINT. \n\n 로그아웃시 쿠키가 삭제됩니다.")
     @PostMapping("/employees/logout")
-    public ResponseEntity logout(Authentication authentication, HttpServletResponse httpServletResponse) {
+    public ResponseEntity<Response> logout(Authentication authentication, HttpServletResponse httpServletResponse) {
 
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
         log.info("🔑 로그아웃을 요청한 계정 [{}]", requestAccount);
@@ -87,11 +86,10 @@ public class EmployeeRestController {
         return ResponseEntity.ok(Response.success("로그아웃 성공"));
     }
 
-    // 본인 정보 수정
     @Tag(name = "02-1. 직원", description = "직원 회원 가입 및 정보 수정,조회")
     @Operation(summary = "직원 수정", description = "ADMIN 회원 및 본인 만 수정이 가능합니다.")
     @PutMapping("/{academyId}")
-    public ResponseEntity update(Authentication authentication, @PathVariable Long academyId, @Validated @RequestBody UpdateEmployeeRequest request,BindingResult bindingResult) {
+    public ResponseEntity<Response<UpdateEmployeeResponse>> update(Authentication authentication, @PathVariable Long academyId, @Validated @RequestBody UpdateEmployeeRequest request,BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
             throw new BindingException(ErrorCode.BINDING_ERROR, bindingResult.getFieldError().getDefaultMessage());
@@ -104,12 +102,9 @@ public class EmployeeRestController {
         return ResponseEntity.ok(Response.success(response));
     }
 
-    // 본인 탈퇴 기능
-//    @Tag(name = "02-1. 직원", description = "직원 회원 가입 및 정보 수정,조회")
-//    @Operation(summary = "직원 본인 삭제", description = "ADMIN 회원 및 본인 만 삭제가 가능합니다.\n\n soft-delete 됩니다.")
     @Hidden
     @DeleteMapping("/{academyId}")
-    public ResponseEntity selfDelete(Authentication authentication, @PathVariable Long academyId) {
+    public ResponseEntity<Response<DeleteEmployeeResponse>> selfDelete(Authentication authentication, @PathVariable Long academyId) {
 
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
         log.info(" ❌ 본인 탈퇴를 요청한 사용자 계정 [{}] || 학원 아이디 [{}] ", requestAccount, academyId);
@@ -119,16 +114,10 @@ public class EmployeeRestController {
         return ResponseEntity.ok(Response.success(response));
     }
 
-    /**
-     * 계정명 찾기
-     *
-     * @param request
-     * @return
-     */
     @Tag(name = "02-2. 직원", description = "직원 로그인,계정 및 비밀번호 찾기, 변경")
     @Operation(summary = "직원 계정찾기", description = "직원 계정을 찾습니다.")
     @PostMapping("employee/findAccount")
-    public ResponseEntity findAccount(@Validated @RequestBody FindAccountEmployeeRequest request,BindingResult bindingResult) {
+    public ResponseEntity<Response<FindAccountEmployeeResponse>> findAccount(@Validated @RequestBody FindAccountEmployeeRequest request,BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
             throw new BindingException(ErrorCode.BINDING_ERROR, bindingResult.getFieldError().getDefaultMessage());
@@ -139,13 +128,11 @@ public class EmployeeRestController {
         return ResponseEntity.ok(Response.success(response));
     }
 
-    /**
-     * 직원 계정 비밀번호 변경
-     */
+
     @Tag(name = "02-2. 직원", description = "직원 로그인,계정 및 비밀번호 찾기, 변경")
     @Operation(summary = "직원 계정 비밀번호 변경", description = "비밀번호를 변경합니다.")
     @PostMapping("{academyId}/employee/changePassword")
-    public ResponseEntity changePassword(@PathVariable Long academyId, @Validated @RequestBody ChangePasswordEmployeeRequest request, BindingResult bindingResult, Authentication authentication) {
+    public ResponseEntity<Response<ChangePasswordEmployeeResponse>> changePassword(@PathVariable Long academyId, @Validated @RequestBody ChangePasswordEmployeeRequest request, BindingResult bindingResult, Authentication authentication) {
 
         if (bindingResult.hasErrors()) {
             throw new BindingException(ErrorCode.BINDING_ERROR, bindingResult.getFieldError().getDefaultMessage());
@@ -157,16 +144,10 @@ public class EmployeeRestController {
         return ResponseEntity.ok(Response.success(response));
     }
 
-    /**
-     * 비밀번호 찾기
-     *
-     * @param request
-     * @return
-     */
     @Tag(name = "02-2. 직원", description = "직원 로그인,계정 및 비밀번호 찾기, 변경")
     @Operation(summary = "직원 비밀번호 찾기", description = "이메일로 임시 비밀번호가 발송됩니다.")
     @PutMapping("/employee/findPassword")
-    public ResponseEntity findPassword(@Validated @RequestBody FindPasswordEmployeeRequest request,BindingResult bindingResult) {
+    public ResponseEntity<Response<FindPasswordEmployeeResponse>> findPassword(@Validated @RequestBody FindPasswordEmployeeRequest request,BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
             throw new BindingException(ErrorCode.BINDING_ERROR, bindingResult.getFieldError().getDefaultMessage());
@@ -175,11 +156,10 @@ public class EmployeeRestController {
         return ResponseEntity.ok(Response.success(response));
     }
 
-    // 관리자(ADMIN) 혹은 직원(STAFF) 등급은 다른 직원 계정을 삭제할 수 있다.
     @Tag(name = "02-1. 직원", description = "직원 회원 가입 및 정보 수정,조회")
     @Operation(summary = "직원 삭제", description = "ADMIN 회원만 삭제가 가능합니다.")
     @DeleteMapping("/{academyId}/employees/{employeeId}")
-    public ResponseEntity delete(Authentication authentication, @PathVariable Long academyId, @PathVariable Long employeeId) {
+    public ResponseEntity<Response<DeleteEmployeeResponse>> delete(Authentication authentication, @PathVariable Long academyId, @PathVariable Long employeeId) {
 
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
         log.info(" ❌ 삭제를 요청한 사용자 계정 [{}] || 학원 아이디 [{}] ", requestAccount, academyId);
@@ -189,11 +169,10 @@ public class EmployeeRestController {
         return ResponseEntity.ok(Response.success(response));
     }
 
-    // 직원 마이페이지 조회
     @Tag(name = "02-1. 직원", description = "직원 회원 가입 및 정보 수정,조회")
     @Operation(summary = "직원 마이페이지 조회", description = "마이페이지를 조회합니다.")
     @GetMapping("/{academyId}/my")
-    public ResponseEntity read(HttpServletRequest request, Authentication authentication, @PathVariable Long academyId) {
+    public ResponseEntity<Response<ReadEmployeeResponse>> read(HttpServletRequest request, Authentication authentication, @PathVariable Long academyId) {
 
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
         log.info(" 🔎 마이페이지 조회를 요청한 사용자 계정 [{}] || 학원 아이디 [{}] ", requestAccount, academyId);
@@ -202,11 +181,10 @@ public class EmployeeRestController {
         return ResponseEntity.ok(Response.success(response));
     }
 
-    // 관리자(ADMIN) 회원만 접근할 수 있는, 전체 회원 보기
     @Tag(name = "02-1. 직원", description = "직원 회원 가입 및 정보 수정,조회")
     @Operation(summary = "직원 조회", description = "ADMIN 회원만 조회가 가능합니다.")
     @GetMapping("/{academyId}/employees")
-    public ResponseEntity readAll(@PathVariable Long academyId, Authentication authentication) {
+    public ResponseEntity<Response<Page<ReadAllEmployeeResponse>>> readAll(@PathVariable Long academyId, Authentication authentication) {
         PageRequest pageable = PageRequest.of(0, 20, Sort.by("id").descending());
 
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
@@ -217,12 +195,9 @@ public class EmployeeRestController {
         return ResponseEntity.ok(Response.success(response));
     }
 
-    // 관리자(ADMIN) 혹은 직원(STAFF) 등급은 다른 직원의 등급을 USER -> STAFF 혹은 STAFF -> USER 로 변경할 수 있다.
-    //@Tag(name = "02-1. 직원", description = "직원 회원 가입 및 정보 수정,조회")
-    //@Operation(summary = "직원 권한 변경", description = "ADMIN,STAFF 회원만 권한변경이 가능합니다. \n\n User ↔ STAFF")
     @Hidden
     @PutMapping("/{academyId}/changeRole/{employeeId}")
-    public ResponseEntity changeRole(Authentication authentication, @PathVariable Long academyId, @PathVariable Long employeeId) {
+    public ResponseEntity<Response<ChangeRoleEmployeeResponse>> changeRole(Authentication authentication, @PathVariable Long academyId, @PathVariable Long employeeId) {
 
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
         log.info("🛠 등급 변경를 요청한 사용자 계정 [{}] || 접근하려는 학원 id [{}]", requestAccount, academyId);
@@ -232,5 +207,4 @@ public class EmployeeRestController {
         return ResponseEntity.ok(Response.success(response));
 
     }
-
 }
