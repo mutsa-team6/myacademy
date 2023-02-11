@@ -26,6 +26,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
@@ -505,6 +506,36 @@ class StudentServiceTest {
                     () -> studentService.deleteStudent(academy.getId(), student1.getId(), employeeUSER.getAccount()));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.INVALID_PERMISSION);
+        }
+    }
+
+    @Nested
+    @DisplayName("UI")
+    class ui {
+
+        @Test
+        @DisplayName("학원 별 학생 수 조회 성공")
+        public void countStudent_byAcademy_success() {
+
+            given(academyRepository.findById(any())).willReturn(Optional.of(academy));
+            given(studentRepository.countStudentByAcademyId(any())).willReturn(1L);
+
+            Long count = studentService.countStudentByAcademy(academy.getId());
+
+            assertThat(count).isEqualTo(1L);
+        }
+
+        @Test
+        @DisplayName("학원 별 학생 수 조회 실패(1) - 일치하는 학원 정보 없음")
+        public void countStudent_byAcademy_fail1() {
+
+            given(academyRepository.findById(any())).willReturn(Optional.empty());
+
+            AppException appException = assertThrows(AppException.class,
+                    () -> studentService.countStudentByAcademy(academy.getId()));
+
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACADEMY_NOT_FOUND);
+            assertThat(appException.getMessage()).isEqualTo("해당 학원을 찾을 수 없습니다.");
         }
     }
 }

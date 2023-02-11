@@ -330,7 +330,7 @@ class DiscountServiceTest {
         }
 
         @Test
-        @DisplayName("할인정책 적용 실패(5) - 할인정책에 적용할 수강 내역이 존재하지 않을 때")
+        @DisplayName("할인정책 적용 실패(5) - 할인정책이 적용될 수강 내역이 존재하지 않을 때")
         public void checkDiscount_fail5() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
