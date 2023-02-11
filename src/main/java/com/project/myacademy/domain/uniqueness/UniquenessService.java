@@ -79,11 +79,10 @@ public class UniquenessService {
         validateRequestEmployeeByAcademy(account, academy);
         // 학생 Id로 학생이 존재하는지 확인 - 있으면 STUDENT_NOT_FOUND 에러발생
         Student student = validateStudentById(studentId);
-        //uniquenessId에 등록된 특이사항이 있는지 확인
-        Uniqueness uniqueness = validateUniqueness(uniquenessId);
+        // 특이사항 Id로 특이사항 조회 - 없을시 UNIQUENESS_NOT_FOUND 에러발생
+        Uniqueness uniqueness = validateUniquenessById(uniquenessId);
 
-        uniqueness.updateUniqueness(request);
-
+        uniqueness.updateUniqueness(request.getBody());
         return UpdateUniquenessResponse.of(uniqueness);
     }
 
@@ -101,16 +100,16 @@ public class UniquenessService {
         validateRequestEmployeeByAcademy(account, academy);
         // 학생 Id로 학생이 존재하는지 확인 - 있으면 STUDENT_NOT_FOUND 에러발생
         Student student = validateStudentById(studentId);
-        //uniquenessId에 등록된 특이사항이 있는지 확인
-        Uniqueness uniqueness = validateUniqueness(uniquenessId);
+        // 특이사항 Id로 특이사항 조회 - 없을시 UNIQUENESS_NOT_FOUND 에러발생
+        Uniqueness uniqueness = validateUniquenessById(uniquenessId);
 
         uniquenessRepository.delete(uniqueness);
 
         return DeleteUniquenessResponse.of(uniqueness);
     }
 
-    private Uniqueness validateUniqueness(Long uniquenessId) {
-        //학생 특이사항 존재 유무 확인
+    // 특이사항 Id로 특이사항 조회 - 없을시 UNIQUENESS_NOT_FOUND 에러발생
+    private Uniqueness validateUniquenessById(Long uniquenessId) {
         Uniqueness validateUniqueness = uniquenessRepository.findById(uniquenessId)
                 .orElseThrow(() -> new AppException(ErrorCode.UNIQUENESS_NOT_FOUND));
         return validateUniqueness;
@@ -129,6 +128,7 @@ public class UniquenessService {
                 .orElseThrow(() -> new AppException(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND));
         return employee;
     }
+
     // 학생 Id로 학생이 존재하는지 확인 - 있으면 STUDENT_NOT_FOUND 에러발생
     private Student validateStudentById(Long studentId) {
         Student validateStudent = studentRepository.findById(studentId)
