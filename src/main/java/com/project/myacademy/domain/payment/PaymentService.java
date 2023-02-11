@@ -31,10 +31,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.mail.MailException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import javax.mail.MessagingException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -192,7 +194,13 @@ public class PaymentService {
         String email = enrollment.getStudent().getEmail();
         String subject = String.format("MyAcademy 결제 완료 안내 메일");
         String body = String.format("%s님의 %d원 %s 결제가 정상적으로 완료되었습니다.%n%n감사합니다.", enrollment.getStudent().getName(), amount, enrollment.getLecture().getName());
-        emailUtil.sendEmail(email, subject, body);
+        try {
+            emailUtil.sendEmail(email, subject, body);
+        } catch (MailException e2){
+            log.info("이메일 전송 에러 발생 [{}]", e2.getMessage());
+        } catch (MessagingException e) {
+            log.info("이메일 전송 에러 발생 [{}]", e.getMessage());
+        }
 
         RestTemplate rest = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -292,7 +300,13 @@ public class PaymentService {
         String email = foundStudent.getEmail();
         String subject = String.format("MyAcademy 결제 취소 안내 메일");
         String body = String.format("%s님의 %s 결제 취소가 정상적으로 처리되었습니다.%n%n감사합니다.", foundStudent.getName(), foundLecture.getName());
-        emailUtil.sendEmail(email, subject, body);
+        try {
+            emailUtil.sendEmail(email, subject, body);
+        } catch (MailException e2){
+            log.info("이메일 전송 에러 발생 [{}]", e2.getMessage());
+        } catch (MessagingException e) {
+            log.info("이메일 전송 에러 발생 [{}]", e.getMessage());
+        }
 
         return rest.postForEntity(
                         uri,

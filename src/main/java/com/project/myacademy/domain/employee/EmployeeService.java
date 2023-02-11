@@ -15,9 +15,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.mail.MailException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.mail.MessagingException;
 
 @Service
 @RequiredArgsConstructor
@@ -191,7 +194,14 @@ public class EmployeeService {
         String title = String.format("%s님의 임시 비밀번호 안내 메일입니다.", name);
         String body = String.format("안녕하세요.%n%nMyAcademy 임시 비밀번호 안내 관련 메일입니다.%n%n%s님의 임시 비밀번호는 %s입니다.%n%n발급된 임시 비밀번호로 로그인해서 새 비밀번호로 변경 후 이용바랍니다.%n%n감사합니다.", name, tempPassword);
 
-        emailUtil.sendEmail(email, title, body);
+
+        try {
+            emailUtil.sendEmail(email, title, body);
+        } catch (MailException e2){
+            log.info("이메일 전송 에러 발생 [{}]", e2.getMessage());
+        } catch (MessagingException e) {
+            log.info("이메일 전송 에러 발생 [{}]", e.getMessage());
+        }
 
         return FindPasswordEmployeeResponse.of(changedEmployee);
     }
@@ -310,6 +320,7 @@ public class EmployeeService {
 
         return employeeRepository.findAllEmployee(foundAcademy, pageable).map(ReadAllEmployeeResponse::of);
     }
+
 
 
     /**

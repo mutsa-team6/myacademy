@@ -20,9 +20,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.mail.MailException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.mail.MessagingException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -105,7 +107,13 @@ public class WaitinglistService {
         String email = student.getEmail();
         String subject = String.format("MyAcademy 대기 신청 완료 안내 메일");
         String body = String.format("%s님의 %s 대기 신청이 정상적으로 완료되었습니다.%n%n감사합니다.", student.getName(), lecture.getName());
-        emailUtil.sendEmail(email, subject, body);
+        try {
+            emailUtil.sendEmail(email, subject, body);
+        } catch (MailException e2){
+            log.info("이메일 전송 에러 발생 [{}]", e2.getMessage());
+        } catch (MessagingException e) {
+            log.info("이메일 전송 에러 발생 [{}]", e.getMessage());
+        }
 
         return CreateWaitinglistResponse.of(savedWaitinglist.getId());
     }
@@ -142,7 +150,13 @@ public class WaitinglistService {
         String email = student.getEmail();
         String subject = String.format("MyAcademy 대기 신청 취소 안내 메일");
         String body = String.format("%s님의 %s 대기 신청 취소가 정상적으로 처리되었습니다.%n%n감사합니다.", student.getName(), lecture.getName());
-        emailUtil.sendEmail(email, subject, body);
+        try {
+            emailUtil.sendEmail(email, subject, body);
+        } catch (MailException e2){
+            log.info("이메일 전송 에러 발생 [{}]", e2.getMessage());
+        } catch (MessagingException e) {
+            log.info("이메일 전송 에러 발생 [{}]", e.getMessage());
+        }
 
         return DeleteWaitinglistResponse.of(waitinglistId);
     }
