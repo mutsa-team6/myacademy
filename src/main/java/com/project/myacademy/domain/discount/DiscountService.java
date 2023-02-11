@@ -167,9 +167,8 @@ public class DiscountService {
 
     // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
     public Employee validateRequestEmployeeByAcademy(String account, Academy academy) {
-        Employee employee = employeeRepository.findByAccountAndAcademy(account, academy)
+        return employeeRepository.findByAccountAndAcademy(account, academy)
                 .orElseThrow(() -> new AppException(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND));
-        return employee;
     }
 
     // 수강 Id로 수강 조회 - 없을시 ENROLLMENT_NOT_FOUND 에러발생

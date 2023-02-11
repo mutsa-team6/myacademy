@@ -48,7 +48,7 @@ public class TossPayRestController {
      */
     @Operation(summary = "결제 승인 성공", description = "OpenApi로 부터 결제 성공시 가격 검증과 가격 승인 처리")
     @GetMapping("/success")
-    public ResponseEntity<Response<ApprovePaymentResponse>> SuccessApproveRequest(@RequestParam String paymentKey,
+    public ResponseEntity<Response<ApprovePaymentResponse>> successApproveRequest(@RequestParam String paymentKey,
                                                                                   @RequestParam String orderId,
                                                                                   @RequestParam Integer amount) {
         paymentService.verifyRequest(paymentKey, orderId, amount);
@@ -62,7 +62,7 @@ public class TossPayRestController {
 
     @Operation(summary = "결제 승인 실패", description = "OpenApi로 부터 결제 실패시 에러메세지 반환")
     @GetMapping("/fail")
-    public ResponseEntity<Response<FailApprovePaymentResponse>> FailApproveRequest(@RequestParam String errorCode,
+    public ResponseEntity<Response<FailApprovePaymentResponse>> failApproveRequest(@RequestParam String errorCode,
                                                             @RequestParam String errorMsg,
                                                             @RequestParam String orderId) {
         return ResponseEntity.ok().body(Response.error(errorCode, paymentService.failApprovePayment(errorCode, errorMsg, orderId)));

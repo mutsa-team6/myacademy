@@ -25,7 +25,7 @@ public class ReadAllLectureResponse {
     private LocalDate startDate;
     private LocalDate finishDate;
     private Integer currentEnrollmentNumber;
-    private long CompletePaymentNumber;
+    private long completePaymentNumber;
     private Long waitingNum;
     private List<FindStudentInfoFromEnrollmentByLectureResponse> registeredStudent = new ArrayList<>();
     private List<FindStudentInfoFromEnrollmentByLectureResponse> waitingStudent = new ArrayList<>();

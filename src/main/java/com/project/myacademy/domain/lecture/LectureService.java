@@ -239,18 +239,14 @@ public class LectureService {
 
     // 요청하는 계정과 학원으로 직원 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
     public Employee validateRequestEmployeeByAcademy(String account, Academy academy) {
-        Employee employee = employeeRepository.findByAccountAndAcademy(account, academy)
+        return employeeRepository.findByAccountAndAcademy(account, academy)
                 .orElseThrow(() -> new AppException(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND));
-        return employee;
     }
 
     // 강사 Id와 학원으로 직원 조회 - 없을시 EMPLOYEE_NOT_FOUND 에러발생
     private Employee validateAcademyEmployeeId(Long employeeId, Academy academy) {
-
-        Employee validateEmployee = employeeRepository.findByIdAndAcademy(employeeId, academy)
+        return employeeRepository.findByIdAndAcademy(employeeId, academy)
                 .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
-
-        return validateEmployee;
     }
 
     // 강좌 Id로 강좌 조회 - 없으면 LECTURE_NOT_FOUND 에러발생

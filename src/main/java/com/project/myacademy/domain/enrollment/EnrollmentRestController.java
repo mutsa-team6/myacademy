@@ -2,9 +2,8 @@ package com.project.myacademy.domain.enrollment;
 
 import com.project.myacademy.domain.enrollment.dto.*;
 import com.project.myacademy.global.Response;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import com.project.myacademy.global.util.AuthenticationUtil;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

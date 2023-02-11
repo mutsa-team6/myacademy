@@ -2,7 +2,6 @@ package com.project.myacademy.domain.enrollment.dto;
 
 import com.project.myacademy.domain.enrollment.Enrollment;
 import com.project.myacademy.domain.student.Student;
-import com.project.myacademy.domain.waitinglist.Waitinglist;
 import lombok.*;
 
 @AllArgsConstructor

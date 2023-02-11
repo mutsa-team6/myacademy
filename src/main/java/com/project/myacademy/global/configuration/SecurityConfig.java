@@ -1,7 +1,6 @@
 package com.project.myacademy.global.configuration;
 
 import com.project.myacademy.domain.employee.EmployeeRepository;
-import com.project.myacademy.domain.employee.EmployeeService;
 import com.project.myacademy.global.configuration.filter.ExceptionHandlerFilter;
 import com.project.myacademy.global.configuration.filter.JwtTokenFilter;
 import com.project.myacademy.global.configuration.oauth.CustomOAuth2UserService;
