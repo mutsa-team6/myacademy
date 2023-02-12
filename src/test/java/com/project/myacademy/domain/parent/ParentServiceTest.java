@@ -297,6 +297,6 @@ class ParentServiceTest {
 
         when(parentRepository.existsByPhoneNum(any(String.class))).thenReturn(true);
 
-        assertDoesNotThrow(() -> parentService.checkExistByPhoneAndAcademy(parent1.getPhoneNum(), parent1.getAcademyId()));
+        assertDoesNotThrow(() -> parentService.checkExistByPhoneAndAcademy(parent1.getPhoneNum()));
     }
 }

@@ -34,8 +34,8 @@ public class SecurityConfig {
 
     private final CustomOAuth2UserService customOAuth2UserService;
 
-    public static final String[] PERMIT_ALL_CONTROLLER_URL = {"/", "/join", "/login", "/find/account", "/find/password", "/academies", "/swagger-ui/**"};
-    public static final String[] REFUSED_USER_CONTROLLER_URL
+    protected static final String[] PERMIT_ALL_CONTROLLER_URL = {"/", "/join", "/login", "/find/account", "/find/password", "/academies", "/swagger-ui/**"};
+    protected static final String[] REFUSED_USER_CONTROLLER_URL
             = {"/academy/announcements/write",
             "/academy/announcements/edit/**",
             "/academy/student/register",
@@ -44,20 +44,20 @@ public class SecurityConfig {
             "/academy/payment/**",
             "/academy/discount"
     };
-    public static final String[] ONLY_ADMIN_CONTROLLER_URL = {"/academy/employees"};
+    protected static final String[] ONLY_ADMIN_CONTROLLER_URL = {"/academy/employees"};
 
 
-    public static final String[] PERMIT_ALL_API_URL_GET = {"/api/v1/academies/employees/logout"
+    protected static final String[] PERMIT_ALL_API_URL_GET = {"/api/v1/academies/employees/logout"
     };
-    public static final String[] PERMIT_ALL_API_URL_POST = {
+    protected static final String[] PERMIT_ALL_API_URL_POST = {
             "/api/v1/academies"
             , "/api/v1/academies/**/employees/signup"
             , "/api/v1/academies/**/employees/login"
             , "/api/v1/academies/employee/findAccount"};
-    public static final String[] PERMIT_ALL_API_URL_PUT = {"/api/v1/academies/employee/findPassword"
+    protected static final String[] PERMIT_ALL_API_URL_PUT = {"/api/v1/academies/employee/findPassword"
     };
 
-    public static final String[] AUTH_API_URL_GET = {
+    protected static final String[] AUTH_API_URL_GET = {
             "/api/v1/academies/**/my"
             , "/api/v1/academies/**/employees/**/files/download"
             , "/api/v1/academies/**/announcements/**"
@@ -75,15 +75,15 @@ public class SecurityConfig {
             , "/api/v1/academies/**/enrollments/**/discounts"
             , "/api/v1/payments/success"
             , "/api/v1/payments/fail"};
-    public static final String[] AUTH_API_URL_POST = {
+    protected static final String[] AUTH_API_URL_POST = {
             "/api/v1/academies/**/employee/changePassword"
             , "/api/v1/academies/**/employees/**/files/upload"
             , "/api/v1/academies/**/students/**/uniqueness"
     };
-    public static final String[] AUTH_API_URL_PUT = {"/api/v1/academies/**"};
+    protected static final String[] AUTH_API_URL_PUT = {"/api/v1/academies/**"};
 
 
-    public static final String[] REFUSED_USER_API_URL_POST = {
+    protected static final String[] REFUSED_USER_API_URL_POST = {
             "/api/v1/academies/**/announcements"
             , "/api/v1/academies/**/announcements/**/files/upload"
             , "/api/v1/academies/**/parents"
@@ -97,7 +97,7 @@ public class SecurityConfig {
             , "/api/v1/payments/students/**"
             , "/api/v1/payments/cancel"
     };
-    public static final String[] REFUSED_USER_API_URL_PUT = {
+    protected static final String[] REFUSED_USER_API_URL_PUT = {
             "/api/v1/academies/**/announcements/**"
             , "/api/v1/academies/**/parents/**"
             , "/api/v1/academies/**/students/**"
@@ -106,7 +106,7 @@ public class SecurityConfig {
             , "/api/v1/academies/**/students/**/lectures/**/enrollments/**"
 
     };
-    public static final String[] REFUSED_USER_API_URL_DELETE = {
+    protected static final String[] REFUSED_USER_API_URL_DELETE = {
             "/api/v1/academies/**/employees/**/employeeProfiles/**/files"
             , "/api/v1/academies/**/announcements/**"
             , "/api/v1/academies/**/announcements/**/announcementFiles/**/files"
@@ -118,14 +118,14 @@ public class SecurityConfig {
     };
 
 
-    public static final String[] ONLY_ADMIN_API_URL_POST = {"/api/v1/academies/**/files/upload"};
+    protected static final String[] ONLY_ADMIN_API_URL_POST = {"/api/v1/academies/**/files/upload"};
 
-    public static final String[] AUTH_API_URL_DELETE = {"/api/v1/academies/**/students/**/uniqueness/**"};
-    public static final String[] ONLY_ADMIN_API_URL_DELETE = {
+    protected static final String[] AUTH_API_URL_DELETE = {"/api/v1/academies/**/students/**/uniqueness/**"};
+    protected static final String[] ONLY_ADMIN_API_URL_DELETE = {
             "/api/v1/academies/**/academyProfiles/**/files"
             , "/api/v1/academies/**/employees/**"
             };
-    public static final String[] ONLY_ADMIN_API_URL_GET = {
+    protected static final String[] ONLY_ADMIN_API_URL_GET = {
             "/api/v1/academies/**/files/upload"
             , "/api/v1/academies/**/employees"};
 

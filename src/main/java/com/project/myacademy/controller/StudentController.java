@@ -1,7 +1,6 @@
 package com.project.myacademy.controller;
 
 import com.project.myacademy.domain.academy.AcademyService;
-import com.project.myacademy.domain.academy.dto.FindAcademyForUIResponse;
 import com.project.myacademy.domain.academy.dto.FindAcademyResponse;
 import com.project.myacademy.domain.employee.EmployeeService;
 import com.project.myacademy.domain.employee.dto.ReadEmployeeResponse;
@@ -52,7 +51,7 @@ public class StudentController {
         Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
 
         // 직원 정보, 학원 정보 세션에 저장 및 model로 넘기는 메서드
-        ReadEmployeeResponse requestEmployee = setSessionEmployeeInfo(request, model, authentication, academyId);
+        setSessionEmployeeInfo(request, model, authentication, academyId);
         setSessionAcademyInfo(request, model, academyId);
 
         return "pages/student";
@@ -77,7 +76,7 @@ public class StudentController {
         Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
         FindParentForUIResponse response = new FindParentForUIResponse(false, 0L);
 
-        boolean isExist = parentService.checkExistByPhoneAndAcademy(parentPhoneNum, academyId);
+        boolean isExist = parentService.checkExistByPhoneAndAcademy(parentPhoneNum);
         if (isExist) {
             response = new FindParentForUIResponse(isExist, academyId);
         }

@@ -11,7 +11,7 @@ public class Response<T> {
     private T result;
 
     public static <T> Response <T> error(String resultCode, T result) {
-        return new Response(resultCode,result);
+        return new Response<>(resultCode,result);
     }
 
 

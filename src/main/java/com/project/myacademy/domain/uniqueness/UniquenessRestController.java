@@ -34,7 +34,7 @@ public class UniquenessRestController {
     @PostMapping("/{academyId}/students/{studentId}/uniqueness")
     public ResponseEntity<Response<CreateUniquenessResponse>> create(@PathVariable Long academyId,
                                                                      @PathVariable Long studentId, @Validated @RequestBody CreateUniquenessRequest request, BindingResult bindingResult, Authentication authentication) {
-        if (bindingResult.hasErrors()) {
+        if (bindingResult.hasFieldErrors()) {
             throw new BindingException(ErrorCode.BINDING_ERROR, bindingResult.getFieldError().getDefaultMessage());
         }
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);

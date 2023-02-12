@@ -49,7 +49,7 @@ public class LectureRestController {
                                                                   BindingResult bindingResult,
                                                                   Authentication authentication) {
 
-        if (bindingResult.hasErrors()) {
+        if (bindingResult.hasFieldErrors()) {
             throw new BindingException(ErrorCode.BINDING_ERROR, bindingResult.getFieldError().getDefaultMessage());
         }
 
