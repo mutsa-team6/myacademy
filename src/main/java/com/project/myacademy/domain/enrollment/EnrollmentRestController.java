@@ -73,7 +73,7 @@ public class EnrollmentRestController {
                                                                      @RequestBody CreateEnrollmentRequest request,
                                                                      Authentication authentication) {
         String account = AuthenticationUtil.getAccountFromAuth(authentication);
-        DeleteEnrollmentResponse deletedEnrollment = enrollmentService.deleteEnrollment(academyId, studentId, lectureId, enrollmentId, request, account);
+        DeleteEnrollmentResponse deletedEnrollment = enrollmentService.deleteEnrollment(academyId, studentId, lectureId, enrollmentId, account);
         log.info("수강 이력 삭제 성공");
         return ResponseEntity.ok().body(Response.success(deletedEnrollment));
     }
