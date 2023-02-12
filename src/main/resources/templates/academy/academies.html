@@ -55,7 +55,7 @@
                                 <input type="text" class="form-control" id="input-academyOwner" name="academyOwner">
                             </div>
                             <div class="input-group input-group-outline mb-3">
-                                <label class="form-label">학원 사업자 등록 번호 (10자리 숫자) </label>
+                                <label class="form-label">학원 사업자 등록 번호</label>
                                 <input type="text" class="form-control" id="input-academybusinessNum"
                                        name="academybusinessNum">
                             </div>
@@ -110,21 +110,25 @@
 
         check: function () {
 
-            var regExp = /^[0-9]+$/;
+            var regExp = /^\d{3}-\d{2}-\d{5}$/;
             if (regExp.test(document.querySelector('#input-academybusinessNum').value.trim()) == false) {
-                alert('학원 사업자 등록번호는 숫자만 입력해주세요.');
+                alert('학원 사업자 등록번호는 000-00-00000 형식으로 입력해주세요.');
                 document.querySelector("input[name=academybusinessNum]").focus();
                 return;
             }
 
-            if (regExp.test(document.querySelector('#input-academybusinessNum').value.trim().length) == 10) {
-                alert('학원 사업자 등록번호는 10자리 숫자입니다.');
-                document.querySelector("input[name=academybusinessNum]").focus();
-                return;
+            let no = document.querySelector('#input-academybusinessNum').value.trim();
+            let noArr = no.split("-");
+            let result = "";
+            for (let i = 0; i < noArr.length; i++) {
+                result += noArr[i];
             }
 
+            console.log(no);
+            console.log(noArr);
+            console.log(result);
             axios.post("https://api.odcloud.kr/api/nts-businessman/v1/status?serviceKey=gwWHo3wdrtSmrSA3XKwtebZwcULcFUiaspzDlATw1W2vzvQEg4RlHgXQLCdj//M0CHkuQWekdG1tXT07kz87lg==",
-                JSON.stringify({b_no: [document.querySelector('#input-academybusinessNum').value.trim()]}),
+                JSON.stringify({b_no: [result]}),
                 {
                     headers: {
                         'Content-Type': 'application/json',
