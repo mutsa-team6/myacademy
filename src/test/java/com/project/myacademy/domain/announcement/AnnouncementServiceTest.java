@@ -55,7 +55,7 @@ class AnnouncementServiceTest {
         employeeSTAFF = Employee.builder().id(1L).name("직원").account("employeeSTAFF@gmail.com").employeeRole(EmployeeRole.ROLE_STAFF).build();
         employeeUSER = Employee.builder().id(2L).name("강사").account("employeeUSER@gmail.com").employeeRole(EmployeeRole.ROLE_USER).build();
         employeeADMIN = Employee.builder().id(3L).name("대표").account("employeeADMIN@gmail.com").employeeRole(EmployeeRole.ROLE_ADMIN).build();
-        announcement1 = Announcement.builder().id(1L).academy(academy).employee(employeeSTAFF).title("제목").body("내용").type(AnnouncementType.ANNOUNCEMENT).build();
+        announcement1 = Announcement.builder().id(1L).academy(academy).employee(employeeSTAFF).title("제목1").body("내용1").type(AnnouncementType.ANNOUNCEMENT).build();
         announcement2 = Announcement.builder().id(2L).academy(academy).employee(employeeSTAFF).title("제목2").body("내용2").type(AnnouncementType.ANNOUNCEMENT).build();
         announcement3 = Announcement.builder().id(3L).academy(academy).employee(employeeSTAFF).title("제목3").body("내용3").type(AnnouncementType.ADMISSION).build();
         pageable = PageRequest.of(0, 20, Sort.Direction.DESC, "id");
@@ -78,8 +78,8 @@ class AnnouncementServiceTest {
 
             CreateAnnouncementResponse response = announcementService.createAnnouncement(academy.getId(), employeeSTAFF.getAccount(), request);
 
-            assertThat(response.getTitle().equals("제목1"));
-            assertThat(response.getBody().equals("내용1"));
+            assertThat(response.getTitle()).isEqualTo("제목1");
+            assertThat(response.getBody()).isEqualTo("내용1");
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
@@ -148,8 +148,8 @@ class AnnouncementServiceTest {
 
             ReadAnnouncementResponse response = announcementService.readAnnouncement(academy.getId(), announcement1.getId(), employeeSTAFF.getAccount());
 
-            assertThat(response.getTitle().equals("제목1"));
-            assertThat(response.getBody().equals("내용1"));
+            assertThat(response.getTitle()).isEqualTo("제목1");
+            assertThat(response.getBody()).isEqualTo("내용1");
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
@@ -301,8 +301,8 @@ class AnnouncementServiceTest {
 
             UpdateAnnouncementResponse response = announcementService.updateAnnouncement(academy.getId(), announcement1.getId(), request, employeeSTAFF.getAccount());
 
-            assertThat(response.getTitle().equals("바뀐제목"));
-            assertThat(response.getBody().equals("바뀐내용"));
+            assertThat(response.getTitle()).isEqualTo("바뀐제목");
+            assertThat(response.getBody()).isEqualTo("바뀐내용");
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
@@ -393,8 +393,8 @@ class AnnouncementServiceTest {
 
             DeleteAnnouncementResponse response = announcementService.deleteAnnouncement(academy.getId(), announcement1.getId(), employeeSTAFF.getAccount());
 
-            assertThat(response.getId().equals(1L));
-            assertThat(response.getTitle().equals("제목1"));
+            assertThat(response.getId()).isEqualTo(1L);
+            assertThat(response.getTitle()).isEqualTo("제목1");
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
@@ -593,9 +593,9 @@ class AnnouncementServiceTest {
         @DisplayName("공지사항 검색 성공")
         void searchAnnouncement_success() {
 
-            Announcement announcement4 = Announcement.builder().id(4L).academy(academy).employee(employeeSTAFF).title("제목").body("내용4").type(AnnouncementType.ADMISSION).build();
-            Announcement announcement5 = Announcement.builder().id(5L).academy(academy).employee(employeeSTAFF).title("제목").body("내용5").type(AnnouncementType.ADMISSION).build();
-            Announcement announcement6 = Announcement.builder().id(6L).academy(academy).employee(employeeSTAFF).title("제목").body("내용6").type(AnnouncementType.ADMISSION).build();
+            Announcement announcement4 = Announcement.builder().id(4L).academy(academy).employee(employeeSTAFF).title("제목1").body("내용4").type(AnnouncementType.ADMISSION).build();
+            Announcement announcement5 = Announcement.builder().id(5L).academy(academy).employee(employeeSTAFF).title("제목1").body("내용5").type(AnnouncementType.ADMISSION).build();
+            Announcement announcement6 = Announcement.builder().id(6L).academy(academy).employee(employeeSTAFF).title("제목1").body("내용6").type(AnnouncementType.ADMISSION).build();
 
             ReflectionTestUtils.setField(announcement1, BaseEntity.class, "createdAt", LocalDateTime.of(2021, 12, 6, 13, 0), LocalDateTime.class);
             ReflectionTestUtils.setField(announcement4, BaseEntity.class, "createdAt", LocalDateTime.of(2021, 12, 7, 13, 0), LocalDateTime.class);
@@ -607,7 +607,7 @@ class AnnouncementServiceTest {
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(employeeSTAFF));
             given(announcementRepository.findAllByAcademyAndTitleContainingOrderByCreatedAtDesc(academy, announcement1.getTitle(), pageable)).willReturn(announcementList);
 
-            Page<ReadAllAnnouncementResponse> response = announcementService.searchAnnouncement(academy.getId(), "제목", pageable, employeeSTAFF.getAccount());
+            Page<ReadAllAnnouncementResponse> response = announcementService.searchAnnouncement(academy.getId(), "제목1", pageable, employeeSTAFF.getAccount());
             assertThat(response.getTotalPages()).isEqualTo(1);
             assertThat(response.getTotalElements()).isEqualTo(4);
 
