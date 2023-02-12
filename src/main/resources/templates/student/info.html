@@ -437,8 +437,8 @@
             }).catch((error) => {
                 if (error.response.data.result["errorCode"] == "INVALID_PERMISSION") {
                     alert("강사는 접근할 수 없습니다.");
-                } else if (error.response.data.result["errorCode"] == "DUPLICATED_ENROLLMENT") {
-                    alert("해당 학생은 해당 강의를 이미 수강 신청한 상태입니다.");
+                } else if (error.response.data.result["errorCode"] == "BINDING_ERROR") {
+                    alert(error.response.data.result["message"]);
                 }
             });
 

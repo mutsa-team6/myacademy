@@ -107,6 +107,8 @@
             }).catch((error) => {
                 if (error.response.data.result["errorCode"] == "EMPLOYEE_NOT_FOUND") {
                     alert("해당 이메일로 가입한 회원을 찾을 수 없습니다.");
+                }else if (error.response.data.result["errorCode"] == "BINDING_ERROR") {
+                    alert(error.response.data.result["message"]);
                 }
             });
         }

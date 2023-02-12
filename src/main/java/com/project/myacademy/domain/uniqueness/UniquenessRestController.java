@@ -2,6 +2,8 @@ package com.project.myacademy.domain.uniqueness;
 
 import com.project.myacademy.domain.uniqueness.dto.*;
 import com.project.myacademy.global.Response;
+import com.project.myacademy.global.exception.BindingException;
+import com.project.myacademy.global.exception.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import com.project.myacademy.global.util.AuthenticationUtil;
@@ -12,6 +14,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "06. 학생 특이사항", description = "학생 특이사항 등록,수정,조회")
@@ -29,8 +33,10 @@ public class UniquenessRestController {
     @Operation(summary = "학생 특이사항 등록", description = "학생 특이사항을 등록합니다.")
     @PostMapping("/{academyId}/students/{studentId}/uniqueness")
     public ResponseEntity<Response<CreateUniquenessResponse>> create(@PathVariable Long academyId,
-                                                                     @PathVariable Long studentId, @RequestBody CreateUniquenessRequest request, Authentication authentication) {
-
+                                                                     @PathVariable Long studentId, @Validated @RequestBody CreateUniquenessRequest request, BindingResult bindingResult, Authentication authentication) {
+        if (bindingResult.hasErrors()) {
+            throw new BindingException(ErrorCode.BINDING_ERROR, bindingResult.getFieldError().getDefaultMessage());
+        }
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
         CreateUniquenessResponse response = uniquenessService.createUniqueness(academyId, studentId, request, requestAccount);
         return ResponseEntity.ok().body(Response.success(response));

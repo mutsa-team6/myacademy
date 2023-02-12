@@ -2,6 +2,8 @@ package com.project.myacademy.domain.lecture;
 
 import com.project.myacademy.domain.lecture.dto.*;
 import com.project.myacademy.global.Response;
+import com.project.myacademy.global.exception.BindingException;
+import com.project.myacademy.global.exception.ErrorCode;
 import com.project.myacademy.global.util.AuthenticationUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -14,6 +16,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "07. 강좌", description = "강좌 등록,수정,조회")
@@ -41,8 +45,14 @@ public class LectureRestController {
     @PostMapping("/{academyId}/employees/{employeeId}/lectures")
     public ResponseEntity<Response<CreateLectureResponse>> create(@PathVariable("academyId") Long academyId,
                                                                   @PathVariable("employeeId") Long employeeId,
-                                                                  @RequestBody CreateLectureRequest request,
+                                                                  @Validated @RequestBody CreateLectureRequest request,
+                                                                  BindingResult bindingResult,
                                                                   Authentication authentication) {
+
+        if (bindingResult.hasErrors()) {
+            throw new BindingException(ErrorCode.BINDING_ERROR, bindingResult.getFieldError().getDefaultMessage());
+        }
+
         String account = AuthenticationUtil.getAccountFromAuth(authentication);
         CreateLectureResponse createdLecture = lectureService.createLecture(academyId, employeeId, request, account);
         log.info("강좌 정보 생성 성공");
