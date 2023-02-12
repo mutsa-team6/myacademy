@@ -303,7 +303,7 @@
                 employeeType: employeeType,
                 subject: document.querySelector('#input-subject').value.trim()
             };
-            console.log(data);
+
 
             var blank_pattern = /[\s]/g;
             var password_pattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
@@ -347,23 +347,7 @@
 
             }).catch((error) => {
                 console.log(error);
-                if (error.response.data.result["errorCode"] == "ACADEMY_NOT_FOUND") {
-                    alert("학원 정보를 먼저 검색 후, 회원 가입을 진행해주세요.");
-                    document.querySelector("input[name=academyName]").focus();
-                } else if (error.response.data.result["errorCode"] == "DUPLICATED_ACCOUNT") {
-                    alert("이미 존재하는 계정명입니다. 다른 계정명을 사용해주세요.");
-                    document.querySelector("input[name=employeeAccount]").focus();
-
-                } else if (error.response.data.result["errorCode"] == "DUPLICATED_EMAIL") {
-                    alert("이미 존재하는 이메일입니다. 다른 이메일을 사용해주세요.");
-                    document.querySelector("input[name=employeeEmail]").focus();
-
-                } else if (error.response.data.result["errorCode"] == "EMPTY_EMPLOYEE_TYPE") {
-                    alert("유형 선택은 필수입니다.");
-                    document.querySelector("input[name=employeeType]").focus();
-                }else if (error.response.data.result["errorCode"] == "BINDING_ERROR") {
-                    alert(error.response.data.result["message"]);
-                }
+                alert(error.response.data.result["message"]);
 
             });
 

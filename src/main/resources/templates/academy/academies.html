@@ -124,9 +124,6 @@
                 result += noArr[i];
             }
 
-            console.log(no);
-            console.log(noArr);
-            console.log(result);
             axios.post("https://api.odcloud.kr/api/nts-businessman/v1/status?serviceKey=gwWHo3wdrtSmrSA3XKwtebZwcULcFUiaspzDlATw1W2vzvQEg4RlHgXQLCdj//M0CHkuQWekdG1tXT07kz87lg==",
                 JSON.stringify({b_no: [result]}),
                 {
@@ -146,15 +143,12 @@
                     owner: document.querySelector('#input-academyOwner').value.trim(),
                     businessRegistrationNumber: document.querySelector('#input-academybusinessNum').value.trim()
                 };
-                console.log(data);
 
                 var blank_pattern = /[\s]/g;
-
 
                 if (data.name == '') {
                     alert('학원명은 필수 입력 항목입니다.');
                     document.querySelector("input[name=academyName]").focus();
-
                     return;
                 }
 
@@ -182,26 +176,17 @@
                         }
                     }
                 ).then((response) => {
-                    console.log(response);
                     alert("학원등록 성공");
-                    window.location.href = '/academies';
+                    window.location.href = '/join';
 
                 }).catch((error) => {
                     console.log(error);
-                    if (error.response.data.result["errorCode"] == "DUPLICATED_ACADEMY") {
-                        alert("학원 이름은 중복될 수 없습니다.");
-                        window.location.href = '/academies';
-                    } else if (error.response.data.result["errorCode"] == "DUPLICATED_BUSINESS_REGISTRATION_NUMBER") {
-                        alert("이미 등록된 사업자등록번호입니다.");
-                    }
-
+                    alert(error.response.data.result["message"]);
 
                 });
             }).catch((error) => {
                 console.log(error);
-                if (error.response.data.result["errorCode"] == "BINDING_ERROR") {
-                    alert(error.response.data.result["message"]);
-                }
+                alert(error.response.data.result["message"]);
             });
         }
 

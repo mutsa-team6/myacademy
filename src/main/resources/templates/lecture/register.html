@@ -397,11 +397,8 @@
                 window.location.reload();
 
             }).catch((error) => {
-                if (error.response.data.result["errorCode"] == "INVALID_PERMISSION") {
-                    alert("강사는 접근할 수 없습니다.");
-                }else if (error.response.data.result["errorCode"] == "BINDING_ERROR") {
-                    alert(error.response.data.result["message"]);
-                }
+                console.log(error);
+                alert(error.response.data.result["message"]);
             });
 
         },
@@ -421,6 +418,8 @@
                     alert("강의 삭제 성공");
                     window.location.href = '/academy/lecture/register?teacherId='+teacherId;
                 }).catch((error) => {
+                    console.log(error);
+                    alert(error.response.data.result["message"]);
                 });
             }
         },
