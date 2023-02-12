@@ -4,14 +4,17 @@
 
         <!--        사이드 바 상단 이미지-->
         <div style="background-color: #5A2082">
+            <div style="margin-top: 10px">
                 <a href="/academy/main" class="text-center">
                     <h3 style="color:white;">MY ACADEMY</h3>
-                    <p class="text-xs" style="font-weight: bold;color: #f4d6c0;background-color: #5A2082">Easy Management</p>
+                    <p class="text-xs" style="font-weight: bold;color: #f4d6c0;background-color: #5A2082">Easy
+                        Management</p>
 
                 </a>
-                <div>
-                    <hr class="horizontal light mt-0 mb-2">
-                </div>
+            </div>
+            <div>
+                <hr class="horizontal light mt-0 mb-2">
+            </div>
         </div>
 
         <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
@@ -79,10 +82,13 @@
                     </a>
                 </li>
 
-                <li class="nav-item mt-3">
-                    <h6 class="ps-4 ms-2 text-uppercase text-xs text-white font-weight-bolder opacity-8">Account
-                        pages</h6>
+                <li class="nav-item mt-3 d-flex justify-content-center">
+                    <h8 class=" text-uppercase text-white font-weight-bolder opacity-8">Account
+                        pages</h8>
                 </li>
+                <div>
+                    <hr class="horizontal light mt-0 mb-2">
+                </div>
                 <th:block th:if="${employee.account =='admin'}">
 
                     <li class="nav-item">

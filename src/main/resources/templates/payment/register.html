@@ -296,9 +296,7 @@
                 alert("결제를 진행해주세요!");
             }).catch((error) => {
                 console.log(error);
-                if (error.response.data.result["errorCode"] == "ACADEMY_NOT_FOUND") {
-                    alert("등록된 학원이 아닙니다. 등록 후 진행해주세요");
-                }
+                alert(error.response.data.result["message"]);
             });
 
         },
@@ -323,9 +321,7 @@
                     window.location.reload();
                 }).catch((error) => {
                     console.log(error);
-                    if (error.response.data.result["errorCode"] == "ACADEMY_NOT_FOUND") {
-                        alert("등록된 학원이 아닙니다. 등록 후 진행해주세요");
-                    }
+                    alert(error.response.data.result["message"]);
                 });
             }
         }

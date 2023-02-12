@@ -55,7 +55,7 @@ public class DiscountService {
 
         // 요청 DTO에 해당하는 수강 내역이 이미 결제된 수강 이력인지 확인
         if (enrollment.getPaymentYN().equals(true)) {
-            throw new AppException(ErrorCode.ALREADY_PAYMENT);
+            throw new AppException(ErrorCode.DUPLICATED_PAYMENT);
         }
 
         enrollment.updateDiscountId(discount.getId());

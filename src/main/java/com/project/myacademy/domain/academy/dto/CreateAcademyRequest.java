@@ -23,6 +23,6 @@ public class CreateAcademyRequest {
     private String phoneNum;
     @NotBlank(message = "학원 대표자명은 필수 입력 항목입니다.")
     private String owner;
-    @Pattern(regexp = "\\d{10}",message = "사업자 등록번호는 숫자만 10자리로 입력해주세요.")
+    @Pattern(regexp = "^\\d{3}-\\d{2}-\\d{5}$",message = "학원 사업자 등록번호는 000-00-00000 형식으로 입력해주세요.")
     private String businessRegistrationNumber;
 }
