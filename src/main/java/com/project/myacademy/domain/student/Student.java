@@ -48,7 +48,7 @@ public class Student extends BaseEntity {
     public void updateStudent(UpdateStudentRequest request) {
         this.name = request.getName();
         this.school = request.getSchool();
-        this.birth = request.getSchool();
+        this.birth = request.getBirth();
         this.phoneNum = request.getPhoneNum();
         this.email = request.getEmail();
     }

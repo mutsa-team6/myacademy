@@ -92,7 +92,7 @@ public class PaymentService {
         Enrollment studentEnrollment = validateEnrollmentByStudentAndLecture(foundStudent, foundLecture);
 
         //결제 여부 확인 - 이미결제가 되어있을시 DUPLICATED_PAYMENT 에러발생
-        if (studentEnrollment.getPaymentYN().equals(true)) {
+        if (studentEnrollment.getPaymentYN()) {
             throw new AppException(ErrorCode.DUPLICATED_PAYMENT);
         }
 
@@ -183,7 +183,7 @@ public class PaymentService {
         Enrollment enrollment = validateEnrollmentByStudentAndLecture(selcetedPayment.getStudent(), selcetedPayment.getLecture());
 
         // 결제 여부 확인
-        if (enrollment.getPaymentYN().equals(true)) {
+        if (enrollment.getPaymentYN()) {
             throw new AppException(ErrorCode.DUPLICATED_PAYMENT);
         }
 
@@ -446,7 +446,7 @@ public class PaymentService {
             Enrollment foundEnrollment = enrollmentRepository.findByLecture_IdAndStudent_Id(payment.getLecture().getId(), payment.getStudent().getId())
                     .orElseThrow(() -> new AppException(ErrorCode.ENROLLMENT_NOT_FOUND));
 
-            if (foundEnrollment.getPaymentYN().equals(true)) {
+            if (foundEnrollment.getPaymentYN()) {
 
                 CompletePaymentResponse completePayment = new CompletePaymentResponse(payment);
 

@@ -98,7 +98,7 @@ public class EnrollmentService {
         try {
             emailUtil.sendEmail(email, subject, body);
         } catch (MailException | MessagingException e){
-            log.info("수강신청 이메일 전송 에러 발생 [{}]", e.getMessage());
+            log.info("이메일 전송 에러 발생 [{}]", e.getMessage());
         }
 
         return CreateEnrollmentResponse.of(savedEnrollment.getId());
@@ -194,9 +194,9 @@ public class EnrollmentService {
         try {
             emailUtil.sendEmail(email, subject, body);
         } catch (MailException e2){
-            log.info("수강 신청 취소 이메일 전송 에러 발생 [{}]", e2.getMessage());
+            log.info("이메일 전송 에러 발생 [{}]", e2.getMessage());
         } catch (MessagingException e) {
-            log.info("수강 신청 취소 이메일 전송 에러 발생 [{}]", e.getMessage());
+            log.info("이메일 전송 에러 발생 [{}]", e.getMessage());
         }
         // 현재 등록인원 -1
         lecture.minusCurrentEnrollmentNumber();

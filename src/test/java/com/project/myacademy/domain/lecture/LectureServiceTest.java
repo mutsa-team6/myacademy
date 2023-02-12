@@ -119,7 +119,7 @@ class LectureServiceTest {
                     () -> lectureService.readAllLectures(academy.getId(), employee.getAccount(), pageable));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND);
-            assertThat(appException.getErrorCode().getMessage()).isEqualTo("요청한 직원을 해당 학원에서 찾을 수 없습니다.");
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("요청한 사용자를 해당 학원에서 찾을 수 없습니다.");
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
@@ -176,7 +176,7 @@ class LectureServiceTest {
                     () -> lectureService.readAllLecturesByTeacherId(academy.getId(), employee.getAccount(), teacher.getId(), pageable));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND);
-            assertThat(appException.getErrorCode().getMessage()).isEqualTo("요청한 직원을 해당 학원에서 찾을 수 없습니다.");
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("요청한 사용자를 해당 학원에서 찾을 수 없습니다.");
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
@@ -194,7 +194,7 @@ class LectureServiceTest {
                     () -> lectureService.readAllLecturesByTeacherId(academy.getId(), employee.getAccount(), teacher.getId(), pageable));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.EMPLOYEE_NOT_FOUND);
-            assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 직원을 찾을 수 없습니다.");
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 사용자를 찾을 수 없습니다.");
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
@@ -250,7 +250,7 @@ class LectureServiceTest {
                     () -> lectureService.readAllLecturesForEnrollment(academy.getId(), employee.getAccount(), pageable));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND);
-            assertThat(appException.getErrorCode().getMessage()).isEqualTo("요청한 직원을 해당 학원에서 찾을 수 없습니다.");
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("요청한 사용자를 해당 학원에서 찾을 수 없습니다.");
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
@@ -360,7 +360,7 @@ class LectureServiceTest {
                     () -> lectureService.createLecture(academy.getId(), employee.getId(), createLectureRequest, employee.getAccount()));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND);
-            assertThat(appException.getErrorCode().getMessage()).isEqualTo("요청한 직원을 해당 학원에서 찾을 수 없습니다.");
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("요청한 사용자를 해당 학원에서 찾을 수 없습니다.");
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
@@ -378,7 +378,7 @@ class LectureServiceTest {
                     () -> lectureService.createLecture(academy.getId(), employee.getId(), createLectureRequest, employee.getAccount()));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.INVALID_PERMISSION);
-            assertThat(appException.getErrorCode().getMessage()).isEqualTo("사용자가 권한이 없습니다.");
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("특정 권한의 회원만 접근할 수 있습니다.");
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
@@ -420,7 +420,7 @@ class LectureServiceTest {
                     () -> lectureService.createLecture(academy.getId(), employee.getId(), createLectureRequest, employee.getAccount()));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.INVALID_PERMISSION);
-            assertThat(appException.getErrorCode().getMessage()).isEqualTo("사용자가 권한이 없습니다.");
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("특정 권한의 회원만 접근할 수 있습니다.");
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
@@ -444,7 +444,7 @@ class LectureServiceTest {
                     () -> lectureService.createLecture(academy.getId(), employee.getId(), createLectureRequest, employee.getAccount()));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.DUPLICATED_LECTURE);
-            assertThat(appException.getErrorCode().getMessage()).isEqualTo("이미 존재하는 수업입니다.");
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("이미 등록되어 있는 강좌입니다.");
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
@@ -507,7 +507,7 @@ class LectureServiceTest {
                     () -> lectureService.updateLecture(academy.getId(), lecture.getId(), updateLectureRequest, employee.getAccount()));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND);
-            assertThat(appException.getErrorCode().getMessage()).isEqualTo("요청한 직원을 해당 학원에서 찾을 수 없습니다.");
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("요청한 사용자를 해당 학원에서 찾을 수 없습니다.");
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
@@ -525,7 +525,7 @@ class LectureServiceTest {
                     () -> lectureService.updateLecture(academy.getId(), lecture.getId(), updateLectureRequest, employee.getAccount()));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.LECTURE_NOT_FOUND);
-            assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 수업을 찾을 수 없습니다.");
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 강좌를 찾을 수 없습니다.");
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
@@ -545,7 +545,7 @@ class LectureServiceTest {
                     () -> lectureService.updateLecture(academy.getId(), lecture.getId(), updateLectureRequest, employee.getAccount()));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.INVALID_PERMISSION);
-            assertThat(appException.getErrorCode().getMessage()).isEqualTo("사용자가 권한이 없습니다.");
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("특정 권한의 회원만 접근할 수 있습니다.");
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
@@ -604,7 +604,7 @@ class LectureServiceTest {
                     () -> lectureService.deleteLecture(academy.getId(), lecture.getId(), employee.getAccount()));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND);
-            assertThat(appException.getErrorCode().getMessage()).isEqualTo("요청한 직원을 해당 학원에서 찾을 수 없습니다.");
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("요청한 사용자를 해당 학원에서 찾을 수 없습니다.");
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
@@ -622,7 +622,7 @@ class LectureServiceTest {
                     () -> lectureService.deleteLecture(academy.getId(), lecture.getId(), employee.getAccount()));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.LECTURE_NOT_FOUND);
-            assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 수업을 찾을 수 없습니다.");
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 강좌를 찾을 수 없습니다.");
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
@@ -642,7 +642,7 @@ class LectureServiceTest {
                     () -> lectureService.deleteLecture(academy.getId(), lecture.getId(), employee.getAccount()));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.INVALID_PERMISSION);
-            assertThat(appException.getErrorCode().getMessage()).isEqualTo("사용자가 권한이 없습니다.");
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("특정 권한의 회원만 접근할 수 있습니다.");
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
