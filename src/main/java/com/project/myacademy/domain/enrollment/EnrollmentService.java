@@ -162,7 +162,7 @@ public class EnrollmentService {
      * @param enrollmentId 수강 id
      * @param account      직원 계정
      */
-    public DeleteEnrollmentResponse deleteEnrollment(Long academyId, Long studentId, Long lectureId, Long enrollmentId, CreateEnrollmentRequest request, String account) {
+    public DeleteEnrollmentResponse deleteEnrollment(Long academyId, Long studentId, Long lectureId, Long enrollmentId, String account) {
 
         // 삭제 진행하는 직원 권한 확인(학원 존재 유무, 해당 학원 직원인지 확인)
         Academy academy = validateAcademyById(academyId);

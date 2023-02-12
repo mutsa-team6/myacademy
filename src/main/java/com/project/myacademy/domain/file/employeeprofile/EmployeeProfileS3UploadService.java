@@ -57,16 +57,17 @@ public class EmployeeProfileS3UploadService {
      */
     public CreateEmployeeProfileResponse uploadEmployeeProfile(Long academyId, Long employeeId, MultipartFile multipartFile, String account) {
 
-        // 빈 파일이 아닌지 확인, 파일 자체를 첨부안하거나 첨부해도 내용이 비어있으면 - FILE_NOT_EXISTS 에러발생
+        // 파일 자체를 첨부안하거나 첨부해도 내용이 비어있는지 확인
         validateFileExists(multipartFile);
-        // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+
+        // 학원, 해당 학원 소속 직원 존재 유무 확인
         Academy academy = validateAcademyById(academyId);
-        // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
         Employee employee = validateRequestEmployeeByAcademy(account, academy);
-        // 프로필이 등록될 계정과 학원으로 직원을 조회 - 없을시 EMPLOYEE_NOT_FOUND 에러발생
+
+        // 프로필이 등록될 계정과 학원으로 직원 존재 유무 확인
         Employee targetEmployee = validateEmployeeByAcademy(employeeId, academy);
 
-        // 원장, 직원, 강사 모두 본인 프로필만 등록 가능 - 아닐시 INVALID_PERMISSION 에러발생
+        // 모두 본인 프로필만 등록 가능
         if (!employee.equals(targetEmployee)) {
             throw new AppException(ErrorCode.INVALID_PERMISSION);
         }
@@ -149,11 +150,11 @@ public class EmployeeProfileS3UploadService {
      */
     public DeleteEmployeeProfileResponse deleteEmployeeProfile(Long academyId, Long employeeId, Long employeeProfileId, String filePath, String account) {
 
-        // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+        // 학원, 해당 학원 소속 직원 존재 유무 확인
         Academy academy = validateAcademyById(academyId);
-        // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
         Employee employee = validateRequestEmployeeByAcademy(account, academy);
-        // 프로필이 등록될 계정과 학원으로 직원을 조회 - 없을시 EMPLOYEE_NOT_FOUND 에러발생
+
+        // 프로필이 등록된 계정과 학원으로 직원 존재 유무 확인
         Employee targetEmployee = validateEmployeeByAcademy(employeeId, academy);
 
         // 일반 직원(강사 포함)은 본인 관련 파일만 삭제 가능
@@ -162,7 +163,7 @@ public class EmployeeProfileS3UploadService {
             throw new AppException(ErrorCode.INVALID_PERMISSION);
         }
 
-        // 직원프로필 아이디로 직원 프로필 조회 - 없을시 EMPLOYEE_PROFILE_NOT_FOUND 에러발생
+        // 프로필 존재 유무 확인
         EmployeeProfile employeeProfile = validateEmployeeProfileById(employeeProfileId);
 
         try {
@@ -188,17 +189,18 @@ public class EmployeeProfileS3UploadService {
     @Transactional(readOnly = true)
     public ResponseEntity<byte[]> downloadEmployeeProfile(Long academyId, Long employeeId, String fileUrl, String account) throws IOException {
 
-        // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+        // 학원, 해당 학원 소속 직원 존재 유무 확인
         Academy academy = validateAcademyById(academyId);
-        // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
         validateRequestEmployeeByAcademy(account, academy);
-        // 프로필이 등록될 계정과 학원으로 직원을 조회 - 없을시 EMPLOYEE_NOT_FOUND 에러발생
+
+        // 프로필이 등록된 계정과 학원으로 직원 존재 유무 확인
         validateEmployeeByAcademy(employeeId, academy);
 
         // S3 객체 추출해서 byte 배열로 변환
         S3Object s3Object = amazonS3Client.getObject(new GetObjectRequest(bucket, fileUrl));
         S3ObjectInputStream s3ObjectInputStream = s3Object.getObjectContent();
-        // 에러 처리해서 IOException 처리해줘야 함
+
+        // IOException 처리
         byte[] bytes = IOUtils.toByteArray(s3ObjectInputStream);
 
         HttpHeaders httpHeaders = new HttpHeaders();
@@ -220,7 +222,6 @@ public class EmployeeProfileS3UploadService {
 
         return new ResponseEntity<>(bytes, httpHeaders, HttpStatus.OK);
     }
-
 
     // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
     private Academy validateAcademyById(Long academyId) {

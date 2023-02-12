@@ -125,7 +125,7 @@ class DiscountServiceTest {
                     () -> discountService.getAllDiscounts(academy.getId(), employee.getAccount(), pageable));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND);
-            assertThat(appException.getErrorCode().getMessage()).isEqualTo("요청한 직원을 해당 학원에서 찾을 수 없습니다.");
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("요청한 사용자를 해당 학원에서 찾을 수 없습니다.");
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
@@ -176,7 +176,7 @@ class DiscountServiceTest {
                     () -> discountService.getAppliedDiscount(academy.getId(), enrollment.getId(), employee.getAccount()));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND);
-            assertThat(appException.getErrorCode().getMessage()).isEqualTo("요청한 직원을 해당 학원에서 찾을 수 없습니다.");
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("요청한 사용자를 해당 학원에서 찾을 수 없습니다.");
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
@@ -194,7 +194,7 @@ class DiscountServiceTest {
                     () -> discountService.getAppliedDiscount(academy.getId(), enrollment.getId(), employee.getAccount()));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ENROLLMENT_NOT_FOUND);
-            assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 수강 이력을 찾을 수 없습니다.");
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 수강신청 내역을 찾을 수 없습니다.");
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
@@ -284,7 +284,7 @@ class DiscountServiceTest {
                     () -> discountService.checkDiscount(academy.getId(), checkDiscountRequest, employee.getAccount()));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND);
-            assertThat(appException.getErrorCode().getMessage()).isEqualTo("요청한 직원을 해당 학원에서 찾을 수 없습니다.");
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("요청한 사용자를 해당 학원에서 찾을 수 없습니다.");
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
@@ -301,7 +301,7 @@ class DiscountServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> discountService.checkDiscount(academy.getId(), checkDiscountRequest, employee.getAccount()));
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.INVALID_PERMISSION);
-            assertThat(appException.getErrorCode().getMessage()).isEqualTo("사용자가 권한이 없습니다.");
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("특정 권한의 회원만 접근할 수 있습니다.");
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
@@ -343,7 +343,7 @@ class DiscountServiceTest {
                     () -> discountService.checkDiscount(academy.getId(), checkDiscountRequest, employee.getAccount()));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ENROLLMENT_NOT_FOUND);
-            assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 수강 이력을 찾을 수 없습니다.");
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 수강신청 내역을 찾을 수 없습니다.");
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
@@ -379,7 +379,7 @@ class DiscountServiceTest {
                     () -> discountService.checkDiscount(academy.getId(), checkDiscountRequest, employee.getAccount()));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.DUPLICATED_PAYMENT);
-            assertThat(appException.getErrorCode().getMessage()).isEqualTo("이미 결제된 수업입니다.");
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("이미 결제된 내역입니다.");
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
@@ -444,7 +444,7 @@ class DiscountServiceTest {
                     () -> discountService.createDiscount(academy.getId(), createDiscountRequest, employee.getAccount()));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND);
-            assertThat(appException.getErrorCode().getMessage()).isEqualTo("요청한 직원을 해당 학원에서 찾을 수 없습니다.");
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("요청한 사용자를 해당 학원에서 찾을 수 없습니다.");
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
@@ -462,7 +462,7 @@ class DiscountServiceTest {
                     () -> discountService.createDiscount(academy.getId(), createDiscountRequest, employee.getAccount()));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.INVALID_PERMISSION);
-            assertThat(appException.getErrorCode().getMessage()).isEqualTo("사용자가 권한이 없습니다.");
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("특정 권한의 회원만 접근할 수 있습니다.");
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
@@ -482,7 +482,7 @@ class DiscountServiceTest {
                     () -> discountService.createDiscount(academy.getId(), createDiscountRequest, employee.getAccount()));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.DUPLICATED_DISCOUNT);
-            assertThat(appException.getErrorCode().getMessage()).isEqualTo("이미 할인 정책에 등록되어 있습니다.");
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("이미 등록되어 있는 할인 정책입니다.");
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
@@ -540,7 +540,7 @@ class DiscountServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> discountService.deleteDiscount(academy.getId(), discount.getId(), employee.getAccount()));
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND);
-            assertThat(appException.getErrorCode().getMessage()).isEqualTo("요청한 직원을 해당 학원에서 찾을 수 없습니다.");
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("요청한 사용자를 해당 학원에서 찾을 수 없습니다.");
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
@@ -578,7 +578,7 @@ class DiscountServiceTest {
                     () -> discountService.deleteDiscount(academy.getId(), discount.getId(), employee.getAccount()));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.INVALID_PERMISSION);
-            assertThat(appException.getErrorCode().getMessage()).isEqualTo("사용자가 권한이 없습니다.");
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("특정 권한의 회원만 접근할 수 있습니다.");
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
