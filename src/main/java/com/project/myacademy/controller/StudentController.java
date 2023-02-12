@@ -131,7 +131,7 @@ public class StudentController {
 
 
         // 학생의 결제 완료된 내역 보여주기
-        Page<CompletePaymentResponse> payments = paymentService.findAllCompletePaymentByStudent(academyId, requestAccount, studentId, pageable);
+        Page<CompletePaymentResponse> payments = paymentService.findAllCompletePaymentByStudent(academyId, requestAccount, studentId);
         model.addAttribute("payments", payments);
 
 
