@@ -31,7 +31,7 @@ public class ParentRestController {
     @PostMapping("/{academyId}/parents")
     public ResponseEntity<Response<CreateParentResponse>> create(@PathVariable Long academyId, @Validated @RequestBody CreateParentRequest request, BindingResult bindingResult, Authentication authentication) {
 
-        if (bindingResult.hasErrors()) {
+        if (bindingResult.hasFieldErrors()) {
             throw new BindingException(ErrorCode.BINDING_ERROR, bindingResult.getFieldError().getDefaultMessage());
         }
 

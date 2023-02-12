@@ -34,7 +34,7 @@ public class AnnouncementRestController {
     @PostMapping("/{academyId}/announcements")
     public ResponseEntity<Response<CreateAnnouncementResponse>> create(@PathVariable Long academyId, @Validated @RequestBody CreateAnnouncementRequest request, BindingResult bindingResult, Authentication authentication) {
 
-        if (bindingResult.hasErrors()) {
+        if (bindingResult.hasFieldErrors()) {
             throw new BindingException(ErrorCode.BINDING_ERROR, bindingResult.getFieldError().getDefaultMessage());
         }
 
@@ -85,7 +85,7 @@ public class AnnouncementRestController {
     @PutMapping("/{academyId}/announcements/{announcementId}")
     public ResponseEntity<Response<UpdateAnnouncementResponse>> update(@PathVariable Long academyId, @PathVariable Long announcementId, @Validated @RequestBody UpdateAnnouncementRequest request, BindingResult bindingResult, Authentication authentication) {
 
-        if (bindingResult.hasErrors()) {
+        if (bindingResult.hasFieldErrors()) {
             throw new BindingException(ErrorCode.BINDING_ERROR, bindingResult.getFieldError().getDefaultMessage());
         }
 

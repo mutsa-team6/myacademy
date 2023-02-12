@@ -40,7 +40,7 @@ public class EmployeeRestController {
 
         log.info("⭐ 회원가입 요청한 id [{}] 요청한 사용자 계정 [{}]", academyId, request.getAccount());
 
-        if (bindingResult.hasErrors()) {
+        if (bindingResult.hasFieldErrors()) {
             throw new BindingException(ErrorCode.BINDING_ERROR, bindingResult.getFieldError().getDefaultMessage());
         }
         CreateEmployeeResponse response = employeeService.createEmployee(request, academyId);
@@ -73,7 +73,7 @@ public class EmployeeRestController {
     @Tag(name = "0. 로그아웃", description = "스웨거용 API")
     @Operation(summary = "직원 로그아웃", description = "스웨거용 ENDPOINT. \n\n 로그아웃시 쿠키가 삭제됩니다.")
     @PostMapping("/employees/logout")
-    public ResponseEntity<Response> logout(Authentication authentication, HttpServletResponse httpServletResponse) {
+    public ResponseEntity<Response<String>> logout(Authentication authentication, HttpServletResponse httpServletResponse) {
 
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
         log.info("🔑 로그아웃을 요청한 계정 [{}]", requestAccount);
@@ -91,7 +91,7 @@ public class EmployeeRestController {
     @PutMapping("/{academyId}")
     public ResponseEntity<Response<UpdateEmployeeResponse>> update(Authentication authentication, @PathVariable Long academyId, @Validated @RequestBody UpdateEmployeeRequest request,BindingResult bindingResult) {
 
-        if (bindingResult.hasErrors()) {
+        if (bindingResult.hasFieldErrors()) {
             throw new BindingException(ErrorCode.BINDING_ERROR, bindingResult.getFieldError().getDefaultMessage());
         }
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
@@ -119,7 +119,7 @@ public class EmployeeRestController {
     @PostMapping("employee/findAccount")
     public ResponseEntity<Response<FindAccountEmployeeResponse>> findAccount(@Validated @RequestBody FindAccountEmployeeRequest request,BindingResult bindingResult) {
 
-        if (bindingResult.hasErrors()) {
+        if (bindingResult.hasFieldErrors()) {
             throw new BindingException(ErrorCode.BINDING_ERROR, bindingResult.getFieldError().getDefaultMessage());
         }
 
@@ -134,7 +134,7 @@ public class EmployeeRestController {
     @PostMapping("{academyId}/employee/changePassword")
     public ResponseEntity<Response<ChangePasswordEmployeeResponse>> changePassword(@PathVariable Long academyId, @Validated @RequestBody ChangePasswordEmployeeRequest request, BindingResult bindingResult, Authentication authentication) {
 
-        if (bindingResult.hasErrors()) {
+        if (bindingResult.hasFieldErrors()) {
             throw new BindingException(ErrorCode.BINDING_ERROR, bindingResult.getFieldError().getDefaultMessage());
         }
 
@@ -149,7 +149,7 @@ public class EmployeeRestController {
     @PutMapping("/employee/findPassword")
     public ResponseEntity<Response<FindPasswordEmployeeResponse>> findPassword(@Validated @RequestBody FindPasswordEmployeeRequest request,BindingResult bindingResult) {
 
-        if (bindingResult.hasErrors()) {
+        if (bindingResult.hasFieldErrors()) {
             throw new BindingException(ErrorCode.BINDING_ERROR, bindingResult.getFieldError().getDefaultMessage());
         }
         FindPasswordEmployeeResponse response = employeeService.findPasswordEmployee(request);

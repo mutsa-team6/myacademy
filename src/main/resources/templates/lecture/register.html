@@ -224,7 +224,7 @@
                     </div>
                     <div class="input-group input-group-outline mb-3">
                         <label class="form-label">강좌 가격</label>
-                        <input type="text" class="form-control" id="input-lecturePrice">
+                        <input type="number" class="form-control" id="input-lecturePrice">
                     </div>
                     <div class="input-group input-group-static my-3">
                         <label>강좌 요일을 선택하세요.</label>
@@ -308,11 +308,11 @@
                 </div>
                 <div class="input-group input-group-outline mb-3">
                     <label class="form-label">최소 수강정원</label>
-                    <input type="text" class="form-control" id="input-minimumCapacity">
+                    <input type="number" class="form-control" id="input-minimumCapacity">
                 </div>
                 <div class="input-group input-group-outline mb-3">
                     <label class="form-label">최대 수강정원</label>
-                    <input type="email" class="form-control" id="input-maximumCapacity">
+                    <input type="number" class="form-control" id="input-maximumCapacity">
                 </div>
                 <!--                    <button th:data-parameter1="${academyId}"  th:data-parameter2="${employeeId}"-->
                 <!--                            th:onclick="|register.registerLecture(this.getAttribute('data-parameter1'),this.getAttribute('data-parameter2'))|" type="button"-->
@@ -375,6 +375,17 @@
             };
             console.log(data);
 
+            if (document.querySelector('#input-lectureStartTime').value =="") {
+                alert("강의 시작 시간을 선택해주세요");
+                return;
+            }
+            if (document.querySelector('#input-lectureEndTime').value =="") {
+                alert("강의 종료 시간을 선택해주세요");
+                return;
+            }
+
+
+
             axios.post("/api/v1/academies/" + academyId + "/employees/" + teacherEmployeeId + "/lectures",
                 JSON.stringify(data), {
                     headers: {
@@ -388,6 +399,8 @@
             }).catch((error) => {
                 if (error.response.data.result["errorCode"] == "INVALID_PERMISSION") {
                     alert("강사는 접근할 수 없습니다.");
+                }else if (error.response.data.result["errorCode"] == "BINDING_ERROR") {
+                    alert(error.response.data.result["message"]);
                 }
             });
 

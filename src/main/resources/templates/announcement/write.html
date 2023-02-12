@@ -200,6 +200,8 @@
                 if (error.response.data.result["errorCode"] == "DUPLICATED_ACADEMY") {
                     alert("학원 이름은 중복될 수 없습니다.");
                     // window.location.href = '/academies';
+                }else if (error.response.data.result["errorCode"] == "BINDING_ERROR") {
+                    alert(error.response.data.result["message"]);
                 }
 
 

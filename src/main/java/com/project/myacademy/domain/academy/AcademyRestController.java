@@ -27,7 +27,7 @@ public class AcademyRestController {
     @PostMapping("")
     public ResponseEntity<Response<CreateAcademyResponse>> create(@Validated @RequestBody CreateAcademyRequest request, BindingResult bindingResult) {
 
-        if (bindingResult.hasErrors()) {
+        if (bindingResult.hasFieldErrors()) {
             throw new BindingException(ErrorCode.BINDING_ERROR, bindingResult.getFieldError().getDefaultMessage());
         }
 
