@@ -197,7 +197,7 @@ public class PaymentService {
         try {
             emailUtil.sendEmail(email, subject, body);
         } catch (MailException | MessagingException e){
-            log.info("이메일 전송 에러 발생 [{}]", e.getMessage());
+            log.info("결제 완료 이메일 전송 에러 발생 [{}]", e.getMessage());
         }
 
         RestTemplate rest = new RestTemplate();
@@ -301,9 +301,9 @@ public class PaymentService {
         try {
             emailUtil.sendEmail(email, subject, body);
         } catch (MailException e2){
-            log.info("이메일 전송 에러 발생 [{}]", e2.getMessage());
+            log.info("결제 취소 이메일 전송 에러 발생 [{}]", e2.getMessage());
         } catch (MessagingException e) {
-            log.info("이메일 전송 에러 발생 [{}]", e.getMessage());
+            log.info("결제 취소 이메일 전송 에러 발생 [{}]", e.getMessage());
         }
 
         return rest.postForEntity(

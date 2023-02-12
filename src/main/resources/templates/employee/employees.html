@@ -213,6 +213,8 @@
                     alert("직원 삭제 성공");
                     window.location.reload();
                 }).catch((error) => {
+                    console.log(error);
+                    alert(error.response.data.result["message"]);
                 });
             }
         }

@@ -130,7 +130,6 @@
                 alert("카테고리 선택은 필수입니다.")
                 return;
             }
-            console.log(data);
 
             axios.put("/api/v1/academies/" + academyId + "/announcements/"+announcementId,
                 JSON.stringify(data), {
@@ -139,20 +138,12 @@
                     }
                 }
             ).then((response) => {
-                console.log(response);
                 alert("수정 성공");
                 window.location.href = '/academy/announcements/detail?announcementNum='+announcementId;
 
             }).catch((error) => {
                 console.log(error);
-                if (error.response.data.result["errorCode"] == "DUPLICATED_ACADEMY") {
-                    alert("학원 이름은 중복될 수 없습니다.");
-                    // window.location.href = '/academies';
-                }else if (error.response.data.result["errorCode"] == "BINDING_ERROR") {
-                    alert(error.response.data.result["message"]);
-                }
-
-
+                alert(error.response.data.result["message"]);
             });
 
         }

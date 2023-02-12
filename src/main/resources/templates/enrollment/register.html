@@ -431,11 +431,8 @@
                 window.location.reload();
 
             }).catch((error) => {
-                if (error.response.data.result["errorCode"] == "INVALID_PERMISSION") {
-                    alert("강사는 접근할 수 없습니다.");
-                } else if (error.response.data.result["errorCode"] == "DUPLICATED_ENROLLMENT") {
-                    alert("해당 학생은 해당 강의를 이미 수강 신청한 상태입니다.");
-                }
+                console.log(error);
+                alert(error.response.data.result["message"]);
             });
 
         },
@@ -454,11 +451,8 @@
                 window.location.reload();
 
             }).catch((error) => {
-                if (error.response.data.result["errorCode"] == "INVALID_PERMISSION") {
-                    alert("강사는 접근할 수 없습니다.");
-                } else if (error.response.data.result["errorCode"] == "DUPLICATED_WAITINGLIST") {
-                    alert("해당 학생은 해당 강의를 이미 대기 신청한 상태입니다.");
-                }
+                console.log(error);
+                alert(error.response.data.result["message"]);
             });
 
         },
@@ -478,6 +472,8 @@
                     alert("대기 취소 성공");
                     window.location.reload();
                 }).catch((error) => {
+                    console.log(error);
+                    alert(error.response.data.result["message"]);
                 });
             }
         }

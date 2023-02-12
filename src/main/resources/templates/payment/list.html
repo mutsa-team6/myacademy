@@ -266,7 +266,7 @@
                 window.location.href = '/academy/payment/list';
             }).catch((error) => {
                 console.log(error);
-
+                alert(error.response.data.result["message"]);
             });
 
         }
