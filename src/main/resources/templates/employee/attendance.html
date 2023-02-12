@@ -119,63 +119,6 @@
 <script src="/assets/js/material-dashboard.min.js?v=3.0.4"></script>
 <link id="pagestyle" href="/assets/css/material-dashboard.css?v=3.0.4" rel="stylesheet"/>
 
-<Script>
-
-    let student = {
-        init: function () {
-            var _this = this;
-        },
-
-
-        uniqueness: function (academyId, studentId) {
-            let data = {
-                body: document.querySelector('#input-uniqueness').value.trim(),
-            };
-            console.log(data)
-            axios.post("/api/v1/academies/" + academyId + "/students/" + studentId + "/uniqueness",
-                JSON.stringify(data), {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
-                }
-            ).then((response) => {
-                alert("특이사항을 작성했습니다.");
-                window.location.reload();
-
-            }).catch((error) => {
-                if (error.response.data.result["errorCode"] == "INVALID_PERMISSION") {
-                    alert("강사는 접근할 수 없습니다.");
-                } else if (error.response.data.result["errorCode"] == "DUPLICATED_ENROLLMENT") {
-                    alert("해당 학생은 해당 강의를 이미 수강 신청한 상태입니다.");
-                }
-            });
-
-        },
-
-        delete: function (academyId, studentId, uniquenessId) {
-
-            const con_check = confirm("삭제하시겠습니까?");
-
-            if (con_check === true) {
-                axios.delete("/api/v1/academies/" + academyId + "/students/" + studentId + "/uniqueness/" + uniquenessId,
-                    {
-                        headers: {
-                            'Content-Type': 'application/json',
-                        }
-                    }
-                ).then((response) => {
-                    alert("특이사항 삭제 성공");
-                    window.location.reload();
-                }).catch((error) => {
-                });
-            }
-        }
-    };
-
-    student.init();
-
-</script>
-
 </body>
 
 </html>

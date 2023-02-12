@@ -92,7 +92,7 @@ public class PaymentService {
         Enrollment studentEnrollment = validateEnrollmentByStudentAndLecture(foundStudent, foundLecture);
 
         //결제 여부 확인 - 이미결제가 되어있을시 DUPLICATED_PAYMENT 에러발생
-        if (studentEnrollment.getPaymentYN()) {
+        if (studentEnrollment.getPaymentYN().equals(true)) {
             throw new AppException(ErrorCode.DUPLICATED_PAYMENT);
         }
 
@@ -183,7 +183,7 @@ public class PaymentService {
         Enrollment enrollment = validateEnrollmentByStudentAndLecture(selcetedPayment.getStudent(), selcetedPayment.getLecture());
 
         // 결제 여부 확인
-        if (enrollment.getPaymentYN()) {
+        if (enrollment.getPaymentYN().equals(true)) {
             throw new AppException(ErrorCode.ALREADY_PAYMENT);
         }
 
@@ -197,7 +197,7 @@ public class PaymentService {
         try {
             emailUtil.sendEmail(email, subject, body);
         } catch (MailException | MessagingException e){
-            log.info("이메일 전송 에러 발생 [{}]", e.getMessage());
+            log.info("결제 완료 이메일 전송 에러 발생 [{}]", e.getMessage());
         }
 
         RestTemplate rest = new RestTemplate();
@@ -301,9 +301,9 @@ public class PaymentService {
         try {
             emailUtil.sendEmail(email, subject, body);
         } catch (MailException e2){
-            log.info("이메일 전송 에러 발생 [{}]", e2.getMessage());
+            log.info("결제 취소 이메일 전송 에러 발생 [{}]", e2.getMessage());
         } catch (MessagingException e) {
-            log.info("이메일 전송 에러 발생 [{}]", e.getMessage());
+            log.info("결제 취소 이메일 전송 에러 발생 [{}]", e.getMessage());
         }
 
         return rest.postForEntity(
@@ -446,7 +446,7 @@ public class PaymentService {
             Enrollment foundEnrollment = enrollmentRepository.findByLecture_IdAndStudent_Id(payment.getLecture().getId(), payment.getStudent().getId())
                     .orElseThrow(() -> new AppException(ErrorCode.ENROLLMENT_NOT_FOUND));
 
-            if (foundEnrollment.getPaymentYN()) {
+            if (foundEnrollment.getPaymentYN().equals(true)) {
 
                 CompletePaymentResponse completePayment = new CompletePaymentResponse(payment);
 

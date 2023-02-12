@@ -121,7 +121,7 @@ public class ParentService {
         return DeleteParentResponse.of(parent);
     }
 
-    public boolean checkExistByPhoneAndAcademy(String parentPhoneNum, Long academyId) {
+    public boolean checkExistByPhoneAndAcademy(String parentPhoneNum) {
         return parentRepository.existsByPhoneNum(parentPhoneNum);
     }
 

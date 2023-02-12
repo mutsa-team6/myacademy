@@ -30,7 +30,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.mail.MailException;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.mail.MessagingException;
@@ -503,7 +502,7 @@ class EnrollmentServiceTest {
             given(enrollmentRepository.findByStudentAndLecture(any(Student.class),any(Lecture.class))).willReturn(Optional.empty());
             given(enrollmentRepository.save(any(Enrollment.class))).willReturn(enrollment2);
 
-            DeleteEnrollmentResponse deletedEnrollment = enrollmentService.deleteEnrollment(academy.getId(), student.getId(), lecture.getId(), enrollment.getId(), createEnrollmentRequest, employee.getAccount());
+            DeleteEnrollmentResponse deletedEnrollment = enrollmentService.deleteEnrollment(academy.getId(), student.getId(), lecture.getId(), enrollment.getId(), employee.getAccount());
             assertThat(deletedEnrollment.getDeletedEnrollmentId()).isEqualTo(1L);
             assertThat(deletedEnrollment.getMessage()).isEqualTo("수강 등록 삭제 완료");
 
@@ -526,7 +525,7 @@ class EnrollmentServiceTest {
             given(academyRepository.findById(anyLong())).willReturn(Optional.empty());
 
             AppException appException = assertThrows(AppException.class,
-                    () -> enrollmentService.deleteEnrollment(academy.getId(), student.getId(), lecture.getId(), enrollment.getId(), createEnrollmentRequest, employee.getAccount()));
+                    () -> enrollmentService.deleteEnrollment(academy.getId(), student.getId(), lecture.getId(), enrollment.getId(), employee.getAccount()));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACADEMY_NOT_FOUND);
             assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 학원을 찾을 수 없습니다.");
@@ -542,7 +541,7 @@ class EnrollmentServiceTest {
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.empty());
 
             AppException appException = assertThrows(AppException.class,
-                    () -> enrollmentService.deleteEnrollment(academy.getId(), student.getId(), lecture.getId(), enrollment.getId(), createEnrollmentRequest, employee.getAccount()));
+                    () -> enrollmentService.deleteEnrollment(academy.getId(), student.getId(), lecture.getId(), enrollment.getId(), employee.getAccount()));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND);
             assertThat(appException.getErrorCode().getMessage()).isEqualTo("요청한 직원을 해당 학원에서 찾을 수 없습니다.");
@@ -560,7 +559,7 @@ class EnrollmentServiceTest {
             given(studentRepository.findById(anyLong())).willReturn(Optional.empty());
 
             AppException appException = assertThrows(AppException.class,
-                    () -> enrollmentService.deleteEnrollment(academy.getId(), student.getId(), lecture.getId(), enrollment.getId(), createEnrollmentRequest, employee.getAccount()));
+                    () -> enrollmentService.deleteEnrollment(academy.getId(), student.getId(), lecture.getId(), enrollment.getId(), employee.getAccount()));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.STUDENT_NOT_FOUND);
             assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 학생을 찾을 수 없습니다.");
@@ -580,7 +579,7 @@ class EnrollmentServiceTest {
             given(lectureRepository.findById(anyLong())).willReturn(Optional.empty());
 
             AppException appException = assertThrows(AppException.class,
-                    () -> enrollmentService.deleteEnrollment(academy.getId(), student.getId(), lecture.getId(), enrollment.getId(), createEnrollmentRequest, employee.getAccount()));
+                    () -> enrollmentService.deleteEnrollment(academy.getId(), student.getId(), lecture.getId(), enrollment.getId(), employee.getAccount()));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.LECTURE_NOT_FOUND);
             assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 수업을 찾을 수 없습니다.");
@@ -602,7 +601,7 @@ class EnrollmentServiceTest {
             given(enrollmentRepository.findById(anyLong())).willReturn(Optional.empty());
 
             AppException appException = assertThrows(AppException.class,
-                    () -> enrollmentService.deleteEnrollment(academy.getId(), student.getId(), lecture.getId(), enrollment.getId(), createEnrollmentRequest, employee.getAccount()));
+                    () -> enrollmentService.deleteEnrollment(academy.getId(), student.getId(), lecture.getId(), enrollment.getId(), employee.getAccount()));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ENROLLMENT_NOT_FOUND);
             assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 수강 이력을 찾을 수 없습니다.");
@@ -625,7 +624,7 @@ class EnrollmentServiceTest {
             given(mockEmployee.getEmployeeRole()).willReturn(EmployeeRole.ROLE_USER);
 
             AppException appException = assertThrows(AppException.class,
-                    () -> enrollmentService.deleteEnrollment(academy.getId(), student.getId(), lecture.getId(), enrollment.getId(), createEnrollmentRequest, employee.getAccount()));
+                    () -> enrollmentService.deleteEnrollment(academy.getId(), student.getId(), lecture.getId(), enrollment.getId(), employee.getAccount()));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.INVALID_PERMISSION);
             assertThat(appException.getErrorCode().getMessage()).isEqualTo("사용자가 권한이 없습니다.");
@@ -655,7 +654,7 @@ class EnrollmentServiceTest {
             given(enrollmentRepository.findByStudentAndLecture(any(Student.class),any(Lecture.class))).willReturn(Optional.of(enrollment2));
 
             AppException appException = assertThrows(AppException.class,
-                    () -> enrollmentService.deleteEnrollment(academy.getId(), student.getId(), lecture.getId(), enrollment.getId(), createEnrollmentRequest, employee.getAccount()));
+                    () -> enrollmentService.deleteEnrollment(academy.getId(), student.getId(), lecture.getId(), enrollment.getId(), employee.getAccount()));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.DUPLICATED_ENROLLMENT);
             assertThat(appException.getErrorCode().getMessage()).isEqualTo("이미 존재하는 수강 내역입니다.");

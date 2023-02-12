@@ -2,6 +2,8 @@ package com.project.myacademy.domain.discount;
 
 import com.project.myacademy.domain.discount.dto.*;
 import com.project.myacademy.global.Response;
+import com.project.myacademy.global.exception.BindingException;
+import com.project.myacademy.global.exception.ErrorCode;
 import com.project.myacademy.global.util.AuthenticationUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -13,6 +15,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "10. 할인정책", description = "할인 정책 등록, 조회, 삭제, 적용유무 확인")
@@ -39,8 +43,14 @@ public class DiscountRestController {
     @Operation(summary = "할인정책 등록", description = "할인정책 이름과, 할인율을 입력받아 할인정책을 등록합니다.")
     @PostMapping("/{academyId}/discounts")
     public ResponseEntity<Response<CreateDiscountResponse>> create(@PathVariable("academyId") Long academyId,
-                                                                   @RequestBody CreateDiscountRequest createDiscountRequest,
+                                                                   @Validated @RequestBody CreateDiscountRequest createDiscountRequest,
+                                                                   BindingResult bindingResult,
                                                                    Authentication authentication) {
+
+        if (bindingResult.hasFieldErrors()) {
+            throw new BindingException(ErrorCode.BINDING_ERROR, bindingResult.getFieldError().getDefaultMessage());
+        }
+
         String account = AuthenticationUtil.getAccountFromAuth(authentication);
         CreateDiscountResponse response = discountService.createDiscount(academyId, createDiscountRequest, account);
         return ResponseEntity.ok().body(Response.success(response));

@@ -78,7 +78,7 @@ public class UniquenessService {
         // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
         validateRequestEmployeeByAcademy(account, academy);
         // 학생 Id로 학생이 존재하는지 확인 - 있으면 STUDENT_NOT_FOUND 에러발생
-        Student student = validateStudentById(studentId);
+        validateStudentById(studentId);
         // 특이사항 Id로 특이사항 조회 - 없을시 UNIQUENESS_NOT_FOUND 에러발생
         Uniqueness uniqueness = validateUniquenessById(uniquenessId);
 
@@ -99,7 +99,7 @@ public class UniquenessService {
         // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
         validateRequestEmployeeByAcademy(account, academy);
         // 학생 Id로 학생이 존재하는지 확인 - 있으면 STUDENT_NOT_FOUND 에러발생
-        Student student = validateStudentById(studentId);
+        validateStudentById(studentId);
         // 특이사항 Id로 특이사항 조회 - 없을시 UNIQUENESS_NOT_FOUND 에러발생
         Uniqueness uniqueness = validateUniquenessById(uniquenessId);
 
@@ -110,29 +110,25 @@ public class UniquenessService {
 
     // 특이사항 Id로 특이사항 조회 - 없을시 UNIQUENESS_NOT_FOUND 에러발생
     private Uniqueness validateUniquenessById(Long uniquenessId) {
-        Uniqueness validateUniqueness = uniquenessRepository.findById(uniquenessId)
+        return uniquenessRepository.findById(uniquenessId)
                 .orElseThrow(() -> new AppException(ErrorCode.UNIQUENESS_NOT_FOUND));
-        return validateUniqueness;
     }
 
     // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
     private Academy validateAcademyById(Long academyId) {
-        Academy validatedAcademy = academyRepository.findById(academyId)
+        return academyRepository.findById(academyId)
                 .orElseThrow(() -> new AppException(ErrorCode.ACADEMY_NOT_FOUND));
-        return validatedAcademy;
     }
 
     // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
     public Employee validateRequestEmployeeByAcademy(String account, Academy academy) {
-        Employee employee = employeeRepository.findByAccountAndAcademy(account, academy)
+        return employeeRepository.findByAccountAndAcademy(account, academy)
                 .orElseThrow(() -> new AppException(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND));
-        return employee;
     }
 
     // 학생 Id로 학생이 존재하는지 확인 - 있으면 STUDENT_NOT_FOUND 에러발생
     private Student validateStudentById(Long studentId) {
-        Student validateStudent = studentRepository.findById(studentId)
+        return studentRepository.findById(studentId)
                 .orElseThrow(() -> new AppException(ErrorCode.STUDENT_NOT_FOUND));
-        return validateStudent;
     }
 }
