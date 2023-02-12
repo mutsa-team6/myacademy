@@ -28,7 +28,6 @@ public class CreateEmployeeRequest {
     @Length(min=8,message = "비밀번호는 길이는 최소 8자리 입니다.")
     private String password;
     private String employeeType;
-    @NotBlank(message = "과목명 필수 입력 항목입니다.")
     private String subject;
 
 }
