@@ -293,7 +293,6 @@ public class EmployeeService {
      * JwtTokenFilter 에서 사용하기 위해 만든 메서드 ( 계정 찾아와서 권한 부여하기 위함 )
      */
     public Employee findByEmail(String email) {
-
         return validateEmployeeByEmail(email);
     }
 
@@ -316,8 +315,6 @@ public class EmployeeService {
 
         return employeeRepository.findAllEmployee(foundAcademy, pageable).map(ReadAllEmployeeResponse::of);
     }
-
-
 
     /**
      * ADMIN 회원은 본인 탈퇴 불가
