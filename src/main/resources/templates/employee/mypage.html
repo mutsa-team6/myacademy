@@ -424,9 +424,7 @@
                     window.location.reload();
                 }).catch((error) => {
                     console.log(error);
-                    if (error.response.data.result["errorCode"] == "DUPLICATED_ACADEMY") {
-                        alert("학원 이름은 중복될 수 없습니다.");
-                    }
+                    alert(error.response.data.result["message"]);
                 });
 
             },
@@ -453,7 +451,7 @@
                     window.location.reload();
                 }).catch((error) => {
                     console.log(error);
-
+                    alert(error.response.data.result["message"]);
                 });
 
             },
@@ -480,6 +478,7 @@
                     window.location.reload();
                 }).catch((error) => {
                     console.log(error);
+                    alert(error.response.data.result["message"]);
                 });
 
             },
@@ -502,13 +501,7 @@
                     window.location.reload();
                 }).catch((error) => {
                     console.log(error);
-                    if (error.response.data.result["errorCode"] == "INVALID_PASSWORD") {
-                        alert("현재 비밀번호가 일치하지 않습니다.");
-                    } else if (error.response.data.result["errorCode"] == "SAME_PASSWORD") {
-                        alert("현재 비밀번호와 변경하려는 비밀번호가 일치합니다.");
-                    } else if (error.response.data.result["errorCode"] == "BINDING_ERROR") {
-                        alert(error.response.data.result["message"]);
-                    }
+                    alert(error.response.data.result["message"]);
                 });
 
             },

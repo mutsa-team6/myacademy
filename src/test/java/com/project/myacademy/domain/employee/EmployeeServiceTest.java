@@ -639,7 +639,7 @@ class EmployeeServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> employeeService.readAllEmployees(employeeSTAFF.getAccount(), academy.getId(), pageable));
 
-            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.NOT_ALLOWED_ROLE);
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.INVALID_PERMISSION);
         }
 
         @Test

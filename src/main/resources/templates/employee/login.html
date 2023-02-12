@@ -146,6 +146,7 @@
                 hide('academy-pass');
             }
         }).catch((error) => {
+
         });
     }
 
@@ -184,15 +185,8 @@
                 window.location.href = '/academy/main';
 
             }).catch((error) => {
-                if (error.response.data.result["errorCode"] == "ACADEMY_NOT_FOUND") {
-                    alert("등록된 학원이 아닙니다. 등록 후 진행해주세요");
-                } else if(error.response.data.result["errorCode"] == "REQUEST_EMPLOYEE_NOT_FOUND"){
-                    alert("가입되어있지 않은 회원입니다.");
-                }else if(error.response.data.result["errorCode"] == "INVALID_PASSWORD"){
-                    alert("비밀번호가 일치하지 않습니다.");
-                }else if (error.response.data.result["errorCode"] == "BINDING_ERROR") {
-                    alert(error.response.data.result["message"]);
-                }
+                console.log(error);
+                alert(error.response.data.result["message"]);
             });
         }
     };

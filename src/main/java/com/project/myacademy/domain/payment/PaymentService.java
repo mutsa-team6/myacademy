@@ -184,7 +184,7 @@ public class PaymentService {
 
         // 결제 여부 확인
         if (enrollment.getPaymentYN().equals(true)) {
-            throw new AppException(ErrorCode.ALREADY_PAYMENT);
+            throw new AppException(ErrorCode.DUPLICATED_PAYMENT);
         }
 
         //결제 여부 false로 변경

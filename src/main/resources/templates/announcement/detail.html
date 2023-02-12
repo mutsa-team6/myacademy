@@ -171,8 +171,6 @@
         },
 
         delete: function (academyId, announcementId) {
-            console.log(academyId);
-            console.log(announcementId);
 
             const con_check = confirm("삭제하시겠습니까?");
 
@@ -187,6 +185,8 @@
                     alert("게시글 삭제 성공");
                     window.location.href = '/academy/announcements';
                 }).catch((error) => {
+                    console.log(error);
+                    alert(error.response.data.result["message"]);
                 });
             }
         }

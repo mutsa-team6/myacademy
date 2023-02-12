@@ -378,7 +378,7 @@ class DiscountServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> discountService.checkDiscount(academy.getId(), checkDiscountRequest, employee.getAccount()));
 
-            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ALREADY_PAYMENT);
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.DUPLICATED_PAYMENT);
             assertThat(appException.getErrorCode().getMessage()).isEqualTo("이미 결제된 수업입니다.");
 
             then(academyRepository).should(times(1)).findById(anyLong());

@@ -252,7 +252,7 @@ public class EmployeeService {
         Academy foundAcademy = validateAcademyById(academyId);
         // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
         Employee requestEmployee = validateRequestEmployeeByAccount(requestAccount, foundAcademy);
-        // 적용될 계정과 학원으로 직원을 조회 - 없을시 ACCOUNT_NOT_FOUND 에러발생
+        // 적용될 계정과 학원으로 직원을 조회 - 없을시 EMPLOYEE_NOT_FOUND 에러발생
         Employee foundEmployee = validateEmployeeById(employeeId, foundAcademy);
 
         // 삭제 요청자 권한이 ADMIN 아니면 - INVALID_PERMISSION 에러발생
@@ -311,7 +311,7 @@ public class EmployeeService {
 
         // 조회를 요청한 회원의 권한이 admin 이 아닐경우 - NOT_ALLOWED_ROLE 에러발생
         if (!employeeAdmin.getEmployeeRole().equals(EmployeeRole.ROLE_ADMIN)) {
-            throw new AppException(ErrorCode.NOT_ALLOWED_ROLE);
+            throw new AppException(ErrorCode.INVALID_PERMISSION);
         }
 
         return employeeRepository.findAllEmployee(foundAcademy, pageable).map(ReadAllEmployeeResponse::of);
@@ -423,7 +423,7 @@ public class EmployeeService {
         // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
         validateRequestEmployeeByAccount(requestAccount, foundAcademy);
 
-        // 적용될 계정과 학원으로 직원을 조회 - 없을시 ACCOUNT_NOT_FOUND 에러발생
+        // 적용될 계정과 학원으로 직원을 조회 - 없을시 EMPLOYEE_NOT_FOUND 에러발생
         Employee foundEmployee = validateEmployeeById(employeeId, foundAcademy);
 
         // 변경하려는 계정이 자기 자신인 경우 - BAD_CHANGE_REQUEST 에러발생
@@ -493,7 +493,7 @@ public class EmployeeService {
     // 이메일로 직원을 조회 - 없을시 EMPLOYEE_NOT_FOUND 에러발생
     private Employee validateEmployeeByEmail(String email) {
         return employeeRepository.findByEmail(email)
-                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.EMAIL_NOT_FOUND));
     }
 
     // 이메일로 직원을 조회 - 있을시 DUPLICATED_EMAIL 에러발생
