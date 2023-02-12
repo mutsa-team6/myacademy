@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -14,13 +12,13 @@ import java.util.List;
 public class CreateEmployeeProfileResponse {
 
     private String uploadFileName;
-    private String S3StoredFileName;
+    private String s3StoredFileName;
     private String message;
 
     public static CreateEmployeeProfileResponse of(String original, String stored) {
         return CreateEmployeeProfileResponse.builder()
                 .uploadFileName(original)
-                .S3StoredFileName(stored)
+                .s3StoredFileName(stored)
                 .message("파일 첨부 완료")
                 .build();
     }

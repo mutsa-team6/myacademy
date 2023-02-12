@@ -48,6 +48,9 @@ public class PaymentController {
     @Value("${payment.toss.failCallbackUrl}")
     private String failCallbackUrl;
 
+    private static final String PREVIOUS = "previous";
+    private static final String NEXT = "next";
+
     @GetMapping("/academy/payment/register")
     public String main(@RequestParam(required = false) String studentName, HttpServletRequest request, Model model, Authentication authentication, Pageable pageable) {
 
@@ -63,14 +66,14 @@ public class PaymentController {
             Page<FindEnrollmentResponse> enrollments = enrollmentService.findEnrollmentForPay(academyId, studentName, pageable);
             log.info("💲 결제 등록을 위한 검색 학생 이름 [{}] ", studentName);
             model.addAttribute("enrollments", enrollments);
-            model.addAttribute("previous", pageable.previousOrFirst().getPageNumber());
-            model.addAttribute("next", pageable.next().getPageNumber());
+            model.addAttribute(PREVIOUS, pageable.previousOrFirst().getPageNumber());
+            model.addAttribute(NEXT, pageable.next().getPageNumber());
 
         } else {
             Page<FindEnrollmentResponse> enrollments = enrollmentService.findAllEnrollmentForPay(academyId, pageable);
             model.addAttribute("enrollments", enrollments);
-            model.addAttribute("previous", pageable.previousOrFirst().getPageNumber());
-            model.addAttribute("next", pageable.next().getPageNumber());
+            model.addAttribute(PREVIOUS, pageable.previousOrFirst().getPageNumber());
+            model.addAttribute(NEXT, pageable.next().getPageNumber());
         }
         log.info("🔑 key = {}", key);
         model.addAttribute("tossKey", key);
@@ -90,7 +93,7 @@ public class PaymentController {
         Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
 
         // 직원 정보, 학원 정보 세션에 저장 및 model로 넘기는 메서드
-        ReadEmployeeResponse requestEmployee = setSessionEmployeeInfo(request, model, authentication, academyId);
+        setSessionEmployeeInfo(request, model, authentication, academyId);
         setSessionAcademyInfo(request, model, academyId);
 
         // 결제 성공 시, payment key 저장
@@ -103,7 +106,7 @@ public class PaymentController {
 
         FindEnrollmentResponse enrollment = enrollmentService.findEnrollmentForPaySuccess(studentId, lectureId);
 
-        if (enrollment.getPaymentYN() == false) {
+        if (enrollment.getPaymentYN().equals(false)) {
             paymentService.successApprovePayment(paymentKey, orderId, amount);
         }
 
@@ -118,7 +121,7 @@ public class PaymentController {
         Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
 
         // 직원 정보, 학원 정보 세션에 저장 및 model로 넘기는 메서드
-        ReadEmployeeResponse requestEmployee = setSessionEmployeeInfo(request, model, authentication, academyId);
+        setSessionEmployeeInfo(request, model, authentication, academyId);
         setSessionAcademyInfo(request, model, academyId);
 
 
@@ -146,8 +149,8 @@ public class PaymentController {
             model.addAttribute("payments", payments);
         }
 
-        model.addAttribute("previous", pageable.previousOrFirst().getPageNumber());
-        model.addAttribute("next", pageable.next().getPageNumber());
+        model.addAttribute(PREVIOUS, pageable.previousOrFirst().getPageNumber());
+        model.addAttribute(NEXT, pageable.next().getPageNumber());
 
 
         return "payment/list";

@@ -195,7 +195,9 @@
                 });
             }).catch((error) => {
                 console.log(error);
-
+                if (error.response.data.result["errorCode"] == "BINDING_ERROR") {
+                    alert(error.response.data.result["message"]);
+                }
             });
         }
 

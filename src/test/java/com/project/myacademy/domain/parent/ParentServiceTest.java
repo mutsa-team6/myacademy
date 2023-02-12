@@ -81,7 +81,7 @@ class ParentServiceTest {
 
         @Test
         @DisplayName("부모 정보 등록 : 실패 - 권한에러")
-        public void createParentFailPermission() {
+        void createParentFailPermission() {
 
             when(academyRepository.findById(any())).thenReturn(Optional.of(academy1));
             when(employeeRepository.findByAccountAndAcademy(any(), any())).thenReturn(Optional.of(mockEmployee));
@@ -147,19 +147,6 @@ class ParentServiceTest {
         }
 
         @Test
-        @DisplayName("부모 정보 조회 : 실패 - 권한에러")
-        public void readParentFailPermission() {
-
-            when(academyRepository.findById(any())).thenReturn(Optional.of(academy1));
-            when(employeeRepository.findByAccountAndAcademy(any(), any())).thenReturn(Optional.of(mockEmployee));
-            when(mockEmployee.getEmployeeRole()).thenReturn(EmployeeRole.ROLE_USER);
-
-            AppException appException = assertThrows(AppException.class, () -> parentService.readParent(1L, 1L, "user"));
-            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.INVALID_PERMISSION);
-        }
-
-
-        @Test
         @DisplayName("부모 정보 조회 : 실패 - 부모에러")
         void readParentFailParent() {
 
@@ -215,7 +202,7 @@ class ParentServiceTest {
 
         @Test
         @DisplayName("부모 정보 수정 : 실패 - 권한에러")
-        public void updateParentFailPermission() {
+        void updateParentFailPermission() {
 
             when(academyRepository.findById(any())).thenReturn(Optional.of(academy1));
             when(employeeRepository.findByAccountAndAcademy(any(), any())).thenReturn(Optional.of(mockEmployee));
@@ -280,7 +267,7 @@ class ParentServiceTest {
 
         @Test
         @DisplayName("부모 정보 삭제 : 실패 - 권한에러")
-        public void deleteParentFailPermission() {
+        void deleteParentFailPermission() {
 
             when(academyRepository.findById(any())).thenReturn(Optional.of(academy1));
             when(employeeRepository.findByAccountAndAcademy(any(), any())).thenReturn(Optional.of(mockEmployee));
@@ -304,12 +291,12 @@ class ParentServiceTest {
 
     @Test
     @DisplayName("부모의 전화번호와 등록된 학원으로 부모가 존재하는지 찾아오기")
-    public void checkExistByPhoneAndAcademy_success() {
+    void checkExistByPhoneAndAcademy_success() {
 
         Parent parent1 = ParentFixtureUtil.PARENT1.init();
 
         when(parentRepository.existsByPhoneNum(any(String.class))).thenReturn(true);
 
-        assertDoesNotThrow(() -> parentService.checkExistByPhoneAndAcademy(parent1.getPhoneNum(), parent1.getAcademyId()));
+        assertDoesNotThrow(() -> parentService.checkExistByPhoneAndAcademy(parent1.getPhoneNum()));
     }
 }

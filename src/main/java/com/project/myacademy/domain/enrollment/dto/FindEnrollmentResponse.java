@@ -1,8 +1,6 @@
 package com.project.myacademy.domain.enrollment.dto;
 
 import com.project.myacademy.domain.enrollment.Enrollment;
-import com.project.myacademy.domain.lecture.Lecture;
-import com.project.myacademy.domain.student.Student;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,7 +9,6 @@ import lombok.NoArgsConstructor;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor

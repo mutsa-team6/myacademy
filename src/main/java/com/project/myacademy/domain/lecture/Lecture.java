@@ -36,10 +36,10 @@ public class Lecture extends BaseEntity {
     private Integer maximumCapacity;
 
     @Column(name = "lecture_day")
-    private String LectureDay;
+    private String lectureDay;
 
     @Column(name = "lecture_time")
-    private String LectureTime;
+    private String lectureTime;
 
     @Column(name = "start_date")
     private LocalDate startDate;
@@ -71,8 +71,8 @@ public class Lecture extends BaseEntity {
                 .price(request.getLecturePrice())
                 .minimumCapacity(request.getMinimumCapacity())
                 .maximumCapacity(request.getMaximumCapacity())
-                .LectureDay(request.getLectureDay())
-                .LectureTime(request.getLectureTime())
+                .lectureDay(request.getLectureDay())
+                .lectureTime(request.getLectureTime())
                 .startDate(request.getStartDate())
                 .finishDate(request.getFinishDate())
                 .employee(teacher)
@@ -90,8 +90,8 @@ public class Lecture extends BaseEntity {
         this.price = request.getLecturePrice();
         this.minimumCapacity = request.getMinimumCapacity();
         this.maximumCapacity = request.getMaximumCapacity();
-        this.LectureDay = request.getLectureDay();
-        this.LectureTime = request.getLectureTime();
+        this.lectureDay = request.getLectureDay();
+        this.lectureTime = request.getLectureTime();
         this.startDate = request.getStartDate();
         this.finishDate = request.getFinishDate();
         this.modifiedEmployee = sb.append(employee.getId()).append(" (").append(employee.getName()).append(")").toString();

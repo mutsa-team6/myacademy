@@ -3,7 +3,6 @@ package com.project.myacademy.domain.employee;
 import com.project.myacademy.domain.BaseEntity;
 import com.project.myacademy.domain.academy.Academy;
 import com.project.myacademy.domain.employee.dto.CreateEmployeeRequest;
-import com.project.myacademy.domain.employee.dto.EmployeeDto;
 import com.project.myacademy.domain.employee.dto.UpdateEmployeeRequest;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
@@ -55,16 +54,6 @@ public class Employee extends BaseEntity {
 
     private String subject;
 
-    public EmployeeDto toEmployeeDto() {
-        return EmployeeDto.builder()
-                .id(this.id)
-                .name(this.name)
-                .account(this.account)
-                .build();
-    }
-
-
-
     public void updateEmployeeInfo(UpdateEmployeeRequest request) {
         this.address = request.getAddress();
         this.phoneNum = request.getPhoneNum();
@@ -82,8 +71,7 @@ public class Employee extends BaseEntity {
 
     // 등록, 수정, 삭제 작업을 진행하는 직원의 권한을 확인하는 메서드
     public static boolean isTeacherAuthority(Employee employee) {
-        if (employee.getEmployeeRole().equals(ROLE_USER)) return true;
-        else return false;
+        return employee.getEmployeeRole().equals(ROLE_USER);
     }
 
     // ADMIN 권한 직원 등록

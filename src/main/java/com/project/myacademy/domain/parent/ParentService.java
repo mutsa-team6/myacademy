@@ -63,9 +63,7 @@ public class ParentService {
         // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
         Academy academy = validateAcademyById(academyId);
         // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
-        Employee employee = validateRequestEmployeeByAcademy(account, academy);
-        // 해당 직원의 권한 체크 - USER 이면 INVALID_PERMISSION 에러발생
-        validateAuthorityUser(employee);
+        validateRequestEmployeeByAcademy(account, academy);
 
         //parentId와 academyId에 해당하는 부모 정보가 존재하는지 확인
         Parent parent = validateParent(parentId, academyId);
@@ -123,15 +121,14 @@ public class ParentService {
         return DeleteParentResponse.of(parent);
     }
 
-    public boolean checkExistByPhoneAndAcademy(String parentPhoneNum, Long academyId) {
+    public boolean checkExistByPhoneAndAcademy(String parentPhoneNum) {
         return parentRepository.existsByPhoneNum(parentPhoneNum);
     }
 
     private Parent validateParent(Long parentId, Long academyId) {
         // parentId와 academyId에 해당하는 부모 존재 유무 확인
-        Parent parent = parentRepository.findByIdAndAcademyId(parentId, academyId)
+        return parentRepository.findByIdAndAcademyId(parentId, academyId)
                 .orElseThrow(() -> new AppException(ErrorCode.PARENT_NOT_FOUND));
-        return parent;
     }
 
     // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
@@ -142,9 +139,8 @@ public class ParentService {
 
     // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
     public Employee validateRequestEmployeeByAcademy(String account, Academy academy) {
-        Employee employee = employeeRepository.findByAccountAndAcademy(account, academy)
+        return employeeRepository.findByAccountAndAcademy(account, academy)
                 .orElseThrow(() -> new AppException(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND));
-        return employee;
     }
 
     // 해당 직원의 권한 체크 - USER 이면 INVALID_PERMISSION 에러발생

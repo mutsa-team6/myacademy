@@ -12,7 +12,6 @@ import com.project.myacademy.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,23 +30,19 @@ public class UniquenessService {
     /**
      * @param studentId 특이사항의 대상이 되는 학생 Id
      * @param request   특이사항의 요청시 받는 request Dto
-     * @param account jwt로 받아온 사용자(Employee) 계정
+     * @param account   jwt로 받아온 사용자(Employee) 계정
      */
     @Transactional
     public CreateUniquenessResponse createUniqueness(Long academyId, Long studentId, CreateUniquenessRequest request, String account) {
 
-        //academyId 존재 유무 확인
-        Academy academy = validateAcademy(academyId);
-        //account 유효검사
-        Employee employee = validateAcademyEmployee(account, academy);
-        // 학생특이사항을 수정할 수 있는 권한인지 확인(강사만 불가능)
-        if(Employee.isTeacherAuthority(employee)) {
-            throw new AppException(ErrorCode.INVALID_PERMISSION);
-        }
-        //student Id에 해당하는 학생이 존재하는지 확인
-        Student student = validateStudent(studentId);
+        // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+        Academy academy = validateAcademyById(academyId);
+        // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
+        Employee employee = validateRequestEmployeeByAcademy(account, academy);
+        // 학생 Id로 학생이 존재하는지 확인 - 있으면 STUDENT_NOT_FOUND 에러발생
+        Student student = validateStudentById(studentId);
 
-        Uniqueness savedUniqueness = uniquenessRepository.save(Uniqueness.toUniqueness(request, student,employee.getName()));
+        Uniqueness savedUniqueness = uniquenessRepository.save(Uniqueness.toUniqueness(request, student, employee.getName()));
 
         return CreateUniquenessResponse.of(savedUniqueness);
     }
@@ -55,20 +50,16 @@ public class UniquenessService {
     /**
      * @param studentId 특이사항의 대상이 되는 학생 Id
      * @param pageable  20개씩 id순서대로(최신순대로)
-     * @param account jwt로 받아온 사용자(Employee) 계정
+     * @param account   jwt로 받아온 사용자(Employee) 계정
      */
     public Page<ReadAllUniquenessResponse> readAllUniqueness(Long academyId, Long studentId, Pageable pageable, String account) {
 
-        //academyId 존재 유무 확인
-        Academy academy = validateAcademy(academyId);
-        //account 유효검사
-        Employee employee = validateAcademyEmployee(account, academy);
-        // 학생특이사항을 수정할 수 있는 권한인지 확인(강사만 불가능)
-        if(Employee.isTeacherAuthority(employee)) {
-            throw new AppException(ErrorCode.INVALID_PERMISSION);
-        }
-        //student Id에 해당하는 학생이 존재하는지 확인
-        Student student = validateStudent(studentId);
+        // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+        Academy academy = validateAcademyById(academyId);
+        // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
+        validateRequestEmployeeByAcademy(account, academy);
+        // 학생 Id로 학생이 존재하는지 확인 - 있으면 STUDENT_NOT_FOUND 에러발생
+        Student student = validateStudentById(studentId);
 
         return uniquenessRepository.findAllByStudent(student, pageable).map(uniqueness -> ReadAllUniquenessResponse.of(uniqueness));
     }
@@ -77,80 +68,67 @@ public class UniquenessService {
      * @param studentId    특이사항의 대상이 되는 학생 Id
      * @param uniquenessId 수정하려고하는 특이사항 Id
      * @param request      수정내용이 담긴 dto
-     * @param account jwt로 받아온 사용자(Employee) 계정
+     * @param account      jwt로 받아온 사용자(Employee) 계정
      */
     @Transactional
     public UpdateUniquenessResponse updateUniqueness(Long academyId, Long studentId, Long uniquenessId, UpdateUniquenessRequest request, String account) {
 
-        //academyId 존재 유무 확인
-        Academy academy = validateAcademy(academyId);
-        //account 유효검사
-        Employee employee = validateAcademyEmployee(account, academy);
-        // 학생특이사항을 수정할 수 있는 권한인지 확인(강사만 불가능)
-        if(Employee.isTeacherAuthority(employee)) {
-            throw new AppException(ErrorCode.INVALID_PERMISSION);
-        }
-        //student Id에 해당하는 학생이 존재하는지 확인
-        Student student = validateStudent(studentId);
-        //uniquenessId에 등록된 특이사항이 있는지 확인
-        Uniqueness uniqueness = validateUniqueness(uniquenessId);
+        // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+        Academy academy = validateAcademyById(academyId);
+        // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
+        validateRequestEmployeeByAcademy(account, academy);
+        // 학생 Id로 학생이 존재하는지 확인 - 있으면 STUDENT_NOT_FOUND 에러발생
+        validateStudentById(studentId);
+        // 특이사항 Id로 특이사항 조회 - 없을시 UNIQUENESS_NOT_FOUND 에러발생
+        Uniqueness uniqueness = validateUniquenessById(uniquenessId);
 
-        uniqueness.updateUniqueness(request);
-
+        uniqueness.updateUniqueness(request.getBody());
         return UpdateUniquenessResponse.of(uniqueness);
     }
 
     /**
      * @param studentId    특이사항의 대상이 되는 학생 Id
      * @param uniquenessId 삭제하려고 하는 특이사항 Id
-     * @param account jwt로 받아온 사용자(Employee) 계정
+     * @param account      jwt로 받아온 사용자(Employee) 계정
      */
     @Transactional
     public DeleteUniquenessResponse deleteUniqueness(Long academyId, Long studentId, Long uniquenessId, String account) {
 
-        //academyId 존재 유무 확인
-        Academy academy = validateAcademy(academyId);
-        //account 유효검사
-        Employee employee = validateAcademyEmployee(account, academy);
-        // 학생특이사항을 수정할 수 있는 권한인지 확인(강사만 불가능)
-        if(Employee.isTeacherAuthority(employee)) {
-            throw new AppException(ErrorCode.INVALID_PERMISSION);
-        }
-        //student Id에 해당하는 학생이 존재하는지 확인
-        Student student = validateStudent(studentId);
-        //uniquenessId에 등록된 특이사항이 있는지 확인
-        Uniqueness uniqueness = validateUniqueness(uniquenessId);
+        // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+        Academy academy = validateAcademyById(academyId);
+        // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
+        validateRequestEmployeeByAcademy(account, academy);
+        // 학생 Id로 학생이 존재하는지 확인 - 있으면 STUDENT_NOT_FOUND 에러발생
+        validateStudentById(studentId);
+        // 특이사항 Id로 특이사항 조회 - 없을시 UNIQUENESS_NOT_FOUND 에러발생
+        Uniqueness uniqueness = validateUniquenessById(uniquenessId);
 
         uniquenessRepository.delete(uniqueness);
 
         return DeleteUniquenessResponse.of(uniqueness);
     }
 
-    private Uniqueness validateUniqueness(Long uniquenessId) {
-        //학생 특이사항 존재 유무 확인
-        Uniqueness validateUniqueness = uniquenessRepository.findById(uniquenessId)
+    // 특이사항 Id로 특이사항 조회 - 없을시 UNIQUENESS_NOT_FOUND 에러발생
+    private Uniqueness validateUniquenessById(Long uniquenessId) {
+        return uniquenessRepository.findById(uniquenessId)
                 .orElseThrow(() -> new AppException(ErrorCode.UNIQUENESS_NOT_FOUND));
-        return validateUniqueness;
     }
 
-    private Academy validateAcademy(Long academyId) {
-        // 학원 존재 유무 확인
-        Academy validatedAcademy = academyRepository.findById(academyId)
+    // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+    private Academy validateAcademyById(Long academyId) {
+        return academyRepository.findById(academyId)
                 .orElseThrow(() -> new AppException(ErrorCode.ACADEMY_NOT_FOUND));
-        return validatedAcademy;
     }
 
-    private Employee validateAcademyEmployee(String account, Academy academy) {
-        // 해당 학원 소속 직원 맞는지 확인
-        Employee employee = employeeRepository.findByAccountAndAcademy(account, academy)
-                .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
-        return employee;
+    // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
+    public Employee validateRequestEmployeeByAcademy(String account, Academy academy) {
+        return employeeRepository.findByAccountAndAcademy(account, academy)
+                .orElseThrow(() -> new AppException(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND));
     }
 
-    private Student validateStudent(Long studentId) {
-        // 학생 존재 유무 확인
-        Student validateStudent = studentRepository.findById(studentId)
+    // 학생 Id로 학생이 존재하는지 확인 - 있으면 STUDENT_NOT_FOUND 에러발생
+    private Student validateStudentById(Long studentId) {
+        return studentRepository.findById(studentId)
                 .orElseThrow(() -> new AppException(ErrorCode.STUDENT_NOT_FOUND));
-        return validateStudent;
     }
 }

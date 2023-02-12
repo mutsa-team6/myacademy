@@ -2,6 +2,8 @@ package com.project.myacademy.domain.student;
 
 import com.project.myacademy.domain.student.dto.*;
 import com.project.myacademy.global.Response;
+import com.project.myacademy.global.exception.BindingException;
+import com.project.myacademy.global.exception.ErrorCode;
 import com.project.myacademy.global.util.AuthenticationUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -12,6 +14,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "05. 학생", description = "학생 등록,수정,조회")
@@ -28,7 +32,11 @@ public class StudentRestController {
      */
     @Operation(summary = "학생 등록", description = "ADMIN,STAFF 회원만 등록이 가능합니다.")
     @PostMapping("/{academyId}/students")
-    public ResponseEntity<Response<CreateStudentResponse>> create(@PathVariable Long academyId, @RequestBody CreateStudentRequest request, Authentication authentication) {
+    public ResponseEntity<Response<CreateStudentResponse>> create(@PathVariable Long academyId, @Validated @RequestBody CreateStudentRequest request, BindingResult bindingResult, Authentication authentication) {
+
+        if (bindingResult.hasFieldErrors()) {
+            throw new BindingException(ErrorCode.BINDING_ERROR, bindingResult.getFieldError().getDefaultMessage());
+        }
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
         CreateStudentResponse response = studentService.createStudent(academyId, request, requestAccount);
         return ResponseEntity.ok().body(Response.success(response));

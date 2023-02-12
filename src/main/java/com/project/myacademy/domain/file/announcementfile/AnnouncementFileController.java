@@ -31,9 +31,9 @@ public class AnnouncementFileController {
     public ResponseEntity<Response<CreateAnnouncementFileResponse>> upload(@PathVariable("academyId") Long academyId,
                                                                            @PathVariable("announcementId") Long announcementId,
                                                                            @RequestPart List<MultipartFile> multipartFile,
-                                                                           Authentication authentication) throws IOException {
+                                                                           Authentication authentication) {
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
-        CreateAnnouncementFileResponse fileResponse = announcementFileS3UploadService.UploadAnnouncementFile(academyId, announcementId, multipartFile, requestAccount);
+        CreateAnnouncementFileResponse fileResponse = announcementFileS3UploadService.uploadAnnouncementFile(academyId, announcementId, multipartFile, requestAccount);
         return ResponseEntity.ok().body(Response.success(fileResponse));
     }
 

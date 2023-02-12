@@ -16,6 +16,7 @@ import com.project.myacademy.domain.waitinglist.WaitinglistRepository;
 import com.project.myacademy.global.exception.AppException;
 import com.project.myacademy.global.exception.ErrorCode;
 import com.project.myacademy.global.util.EmailUtil;
+import groovy.util.logging.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -31,17 +32,20 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import javax.mail.MessagingException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@Slf4j
 class EnrollmentServiceTest {
 
     @Mock
@@ -96,7 +100,7 @@ class EnrollmentServiceTest {
 
         @Test
         @DisplayName("수강 리스트 조회 성공")
-        public void readAllEnrollments_success() {
+        void readAllEnrollments_success() {
 
             PageImpl<Enrollment> enrollmentList = new PageImpl<>(List.of(enrollment, enrollment2));
 
@@ -116,22 +120,20 @@ class EnrollmentServiceTest {
 
         @Test
         @DisplayName("수강 리스트 조회 실패(1) - 학원이 존재하지 않을 때")
-        public void readAllEnrollments_fail1() {
+        void readAllEnrollments_fail1() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.empty());
 
-            AppException appException = assertThrows(AppException.class,
-                    () -> enrollmentService.readAllEnrollments(academy.getId(), employee.getAccount(), pageable));
-
-            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACADEMY_NOT_FOUND);
-            assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 학원을 찾을 수 없습니다.");
+            assertThatThrownBy(() -> enrollmentService.readAllEnrollments(academy.getId(), employee.getAccount(), pageable))
+                    .isInstanceOf(RuntimeException.class)
+                    .hasMessage("해당 학원을 찾을 수 없습니다.");
 
             then(academyRepository).should(times(1)).findById(anyLong());
         }
 
         @Test
         @DisplayName("수강 리스트 조회 실패(2) - 조회 진행하는 직원이 해당 학원 소속이 아닐 때")
-        public void readAllEnrollments_fail2() {
+        void readAllEnrollments_fail2() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.empty());
@@ -153,7 +155,7 @@ class EnrollmentServiceTest {
 
         @Test
         @DisplayName("등록 성공")
-        public void createEnrollment_success() {
+        void createEnrollment_success() throws MessagingException {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
@@ -166,7 +168,7 @@ class EnrollmentServiceTest {
             willDoNothing().given(emailUtil).sendEmail(anyString(), anyString(), anyString());
 
             CreateEnrollmentResponse savedEnrollment = enrollmentService.createEnrollment(academy.getId(), student.getId(), lecture.getId(), employee.getAccount());
-            assertThat(savedEnrollment.getEnrollmentIdId()).isEqualTo(1L);
+            assertThat(savedEnrollment.getEnrollmentId()).isEqualTo(1L);
             assertThat(savedEnrollment.getMessage()).isEqualTo("수강 등록 완료");
 
             then(academyRepository).should(times(1)).findById(anyLong());
@@ -182,7 +184,7 @@ class EnrollmentServiceTest {
 
         @Test
         @DisplayName("등록 실패(1) - 학원이 존재하지 않을 때")
-        public void createEnrollment_fail1() {
+        void createEnrollment_fail1() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.empty());
 
@@ -197,7 +199,7 @@ class EnrollmentServiceTest {
 
         @Test
         @DisplayName("등록 실패(2) - 등록 진행하는 직원이 해당 학원 소속이 아닐 때")
-        public void createEnrollment_fail2() {
+        void createEnrollment_fail2() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.empty());
@@ -214,7 +216,7 @@ class EnrollmentServiceTest {
 
         @Test
         @DisplayName("등록 실패(3) - 수강에 등록될 학생이 존재하지 않을 때")
-        public void createEnrollment_fail3() {
+        void createEnrollment_fail3() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
@@ -234,7 +236,7 @@ class EnrollmentServiceTest {
 
         @Test
         @DisplayName("등록 실패(4) - 수강에 등록될 강좌가 존재하지 않을 때")
-        public void createEnrollment_fail4() {
+        void createEnrollment_fail4() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
@@ -255,7 +257,7 @@ class EnrollmentServiceTest {
 
         @Test
         @DisplayName("등록 실패(5) - 직원이 수강을 개설할 권한이 아닐 때")
-        public void createEnrollment_fail5() {
+        void createEnrollment_fail5() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
@@ -278,7 +280,7 @@ class EnrollmentServiceTest {
 
         @Test
         @DisplayName("등록 실패(6) - 수강이 중복 등록되어 있는 경우")
-        public void createEnrollment_fail6() {
+        void createEnrollment_fail6() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
@@ -303,7 +305,7 @@ class EnrollmentServiceTest {
 
         @Test
         @DisplayName("등록 실패(7) - 수강 정원 초과")
-        public void createEnrollment_fail7() {
+        void createEnrollment_fail7() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
@@ -336,7 +338,7 @@ class EnrollmentServiceTest {
 
         @Test
         @DisplayName("수정 성공")
-        public void updateEnrollment_success() {
+        void updateEnrollment_success() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
@@ -359,7 +361,7 @@ class EnrollmentServiceTest {
 
         @Test
         @DisplayName("수정 실패(1) - 학원이 존재하지 않을 때")
-        public void updateEnrollment_fail1() {
+        void updateEnrollment_fail1() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.empty());
 
@@ -374,7 +376,7 @@ class EnrollmentServiceTest {
 
         @Test
         @DisplayName("수정 실패(2) - 수정 진행하는 직원이 해당 학원 소속이 아닐 때")
-        public void updateEnrollment_fail2() {
+        void updateEnrollment_fail2() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.empty());
@@ -391,7 +393,7 @@ class EnrollmentServiceTest {
 
         @Test
         @DisplayName("수정 실패(3) - 수정할 수강에 학생이 존재하지 않을 때")
-        public void updateEnrollment_fail3() {
+        void updateEnrollment_fail3() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
@@ -410,7 +412,7 @@ class EnrollmentServiceTest {
 
         @Test
         @DisplayName("수정 실패(4) - 수정할 수강에 강좌가 존재하지 않을 때")
-        public void updateEnrollment_fail4() {
+        void updateEnrollment_fail4() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
@@ -431,7 +433,7 @@ class EnrollmentServiceTest {
 
         @Test
         @DisplayName("수정 실패(5) - 수강 이력이 존재하지 않을 때")
-        public void updateEnrollment_fail5() {
+        void updateEnrollment_fail5() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
@@ -454,7 +456,7 @@ class EnrollmentServiceTest {
 
         @Test
         @DisplayName("수정 실패(6) - 직원이 수강을 수정할 권한이 아닐 때")
-        public void updateEnrollment_fail6() {
+        void updateEnrollment_fail6() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
@@ -481,12 +483,11 @@ class EnrollmentServiceTest {
     @Nested
     @DisplayName("삭제")
     class EnrollmentDelete{
-
         CreateEnrollmentRequest createEnrollmentRequest = new CreateEnrollmentRequest("memo");
 
         @Test
         @DisplayName("삭제 성공")
-        public void deleteEnrollment_success() {
+        void deleteEnrollment_success() throws MessagingException {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
@@ -501,7 +502,7 @@ class EnrollmentServiceTest {
             given(enrollmentRepository.findByStudentAndLecture(any(Student.class),any(Lecture.class))).willReturn(Optional.empty());
             given(enrollmentRepository.save(any(Enrollment.class))).willReturn(enrollment2);
 
-            DeleteEnrollmentResponse deletedEnrollment = enrollmentService.deleteEnrollment(academy.getId(), student.getId(), lecture.getId(), enrollment.getId(), createEnrollmentRequest, employee.getAccount());
+            DeleteEnrollmentResponse deletedEnrollment = enrollmentService.deleteEnrollment(academy.getId(), student.getId(), lecture.getId(), enrollment.getId(), employee.getAccount());
             assertThat(deletedEnrollment.getDeletedEnrollmentId()).isEqualTo(1L);
             assertThat(deletedEnrollment.getMessage()).isEqualTo("수강 등록 삭제 완료");
 
@@ -519,12 +520,12 @@ class EnrollmentServiceTest {
 
         @Test
         @DisplayName("삭제 실패(1) - 학원이 존재하지 않을 때")
-        public void deleteEnrollment_fail1() {
+        void deleteEnrollment_fail1() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.empty());
 
             AppException appException = assertThrows(AppException.class,
-                    () -> enrollmentService.deleteEnrollment(academy.getId(), student.getId(), lecture.getId(), enrollment.getId(), createEnrollmentRequest, employee.getAccount()));
+                    () -> enrollmentService.deleteEnrollment(academy.getId(), student.getId(), lecture.getId(), enrollment.getId(), employee.getAccount()));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ACADEMY_NOT_FOUND);
             assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 학원을 찾을 수 없습니다.");
@@ -534,13 +535,13 @@ class EnrollmentServiceTest {
 
         @Test
         @DisplayName("삭제 실패(2) - 삭제 진행하는 직원이 해당 학원 소속이 아닐 때")
-        public void deleteEnrollment_fail2() {
+        void deleteEnrollment_fail2() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.empty());
 
             AppException appException = assertThrows(AppException.class,
-                    () -> enrollmentService.deleteEnrollment(academy.getId(), student.getId(), lecture.getId(), enrollment.getId(), createEnrollmentRequest, employee.getAccount()));
+                    () -> enrollmentService.deleteEnrollment(academy.getId(), student.getId(), lecture.getId(), enrollment.getId(), employee.getAccount()));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND);
             assertThat(appException.getErrorCode().getMessage()).isEqualTo("요청한 직원을 해당 학원에서 찾을 수 없습니다.");
@@ -551,14 +552,14 @@ class EnrollmentServiceTest {
 
         @Test
         @DisplayName("삭제 실패(3) - 삭제할 수강에 학생이 존재하지 않을 때")
-        public void deleteEnrollment_fail3() {
+        void deleteEnrollment_fail3() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
             given(studentRepository.findById(anyLong())).willReturn(Optional.empty());
 
             AppException appException = assertThrows(AppException.class,
-                    () -> enrollmentService.deleteEnrollment(academy.getId(), student.getId(), lecture.getId(), enrollment.getId(), createEnrollmentRequest, employee.getAccount()));
+                    () -> enrollmentService.deleteEnrollment(academy.getId(), student.getId(), lecture.getId(), enrollment.getId(), employee.getAccount()));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.STUDENT_NOT_FOUND);
             assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 학생을 찾을 수 없습니다.");
@@ -570,7 +571,7 @@ class EnrollmentServiceTest {
 
         @Test
         @DisplayName("삭제 실패(4) - 삭제할 수강에 강좌가 존재하지 않을 때")
-        public void deleteEnrollment_fail4() {
+        void deleteEnrollment_fail4() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
@@ -578,7 +579,7 @@ class EnrollmentServiceTest {
             given(lectureRepository.findById(anyLong())).willReturn(Optional.empty());
 
             AppException appException = assertThrows(AppException.class,
-                    () -> enrollmentService.deleteEnrollment(academy.getId(), student.getId(), lecture.getId(), enrollment.getId(), createEnrollmentRequest, employee.getAccount()));
+                    () -> enrollmentService.deleteEnrollment(academy.getId(), student.getId(), lecture.getId(), enrollment.getId(), employee.getAccount()));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.LECTURE_NOT_FOUND);
             assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 수업을 찾을 수 없습니다.");
@@ -591,7 +592,7 @@ class EnrollmentServiceTest {
 
         @Test
         @DisplayName("삭제 실패(5) - 수강 이력이 존재하지 않을 때")
-        public void deleteEnrollment_fail5() {
+        void deleteEnrollment_fail5() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
@@ -600,7 +601,7 @@ class EnrollmentServiceTest {
             given(enrollmentRepository.findById(anyLong())).willReturn(Optional.empty());
 
             AppException appException = assertThrows(AppException.class,
-                    () -> enrollmentService.deleteEnrollment(academy.getId(), student.getId(), lecture.getId(), enrollment.getId(), createEnrollmentRequest, employee.getAccount()));
+                    () -> enrollmentService.deleteEnrollment(academy.getId(), student.getId(), lecture.getId(), enrollment.getId(), employee.getAccount()));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.ENROLLMENT_NOT_FOUND);
             assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 수강 이력을 찾을 수 없습니다.");
@@ -613,7 +614,7 @@ class EnrollmentServiceTest {
 
         @Test
         @DisplayName("삭제 실패(6) - 직원이 수강을 삭제할 권한이 아닐 때")
-        public void deleteEnrollment_fail6() {
+        void deleteEnrollment_fail6() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
@@ -623,7 +624,7 @@ class EnrollmentServiceTest {
             given(mockEmployee.getEmployeeRole()).willReturn(EmployeeRole.ROLE_USER);
 
             AppException appException = assertThrows(AppException.class,
-                    () -> enrollmentService.deleteEnrollment(academy.getId(), student.getId(), lecture.getId(), enrollment.getId(), createEnrollmentRequest, employee.getAccount()));
+                    () -> enrollmentService.deleteEnrollment(academy.getId(), student.getId(), lecture.getId(), enrollment.getId(), employee.getAccount()));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.INVALID_PERMISSION);
             assertThat(appException.getErrorCode().getMessage()).isEqualTo("사용자가 권한이 없습니다.");
@@ -638,7 +639,7 @@ class EnrollmentServiceTest {
 
         @Test
         @DisplayName("삭제 실패(7) - 대기번호를 수강등록으로 변경하려고 할 때 이미 해당 수강이력이 있는 경우")
-        public void deleteEnrollment_fail8() {
+        void deleteEnrollment_fail8() throws MessagingException {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
@@ -653,7 +654,7 @@ class EnrollmentServiceTest {
             given(enrollmentRepository.findByStudentAndLecture(any(Student.class),any(Lecture.class))).willReturn(Optional.of(enrollment2));
 
             AppException appException = assertThrows(AppException.class,
-                    () -> enrollmentService.deleteEnrollment(academy.getId(), student.getId(), lecture.getId(), enrollment.getId(), createEnrollmentRequest, employee.getAccount()));
+                    () -> enrollmentService.deleteEnrollment(academy.getId(), student.getId(), lecture.getId(), enrollment.getId(), employee.getAccount()));
 
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.DUPLICATED_ENROLLMENT);
             assertThat(appException.getErrorCode().getMessage()).isEqualTo("이미 존재하는 수강 내역입니다.");
@@ -678,7 +679,7 @@ class EnrollmentServiceTest {
 
         @Test
         @DisplayName("결제를 위한 수강 조회 성공")
-        public void findEnrollment_ForPay() {
+        void findEnrollment_ForPay() {
 
             Student student3 = Student.builder().id(3L).name("student").academyId(academy.getId()).build();
             Lecture lecture2 = Lecture.builder().id(2L).name("lecture2").price(10000).employee(teacher).maximumCapacity(10).currentEnrollmentNumber(0).build();
@@ -716,7 +717,7 @@ class EnrollmentServiceTest {
 
         @Test
         @DisplayName("특정 학생의 결제가 완료된 수강 신청 내역 조회 성공")
-        public void findEnrollment_ByStudentId_success() {
+        void findEnrollment_ByStudentId_success() {
 
             Enrollment enrollment3 = Enrollment.builder().id(3L).student(student).lecture(lecture).paymentYN(true).build();
             ReflectionTestUtils.setField(enrollment, BaseEntity.class, "createdAt", LocalDateTime.of(2021, 12, 6, 12, 0), LocalDateTime.class);
@@ -738,7 +739,7 @@ class EnrollmentServiceTest {
 
         @Test
         @DisplayName("특정 학생의 결제가 완료된 수강 신청 내역 조회 실패(1) - 학원이 존재하지 않을 때")
-        public void findEnrollment_ByStudentId_fail1() {
+        void findEnrollment_ByStudentId_fail1() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.empty());
 
@@ -753,7 +754,7 @@ class EnrollmentServiceTest {
 
         @Test
         @DisplayName("특정 학생의 결제가 완료된 수강 신청 내역 조회 실패(2) - 학생이 존재하지 않을 때")
-        public void findEnrollment_ByStudentId_fail2() {
+        void findEnrollment_ByStudentId_fail2() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(studentRepository.findById(anyLong())).willReturn(Optional.empty());
@@ -770,7 +771,7 @@ class EnrollmentServiceTest {
 
         @Test
         @DisplayName("해당 학원의 미결제 상태의 모든 수강신청내역 조회 성공")
-        public void findAllEnrollment_ForPay_success() {
+        void findAllEnrollment_ForPay_success() {
 
             Lecture lecture2 = Lecture.builder().id(2L).name("lecture2").price(10000).employee(teacher).maximumCapacity(10).currentEnrollmentNumber(0).build();
             Enrollment enrollment3 = Enrollment.builder().id(3L).student(student).lecture(lecture2).paymentYN(false).build();
@@ -790,7 +791,7 @@ class EnrollmentServiceTest {
 
         @Test
         @DisplayName("해당 학원의 특정 학생의 결제가 끝난 수강 내역 조회 성공")
-        public void findEnrollment_ForPaySuccess_success() {
+        void findEnrollment_ForPaySuccess_success() {
 
             ReflectionTestUtils.setField(enrollment, BaseEntity.class, "createdAt", LocalDateTime.of(2021, 12, 6, 12, 0), LocalDateTime.class);
 
@@ -808,7 +809,7 @@ class EnrollmentServiceTest {
 
         @Test
         @DisplayName("해당 학원의 특정 학생의 수강 내역 조회 실패 - 수강 내역 없음")
-        public void findEnrollment_ForPaySuccess_fai11() {
+        void findEnrollment_ForPaySuccess_fai11() {
 
             given(enrollmentRepository.findByLecture_IdAndStudent_Id(anyLong(), anyLong())).willReturn(Optional.empty());
 
@@ -823,7 +824,7 @@ class EnrollmentServiceTest {
 
         @Test
         @DisplayName("결제 완료된 수강신청내역을 활용해서 출석부에 표시하기 위한 메서드 - 성공")
-        public void findStudentInfo_FromEnrollment_ByLecture_success() {
+        void findStudentInfo_FromEnrollment_ByLecture_success() {
 
             PageImpl<Enrollment> enrollmentList = new PageImpl<>(List.of(enrollment, enrollment2));
 
@@ -844,7 +845,7 @@ class EnrollmentServiceTest {
 
         @Test
         @DisplayName("결제 완료된 수강신청내역을 활용해서 출석부에 표시하기 위한 메서드 - 실패(1) - 학원이 존재하지 않을 때")
-        public void findStudentInfo_FromEnrollment_ByLecture_fail1() {
+        void findStudentInfo_FromEnrollment_ByLecture_fail1() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.empty());
 
@@ -859,7 +860,7 @@ class EnrollmentServiceTest {
 
         @Test
         @DisplayName("결제 완료된 수강신청내역을 활용해서 출석부에 표시하기 위한 메서드 - 실패(2) - 직원이 해당 학원 소속이 아닐 때")
-        public void findStudentInfo_FromEnrollment_ByLecture_fail2() {
+        void findStudentInfo_FromEnrollment_ByLecture_fail2() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.empty());
@@ -876,7 +877,7 @@ class EnrollmentServiceTest {
 
         @Test
         @DisplayName("결제 완료된 수강신청내역을 활용해서 출석부에 표시하기 위한 메서드 - 실패(3) - 강좌가 존재하지 않을 때")
-        public void findStudentInfo_FromEnrollment_ByLecture_fail3() {
+        void findStudentInfo_FromEnrollment_ByLecture_fail3() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(employee));
@@ -895,7 +896,7 @@ class EnrollmentServiceTest {
 
         @Test
         @DisplayName("결제 완료 여부와 상관없이 수강신청내역을 활용해서 수강 신청자 명단 조회 - 성공")
-        public void findAllStudentInfo_FromEnrollment_ByLecture_success() {
+        void findAllStudentInfo_FromEnrollment_ByLecture_success() {
 
             Student student3 = Student.builder().id(3L).name("student3").academyId(academy.getId()).build();
             Student student4 = Student.builder().id(4L).name("student4").academyId(academy.getId()).build();
@@ -910,8 +911,7 @@ class EnrollmentServiceTest {
             given(enrollmentRepository.findByLecture(any(Lecture.class))).willReturn(enrollmentList);
 
             List<FindStudentInfoFromEnrollmentByLectureResponse> responses = enrollmentService.findAllStudentInfoFromEnrollmentByLecture(academy.getId(), employee.getAccount(), lecture.getId());
-            assertThat(responses.size()).isEqualTo(4);
-            assertThat(responses).asList();
+            assertThat(responses).hasSize(4);
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
@@ -921,7 +921,7 @@ class EnrollmentServiceTest {
 
         @Test
         @DisplayName("결제 완료 여부와 상관없이 수강신청내역을 활용해서 수강 신청자 명단 조회 - 실패(1) - 학원이 존재하지 않을 때")
-        public void findAllStudentInfo_FromEnrollment_ByLecture_fail1() {
+        void findAllStudentInfo_FromEnrollment_ByLecture_fail1() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.empty());
 
@@ -936,7 +936,7 @@ class EnrollmentServiceTest {
 
         @Test
         @DisplayName("결제 완료 여부와 상관없이 수강신청내역을 활용해서 수강 신청자 명단 조회 - 실패(2) - 직원이 해당 학원 소속이 아닐 때")
-        public void findAllStudentInfo_FromEnrollment_ByLecture_fail2() {
+        void findAllStudentInfo_FromEnrollment_ByLecture_fail2() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.empty());
@@ -953,7 +953,7 @@ class EnrollmentServiceTest {
 
         @Test
         @DisplayName("결제 완료 여부와 상관없이 수강신청내역을 활용해서 수강 신청자 명단 조회 - 실패(3) - 강좌가 존재하지 않을 때")
-        public void findAllStudentInfo_FromEnrollment_ByLecture_fail3() {
+        void findAllStudentInfo_FromEnrollment_ByLecture_fail3() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(employee));

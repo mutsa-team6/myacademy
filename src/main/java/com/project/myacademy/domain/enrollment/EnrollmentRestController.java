@@ -2,9 +2,8 @@ package com.project.myacademy.domain.enrollment;
 
 import com.project.myacademy.domain.enrollment.dto.*;
 import com.project.myacademy.global.Response;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import com.project.myacademy.global.util.AuthenticationUtil;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,10 +48,10 @@ public class EnrollmentRestController {
         return ResponseEntity.ok().body(Response.success(enrollments));
     }
 
-    // 수강 수정
-    @Operation(summary = "수강 수정", description = "ADMIN,STAFF 회원만 수정이 가능합니다.")
+    // 수강 메모
+    @Operation(summary = "수강 메모", description = "수강 신청에 대한 메모를 작성합니다.")
     @PutMapping("/{academyId}/students/{studentId}/lectures/{lectureId}/enrollments/{enrollmentId}")
-    public ResponseEntity<Response<UpdateEnrollmentResponse>> update(@PathVariable("academyId") Long academyId,
+    public ResponseEntity<Response<UpdateEnrollmentResponse>> memo(@PathVariable("academyId") Long academyId,
                                                                      @PathVariable("studentId") Long studentId,
                                                                      @PathVariable("lectureId") Long lectureId,
                                                                      @PathVariable("enrollmentId") Long enrollmentId,
@@ -74,7 +73,7 @@ public class EnrollmentRestController {
                                                                      @RequestBody CreateEnrollmentRequest request,
                                                                      Authentication authentication) {
         String account = AuthenticationUtil.getAccountFromAuth(authentication);
-        DeleteEnrollmentResponse deletedEnrollment = enrollmentService.deleteEnrollment(academyId, studentId, lectureId, enrollmentId, request, account);
+        DeleteEnrollmentResponse deletedEnrollment = enrollmentService.deleteEnrollment(academyId, studentId, lectureId, enrollmentId, account);
         log.info("수강 이력 삭제 성공");
         return ResponseEntity.ok().body(Response.success(deletedEnrollment));
     }
