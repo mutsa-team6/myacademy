@@ -80,7 +80,7 @@ class StudentServiceTest {
 
             CreateStudentResponse response = studentService.createStudent(academy.getId(), request, employeeSTAFF.getAccount());
 
-            assertThat(response.getName().equals("학생"));
+            assertThat(response.getName()).isEqualTo("학생");
 
         }
 
@@ -182,10 +182,10 @@ class StudentServiceTest {
 
             ReadStudentResponse response = studentService.readStudent(academy.getId(), student1.getId(), employeeUSER.getAccount());
 
-            assertThat(response.getId().equals(1L));
-            assertThat(response.getName().equals("학생"));
-            assertThat(response.getPhoneNum().equals("010-1111-1111"));
-            assertThat(response.getParentPhoneNum().equals(010 - 0000 - 0000));
+            assertThat(response.getId()).isEqualTo(1L);
+            assertThat(response.getName()).isEqualTo("학생");
+            assertThat(response.getPhoneNum()).isEqualTo("010-1111-1111");
+            assertThat(response.getParentPhoneNum()).isEqualTo("010-0000-0000");
         }
 
         @Test
@@ -283,8 +283,8 @@ class StudentServiceTest {
 
             Page<ReadAllStudentResponse> studentListResponse = studentService.findStudentForStudentList(academy.getId(), student1.getName(), pageable);
 
-            assertThat(studentListResponse.getTotalElements() == 2);
-            assertThat(studentListResponse.getTotalPages() == 1);
+            assertThat(studentListResponse.getTotalElements()).isEqualTo(2);
+            assertThat(studentListResponse.getTotalPages()).isEqualTo(1);
         }
     }
 
@@ -305,11 +305,11 @@ class StudentServiceTest {
 
             UpdateStudentResponse response = studentService.updateStudent(academy.getId(), student1.getId(), request, employeeSTAFF.getAccount());
 
-            assertThat(response.getId().equals(1L));
-            assertThat(response.getName().equals("바뀐이름"));
-            assertThat(response.getEmail().equals("changeEmail@gamil.com"));
-            assertThat(response.getPhoneNum().equals("010-9999-9999"));
-            assertThat(response.getBirth().equals("980525"));
+            assertThat(response.getId()).isEqualTo(1L);
+            assertThat(response.getName()).isEqualTo("바뀐이름");
+            assertThat(response.getEmail()).isEqualTo("changeEmail@gmail.com");
+            assertThat(response.getPhoneNum()).isEqualTo("010-9999-9999");
+            assertThat(response.getBirth()).isEqualTo("980525");
         }
 
         @Test
@@ -324,11 +324,11 @@ class StudentServiceTest {
 
             UpdateStudentResponse response = studentService.updateStudent(academy.getId(), student1.getId(), request, employeeSTAFF.getAccount());
 
-            assertThat(response.getId().equals(1L));
-            assertThat(response.getName().equals("바뀐이름"));
-            assertThat(response.getEmail().equals("changeEmail@gamil.com"));
-            assertThat(response.getPhoneNum().equals("010-9999-9999"));
-            assertThat(response.getBirth().equals("980525"));
+            assertThat(response.getId()).isEqualTo(1L);
+            assertThat(response.getName()).isEqualTo("바뀐이름");
+            assertThat(response.getEmail()).isEqualTo("changeEmail@gmail.com");
+            assertThat(response.getPhoneNum()).isEqualTo("010-9999-9999");
+            assertThat(response.getBirth()).isEqualTo("980525");
         }
 
         @Test
@@ -343,11 +343,11 @@ class StudentServiceTest {
 
             UpdateStudentResponse response = studentService.updateStudent(academy.getId(), student1.getId(), request, employeeSTAFF.getAccount());
 
-            assertThat(response.getId().equals(1L));
-            assertThat(response.getName().equals("바뀐이름"));
-            assertThat(response.getEmail().equals("changeEmail@gamil.com"));
-            assertThat(response.getPhoneNum().equals("010-9999-9999"));
-            assertThat(response.getBirth().equals("980525"));
+            assertThat(response.getId()).isEqualTo(1L);
+            assertThat(response.getName()).isEqualTo("바뀐이름");
+            assertThat(response.getEmail()).isEqualTo("changeEmail@gmail.com");
+            assertThat(response.getPhoneNum()).isEqualTo("010-9999-9999");
+            assertThat(response.getBirth()).isEqualTo("980525");
         }
 
         @Test
@@ -452,8 +452,8 @@ class StudentServiceTest {
 
             DeleteStudentResponse response = studentService.deleteStudent(academy.getId(), student1.getId(), employeeSTAFF.getAccount());
 
-            assertThat(response.getId().equals(student1.getId()));
-            assertThat(response.getName().equals(student1.getName()));
+            assertThat(response.getId()).isEqualTo(student1.getId());
+            assertThat(response.getName()).isEqualTo(student1.getName());
         }
 
         @Test
