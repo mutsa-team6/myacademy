@@ -37,8 +37,6 @@ public class EmployeeService {
     @Value("${jwt.token.secret}")
     private String secretKey;
 
-    private long expiredTimeMs = 1000 * 60 * 30;
-
     /**
      * 직원 등록
      *

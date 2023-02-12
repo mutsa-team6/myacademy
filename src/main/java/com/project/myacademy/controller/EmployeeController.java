@@ -46,6 +46,10 @@ public class EmployeeController {
 
     private final EmployeeProfileS3UploadService employeeProfileS3UploadService;
 
+    private static final String PREVIOUS = "previous";
+    private static final String NEXT = "next";
+    private static final String JWT_TOKEN_NAME = "token";
+
     @GetMapping("/join")
     public String join() {
         return "employee/join";
@@ -99,8 +103,8 @@ public class EmployeeController {
         model.addAttribute("lectures", lectures);
 
 
-        model.addAttribute("previous", pageable.previousOrFirst().getPageNumber());
-        model.addAttribute("next", pageable.next().getPageNumber());
+        model.addAttribute(PREVIOUS, pageable.previousOrFirst().getPageNumber());
+        model.addAttribute(NEXT, pageable.next().getPageNumber());
 
         return "employee/mypage";
     }
@@ -117,7 +121,7 @@ public class EmployeeController {
 
         // 직원 정보, 학원 정보 세션에 저장 및 model로 넘기는 메서드
         ReadEmployeeResponse requestEmployee = setSessionEmployeeInfo(request, model, authentication, academyId);
-        FindAcademyResponse academy = setSessionAcademyInfo(request, model, academyId);
+        setSessionAcademyInfo(request, model, academyId);
         String requestAccount = requestEmployee.getAccount();
 
         // 해당 학원에 존재하는 모든 직원 정보 조회 (학원 원장 데이터는 제외, 자기 자신이므로)
@@ -130,8 +134,8 @@ public class EmployeeController {
         model.addAttribute("employees", foundEmployees);
 
 
-        model.addAttribute("previous", pageable.previousOrFirst().getPageNumber());
-        model.addAttribute("next", pageable.next().getPageNumber());
+        model.addAttribute(PREVIOUS, pageable.previousOrFirst().getPageNumber());
+        model.addAttribute(NEXT, pageable.next().getPageNumber());
 
         return "employee/employees";
     }
@@ -152,8 +156,8 @@ public class EmployeeController {
                 = enrollmentService.findStudentInfoFromEnrollmentByLecture(academyId, requestAccount, lectureId, pageable);
         model.addAttribute("studentsInfo", studentsInfo);
 
-        model.addAttribute("previous", pageable.previousOrFirst().getPageNumber());
-        model.addAttribute("next", pageable.next().getPageNumber());
+        model.addAttribute(PREVIOUS, pageable.previousOrFirst().getPageNumber());
+        model.addAttribute(NEXT, pageable.next().getPageNumber());
 
         return "employee/attendance";
     }
@@ -173,7 +177,7 @@ public class EmployeeController {
 
         String token = null;
         for (Cookie cookie : list) {
-            if (cookie.getName().equals("token")) {
+            if (cookie.getName().equals(JWT_TOKEN_NAME)) {
                 token = cookie.getValue();
 
             }
@@ -183,7 +187,7 @@ public class EmployeeController {
         }
 
         CookieGenerator cookieGenerator = new CookieGenerator();
-        cookieGenerator.setCookieName("token");
+        cookieGenerator.setCookieName(JWT_TOKEN_NAME);
         cookieGenerator.addCookie(response, "deleted");
         cookieGenerator.setCookieMaxAge(0);
 
@@ -198,7 +202,7 @@ public class EmployeeController {
         refreshTokenService.saveTokenInfo(employeeId, refreshToken, token);
 
         CookieGenerator cookieGenerator = new CookieGenerator();
-        cookieGenerator.setCookieName("token");
+        cookieGenerator.setCookieName(JWT_TOKEN_NAME);
         cookieGenerator.setCookieHttpOnly(true);
         cookieGenerator.addCookie(response, token);
         cookieGenerator.setCookieMaxAge(60 * 60);//1시간

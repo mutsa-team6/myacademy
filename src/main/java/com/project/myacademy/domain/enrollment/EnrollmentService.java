@@ -98,7 +98,7 @@ public class EnrollmentService {
         try {
             emailUtil.sendEmail(email, subject, body);
         } catch (MailException | MessagingException e){
-            log.info("이메일 전송 에러 발생 [{}]", e.getMessage());
+            log.info("수강신청 이메일 전송 에러 발생 [{}]", e.getMessage());
         }
 
         return CreateEnrollmentResponse.of(savedEnrollment.getId());
@@ -162,7 +162,7 @@ public class EnrollmentService {
      * @param enrollmentId 수강 id
      * @param account      직원 계정
      */
-    public DeleteEnrollmentResponse deleteEnrollment(Long academyId, Long studentId, Long lectureId, Long enrollmentId, CreateEnrollmentRequest request, String account) {
+    public DeleteEnrollmentResponse deleteEnrollment(Long academyId, Long studentId, Long lectureId, Long enrollmentId, String account) {
 
         // 삭제 진행하는 직원 권한 확인(학원 존재 유무, 해당 학원 직원인지 확인)
         Academy academy = validateAcademyById(academyId);
@@ -194,9 +194,9 @@ public class EnrollmentService {
         try {
             emailUtil.sendEmail(email, subject, body);
         } catch (MailException e2){
-            log.info("이메일 전송 에러 발생 [{}]", e2.getMessage());
+            log.info("수강 신청 취소 이메일 전송 에러 발생 [{}]", e2.getMessage());
         } catch (MessagingException e) {
-            log.info("이메일 전송 에러 발생 [{}]", e.getMessage());
+            log.info("수강 신청 취소 이메일 전송 에러 발생 [{}]", e.getMessage());
         }
         // 현재 등록인원 -1
         lecture.minusCurrentEnrollmentNumber();

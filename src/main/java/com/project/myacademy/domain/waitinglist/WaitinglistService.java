@@ -110,7 +110,7 @@ public class WaitinglistService {
         try {
             emailUtil.sendEmail(email, subject, body);
         } catch (MailException | MessagingException e){
-            log.info("이메일 전송 에러 발생 [{}]", e.getMessage());
+            log.info("수강 대기 신청 이메일 전송 에러 발생 [{}]", e.getMessage());
         }
 
         return CreateWaitinglistResponse.of(savedWaitinglist.getId());
@@ -151,9 +151,9 @@ public class WaitinglistService {
         try {
             emailUtil.sendEmail(email, subject, body);
         } catch (MailException e2){
-            log.info("이메일 전송 에러 발생 [{}]", e2.getMessage());
+            log.info("수강 대기 취소 이메일 전송 에러 발생 [{}]", e2.getMessage());
         } catch (MessagingException e) {
-            log.info("이메일 전송 에러 발생 [{}]", e.getMessage());
+            log.info("수강 대기 취소 이메일 전송 에러 발생 [{}]", e.getMessage());
         }
 
         return DeleteWaitinglistResponse.of(waitinglistId);

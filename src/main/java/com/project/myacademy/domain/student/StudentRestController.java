@@ -34,7 +34,7 @@ public class StudentRestController {
     @PostMapping("/{academyId}/students")
     public ResponseEntity<Response<CreateStudentResponse>> create(@PathVariable Long academyId, @Validated @RequestBody CreateStudentRequest request, BindingResult bindingResult, Authentication authentication) {
 
-        if (bindingResult.hasErrors()) {
+        if (bindingResult.hasFieldErrors()) {
             throw new BindingException(ErrorCode.BINDING_ERROR, bindingResult.getFieldError().getDefaultMessage());
         }
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
