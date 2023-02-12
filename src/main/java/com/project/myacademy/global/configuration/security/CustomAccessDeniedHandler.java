@@ -25,7 +25,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
         log.info(" 에러 메세지 {}", accessDeniedException.getMessage());
 
-        ErrorCode errorCode = ErrorCode.NOT_ALLOWED_ROLE;
+        ErrorCode errorCode = ErrorCode.INVALID_PERMISSION;
 
         response.setContentType("text/html; charset=utf-8");
         PrintWriter writer = response.getWriter();
