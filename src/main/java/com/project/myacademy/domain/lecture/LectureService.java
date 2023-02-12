@@ -233,31 +233,25 @@ public class LectureService {
 
     // 학원 Id로 학원 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
     private Academy validateAcademyById(Long academyId) {
-        Academy validatedAcademy = academyRepository.findById(academyId)
+        return academyRepository.findById(academyId)
                 .orElseThrow(() -> new AppException(ErrorCode.ACADEMY_NOT_FOUND));
-        return validatedAcademy;
     }
 
     // 요청하는 계정과 학원으로 직원 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
     public Employee validateRequestEmployeeByAcademy(String account, Academy academy) {
-        Employee employee = employeeRepository.findByAccountAndAcademy(account, academy)
+        return employeeRepository.findByAccountAndAcademy(account, academy)
                 .orElseThrow(() -> new AppException(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND));
-        return employee;
     }
 
     // 강사 Id와 학원으로 직원 조회 - 없을시 EMPLOYEE_NOT_FOUND 에러발생
     private Employee validateAcademyEmployeeId(Long employeeId, Academy academy) {
-
-        Employee validateEmployee = employeeRepository.findByIdAndAcademy(employeeId, academy)
+        return employeeRepository.findByIdAndAcademy(employeeId, academy)
                 .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
-
-        return validateEmployee;
     }
 
     // 강좌 Id로 강좌 조회 - 없으면 LECTURE_NOT_FOUND 에러발생
     private Lecture validateLecture(Long lectureId) {
-        Lecture validatedLecture = lectureRepository.findById(lectureId)
+        return lectureRepository.findById(lectureId)
                 .orElseThrow(() -> new AppException(ErrorCode.LECTURE_NOT_FOUND));
-        return validatedLecture;
     }
 }

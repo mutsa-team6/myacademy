@@ -82,7 +82,7 @@ public class EmployeeProfileS3UploadService {
         int index;
         try {
             index = originalFilename.lastIndexOf(".");
-        } catch (StringIndexOutOfBoundsException e) {
+        } catch (NullPointerException | StringIndexOutOfBoundsException e) {
             throw new AppException(ErrorCode.WRONG_FILE_FORMAT);
         }
 
@@ -156,13 +156,10 @@ public class EmployeeProfileS3UploadService {
         // 프로필이 등록될 계정과 학원으로 직원을 조회 - 없을시 EMPLOYEE_NOT_FOUND 에러발생
         Employee targetEmployee = validateEmployeeByAcademy(employeeId, academy);
 
-        // 1. 직원이 파일 삭제할 권한이 있는지 확인 (강사 외 모든 직원 가능)
-        // 2. 일반 직원은 본인 관련 파일만 삭제 가능
-        // 3. 원장은 모든 직원 파일 삭제 가능
-        if (!employee.getEmployeeRole().equals(EmployeeRole.ROLE_ADMIN)) {
-            if (Employee.isTeacherAuthority(employee) || !employee.equals(targetEmployee)) {
-                throw new AppException(ErrorCode.INVALID_PERMISSION);
-            }
+        // 일반 직원(강사 포함)은 본인 관련 파일만 삭제 가능
+        // 원장은 모든 직원 파일 삭제 가능
+        if (!employee.getEmployeeRole().equals(EmployeeRole.ROLE_ADMIN) && !employee.equals(targetEmployee)) {
+            throw new AppException(ErrorCode.INVALID_PERMISSION);
         }
 
         // 직원프로필 아이디로 직원 프로필 조회 - 없을시 EMPLOYEE_PROFILE_NOT_FOUND 에러발생
@@ -174,10 +171,8 @@ public class EmployeeProfileS3UploadService {
             // 해당 업로드 파일 테이블에서도 같이 삭제
             employeeProfileRepository.delete(employeeProfile);
             log.info("파일 삭제 성공");
-        } catch (AmazonServiceException e) {
-            e.printStackTrace();
         } catch (SdkClientException e) {
-            e.printStackTrace();
+            log.error("파일 삭제 실패");
         }
         return DeleteEmployeeProfileResponse.of(employee);
     }
@@ -212,7 +207,6 @@ public class EmployeeProfileS3UploadService {
 
         // 버킷 폴더 추출
         String[] bucketFolder = fileUrl.split("/");
-//        log.info("bucketFolder : {}", bucketFolder);
 
         // 버킷 폴더에 저장된 해당 파일명 추출
         String fileName = bucketFolder[bucketFolder.length - 1];
@@ -230,30 +224,26 @@ public class EmployeeProfileS3UploadService {
 
     // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
     private Academy validateAcademyById(Long academyId) {
-        Academy validatedAcademy = academyRepository.findById(academyId)
+        return academyRepository.findById(academyId)
                 .orElseThrow(() -> new AppException(ErrorCode.ACADEMY_NOT_FOUND));
-        return validatedAcademy;
     }
 
     // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
     public Employee validateRequestEmployeeByAcademy(String account, Academy academy) {
-        Employee employee = employeeRepository.findByAccountAndAcademy(account, academy)
+        return employeeRepository.findByAccountAndAcademy(account, academy)
                 .orElseThrow(() -> new AppException(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND));
-        return employee;
     }
 
     // 프로필이 등록될 계정과 학원으로 직원을 조회 - 없을시 EMPLOYEE_NOT_FOUND 에러발생
     private Employee validateEmployeeByAcademy(Long employeeId, Academy academy) {
-        Employee validateEmployee = employeeRepository.findByIdAndAcademy(employeeId, academy)
+        return employeeRepository.findByIdAndAcademy(employeeId, academy)
                 .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
-        return validateEmployee;
     }
 
     // 직원프로필 아이디로 직원 프로필 조회 - 없을시 EMPLOYEE_PROFILE_NOT_FOUND 에러발생
     private EmployeeProfile validateEmployeeProfileById(Long employeeProfileId) {
-        EmployeeProfile validatedEmployeeProfile = employeeProfileRepository.findById(employeeProfileId)
+        return employeeProfileRepository.findById(employeeProfileId)
                 .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_PROFILE_NOT_FOUND));
-        return validatedEmployeeProfile;
     }
 
     // 빈 파일이 아닌지 확인, 파일 자체를 첨부안하거나 첨부해도 내용이 비어있으면 - FILE_NOT_EXISTS 에러발생
@@ -266,7 +256,6 @@ public class EmployeeProfileS3UploadService {
     // 저장된 파일 확장자 별로 구분하여 저장
     private MediaType contentType(String keyname) {
         String[] arr = keyname.split("\\.");
-//        log.info("arr : {}", arr);
         String fileExtension = arr[arr.length - 1];
         switch (fileExtension) {
             case "txt":

@@ -38,7 +38,7 @@ public class AcademyRestController {
 
     @Operation(summary = "학원 삭제", description = "학원을 soft-delete 합니다.")
     @DeleteMapping("/{academyId}/delete")
-    public ResponseEntity delete(@PathVariable Long academyId) {
+    public ResponseEntity<Response<DeleteAcademyResponse>> delete(@PathVariable Long academyId) {
 
         Long deletedAcademyId = academyService.deleteAcademy(academyId);
 

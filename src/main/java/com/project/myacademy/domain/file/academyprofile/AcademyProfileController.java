@@ -32,7 +32,7 @@ public class AcademyProfileController {
     @PostMapping("/{academyId}/files/upload")
     public ResponseEntity<Response<CreateAcademyProfileResponse>> upload(@PathVariable("academyId") Long academyId,
                                                                          @RequestPart MultipartFile multipartFile,
-                                                                         Authentication authentication) throws IOException {
+                                                                         Authentication authentication) {
         String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
         CreateAcademyProfileResponse profileResponse = academyProfileS3UploadService.uploadAcademyProfile(academyId, multipartFile, requestAccount);
         return ResponseEntity.ok().body(Response.success(profileResponse));

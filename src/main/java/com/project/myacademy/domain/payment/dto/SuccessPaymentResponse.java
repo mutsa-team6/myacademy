@@ -1,6 +1,5 @@
 package com.project.myacademy.domain.payment.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.project.myacademy.domain.payment.PayType;
 import com.project.myacademy.domain.payment.entity.Payment;
 import lombok.AllArgsConstructor;
@@ -10,7 +9,6 @@ import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor

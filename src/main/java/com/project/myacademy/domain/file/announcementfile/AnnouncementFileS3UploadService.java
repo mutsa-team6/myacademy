@@ -59,7 +59,7 @@ public class AnnouncementFileS3UploadService {
      * @param multipartFile  파일 업로드를 위한 객체
      * @param account        파일 업로드 진행하는 직원 계정
      */
-    public CreateAnnouncementFileResponse UploadAnnouncementFile(Long academyId, Long announcementId, List<MultipartFile> multipartFile, String account) {
+    public CreateAnnouncementFileResponse uploadAnnouncementFile(Long academyId, Long announcementId, List<MultipartFile> multipartFile, String account) {
 
         // 빈 파일이 아닌지 확인, 파일 자체를 첨부안하거나 첨부해도 내용이 비어있는지 확인 - 비어있으면 FILE_NOT_EXISTS 에러발생
         validateFileExists(multipartFile);
@@ -83,11 +83,11 @@ public class AnnouncementFileS3UploadService {
 
             String originalFilename = file.getOriginalFilename();
 
-            int index;
             // file 형식이 잘못된 경우를 확인
+            int index;
             try {
                 index = originalFilename.lastIndexOf(".");
-            } catch (StringIndexOutOfBoundsException e) {
+            } catch (NullPointerException | StringIndexOutOfBoundsException e) {
                 throw new AppException(ErrorCode.WRONG_FILE_FORMAT);
             }
 
@@ -147,10 +147,8 @@ public class AnnouncementFileS3UploadService {
             // 해당 업로드 파일 테이블에서도 같이 삭제
             announcementFileRepository.delete(announcementFile);
             log.info("파일 삭제 성공");
-        } catch (AmazonServiceException e) {
-            e.printStackTrace();
         } catch (SdkClientException e) {
-            e.printStackTrace();
+            log.error("파일 삭제 실패");
         }
 
         return DeleteAnnoucementFileResponse.of(employee);
@@ -186,7 +184,6 @@ public class AnnouncementFileS3UploadService {
 
         // 버킷 폴더 추출
         String[] bucketFolder = fileUrl.split("/");
-//        log.info("bucketFolder : {}", bucketFolder);
 
         // 버킷 폴더에 저장된 해당 파일명 추출
         String fileName = bucketFolder[bucketFolder.length - 1];
@@ -217,30 +214,26 @@ public class AnnouncementFileS3UploadService {
 
     // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
     private Academy validateAcademyById(Long academyId) {
-        Academy validatedAcademy = academyRepository.findById(academyId)
+        return academyRepository.findById(academyId)
                 .orElseThrow(() -> new AppException(ErrorCode.ACADEMY_NOT_FOUND));
-        return validatedAcademy;
     }
 
     // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
     public Employee validateRequestEmployeeByAcademy(String account, Academy academy) {
-        Employee employee = employeeRepository.findByAccountAndAcademy(account, academy)
+        return employeeRepository.findByAccountAndAcademy(account, academy)
                 .orElseThrow(() -> new AppException(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND));
-        return employee;
     }
 
     // 공지사항 Id로 공지사항 조회 - 없으면 ANNOUNCEMENT_NOT_FOUND 에러발생
     private Announcement validateAnnouncementById(Long announcementId) {
-        Announcement validatedAnnouncement = announcementRepository.findById(announcementId)
+        return announcementRepository.findById(announcementId)
                 .orElseThrow(() -> new AppException(ErrorCode.ANNOUNCEMENT_NOT_FOUND));
-        return validatedAnnouncement;
     }
 
     // 공지사항파일 Id로 공지사항파일 조회 - 없으면 ANNOUNCEMENT_FILE_NOT_FOUND 에러발생
     private AnnouncementFile validateAnnouncementFileById(Long announcementFileId) {
-        AnnouncementFile validatedAnnouncementFile = announcementFileRepository.findById(announcementFileId)
+        return announcementFileRepository.findById(announcementFileId)
                 .orElseThrow(() -> new AppException(ErrorCode.ANNOUNCEMENT_FILE_NOT_FOUND));
-        return validatedAnnouncementFile;
     }
 
     // 빈 파일이 아닌지 확인, 파일 자체를 첨부안하거나 첨부해도 내용이 비어있는지 확인 - 비어있으면 FILE_NOT_EXISTS 에러발생
@@ -262,7 +255,6 @@ public class AnnouncementFileS3UploadService {
     // 저장된 파일 확장자 별로 구분하여 저장
     private MediaType contentType(String keyname) {
         String[] arr = keyname.split("\\.");
-//        log.info("arr : {}", arr);
         String fileExtension = arr[arr.length - 1];
         switch (fileExtension) {
             case "txt":

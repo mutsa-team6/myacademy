@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.mail.MessagingException;
+import java.security.SecureRandom;
 
 @Service
 @RequiredArgsConstructor
@@ -88,9 +89,9 @@ public class EmployeeService {
             }
 
             //ADMIN 권한의 Employee 객체 생성
-            Employee AdminEmployee = Employee.createAdminEmployee(request, foundAcademy, encryptedPassword);
+            Employee adminEmployee = Employee.createAdminEmployee(request, foundAcademy, encryptedPassword);
 
-            Employee saved = employeeRepository.save(AdminEmployee);
+            Employee saved = employeeRepository.save(adminEmployee);
             return new CreateEmployeeResponse(saved, foundAcademy.getName());
         }
         //그 외는 일반 USER 등급 && 요청한 아이디로 가입
@@ -102,9 +103,9 @@ public class EmployeeService {
                 throw new AppException(ErrorCode.EMPTY_SUBJECT_FORBIDDEN);
             }
             //USER 권한의 Employee 객체 생성
-            Employee UserEmployee = Employee.createUserEmployee(request, foundAcademy, encryptedPassword);
+            Employee userEmployee = Employee.createUserEmployee(request, foundAcademy, encryptedPassword);
 
-            Employee saved = employeeRepository.save(UserEmployee);
+            Employee saved = employeeRepository.save(userEmployee);
             return new CreateEmployeeResponse(saved, foundAcademy.getName());
         }
 
@@ -185,6 +186,7 @@ public class EmployeeService {
         Employee foundEmployee = validateEmployeeByEmail(email);
 
         String tempPassword = getTempPassword();
+        log.info("tempPassword : {}",tempPassword);
         String encodedTempPassword = bCryptPasswordEncoder.encode(tempPassword);
 
         foundEmployee.updatePasswordOnly(encodedTempPassword);
@@ -218,7 +220,6 @@ public class EmployeeService {
 
         // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
         Academy academy = validateAcademyById(academyId);
-
         // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
         Employee employee = validateRequestEmployeeByAccount(account, academy);
 
@@ -251,10 +252,8 @@ public class EmployeeService {
 
         // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
         Academy foundAcademy = validateAcademyById(academyId);
-
         // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
         Employee requestEmployee = validateRequestEmployeeByAccount(requestAccount, foundAcademy);
-
         // 적용될 계정과 학원으로 직원을 조회 - 없을시 ACCOUNT_NOT_FOUND 에러발생
         Employee foundEmployee = validateEmployeeById(employeeId, foundAcademy);
 
@@ -286,11 +285,10 @@ public class EmployeeService {
 
         // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
         Academy foundAcademy = validateAcademyById(academyId);
-
         // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
-        Employee RequestEmployee = validateRequestEmployeeByAccount(requestAccount, foundAcademy);
+        Employee requestEmployee = validateRequestEmployeeByAccount(requestAccount, foundAcademy);
 
-        return new ReadEmployeeResponse(RequestEmployee);
+        return new ReadEmployeeResponse(requestEmployee);
     }
 
     /**
@@ -310,7 +308,6 @@ public class EmployeeService {
 
         // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
         Academy foundAcademy = validateAcademyById(academyId);
-
         // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
         Employee employeeAdmin = validateRequestEmployeeByAccount(requestAccount, foundAcademy);
 
@@ -335,7 +332,6 @@ public class EmployeeService {
 
         // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
         Academy foundAcademy = validateAcademyById(academyId);
-
         // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
         Employee requestEmployee = validateRequestEmployeeByAccount(requestAccount, foundAcademy);
 
@@ -365,10 +361,8 @@ public class EmployeeService {
 
         // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
         Academy foundAcademy = validateAcademyById(academyId);
-
         // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
         Employee requestEmployee = validateRequestEmployeeByAccount(requestAccount, foundAcademy);
-
         //정보 수정
         requestEmployee.updateEmployeeInfo(request);
 
@@ -380,12 +374,13 @@ public class EmployeeService {
      * 회원가입한 사용자 들 중에서, 특정 학원의 강사들만 추출하는 메서드
      */
     public Page<ReadEmployeeResponse> findAllTeachers(String requestAccount, Long academyId, Pageable pageable) {
+
         // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
         Academy foundAcademy = validateAcademyById(academyId);
-
         // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
-        Employee requestEmployee = validateRequestEmployeeByAccount(requestAccount, foundAcademy);
-        return employeeRepository.findAllTeacher(foundAcademy, pageable).map(employee -> new ReadEmployeeResponse(employee));
+        validateRequestEmployeeByAccount(requestAccount, foundAcademy);
+
+        return employeeRepository.findAllTeacher(foundAcademy, pageable).map(ReadEmployeeResponse::new);
     }
 
     /**
@@ -393,23 +388,19 @@ public class EmployeeService {
      * 강좌 등록 시에 강사 정보를 보여주기 위함
      */
     public ReadEmployeeResponse findOneTeacher(String requestAccount, Long academyId, Long teacherId) {
+
         // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
         Academy foundAcademy = validateAcademyById(academyId);
-
         // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
-        Employee requestEmployee = validateRequestEmployeeByAccount(requestAccount, foundAcademy);
-
+        validateRequestEmployeeByAccount(requestAccount, foundAcademy);
         // 해당 강사가 해당 학원에 존재하는지 확인
         Employee foundTeacher = validateEmployeeById(teacherId, foundAcademy);
-
         // 강사가 맞는지 체크 - 아니면 NOT_TEACHER 에러발생
         if (foundTeacher.getEmployeeRole().equals(EmployeeRole.ROLE_STAFF)) {
             throw new AppException(ErrorCode.NOT_TEACHER);
         }
 
-        ReadEmployeeResponse response = new ReadEmployeeResponse(foundTeacher);
-
-        return response;
+        return new ReadEmployeeResponse(foundTeacher);
     }
 
     /**
@@ -477,23 +468,20 @@ public class EmployeeService {
 
     // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
     private Academy validateAcademyById(Long academyId) {
-        Academy validateAcademy = academyRepository.findById(academyId)
+        return academyRepository.findById(academyId)
                 .orElseThrow(() -> new AppException(ErrorCode.ACADEMY_NOT_FOUND));
-        return validateAcademy;
     }
 
     // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
     private Employee validateRequestEmployeeByAccount(String requestAccount, Academy academy) {
-        Employee validateRequestEmployee = employeeRepository.findByAccountAndAcademy(requestAccount, academy)
+        return employeeRepository.findByAccountAndAcademy(requestAccount, academy)
                 .orElseThrow(() -> new AppException(ErrorCode.REQUEST_EMPLOYEE_NOT_FOUND));
-        return validateRequestEmployee;
     }
 
     // 특정 요청이 적용될 Id와 학원으로 직원을 조회 - 없을시 EMPLOYEE_NOT_FOUND 에러발생
     private Employee validateEmployeeById(Long employeeId, Academy academy) {
-        Employee validateEmployee = employeeRepository.findByIdAndAcademy(employeeId, academy)
+        return employeeRepository.findByIdAndAcademy(employeeId, academy)
                 .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
-        return validateEmployee;
     }
 
     // 가입을 요청한 계정과 학원으로 직원을 조회 - 있을시 DUPLICATED_ACCOUNT 에러발생
@@ -506,9 +494,8 @@ public class EmployeeService {
 
     // 이메일로 직원을 조회 - 없을시 EMPLOYEE_NOT_FOUND 에러발생
     private Employee validateEmployeeByEmail(String email) {
-        Employee foundEmployee = employeeRepository.findByEmail(email)
+        return employeeRepository.findByEmail(email)
                 .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
-        return foundEmployee;
     }
 
     // 이메일로 직원을 조회 - 있을시 DUPLICATED_EMAIL 에러발생
@@ -524,10 +511,11 @@ public class EmployeeService {
                 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
 
         String str = "";
+        SecureRandom random = new SecureRandom();
 
         int idx = 0;
         for (int i = 0; i < 10; i++) {
-            idx = (int) (charSet.length * Math.random());
+            idx = random.nextInt(charSet.length);
             str += charSet[idx];
         }
         return str;

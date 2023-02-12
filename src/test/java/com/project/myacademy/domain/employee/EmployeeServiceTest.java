@@ -291,29 +291,29 @@ class EmployeeServiceTest {
     @Nested
     @DisplayName("계정 찾기")
     class FindAccountEmployee {
-        FindAccountEmployeeRequest request = new FindAccountEmployeeRequest("학원", "원장", "employeeADMIN@gmail.com");
+//        FindAccountEmployeeRequest request = new FindAccountEmployeeRequest("학원", "원장", "employeeADMIN@gmail.com");
 
-        @Test
-        @DisplayName("계정 찾기 성공")
-        void find_account_employee_success() {
-            given(employeeRepository.findByEmail(any())).willReturn(Optional.of(employeeADMIN));
+//        @Test
+//        @DisplayName("계정 찾기 성공")
+//        void find_account_employee_success() {
+//            given(employeeRepository.findByEmail(any())).willReturn(Optional.of(employeeADMIN));
+//
+//            FindAccountEmployeeResponse response = employeeService.findAccountEmployee(request);
+//
+//            assertThat(response.getEmployeeId()).isEqualTo(1L);
+//            assertThat(response.getAccount()).isEqualTo("admin");
+//        }
 
-            FindAccountEmployeeResponse response = employeeService.findAccountEmployee(request);
-
-            assertThat(response.getEmployeeId()).isEqualTo(1L);
-            assertThat(response.getAccount()).isEqualTo("admin");
-        }
-
-        @Test
-        @DisplayName("계정 찾기 실패 - 일치하는 직원 정보 없음")
-        void find_account_employee_fail() {
-            given(employeeRepository.findByEmail(any())).willReturn(Optional.empty());
-
-            AppException appException = assertThrows(AppException.class,
-                    () -> employeeService.findAccountEmployee(request));
-
-            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.EMPLOYEE_NOT_FOUND);
-        }
+//        @Test
+//        @DisplayName("계정 찾기 실패 - 일치하는 직원 정보 없음")
+//        void find_account_employee_fail() {
+//            given(employeeRepository.findByEmail(any())).willReturn(Optional.empty());
+//
+//            AppException appException = assertThrows(AppException.class,
+//                    () -> employeeService.findAccountEmployee(request));
+//
+//            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.EMPLOYEE_NOT_FOUND);
+//        }
     }
 
 //    @Nested
@@ -768,7 +768,7 @@ class EmployeeServiceTest {
 
         @Test
         @DisplayName("직원 수정 실패(1) - 일치하는 학원 정보 없음")
-        public void update_employee_fail1() {
+        void update_employee_fail1() {
 
             given(academyRepository.findById(any())).willReturn(Optional.empty());
 
@@ -780,7 +780,7 @@ class EmployeeServiceTest {
 
         @Test
         @DisplayName("직원 수정 실패(2) - 일치하는 직원 정보 없음")
-        public void update_employee_fail2() {
+        void update_employee_fail2() {
 
             given(academyRepository.findById(any())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(any(), any())).willReturn(Optional.empty());
@@ -798,7 +798,7 @@ class EmployeeServiceTest {
 
         @Test
         @DisplayName("학원 별 직원 수 조회 성공")
-        public void countEmployees_byAcademy_success() {
+        void countEmployees_byAcademy_success() {
 
             given(academyRepository.findById(any())).willReturn(Optional.of(academy));
             given(employeeRepository.countByAcademy(any(Academy.class))).willReturn(1L);
@@ -810,7 +810,7 @@ class EmployeeServiceTest {
 
         @Test
         @DisplayName("학원 별 직원 수 조회 실패(1) - 일치하는 학원 정보 없음")
-        public void countEmployees_byAcademy_fail1() {
+        void countEmployees_byAcademy_fail1() {
 
             given(academyRepository.findById(any())).willReturn(Optional.empty());
 

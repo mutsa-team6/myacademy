@@ -1,6 +1,5 @@
 package com.project.myacademy.domain.lecture;
 
-import com.project.myacademy.domain.BaseEntity;
 import com.project.myacademy.domain.academy.Academy;
 import com.project.myacademy.domain.academy.AcademyRepository;
 import com.project.myacademy.domain.employee.Employee;
@@ -21,14 +20,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.test.util.ReflectionTestUtils;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.TextStyle;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -64,7 +58,7 @@ class LectureServiceTest {
         academy = Academy.builder().id(1L).name("academy").owner("owner").build();
         employee = Employee.builder().id(1L).name("staff").email("email").account("account").password("password").employeeRole(EmployeeRole.ROLE_STAFF).academy(academy).build();
         teacher = Employee.builder().id(2L).name("teacher").email("email1").account("account1").employeeRole(EmployeeRole.ROLE_USER).academy(academy).build();
-        lecture = Lecture.builder().id(1L).name("lecture").price(10000).LectureDay("월").finishDate(LocalDate.now().plusDays(3)).employee(teacher).build();
+        lecture = Lecture.builder().id(1L).name("lecture").price(10000).lectureDay("월").finishDate(LocalDate.now().plusDays(3)).employee(teacher).build();
         mockEmployee = mock(Employee.class);
         mockTeacher = mock(Employee.class);
         mockLecture1 = mock(Lecture.class);
@@ -79,7 +73,7 @@ class LectureServiceTest {
 
         @Test
         @DisplayName("강좌 리스트 조회 성공")
-        public void readAllLectures_success() {
+        void readAllLectures_success() {
 
             Employee teacher2 = Employee.builder().id(3L).name("teacher2").email("email2").account("account2").employeeRole(EmployeeRole.ROLE_USER).academy(academy).build();
             Lecture lecture2 = Lecture.builder().id(2L).name("lecture2").price(10000).employee(teacher2).build();
@@ -101,7 +95,7 @@ class LectureServiceTest {
 
         @Test
         @DisplayName("강좌 리스트 조회 실패(1) - 학원이 존재하지 않을 때")
-        public void readAllLectures_fail1() {
+        void readAllLectures_fail1() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.empty());
 
@@ -116,7 +110,7 @@ class LectureServiceTest {
 
         @Test
         @DisplayName("강좌 리스트 조회 실패(2) - 조회 진행하는 직원이 해당 학원 소속이 아닐 때")
-        public void readAllLectures_fail2() {
+        void readAllLectures_fail2() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.empty());
@@ -133,7 +127,7 @@ class LectureServiceTest {
 
         @Test
         @DisplayName("강사의 강좌 리스트 조회 성공")
-        public void readAllLectures_ByTeacher_success() {
+        void readAllLectures_ByTeacher_success() {
 
             Lecture lecture2 = Lecture.builder().id(2L).name("lecture2").price(10000).employee(teacher).build();
             Lecture lecture3 = Lecture.builder().id(3L).name("lecture3").price(10000).employee(teacher).build();
@@ -158,7 +152,7 @@ class LectureServiceTest {
 
         @Test
         @DisplayName("강사의 강좌 리스트 조회 실패(1) - 학원이 존재하지 않을 때")
-        public void readAllLectures_ByTeacher_fail1() {
+        void readAllLectures_ByTeacher_fail1() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.empty());
 
@@ -173,7 +167,7 @@ class LectureServiceTest {
 
         @Test
         @DisplayName("강사의 강좌 리스트 조회 실패(2) - 조회 진행하는 직원이 해당 학원 소속이 아닐 때")
-        public void readAllLectures_ByTeacher_fail2() {
+        void readAllLectures_ByTeacher_fail2() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.empty());
@@ -190,7 +184,7 @@ class LectureServiceTest {
 
         @Test
         @DisplayName("강사의 강좌 리스트 조회 실패(3) - 강사가 해당 학원 소속이 아닐 때")
-        public void readAllLectures_ByTeacher_fail3() {
+        void readAllLectures_ByTeacher_fail3() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(employee));
@@ -209,7 +203,7 @@ class LectureServiceTest {
 
         @Test
         @DisplayName("수강 목록에 보여질 강좌 리스트 조회 성공")
-        public void readAllLectures_ForEnrollment_success() {
+        void readAllLectures_ForEnrollment_success() {
 
             Lecture lecture2 = Lecture.builder().id(2L).name("lecture2").price(10000).employee(teacher).finishDate(LocalDate.now().plusDays(10)).build();
             Lecture lecture3 = Lecture.builder().id(3L).name("lecture3").price(10000).employee(teacher).finishDate(LocalDate.now().plusDays(10)).build();
@@ -232,7 +226,7 @@ class LectureServiceTest {
 
         @Test
         @DisplayName("수강 목록에 보여질 강좌 리스트 조회 실패(1) - 학원이 존재하지 않을 때")
-        public void readAllLectures_ForEnrollment_fail1() {
+        void readAllLectures_ForEnrollment_fail1() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.empty());
 
@@ -247,7 +241,7 @@ class LectureServiceTest {
 
         @Test
         @DisplayName("수강 목록에 보여질 강좌 리스트 조회 실패(2) - 조회 진행하는 직원이 해당 학원 소속이 아닐 때")
-        public void readAllLectures_ForEnrollment_fail2() {
+        void readAllLectures_ForEnrollment_fail2() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.empty());
@@ -264,7 +258,7 @@ class LectureServiceTest {
 
 //        @Test
 //        @DisplayName("금일 강좌 전체 조회 성공")
-//        public void readAllTodayLectures_success() {
+//        void readAllTodayLectures_success() {
 //
 //            Lecture lecture2 = Lecture.builder().id(2L).name("lecture2").price(10000).LectureDay("월").finishDate(LocalDate.now().plusDays(3)).employee(teacher).build();
 //            Page<Lecture> lectures = new PageImpl<>(List.of(lecture,lecture2));
@@ -304,13 +298,13 @@ class LectureServiceTest {
 //
 //        @Test
 //        @DisplayName("금일 강좌 전체 조회 실패(1) - 학원이 존재하지 않을 때")
-//        public void readAllTodayLectures_fail1() {
+//        void readAllTodayLectures_fail1() {
 //
 //        }
 //
 //        @Test
 //        @DisplayName("금일 강좌 전체 조회 실패(2) - 조회 진행하는 직원이 해당 학원 소속이 아닐 때")
-//        public void readAllTodayLectures_fail2() {
+//        void readAllTodayLectures_fail2() {
 //
 //        }
     }
@@ -323,7 +317,7 @@ class LectureServiceTest {
 
         @Test
         @DisplayName("등록 성공")
-        public void createLecture_success() {
+        void createLecture_success() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(employee));
@@ -342,7 +336,7 @@ class LectureServiceTest {
 
         @Test
         @DisplayName("등록 실패(1) - 학원이 존재하지 않을 때")
-        public void createLecture_fail1() {
+        void createLecture_fail1() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.empty());
 
@@ -357,7 +351,7 @@ class LectureServiceTest {
 
         @Test
         @DisplayName("등록 실패(2) - 등록 진행하는 직원이 해당 학원 소속이 아닐 때")
-        public void createLecture_fail2() {
+        void createLecture_fail2() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.empty());
@@ -374,7 +368,7 @@ class LectureServiceTest {
 
         @Test
         @DisplayName("등록 실패(3) - 직원이 강좌를 개설할 권한이 아닐 때")
-        public void createLecture_fail3() {
+        void createLecture_fail3() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
@@ -393,7 +387,7 @@ class LectureServiceTest {
 
         @Test
         @DisplayName("등록 실패(4) - 강좌에 등록될 강사가 존재하지 않을 때")
-        public void createLecture_fail4() {
+        void createLecture_fail4() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
@@ -414,7 +408,7 @@ class LectureServiceTest {
 
         @Test
         @DisplayName("등록 실패(5) - 강좌에 등록될 강사의 권한이 STAFF인 경우")
-        public void createLecture_fail5() {
+        void createLecture_fail5() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
@@ -437,7 +431,7 @@ class LectureServiceTest {
 
         @Test
         @DisplayName("등록 실패(6) - 강좌가 중복 등록되어 있는 경우")
-        public void createLecture_fail6() {
+        void createLecture_fail6() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
@@ -469,7 +463,7 @@ class LectureServiceTest {
 
         @Test
         @DisplayName("수정 성공")
-        public void updateLecture_success() {
+        void updateLecture_success() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
@@ -489,7 +483,7 @@ class LectureServiceTest {
 
         @Test
         @DisplayName("수정 실패(1) - 학원이 존재하지 않을 때")
-        public void updateLecture_fail1() {
+        void updateLecture_fail1() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.empty());
 
@@ -504,7 +498,7 @@ class LectureServiceTest {
 
         @Test
         @DisplayName("수정 실패(2) - 수정 진행하는 직원이 해당 학원 소속이 아닐 때")
-        public void updateLecture_fail2() {
+        void updateLecture_fail2() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.empty());
@@ -521,7 +515,7 @@ class LectureServiceTest {
 
         @Test
         @DisplayName("수정 실패(3) - 수정할 강좌가 존재하지 않을 때")
-        public void updateLecture_fail3() {
+        void updateLecture_fail3() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(employee));
@@ -540,7 +534,7 @@ class LectureServiceTest {
 
         @Test
         @DisplayName("수정 실패(4) - 직원이 강좌를 수정할 권한이 아닐 때")
-        public void updateLecture_fail4() {
+        void updateLecture_fail4() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
@@ -566,7 +560,7 @@ class LectureServiceTest {
 
         @Test
         @DisplayName("삭제 성공")
-        public void deleteLecture_success() {
+        void deleteLecture_success() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
@@ -586,7 +580,7 @@ class LectureServiceTest {
 
         @Test
         @DisplayName("삭제 실패(1) - 학원이 존재하지 않을 때 ")
-        public void deleteLecture_fail1() {
+        void deleteLecture_fail1() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.empty());
 
@@ -601,7 +595,7 @@ class LectureServiceTest {
 
         @Test
         @DisplayName("삭제 실패(2) - 삭제 진행하는 직원이 해당 학원 소속이 아닐 때")
-        public void deleteLecture_fail2() {
+        void deleteLecture_fail2() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.empty());
@@ -618,7 +612,7 @@ class LectureServiceTest {
 
         @Test
         @DisplayName("삭제 실패(3) - 삭제할 강좌가 존재하지 않을 때")
-        public void deleteLecture_fail3() {
+        void deleteLecture_fail3() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(employee));
@@ -637,7 +631,7 @@ class LectureServiceTest {
 
         @Test
         @DisplayName("삭제 실패(4) - 직원이 강좌를 삭제할 권한이 아닐 때")
-        public void deleteLecture_fail4() {
+        void deleteLecture_fail4() {
 
             given(academyRepository.findById(anyLong())).willReturn(Optional.of(academy));
             given(employeeRepository.findByAccountAndAcademy(anyString(), any(Academy.class))).willReturn(Optional.of(mockEmployee));
