@@ -4,7 +4,6 @@ import com.project.myacademy.domain.academy.Academy;
 import com.project.myacademy.domain.academy.AcademyRepository;
 import com.project.myacademy.domain.employee.Employee;
 import com.project.myacademy.domain.employee.EmployeeRepository;
-import com.project.myacademy.domain.employee.EmployeeRole;
 import com.project.myacademy.domain.enrollment.dto.*;
 import com.project.myacademy.domain.lecture.Lecture;
 import com.project.myacademy.domain.lecture.LectureRepository;
@@ -13,20 +12,17 @@ import com.project.myacademy.domain.student.StudentRepository;
 import com.project.myacademy.domain.waitinglist.WaitinglistRepository;
 import com.project.myacademy.global.exception.AppException;
 import com.project.myacademy.global.exception.ErrorCode;
-import com.project.myacademy.global.util.EmailUtil;
-import com.sun.mail.smtp.SMTPAddressFailedException;
+import com.project.myacademy.domain.email.EmailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mail.MailException;
-import org.springframework.mail.MailSendException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.mail.MessagingException;
-import javax.mail.SendFailedException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,7 +39,7 @@ public class EnrollmentService {
     private final StudentRepository studentRepository;
     private final LectureRepository lectureRepository;
     private final WaitinglistRepository waitinglistRepository;
-    private final EmailUtil emailUtil;
+    private final EmailService emailService;
 
     /**
      * 수강 이력 등록
@@ -91,15 +87,15 @@ public class EnrollmentService {
         }
 
         // 학생의 이메일로 메시지 전송
-        String email = student.getEmail();
-        String subject = "MyAcademy 수강 등록 안내 메일";
-        String body = String.format("%s님의 %s 수강 등록이 정상적으로 완료되었습니다.%n%n감사합니다.", student.getName(), lecture.getName());
-
-        try {
-            emailUtil.sendEmail(email, subject, body);
-        } catch (MailException | MessagingException e){
-            log.info("이메일 전송 에러 발생 [{}]", e.getMessage());
-        }
+//        String email = student.getEmail();
+//        String subject = "MyAcademy 수강 등록 안내 메일";
+//        String body = String.format("%s님의 %s 수강 등록이 정상적으로 완료되었습니다.%n%n감사합니다.", student.getName(), lecture.getName());
+//
+//        try {
+//            emailService.sendEmail(email, subject, body);
+//        } catch (MailException | MessagingException e){
+//            log.info("이메일 전송 에러 발생 [{}]", e.getMessage());
+//        }
 
         return CreateEnrollmentResponse.of(savedEnrollment.getId());
     }
@@ -188,16 +184,17 @@ public class EnrollmentService {
         enrollmentRepository.delete(enrollment);
 
         // 학생의 이메일로 메시지 전송
-        String email = student.getEmail();
-        String subject = "MyAcademy 수강 취소 안내 메일";
-        String body = String.format("%s님의 %s 수강 취소 신청이 정상적으로 처리되었습니다.%n%n감사합니다.", student.getName(), lecture.getName());
-        try {
-            emailUtil.sendEmail(email, subject, body);
-        } catch (MailException e2){
-            log.info("이메일 전송 에러 발생 [{}]", e2.getMessage());
-        } catch (MessagingException e) {
-            log.info("이메일 전송 에러 발생 [{}]", e.getMessage());
-        }
+//        String email = student.getEmail();
+//        String subject = "MyAcademy 수강 취소 안내 메일";
+//        String body = String.format("%s님의 %s 수강 취소 신청이 정상적으로 처리되었습니다.%n%n감사합니다.", student.getName(), lecture.getName());
+//        try {
+//            emailService.sendEmail(email, subject, body);
+//        } catch (MailException e2){
+//            log.info("이메일 전송 에러 발생 [{}]", e2.getMessage());
+//        } catch (MessagingException e) {
+//            log.info("이메일 전송 에러 발생 [{}]", e.getMessage());
+//        }
+
         // 현재 등록인원 -1
         lecture.minusCurrentEnrollmentNumber();
 

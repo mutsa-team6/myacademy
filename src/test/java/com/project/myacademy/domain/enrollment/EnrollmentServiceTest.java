@@ -15,7 +15,7 @@ import com.project.myacademy.domain.waitinglist.Waitinglist;
 import com.project.myacademy.domain.waitinglist.WaitinglistRepository;
 import com.project.myacademy.global.exception.AppException;
 import com.project.myacademy.global.exception.ErrorCode;
-import com.project.myacademy.global.util.EmailUtil;
+import com.project.myacademy.domain.email.EmailService;
 import groovy.util.logging.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -61,7 +61,7 @@ class EnrollmentServiceTest {
     @Mock
     private WaitinglistRepository waitinglistRepository;
     @Mock
-    private EmailUtil emailUtil;
+    private EmailService emailService;
     @InjectMocks
     private EnrollmentService enrollmentService;
 
@@ -165,7 +165,7 @@ class EnrollmentServiceTest {
             given(enrollmentRepository.findByStudentAndLecture(any(Student.class), any(Lecture.class))).willReturn(Optional.empty());
             when(enrollmentRepository.countByLecture_Id(anyLong())).then(AdditionalAnswers.returnsFirstArg());
             given(enrollmentRepository.save(any(Enrollment.class))).willReturn(enrollment);
-            willDoNothing().given(emailUtil).sendEmail(anyString(), anyString(), anyString());
+//            willDoNothing().given(emailService).sendEmail(anyString(), anyString(), anyString());
 
             CreateEnrollmentResponse savedEnrollment = enrollmentService.createEnrollment(academy.getId(), student.getId(), lecture.getId(), employee.getAccount());
             assertThat(savedEnrollment.getEnrollmentId()).isEqualTo(1L);
@@ -179,7 +179,7 @@ class EnrollmentServiceTest {
             then(enrollmentRepository).should(times(1)).findByStudentAndLecture(any(Student.class), any(Lecture.class));
             then(enrollmentRepository).should(times(1)).countByLecture_Id(anyLong());
             then(enrollmentRepository).should(times(1)).save(any(Enrollment.class));
-            then(emailUtil).should(times(1)).sendEmail(anyString(),anyString(),anyString());
+//            then(emailService).should(times(1)).sendEmail(anyString(),anyString(),anyString());
         }
 
         @Test
@@ -495,7 +495,7 @@ class EnrollmentServiceTest {
             given(lectureRepository.findById(anyLong())).willReturn(Optional.of(lecture));
             given(enrollmentRepository.findById(anyLong())).willReturn(Optional.of(enrollment));
             given(mockEmployee.getEmployeeRole()).willReturn(EmployeeRole.ROLE_STAFF);
-            willDoNothing().given(emailUtil).sendEmail(anyString(), anyString(), anyString());
+//            willDoNothing().given(emailService).sendEmail(anyString(), anyString(), anyString());
 
             given(waitinglistRepository.findTopByLectureOrderByCreatedAtAsc(any(Lecture.class))).willReturn(Optional.of(waitinglist));
             given(studentRepository.findById(anyLong())).willReturn(Optional.of(student2));
@@ -514,7 +514,7 @@ class EnrollmentServiceTest {
             then(enrollmentRepository).should(times(1)).findByStudentAndLecture(any(Student.class), any(Lecture.class));
             then(enrollmentRepository).should(times(1)).save(any(Enrollment.class));
             then(mockEmployee).should(times(1)).getEmployeeRole();
-            then(emailUtil).should(times(1)).sendEmail(anyString(),anyString(),anyString());
+//            then(emailService).should(times(1)).sendEmail(anyString(),anyString(),anyString());
             then(waitinglistRepository).should(times(1)).findTopByLectureOrderByCreatedAtAsc(any(Lecture.class));
         }
 
@@ -647,7 +647,7 @@ class EnrollmentServiceTest {
             given(lectureRepository.findById(anyLong())).willReturn(Optional.of(lecture));
             given(enrollmentRepository.findById(anyLong())).willReturn(Optional.of(enrollment));
             given(mockEmployee.getEmployeeRole()).willReturn(EmployeeRole.ROLE_STAFF);
-            willDoNothing().given(emailUtil).sendEmail(anyString(), anyString(), anyString());
+//            willDoNothing().given(emailService).sendEmail(anyString(), anyString(), anyString());
 
             given(waitinglistRepository.findTopByLectureOrderByCreatedAtAsc(any(Lecture.class))).willReturn(Optional.of(waitinglist));
             given(studentRepository.findById(anyLong())).willReturn(Optional.of(student2));
@@ -666,7 +666,7 @@ class EnrollmentServiceTest {
             then(enrollmentRepository).should(times(1)).findById(anyLong());
             then(enrollmentRepository).should(times(1)).findByStudentAndLecture(any(Student.class), any(Lecture.class));
             then(mockEmployee).should(times(1)).getEmployeeRole();
-            then(emailUtil).should(times(1)).sendEmail(anyString(),anyString(),anyString());
+//            then(emailService).should(times(1)).sendEmail(anyString(),anyString(),anyString());
             then(waitinglistRepository).should(times(1)).findTopByLectureOrderByCreatedAtAsc(any(Lecture.class));
         }
     }

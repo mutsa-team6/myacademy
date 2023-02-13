@@ -495,7 +495,7 @@ class AnnouncementServiceTest {
 
             List<ReadAnnouncementResponse> response = announcementService.readAnnouncementForMain(academy.getId(), employeeSTAFF.getAccount());
 
-            assertThat(response.size()).isEqualTo(5);
+            assertThat(response).hasSize(5);
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
@@ -552,7 +552,7 @@ class AnnouncementServiceTest {
 
             List<ReadAnnouncementResponse> response = announcementService.readAdmissionForMain(academy.getId(), employeeSTAFF.getAccount());
 
-            assertThat(response.size()).isEqualTo(4);
+            assertThat(response).hasSize(4);
 
             then(academyRepository).should(times(1)).findById(anyLong());
             then(employeeRepository).should(times(1)).findByAccountAndAcademy(anyString(), any(Academy.class));
