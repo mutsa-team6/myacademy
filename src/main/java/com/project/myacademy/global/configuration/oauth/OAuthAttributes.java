@@ -6,13 +6,14 @@ import java.util.function.Function;
 
 public enum OAuthAttributes {
 
-    GOOGLE("google", (attributes) -> {
+    GOOGLE("google", attributes -> {
         return new EmployeeProfile(
                 (String) attributes.get("name"),
                 (String) attributes.get("email")
         );
     }),
-    NAVER("naver", (attributes) -> {
+
+    NAVER("naver", attributes -> {
         Map<String, Object> response = (Map<String, Object>) attributes.get("response");
         return new EmployeeProfile(
                 (String) response.get("name"),
