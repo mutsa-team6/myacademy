@@ -297,8 +297,13 @@
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
+                            <h4 th:text="|${lecture.teacherName}|"
+                                style="font-family: 'Jua', sans-serif;font-weight: lighter;color: #5A2082"></h4>
+                            <h5 style="font-family: 'Jua', sans-serif;font-weight: lighter">&nbsp;선생님의&nbsp;</h5>
+                            <h4 th:text="|${lecture.lectureName} |"
+                                style="font-family: 'Jua', sans-serif;font-weight: lighter;color: #5A2082"></h4>
+                            <h5 style="font-family: 'Jua', sans-serif;font-weight: lighter">&nbsp;강의를 수강하는 학생입니다.</h5>
 
-                            <h6 th:text="|${lecture.teacherName} 선생님의 ${lecture.lectureName} 강의의 수강 신청자 |"></h6>
 
                             <div class="row"></div>
                         </div>

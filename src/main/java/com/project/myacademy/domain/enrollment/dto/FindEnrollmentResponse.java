@@ -20,6 +20,7 @@ public class FindEnrollmentResponse {
     private Long studentId;
     private Long lectureId;
     private String studentName;
+    private String studentEmail;
     private String studentPhoneNum;
     private String lectureName;
     private String teacherName;
@@ -36,6 +37,7 @@ public class FindEnrollmentResponse {
         this.studentId = enrollment.getStudent().getId();
         this.lectureId = enrollment.getLecture().getId();
         this.studentName = enrollment.getStudent().getName();
+        this.studentEmail = enrollment.getStudent().getEmail();
         this.studentPhoneNum = enrollment.getStudent().getPhoneNum();
         this.lectureName = enrollment.getLecture().getName();
         this.price = enrollment.getLecture().getPrice();

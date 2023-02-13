@@ -172,8 +172,13 @@
                                                 th:data-parameter2="${enrollment.enrollmentId}"
                                                 th:data-parameter3="${academy.academyId}"
                                                 th:data-parameter4="${enrollment.lectureId}"
+                                                th:data-parameter5="${enrollment.studentEmail}"
+                                                th:data-parameter6="${enrollment.studentName}"
+                                                th:data-parameter7="${enrollment.lectureName}"
                                                 th:onclick="|pay.deleteEnrollment(this.getAttribute('data-parameter1'),this.getAttribute('data-parameter2')
-                                                ,this.getAttribute('data-parameter3'),this.getAttribute('data-parameter4'))|"
+                                                ,this.getAttribute('data-parameter3'),this.getAttribute('data-parameter4')
+                                                ,this.getAttribute('data-parameter5'),this.getAttribute('data-parameter6')
+                                                ,this.getAttribute('data-parameter7'))|"
                                                 class="btn btn-sm bg-gradient-danger btn-lg w-100 mb-0">수강신청 취소
                                         </button>
                                 </tr>
@@ -301,7 +306,7 @@
 
         },
 
-        deleteEnrollment: function (studentId,enrollmentId,academyId,lectureId) {
+        deleteEnrollment: function (studentId,enrollmentId,academyId,lectureId,email,studentName,lectureName) {
 
             const con_check = confirm("삭제하시겠습니까?");
 
@@ -319,6 +324,26 @@
                 ).then((response) => {
                     alert("수강신청이 취소되었습니다.");
                     window.location.reload();
+
+                    let data = {
+                        email: email,
+                        title: studentName+'님의 수강 등록 취소 안내 메일입니다.',
+                        body: studentName+'님의 '+lectureName+' 강좌 수강 등록 취소가 정상적으로 완료되었습니다. \n \n감사합니다.'
+                    };
+
+                    axios.post("/api/v1/academies/" + academyId + "/send/email",
+                        JSON.stringify(data), {
+                            headers: {
+                                'Content-Type': 'application/json',
+                            }
+                        }
+                    ).then((response) => {
+
+                    }).catch((error) => {
+                        console.log(error);
+                        alert(error.response.data.result["message"]);
+                    });
+
                 }).catch((error) => {
                     console.log(error);
                     alert(error.response.data.result["message"]);
