@@ -306,22 +306,10 @@
 
 
             var blank_pattern = /[\s]/g;
-            var password_pattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
 
             if (blank_pattern.test(data.account) == true || data.account == '') {
                 alert('계정명에 공백이 입력되었습니다. 다시 입력해주세요.');
                 document.querySelector("input[name=employeeAccount]").focus();
-
-                return;
-            }
-            if (password_pattern.test(data.password) == false) {
-                alert('비밀번호는 최소 8자, 하나 이상의 문자와 숫자를 포함해야합니다.');
-                document.querySelector("input[name=employeePassword]").focus();
-                return;
-            }
-            if (blank_pattern.test(data.password) == true || data.password == '') {
-                alert('비밀번호에 공백이 입력되었습니다. 다시 입력해주세요.');
-                document.querySelector("input[name=employeePassword]").focus();
 
                 return;
             }
