@@ -175,7 +175,7 @@ public class AnnouncementFileS3UploadService {
 
         // 학원, 해당 학원 소속 직원 존재 유무 확인
         Academy academy = validateAcademyById(academyId);
-        Employee employee = validateRequestEmployeeByAcademy(account, academy);
+        validateRequestEmployeeByAcademy(account, academy);
 
         // 공지사항 존재 유무 확인
         validateAnnouncementById(announcementId);
