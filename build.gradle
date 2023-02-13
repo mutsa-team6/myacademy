@@ -142,7 +142,9 @@ jacocoTestReport {
 							'**/*ExceptionManager*',
 							'**/configuration',
 							'**/util',
-							'**/file'
+							'**/file',
+							'**/email',
+							'**/payment'
 					] + Qdomains)
 				})
 		)
@@ -203,7 +205,8 @@ jacocoTestCoverageVerification {
 					'*.configuration.*',
 					'*.util.*',
 					'*.file.*',
-					'*.payment.*'
+					'*.payment.*',
+					'*.email.*'
 			] + Qdomains
 		}
 	}

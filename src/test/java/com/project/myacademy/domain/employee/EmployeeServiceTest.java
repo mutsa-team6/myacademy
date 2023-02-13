@@ -6,7 +6,7 @@ import com.project.myacademy.domain.employee.dto.*;
 import com.project.myacademy.global.configuration.refreshToken.RefreshTokenRepository;
 import com.project.myacademy.global.exception.AppException;
 import com.project.myacademy.global.exception.ErrorCode;
-import com.project.myacademy.global.util.EmailUtil;
+import com.project.myacademy.domain.email.EmailService;
 import com.project.myacademy.global.util.JwtTokenUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -46,7 +46,7 @@ class EmployeeServiceTest {
     @Mock
     private RefreshTokenRepository refreshTokenRepository;
     @Mock
-    private EmailUtil emailUtil;
+    private EmailService emailService;
     @InjectMocks
     private EmployeeService employeeService;
     private Academy academy;
@@ -335,7 +335,7 @@ class EmployeeServiceTest {
 
             willDoNothing().given(mockEmployee).updatePasswordOnly(any());
             given(employeeRepository.save(any())).willReturn(employeeADMIN);
-            willDoNothing().given(emailUtil).sendEmail(anyString(), anyString(), anyString());
+//            willDoNothing().given(emailService).sendEmail(anyString(), anyString(), anyString());
 
             FindPasswordEmployeeResponse response = employeeService.findPasswordEmployee(request);
 
