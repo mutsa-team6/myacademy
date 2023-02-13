@@ -61,7 +61,7 @@ public class UniquenessService {
         // 학생 Id로 학생이 존재하는지 확인 - 있으면 STUDENT_NOT_FOUND 에러발생
         Student student = validateStudentById(studentId);
 
-        return uniquenessRepository.findAllByStudent(student, pageable).map(uniqueness -> ReadAllUniquenessResponse.of(uniqueness));
+        return uniquenessRepository.findAllByStudent(student, pageable).map(ReadAllUniquenessResponse::of);
     }
 
     /**
