@@ -132,8 +132,10 @@ public class EmployeeProfileS3UploadService {
      */
     public String getStoredUrl(Long employeeId) {
 
-        if (employeeProfileRepository.existsEmployeeProfileByEmployee_Id(employeeId)) {
-            return employeeProfileRepository.findByEmployee_Id(employeeId).get().getStoredFileUrl();
+        Optional<EmployeeProfile> profile = employeeProfileRepository.findByEmployee_Id(employeeId);
+
+        if (profile.isPresent()) {
+            return profile.get().getStoredFileUrl();
         } else {
             return "null";
         }
