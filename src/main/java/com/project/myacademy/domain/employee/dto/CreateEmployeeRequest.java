@@ -25,11 +25,9 @@ public class CreateEmployeeRequest {
     @NotBlank(message = "계정명은 필수 입력 항목입니다.")
     private String account;
     @NotBlank(message = "비밀번호는 필수 입력 항목입니다.")
-    @Length(min=8,message = "비밀번호는 길이는 최소 8자리 입니다.")
+    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,}$",message = "최소 8글자로 입력해주시고, 글자 1개, 숫자 1개, 특수문자 1개를 포함해주세요.")
     private String password;
-    @NotBlank(message = "직원 유형은 필수 입력 항목입니다.")
     private String employeeType;
-    @NotBlank(message = "과목명 필수 입력 항목입니다.")
     private String subject;
 
 }

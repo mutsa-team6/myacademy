@@ -39,7 +39,7 @@
             <div class="col-lg-4 col-md-6 mb-md-0 mb-4">
                 <div style="border-radius: 10px; ">
                     <th:block th:if="${imageUrl =='null'}">
-                        <img src="https://raw.githubusercontent.com/buinq/imageServer/main/img/image-20230210213531339.png"
+                        <img src="https://raw.githubusercontent.com/buinq/imageServer/main/img/image-20230212155135685.png"
                              alt="img-blur-shadow" class="img-fluid shadow border-radius-lg"
                              style="height: 300px">
                     </th:block>
@@ -297,8 +297,13 @@
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
+                            <h4 th:text="|${lecture.teacherName}|"
+                                style="font-family: 'Jua', sans-serif;font-weight: lighter;color: #5A2082"></h4>
+                            <h5 style="font-family: 'Jua', sans-serif;font-weight: lighter">&nbsp;선생님의&nbsp;</h5>
+                            <h4 th:text="|${lecture.lectureName} |"
+                                style="font-family: 'Jua', sans-serif;font-weight: lighter;color: #5A2082"></h4>
+                            <h5 style="font-family: 'Jua', sans-serif;font-weight: lighter">&nbsp;강의를 수강하는 학생입니다.</h5>
 
-                            <h6 th:text="|${lecture.teacherName} 선생님의 ${lecture.lectureName} 강의의 수강 신청자 |"></h6>
 
                             <div class="row"></div>
                         </div>
@@ -358,21 +363,21 @@
                     </ol>
                     <div class="carousel-inner ">
                         <div class="carousel-item">
-                            <a href="https://techit.education/school/kdt-backend-4th">
+                            <a href="https://techit.education/school/kdt-backend-4th" target="_blank">
                                 <img class="d-block "
                                      src="https://raw.githubusercontent.com/buinq/imageServer/main/img/image-20230210181251237.png"
                                      alt="Second slide">
                             </a>
                         </div>
                         <div class="carousel-item">
-                            <a href="https://techit.education/school/kdt-frontend-5th">
+                            <a href="https://techit.education/school/kdt-frontend-5th" target="_blank">
                                 <img class="d-block "
                                      src="https://raw.githubusercontent.com/buinq/imageServer/main/img/image-20230210181241715.png"
                                      alt="First slide">
                             </a>
                         </div>
                         <div class="carousel-item active">
-                            <a href="https://techit.education/school/kdt-blockchain-3rd">
+                            <a href="https://techit.education/school/kdt-blockchain-3rd" target="_blank">
                                 <img class="d-block "
                                      src="https://raw.githubusercontent.com/buinq/imageServer/main/img/image-20230210181258589.png"
                                      alt="First slide">

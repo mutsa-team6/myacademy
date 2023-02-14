@@ -6,7 +6,7 @@ import com.project.myacademy.domain.employee.dto.*;
 import com.project.myacademy.global.configuration.refreshToken.RefreshTokenRepository;
 import com.project.myacademy.global.exception.AppException;
 import com.project.myacademy.global.exception.ErrorCode;
-import com.project.myacademy.global.util.EmailUtil;
+import com.project.myacademy.domain.email.EmailService;
 import com.project.myacademy.global.util.JwtTokenUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import javax.mail.MessagingException;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,10 +45,13 @@ class EmployeeServiceTest {
     private BCryptPasswordEncoder bCryptPasswordEncoder;
     @Mock
     private RefreshTokenRepository refreshTokenRepository;
+    @Mock
+    private EmailService emailService;
     @InjectMocks
     private EmployeeService employeeService;
     private Academy academy;
     private Employee employeeADMIN, employeeSTAFF, employeeUSER;
+    private Employee mockEmployee;
     private Pageable pageable;
     @Value("${jwt.token.secret}")
     String secretKey;
@@ -59,6 +63,7 @@ class EmployeeServiceTest {
         employeeSTAFF = Employee.builder().id(2L).name("직원").account("staff").password("password").phoneNum("010-0000-0001").email("employeeSTAFF@gmail.com").academy(academy).subject("직원").employeeRole(ROLE_STAFF).build();
         employeeUSER = Employee.builder().id(3L).name("강사").account("user").password("password").phoneNum("010-0000-0002").email("employeeUSER@gmail.com").academy(academy).subject("수학").employeeRole(ROLE_USER).build();
         pageable = PageRequest.of(0, 20, Sort.Direction.DESC, "id");
+        mockEmployee = mock(Employee.class);
     }
 
     @Nested
@@ -291,53 +296,64 @@ class EmployeeServiceTest {
     @Nested
     @DisplayName("계정 찾기")
     class FindAccountEmployee {
-//        FindAccountEmployeeRequest request = new FindAccountEmployeeRequest("학원", "원장", "employeeADMIN@gmail.com");
+        FindAccountEmployeeRequest request = new FindAccountEmployeeRequest("원장", "employeeADMIN@gmail.com");
 
-//        @Test
-//        @DisplayName("계정 찾기 성공")
-//        void find_account_employee_success() {
-//            given(employeeRepository.findByEmail(any())).willReturn(Optional.of(employeeADMIN));
-//
-//            FindAccountEmployeeResponse response = employeeService.findAccountEmployee(request);
-//
-//            assertThat(response.getEmployeeId()).isEqualTo(1L);
-//            assertThat(response.getAccount()).isEqualTo("admin");
-//        }
+        @Test
+        @DisplayName("계정 찾기 성공")
+        void find_account_employee_success() {
+            given(employeeRepository.findByEmail(any())).willReturn(Optional.of(employeeADMIN));
 
-//        @Test
-//        @DisplayName("계정 찾기 실패 - 일치하는 직원 정보 없음")
-//        void find_account_employee_fail() {
-//            given(employeeRepository.findByEmail(any())).willReturn(Optional.empty());
-//
-//            AppException appException = assertThrows(AppException.class,
-//                    () -> employeeService.findAccountEmployee(request));
-//
-//            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.EMPLOYEE_NOT_FOUND);
-//        }
+            FindAccountEmployeeResponse response = employeeService.findAccountEmployee(request);
+
+            assertThat(response.getEmployeeId()).isEqualTo(1L);
+            assertThat(response.getAccount()).isEqualTo("admin");
+        }
+
+        @Test
+        @DisplayName("계정 찾기 실패 - 일치하는 직원 정보 없음")
+        void find_account_employee_fail() {
+            given(employeeRepository.findByEmail(any())).willReturn(Optional.empty());
+
+            AppException appException = assertThrows(AppException.class,
+                    () -> employeeService.findAccountEmployee(request));
+
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.EMAIL_NOT_FOUND);
+        }
     }
 
-//    @Nested
-//    @DisplayName("비밀번호 찾기(임시비밀번호로 변경해 이메일로 전송해줌)")
-//    class FindPasswordEmployee {
-//        FindPasswordEmployeeRequest request = new FindPasswordEmployeeRequest("원장", "admin", "employeeADMIN@gmail.com");
-//        String tempPassword = employeeService.getTempPassword();
-//
-//        @Test
-//        @DisplayName("비밀번호 찾기 성공")
-//        void change_password_employee_success() {
-//
-//            given(employeeRepository.findByAccount(any())).willReturn(Optional.of(mockEmployee));
-//            given(employeeRepository.findByNameAndEmail(any(), any())).willReturn(Optional.of(mockEmployee));
-//            given(bCryptPasswordEncoder.encode(any())).willReturn(tempPassword);
-//            willDoNothing().given(mockEmployee).updatePasswordOnly(any());
-//            given(employeeRepository.save(any())).willReturn(mockEmployee);
-//            willDoNothing().given(emailUtil).sendEmail(anyString(),anyString(),anyString());
-//
-//            FindPasswordEmployeeResponse response = employeeService.findPasswordEmployee(request);
-//
-//            assertThat(response.getAccount()).isEqualTo("admin");
-//        }
-//    }
+    @Nested
+    @DisplayName("비밀번호 찾기(임시비밀번호로 변경해 이메일로 전송해줌)")
+    class FindPasswordEmployee {
+        FindPasswordEmployeeRequest request = new FindPasswordEmployeeRequest("admin", "employeeADMIN@gmail.com");
+
+        @Test
+        @DisplayName("비밀번호 찾기 성공")
+        void change_password_employee_success() throws MessagingException {
+
+            given(employeeRepository.findByEmail(any())).willReturn(Optional.of(mockEmployee));
+            given(bCryptPasswordEncoder.encode(any())).willReturn(employeeADMIN.getPassword());
+
+            willDoNothing().given(mockEmployee).updatePasswordOnly(any());
+            given(employeeRepository.save(any())).willReturn(employeeADMIN);
+//            willDoNothing().given(emailService).sendEmail(anyString(), anyString(), anyString());
+
+            FindPasswordEmployeeResponse response = employeeService.findPasswordEmployee(request);
+
+            assertThat(response.getAccount()).isEqualTo("admin");
+        }
+
+        @Test
+        @DisplayName("비밀번호 찾기 실패(1) - 이메일이 존재하지 않음")
+        void change_password_employee_fail1() {
+
+            given(employeeRepository.findByEmail(any())).willReturn(Optional.empty());
+
+            AppException appException = assertThrows(AppException.class,
+                    () -> employeeService.findPasswordEmployee(request));
+
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.EMAIL_NOT_FOUND);
+        }
+    }
 
     @Nested
     @DisplayName("직원 비밀번호 변경")
@@ -585,7 +601,7 @@ class EmployeeServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> employeeService.findByEmail(employeeADMIN.getEmail()));
 
-            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.EMPLOYEE_NOT_FOUND);
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.EMAIL_NOT_FOUND);
         }
 
         @Test
@@ -639,7 +655,7 @@ class EmployeeServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> employeeService.readAllEmployees(employeeSTAFF.getAccount(), academy.getId(), pageable));
 
-            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.NOT_ALLOWED_ROLE);
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.INVALID_PERMISSION);
         }
 
         @Test

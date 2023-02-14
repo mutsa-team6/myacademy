@@ -4,6 +4,7 @@ import com.project.myacademy.domain.academy.AcademyService;
 import com.project.myacademy.domain.academy.dto.FindAcademyResponse;
 import com.project.myacademy.domain.discount.DiscountService;
 import com.project.myacademy.domain.discount.dto.GetDiscountResponse;
+import com.project.myacademy.domain.email.EmailService;
 import com.project.myacademy.domain.employee.EmployeeService;
 import com.project.myacademy.domain.employee.dto.ReadEmployeeResponse;
 
@@ -26,6 +27,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 
@@ -40,6 +42,7 @@ public class PaymentController {
     private final DiscountService discountService;
     private final PaymentService paymentService;
     private final StudentService studentService;
+    private final EmailService emailService;
     @Value("${payment.toss.testClientApiKey}")
     private String key;
     @Value("${payment.toss.successCallbackUrl}")
@@ -88,9 +91,10 @@ public class PaymentController {
     }
 
     @GetMapping("/academy/payment/success")
-    public String paySuccess(@RequestParam String orderId, @RequestParam String paymentKey, @RequestParam Integer amount, HttpServletRequest request, Model model, Authentication authentication, Pageable pageable) {
+    public String paySuccess(@RequestParam String orderId, @RequestParam String paymentKey, @RequestParam Integer amount, HttpServletRequest request, Model model, Authentication authentication, Pageable pageable) throws MessagingException {
 
         Long academyId = AuthenticationUtil.getAcademyIdFromAuth(authentication);
+        String requestAccount = AuthenticationUtil.getAccountFromAuth(authentication);
 
         // 직원 정보, 학원 정보 세션에 저장 및 model로 넘기는 메서드
         setSessionEmployeeInfo(request, model, authentication, academyId);
@@ -113,6 +117,9 @@ public class PaymentController {
         SuccessPaymentResponse payment = paymentService.findPayment(orderId);
         model.addAttribute("payment", payment);
 
+        String title = String.format("%s님의 %s 강좌 결제 완료 메일입니다.",enrollment.getStudentName(),enrollment.getLectureName());
+        String body = String.format("%s님의 %s 강좌 %d원 결제 완료되었습니다. \n \n감사합니다.",enrollment.getStudentName(),enrollment.getLectureName(),amount);
+        emailService.sendEmail(academyId, enrollment.getStudentEmail(), title, body, requestAccount);
 
         return "payment/success";
     }

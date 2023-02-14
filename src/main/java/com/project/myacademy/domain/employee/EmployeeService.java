@@ -7,7 +7,7 @@ import com.project.myacademy.global.configuration.refreshToken.RefreshToken;
 import com.project.myacademy.global.configuration.refreshToken.RefreshTokenRepository;
 import com.project.myacademy.global.exception.AppException;
 import com.project.myacademy.global.exception.ErrorCode;
-import com.project.myacademy.global.util.EmailUtil;
+import com.project.myacademy.domain.email.EmailService;
 import com.project.myacademy.global.util.JwtTokenUtil;
 import com.querydsl.core.util.StringUtils;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +32,7 @@ public class EmployeeService {
     private final EmployeeRepository employeeRepository;
     private final AcademyRepository academyRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
-    private final EmailUtil emailUtil;
+    private final EmailService emailService;
     private final RefreshTokenRepository refreshTokenRepository;
     @Value("${jwt.token.secret}")
     private String secretKey;
@@ -191,17 +191,16 @@ public class EmployeeService {
 
         Employee changedEmployee = employeeRepository.save(foundEmployee);
 
-        String title = String.format("%s님의 임시 비밀번호 안내 메일입니다.", name);
-        String body = String.format("안녕하세요.%n%nMyAcademy 임시 비밀번호 안내 관련 메일입니다.%n%n%s님의 임시 비밀번호는 %s입니다.%n%n발급된 임시 비밀번호로 로그인해서 새 비밀번호로 변경 후 이용바랍니다.%n%n감사합니다.", name, tempPassword);
-
-
-        try {
-            emailUtil.sendEmail(email, title, body);
-        } catch (MailException e2){
-            log.info("이메일 전송 에러 발생 [{}]", e2.getMessage());
-        } catch (MessagingException e) {
-            log.info("이메일 전송 에러 발생 [{}]", e.getMessage());
-        }
+//        String title = String.format("%s님의 임시 비밀번호 안내 메일입니다.", name);
+//        String body = String.format("안녕하세요.%n%nMyAcademy 임시 비밀번호 안내 관련 메일입니다.%n%n%s님의 임시 비밀번호는 %s입니다.%n%n발급된 임시 비밀번호로 로그인해서 새 비밀번호로 변경 후 이용바랍니다.%n%n감사합니다.", name, tempPassword);
+//
+//        try {
+//            emailService.sendEmail(email, title, body);
+//        } catch (MailException e2){
+//            log.info("이메일 전송 에러 발생 [{}]", e2.getMessage());
+//        } catch (MessagingException e) {
+//            log.info("이메일 전송 에러 발생 [{}]", e.getMessage());
+//        }
 
         return FindPasswordEmployeeResponse.of(changedEmployee);
     }
@@ -252,7 +251,7 @@ public class EmployeeService {
         Academy foundAcademy = validateAcademyById(academyId);
         // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
         Employee requestEmployee = validateRequestEmployeeByAccount(requestAccount, foundAcademy);
-        // 적용될 계정과 학원으로 직원을 조회 - 없을시 ACCOUNT_NOT_FOUND 에러발생
+        // 적용될 계정과 학원으로 직원을 조회 - 없을시 EMPLOYEE_NOT_FOUND 에러발생
         Employee foundEmployee = validateEmployeeById(employeeId, foundAcademy);
 
         // 삭제 요청자 권한이 ADMIN 아니면 - INVALID_PERMISSION 에러발생
@@ -293,7 +292,6 @@ public class EmployeeService {
      * JwtTokenFilter 에서 사용하기 위해 만든 메서드 ( 계정 찾아와서 권한 부여하기 위함 )
      */
     public Employee findByEmail(String email) {
-
         return validateEmployeeByEmail(email);
     }
 
@@ -311,13 +309,11 @@ public class EmployeeService {
 
         // 조회를 요청한 회원의 권한이 admin 이 아닐경우 - NOT_ALLOWED_ROLE 에러발생
         if (!employeeAdmin.getEmployeeRole().equals(EmployeeRole.ROLE_ADMIN)) {
-            throw new AppException(ErrorCode.NOT_ALLOWED_ROLE);
+            throw new AppException(ErrorCode.INVALID_PERMISSION);
         }
 
         return employeeRepository.findAllEmployee(foundAcademy, pageable).map(ReadAllEmployeeResponse::of);
     }
-
-
 
     /**
      * ADMIN 회원은 본인 탈퇴 불가
@@ -423,7 +419,7 @@ public class EmployeeService {
         // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
         validateRequestEmployeeByAccount(requestAccount, foundAcademy);
 
-        // 적용될 계정과 학원으로 직원을 조회 - 없을시 ACCOUNT_NOT_FOUND 에러발생
+        // 적용될 계정과 학원으로 직원을 조회 - 없을시 EMPLOYEE_NOT_FOUND 에러발생
         Employee foundEmployee = validateEmployeeById(employeeId, foundAcademy);
 
         // 변경하려는 계정이 자기 자신인 경우 - BAD_CHANGE_REQUEST 에러발생
@@ -493,7 +489,7 @@ public class EmployeeService {
     // 이메일로 직원을 조회 - 없을시 EMPLOYEE_NOT_FOUND 에러발생
     private Employee validateEmployeeByEmail(String email) {
         return employeeRepository.findByEmail(email)
-                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.EMAIL_NOT_FOUND));
     }
 
     // 이메일로 직원을 조회 - 있을시 DUPLICATED_EMAIL 에러발생

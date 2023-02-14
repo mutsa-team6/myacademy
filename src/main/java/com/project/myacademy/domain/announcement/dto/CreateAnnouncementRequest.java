@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Getter
 @AllArgsConstructor
@@ -18,6 +19,6 @@ public class CreateAnnouncementRequest {
     @NotBlank(message = "내용은 필수 입력 항목입니다.")
     private String body;
     //공지사항 타입
-    @NotBlank(message = "게시글 카테고리는 필수 입력 항목입니다.")
+    @NotNull
     private AnnouncementType type;
 }

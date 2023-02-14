@@ -214,11 +214,8 @@
                 alert("부모 정보 등록을 성공했습니다. 학생 정보를 입력해주세요");
                 hide('parent-fail');
             }).catch((error) => {
-                if (error.response.data.result["errorCode"] == "INVALID_PERMISSION") {
-                    alert("강사는 접근할 수 없습니다.");
-                }else if (error.response.data.result["errorCode"] == "BINDING_ERROR") {
-                    alert(error.response.data.result["message"]);
-                }
+                console.log(error);
+                alert(error.response.data.result["message"]);
             });
 
         },
@@ -245,15 +242,8 @@
                 window.location.href = '/academy/student';
 
             }).catch((error) => {
-                if (error.response.data.result["errorCode"] == "INVALID_PERMISSION") {
-                    alert("강사는 접근할 수 없습니다.");
-                }else if(error.response.data.result["errorCode"] == "DUPLICATED_STUDENT"){
-                    alert("해당 전화번호로 저장된 학생이 이미 존재합니다.");
-                }else if(error.response.data.result["errorCode"] == "DUPLICATED_EMAIL"){
-                    alert("해당 이메일로 저장된 학생이 이미 존재합니다.");
-                }else if (error.response.data.result["errorCode"] == "BINDING_ERROR") {
-                    alert(error.response.data.result["message"]);
-                }
+                console.log(error);
+                alert(error.response.data.result["message"]);
             });
 
         }

@@ -15,7 +15,7 @@ import com.project.myacademy.domain.waitinglist.dto.DeleteWaitinglistResponse;
 import com.project.myacademy.domain.waitinglist.dto.ReadAllWaitinglistResponse;
 import com.project.myacademy.global.exception.AppException;
 import com.project.myacademy.global.exception.ErrorCode;
-import com.project.myacademy.global.util.EmailUtil;
+import com.project.myacademy.domain.email.EmailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -40,7 +40,7 @@ public class WaitinglistService {
     private final LectureRepository lectureRepository;
     private final EnrollmentRepository enrollmentRepository;
     private final WaitinglistRepository waitinglistRepository;
-    private final EmailUtil emailUtil;
+    private final EmailService emailService;
 
     /**
      * 수강 대기 전체 조회
@@ -104,14 +104,14 @@ public class WaitinglistService {
         Waitinglist savedWaitinglist = waitinglistRepository.saveAndFlush(Waitinglist.makeWaitinglist(lecture, student));
 
         // 학생의 이메일로 메시지 전송
-        String email = student.getEmail();
-        String subject = "MyAcademy 대기 신청 완료 안내 메일";
-        String body = String.format("%s님의 %s 대기 신청이 정상적으로 완료되었습니다.%n%n감사합니다.", student.getName(), lecture.getName());
-        try {
-            emailUtil.sendEmail(email, subject, body);
-        } catch (MailException | MessagingException e){
-            log.info("수강 대기 신청 이메일 전송 에러 발생 [{}]", e.getMessage());
-        }
+//        String email = student.getEmail();
+//        String subject = "MyAcademy 대기 신청 완료 안내 메일";
+//        String body = String.format("%s님의 %s 대기 신청이 정상적으로 완료되었습니다.%n%n감사합니다.", student.getName(), lecture.getName());
+//        try {
+//            emailService.sendEmail(email, subject, body);
+//        } catch (MailException | MessagingException e){
+//            log.info("이메일 전송 에러 발생 [{}]", e.getMessage());
+//        }
 
         return CreateWaitinglistResponse.of(savedWaitinglist.getId());
     }
@@ -145,16 +145,16 @@ public class WaitinglistService {
         waitinglistRepository.delete(waitinglist);
 
         // 학생의 이메일로 메시지 전송
-        String email = student.getEmail();
-        String subject = "MyAcademy 대기 신청 취소 안내 메일";
-        String body = String.format("%s님의 %s 대기 신청 취소가 정상적으로 처리되었습니다.%n%n감사합니다.", student.getName(), lecture.getName());
-        try {
-            emailUtil.sendEmail(email, subject, body);
-        } catch (MailException e2){
-            log.info("수강 대기 취소 이메일 전송 에러 발생 [{}]", e2.getMessage());
-        } catch (MessagingException e) {
-            log.info("수강 대기 취소 이메일 전송 에러 발생 [{}]", e.getMessage());
-        }
+//        String email = student.getEmail();
+//        String subject = "MyAcademy 대기 신청 취소 안내 메일";
+//        String body = String.format("%s님의 %s 대기 신청 취소가 정상적으로 처리되었습니다.%n%n감사합니다.", student.getName(), lecture.getName());
+//        try {
+//            emailService.sendEmail(email, subject, body);
+//        } catch (MailException e2){
+//            log.info("이메일 전송 에러 발생 [{}]", e2.getMessage());
+//        } catch (MessagingException e) {
+//            log.info("이메일 전송 에러 발생 [{}]", e.getMessage());
+//        }
 
         return DeleteWaitinglistResponse.of(waitinglistId);
     }

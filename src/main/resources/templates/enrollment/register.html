@@ -233,7 +233,12 @@
                                                     <button th:data-parameter1="${academy.academyId}"
                                                             th:data-parameter2="${student.id}"
                                                             th:data-parameter3="${lecture.lectureId}"
-                                                            th:onclick="|register.registerEnrollment(this.getAttribute('data-parameter1'),this.getAttribute('data-parameter2'),this.getAttribute('data-parameter3'))|"
+                                                            th:data-parameter4="${lecture.lectureName}"
+                                                            th:data-parameter5="${student.email}"
+                                                            th:data-parameter6="${student.name}"
+                                                            th:onclick="|register.registerEnrollment(this.getAttribute('data-parameter1'),this.getAttribute('data-parameter2')
+                                                            ,this.getAttribute('data-parameter3'),this.getAttribute('data-parameter4')
+                                                            ,this.getAttribute('data-parameter5'),this.getAttribute('data-parameter6'))|"
                                                             type="button"
                                                             class="btn btn-lg bg-gradient-primary btn-lg w-100  mb-0">수강
                                                         신청
@@ -246,7 +251,12 @@
                                                     <button th:data-parameter1="${academy.academyId}"
                                                             th:data-parameter2="${student.id}"
                                                             th:data-parameter3="${lecture.lectureId}"
-                                                            th:onclick="|register.registerWaiting(this.getAttribute('data-parameter1'),this.getAttribute('data-parameter2'),this.getAttribute('data-parameter3'))|"
+                                                            th:data-parameter4="${student.email}"
+                                                            th:data-parameter5="${student.name}"
+                                                            th:data-parameter6="${lecture.lectureName}"
+                                                            th:onclick="|register.registerWaiting(this.getAttribute('data-parameter1'),this.getAttribute('data-parameter2')
+                                                            ,this.getAttribute('data-parameter3'),this.getAttribute('data-parameter4')
+                                                            ,this.getAttribute('data-parameter5'),this.getAttribute('data-parameter6'))|"
                                                             type="button"
                                                             class="btn btn-lg bg-gradient-secondary btn-lg w-100  mb-0">
                                                         대기 신청
@@ -268,11 +278,14 @@
                                      aria-labelledby="exampleModalLabel" aria-hidden="true">
                                     <div class="modal-dialog">
                                         <div class="modal-content">
-                                            <div class="modal-header">
+                                            <div class="modal-header mt-4 d-flex justify-content-center">
+                                                <h4 th:text="|${lecture.teacherName}|"
+                                                    style="font-family: 'Jua', sans-serif;font-weight: lighter;color: #5A2082"></h4>
+                                                <h5 style="font-family: 'Jua', sans-serif;font-weight: lighter">&nbsp;선생님의&nbsp;</h5>
+                                                    <h4 th:text="|${lecture.lectureName} |"
+                                                        style="font-family: 'Jua', sans-serif;font-weight: lighter;color: #5A2082"></h4>
+                                                <h5 style="font-family: 'Jua', sans-serif;font-weight: lighter">&nbsp;강의 수강 신청자 명단</h5>
 
-                                                <h6 th:text="|${lecture.teacherName} 선생님의 ${lecture.lectureName} 강의의 수강 신청자 |"></h6>
-
-                                                <div class="row"></div>
                                             </div>
                                             <div class="modal-body">
                                                 <div class="table">
@@ -326,10 +339,13 @@
                                      aria-labelledby="exampleModalLabel" aria-hidden="true">
                                     <div class="modal-dialog">
                                         <div class="modal-content">
-                                            <div class="modal-header">
-
-                                                <h6 th:text="|${lecture.teacherName} 선생님의 ${lecture.lectureName} 강의의 대기 신청자 |"></h6>
-
+                                            <div class="modal-header mt-4 d-flex justify-content-center">
+                                                <h4 th:text="|${lecture.teacherName}|"
+                                                    style="font-family: 'Jua', sans-serif;font-weight: lighter;color: #5A2082"></h4>
+                                                <h5 style="font-family: 'Jua', sans-serif;font-weight: lighter">&nbsp;선생님의&nbsp;</h5>
+                                                <h4 th:text="|${lecture.lectureName} |"
+                                                    style="font-family: 'Jua', sans-serif;font-weight: lighter;color: #5A2082"></h4>
+                                                <h5 style="font-family: 'Jua', sans-serif;font-weight: lighter">&nbsp;강의 대기 신청자 명단</h5>
                                                 <div class="row"></div>
                                             </div>
                                             <div class="modal-body">
@@ -350,23 +366,32 @@
                                                         </tr>
                                                         </thead>
                                                         <tbody>
-                                                        <tr th:each="student : ${lecture.getWaitingStudent}">
+                                                        <tr th:each="studentInfo : ${lecture.getWaitingStudent}">
                                                             <td class="align-middle text-center">
                                                 <span class=" text-xs font-weight-bold"
-                                                      th:text="${student.waitingNum}"></span>
+                                                      th:text="${studentInfo.waitingNum}"></span>
                                                             </td>
                                                             <th class="align-middle text-center">
                                                 <span class=" text-xs font-weight-bold"
-                                                      th:text="${student.studentName}"></span>
+                                                      th:text="${studentInfo.studentName}"></span>
                                                             </th>
                                                             <td class="align-middle text-center">
                                                 <span class=" text-xs font-weight-bold"
-                                                      th:text="${student.studentPhoneNum}"></span>
+                                                      th:text="${studentInfo.studentPhoneNum}"></span>
                                                             </td>
                                                             <td class="align-middle">
 
                                                                 <a href="javascript:;"
-                                                                   th:onclick="|register.deleteWaiting(${academy.academyId},${student.studentId},${student.lectureId},${student.waitingId})|"
+                                                                   th:data-parameter1="${academy.academyId}"
+                                                                   th:data-parameter2="${studentInfo.studentId}"
+                                                                   th:data-parameter3="${lecture.lectureId}"
+                                                                   th:data-parameter4="${studentInfo.waitingId}"
+                                                                   th:data-parameter5="${studentInfo.studentEmail}"
+                                                                   th:data-parameter6="${studentInfo.studentName}"
+                                                                   th:data-parameter7="${lecture.lectureName}"
+                                                                   th:onclick="|register.deleteWaiting(this.getAttribute('data-parameter1'),this.getAttribute('data-parameter2')
+                                                            ,this.getAttribute('data-parameter3'),this.getAttribute('data-parameter4')
+                                                            ,this.getAttribute('data-parameter5'),this.getAttribute('data-parameter6'),this.getAttribute('data-parameter7'))|"
                                                                    type="button"
                                                                    class="text-danger font-weight-bold text-xs"
                                                                    data-toggle="tooltip"
@@ -417,7 +442,7 @@
         },
 
 
-        registerEnrollment: function (academyId, studentId, lectureId) {
+        registerEnrollment: function (academyId, studentId, lectureId, lectureName, email, studentName) {
 
             const data = null;
             axios.post("/api/v1/academies/" + academyId + "/students/" + studentId + "/lectures/" + lectureId + "/enrollments",
@@ -430,17 +455,34 @@
                 alert("수강 신청을 성공했습니다.");
                 window.location.reload();
 
+                let data = {
+                    email: email,
+                    title: studentName + '님의 수강 등록 안내 메일입니다.',
+                    body: studentName + '님의 ' + lectureName + ' 강좌 수강 등록이 정상적으로 완료되었습니다. \n \n감사합니다.'
+                };
+
+                axios.post("/api/v1/academies/" + academyId + "/send/email",
+                    JSON.stringify(data), {
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    }
+                ).then((response) => {
+
+                }).catch((error) => {
+                    console.log(error);
+                    alert(error.response.data.result["message"]);
+                });
+
+
             }).catch((error) => {
-                if (error.response.data.result["errorCode"] == "INVALID_PERMISSION") {
-                    alert("강사는 접근할 수 없습니다.");
-                } else if (error.response.data.result["errorCode"] == "DUPLICATED_ENROLLMENT") {
-                    alert("해당 학생은 해당 강의를 이미 수강 신청한 상태입니다.");
-                }
+                console.log(error);
+                alert(error.response.data.result["message"]);
             });
 
         },
 
-        registerWaiting: function (academyId, studentId, lectureId) {
+        registerWaiting: function (academyId, studentId, lectureId, email, studentName, lectureName) {
 
             const data = null;
             axios.post("/api/v1/academies/" + academyId + "/students/" + studentId + "/lectures/" + lectureId + "/waitinglists",
@@ -452,18 +494,33 @@
             ).then((response) => {
                 alert("수강 대기 신청을 성공했습니다.");
                 window.location.reload();
+                let data = {
+                    email: email,
+                    title: studentName + '님의 수강 대기 신청 안내 메일입니다.',
+                    body: studentName + '님의 ' + lectureName + ' 강좌 수강 대기 신청이 정상적으로 완료되었습니다. \n \n감사합니다.'
+                };
+
+                axios.post("/api/v1/academies/" + academyId + "/send/email",
+                    JSON.stringify(data), {
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    }
+                ).then((response) => {
+
+                }).catch((error) => {
+                    console.log(error);
+                    alert(error.response.data.result["message"]);
+                });
 
             }).catch((error) => {
-                if (error.response.data.result["errorCode"] == "INVALID_PERMISSION") {
-                    alert("강사는 접근할 수 없습니다.");
-                } else if (error.response.data.result["errorCode"] == "DUPLICATED_WAITINGLIST") {
-                    alert("해당 학생은 해당 강의를 이미 대기 신청한 상태입니다.");
-                }
+                console.log(error);
+                alert(error.response.data.result["message"]);
             });
 
         },
 
-        deleteWaiting: function (academyId, studentId, lectureId, waitinglistId) {
+        deleteWaiting: function (academyId, studentId, lectureId, waitinglistId, email, studentName, lectureName) {
 
             const con_check = confirm("대기 취소하시겠습니까?");
 
@@ -477,7 +534,27 @@
                 ).then((response) => {
                     alert("대기 취소 성공");
                     window.location.reload();
+                    let data = {
+                        email: email,
+                        title: studentName + '님의 수강 대기 취소 안내 메일입니다.',
+                        body: studentName + '님의 ' + lectureName + ' 강좌 수강 대기 취소가 정상적으로 완료되었습니다. \n \n감사합니다.'
+                    };
+
+                    axios.post("/api/v1/academies/" + academyId + "/send/email",
+                        JSON.stringify(data), {
+                            headers: {
+                                'Content-Type': 'application/json',
+                            }
+                        }
+                    ).then((response) => {
+
+                    }).catch((error) => {
+                        console.log(error);
+                        alert(error.response.data.result["message"]);
+                    });
                 }).catch((error) => {
+                    console.log(error);
+                    alert(error.response.data.result["message"]);
                 });
             }
         }

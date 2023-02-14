@@ -32,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -57,14 +58,14 @@ public class AcademyProfileS3UploadService {
      */
     public CreateAcademyProfileResponse uploadAcademyProfile(Long academyId, MultipartFile multipartFile, String account) {
 
-        // 빈 파일이 아닌지 확인, 파일 자체를 첨부안하거나 첨부해도 내용이 비어있으면 - FILE_NOT_EXISTS 에러발생
+        // 파일 자체를 첨부안하거나 첨부해도 내용이 비어있는지 확인
         validateFileExists(multipartFile);
-        // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+
+        // 학원, 해당 학원 소속 직원 존재 유무 확인
         Academy academy = validateAcademyById(academyId);
-        // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
         Employee employee = validateRequestEmployeeByAcademy(account, academy);
 
-        // 원장만 학원 프로필 등록 가능 - 아닐시 INVALID_PERMISSION 에러발생
+        // 원장만 학원 프로필 등록 가능
         if (!employee.getEmployeeRole().equals(EmployeeRole.ROLE_ADMIN)) {
             throw new AppException(ErrorCode.INVALID_PERMISSION);
         }
@@ -129,8 +130,10 @@ public class AcademyProfileS3UploadService {
      */
     public String getStoredUrl(Long academyId) {
 
-        if (academyProfileRepository.existsAcademyProfileByAcademy_Id(academyId)) {
-            return academyProfileRepository.findByAcademy_Id(academyId).get().getStoredFileUrl();
+        Optional<AcademyProfile> profile = academyProfileRepository.findByAcademy_Id(academyId);
+        
+        if (profile.isPresent()) {
+            return profile.get().getStoredFileUrl();
         } else {
             return "null";
         }
@@ -146,9 +149,8 @@ public class AcademyProfileS3UploadService {
      */
     public DeleteAcademyProfileResponse deleteAcademyProfile(Long academyId, Long academyProfileId, String filePath, String account) {
 
-        // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+        // 학원, 해당 학원 소속 직원 존재 유무 확인
         Academy academy = validateAcademyById(academyId);
-        // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
         Employee employee = validateRequestEmployeeByAcademy(account, academy);
 
         // 원장만 파일 삭제할 권한 있음
@@ -156,7 +158,7 @@ public class AcademyProfileS3UploadService {
             throw new AppException(ErrorCode.INVALID_PERMISSION);
         }
 
-        // 학원프로필 아이디로 직원 프로필 조회 - 없을시 ACADEMY_PROFILE_NOT_FOUND 에러발생
+        // 학원 프로필 존재 유무 확인
         AcademyProfile academyProfile = validateAcademyProfileById(academyProfileId);
 
         try {
@@ -174,9 +176,8 @@ public class AcademyProfileS3UploadService {
     @Transactional(readOnly = true)
     public ResponseEntity<byte[]> downloadAcademyProfile(Long academyId, String fileUrl, String account) throws IOException {
 
-        // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
+        // 학원, 해당 학원 소속 직원 존재 유무 확인
         Academy academy = validateAcademyById(academyId);
-        // 요청하는 계정과 학원으로 직원을 조회 - 없을시 REQUEST_EMPLOYEE_NOT_FOUND 에러발생
         validateRequestEmployeeByAcademy(account, academy);
 
         // S3 객체 추출해서 byte 배열로 변환

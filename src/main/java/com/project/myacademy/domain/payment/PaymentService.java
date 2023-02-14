@@ -20,7 +20,7 @@ import com.project.myacademy.domain.student.Student;
 import com.project.myacademy.domain.student.StudentRepository;
 import com.project.myacademy.global.exception.AppException;
 import com.project.myacademy.global.exception.ErrorCode;
-import com.project.myacademy.global.util.EmailUtil;
+import com.project.myacademy.domain.email.EmailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONObject;
@@ -53,7 +53,7 @@ public class PaymentService {
     private final LectureRepository lectureRepository;
     private final CancelPaymentRepository cancelPaymentRepository;
     private final DiscountRepository discountRepository;
-    private final EmailUtil emailUtil;
+    private final EmailService emailService;
 
     @Value("${payment.toss.testSecretApiKey}")
     private String testSecretApiKey;
@@ -92,7 +92,7 @@ public class PaymentService {
         Enrollment studentEnrollment = validateEnrollmentByStudentAndLecture(foundStudent, foundLecture);
 
         //결제 여부 확인 - 이미결제가 되어있을시 DUPLICATED_PAYMENT 에러발생
-        if (studentEnrollment.getPaymentYN().equals(true)) {
+        if (studentEnrollment.getPaymentYN()) {
             throw new AppException(ErrorCode.DUPLICATED_PAYMENT);
         }
 
@@ -183,22 +183,22 @@ public class PaymentService {
         Enrollment enrollment = validateEnrollmentByStudentAndLecture(selcetedPayment.getStudent(), selcetedPayment.getLecture());
 
         // 결제 여부 확인
-        if (enrollment.getPaymentYN().equals(true)) {
-            throw new AppException(ErrorCode.ALREADY_PAYMENT);
+        if (enrollment.getPaymentYN()) {
+            throw new AppException(ErrorCode.DUPLICATED_PAYMENT);
         }
 
         //결제 여부 false로 변경
         enrollment.updatePaymentTrue();
 
         // 학생의 이메일로 메시지 전송
-        String email = enrollment.getStudent().getEmail();
-        String subject = "MyAcademy 결제 완료 안내 메일";
-        String body = String.format("%s님의 %d원 %s 결제가 정상적으로 완료되었습니다.%n%n감사합니다.", enrollment.getStudent().getName(), amount, enrollment.getLecture().getName());
-        try {
-            emailUtil.sendEmail(email, subject, body);
-        } catch (MailException | MessagingException e){
-            log.info("결제 완료 이메일 전송 에러 발생 [{}]", e.getMessage());
-        }
+//        String email = enrollment.getStudent().getEmail();
+//        String subject = "MyAcademy 결제 완료 안내 메일";
+//        String body = String.format("%s님의 %d원 %s 결제가 정상적으로 완료되었습니다.%n%n감사합니다.", enrollment.getStudent().getName(), amount, enrollment.getLecture().getName());
+//        try {
+//            emailService.sendEmail(email, subject, body);
+//        } catch (MailException | MessagingException e){
+//            log.info("결제 완료 이메일 전송 에러 발생 [{}]", e.getMessage());
+//        }
 
         RestTemplate rest = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -293,18 +293,18 @@ public class PaymentService {
                 .build());
 
         // 학생의 이메일로 메시지 전송
-        Student foundStudent = enrollment.getStudent();
-        Lecture foundLecture = enrollment.getLecture();
-        String email = foundStudent.getEmail();
-        String subject = "MyAcademy 결제 취소 안내 메일";
-        String body = String.format("%s님의 %s 결제 취소가 정상적으로 처리되었습니다.%n%n감사합니다.", foundStudent.getName(), foundLecture.getName());
-        try {
-            emailUtil.sendEmail(email, subject, body);
-        } catch (MailException e2){
-            log.info("결제 취소 이메일 전송 에러 발생 [{}]", e2.getMessage());
-        } catch (MessagingException e) {
-            log.info("결제 취소 이메일 전송 에러 발생 [{}]", e.getMessage());
-        }
+//        Student foundStudent = enrollment.getStudent();
+//        Lecture foundLecture = enrollment.getLecture();
+//        String email = foundStudent.getEmail();
+//        String subject = "MyAcademy 결제 취소 안내 메일";
+//        String body = String.format("%s님의 %s 결제 취소가 정상적으로 처리되었습니다.%n%n감사합니다.", foundStudent.getName(), foundLecture.getName());
+//        try {
+//            emailService.sendEmail(email, subject, body);
+//        } catch (MailException e2){
+//            log.info("결제 취소 이메일 전송 에러 발생 [{}]", e2.getMessage());
+//        } catch (MessagingException e) {
+//            log.info("결제 취소 이메일 전송 에러 발생 [{}]", e.getMessage());
+//        }
 
         return rest.postForEntity(
                         uri,
@@ -446,7 +446,7 @@ public class PaymentService {
             Enrollment foundEnrollment = enrollmentRepository.findByLecture_IdAndStudent_Id(payment.getLecture().getId(), payment.getStudent().getId())
                     .orElseThrow(() -> new AppException(ErrorCode.ENROLLMENT_NOT_FOUND));
 
-            if (foundEnrollment.getPaymentYN().equals(true)) {
+            if (foundEnrollment.getPaymentYN()) {
 
                 CompletePaymentResponse completePayment = new CompletePaymentResponse(payment);
 
