@@ -41,15 +41,18 @@
                     <div class="row">
                         <div class="card my-4">
 
-                            <div class="col-4">
-                                <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-                                    <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
-                                        <h6 class="text-white text-capitalize ps-3">선택한 강의를 수강하는 학생 정보입니다.</h6>
+                            <div class="card-header pb-0">
+                                <div class="row">
+                                    <div class="col-lg-9 col-7">
+                                        <h3 style="font-family: 'Jua', sans-serif;; font-size: 3.5rem; font-weight: lighter;color: #5A2082">출석부</h3>
+                                        <p class="mb-0" style="font-weight: bold;color: #5A2060">해당 강의를 수강하는 학생 명단입니다.</p>
+
                                     </div>
                                 </div>
                             </div>
-
-
+                            <div>
+                                <hr style="color: #5A2082; height: 1.5px;background-color: #5A2082">
+                            </div>
                             <div class="card-body px-0 pb-2">
                                 <div class="table-responsive">
                                     <table class="table align-items-center mb-0">
@@ -76,6 +79,7 @@
                                                 <th class="align-middle text-center">
                                                 <span class=" text-xs font-weight-bold"
                                                       th:text="${student.studentPhoneNum}"></span>
+
                                                 </th>
                                                 <th class="align-middle text-center">
 

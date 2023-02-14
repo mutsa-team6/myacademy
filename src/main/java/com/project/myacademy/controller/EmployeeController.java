@@ -154,6 +154,8 @@ public class EmployeeController {
         //특정 강의의 lectureId를 파라미터로 받아서, 해당 강의를 결제한 학생을 구하기 위해 사용한 메서드
         Page<FindStudentInfoFromEnrollmentByLectureResponse> studentsInfo
                 = enrollmentService.findStudentInfoFromEnrollmentByLecture(academyId, requestAccount, lectureId, pageable);
+
+
         model.addAttribute("studentsInfo", studentsInfo);
 
         model.addAttribute(PREVIOUS, pageable.previousOrFirst().getPageNumber());

@@ -189,8 +189,10 @@
                                                 <div class="modal-body">
                                                     <div class="input-group input-group-outline mb-3">
                                                         <label class="form-label">취소 사유를 적어주세요</label>
-                                                        <input type="text" class="form-control" id="input-employeePassword"
-                                                               name="employeePassword" th:id="|cancelReason${payment.paymentId}|">
+                                                        <input type="text" class="form-control"
+                                                               id="input-employeePassword"
+                                                               name="employeePassword"
+                                                               th:id="|cancelReason${payment.paymentId}|">
                                                     </div>
                                                 </div>
 
@@ -201,7 +203,15 @@
                                                     <button type="button" class="btn btn-primary"
                                                             th:data-parameter1="${payment.paymentKey}"
                                                             th:data-parameter2="${payment.paymentId}"
-                                                            th:onclick="|payment.delete(this.getAttribute('data-parameter1'),this.getAttribute('data-parameter2'))|"
+                                                            th:data-parameter3="${academy.academyId}"
+                                                            th:data-parameter4="${payment.studentEmail}"
+                                                            th:data-parameter5="${payment.studentName}"
+                                                            th:data-parameter6="${payment.orderName}"
+                                                            th:data-parameter7="${payment.amount}"
+                                                            th:onclick="|payment.delete(this.getAttribute('data-parameter1'),this.getAttribute('data-parameter2')
+                                                            ,this.getAttribute('data-parameter3'),this.getAttribute('data-parameter4')
+                                                            ,this.getAttribute('data-parameter5'),this.getAttribute('data-parameter6')
+                                                             ,this.getAttribute('data-parameter7'))|"
                                                     >결제 취소
                                                     </button>
                                                 </div>
@@ -249,7 +259,7 @@
             var _this = this;
         },
 
-        delete: function (paymentKey, paymentId) {
+        delete: function (paymentKey, paymentId, academyId, email, studentName, lectureName, amount) {
 
             console.log("paymentId " + paymentId);
             let cancelReason = document.querySelector("#cancelReason" + paymentId).value.trim();
@@ -264,6 +274,27 @@
                 console.log(response);
                 alert("결제 취소 성공");
                 window.location.href = '/academy/payment/list';
+
+                let data = {
+                    email: email,
+                    title: studentName + '님의 ' + lectureName + ' 강좌 결제 취소 안내 메일입니다.',
+                    body: studentName + '님의 ' + lectureName + ' 강좌 관련 ' + amount + '원 결제 취소가 정상적으로 완료되었습니다. \n \n감사합니다.',
+
+                };
+
+                axios.post("/api/v1/academies/" + academyId + "/send/email",
+                    JSON.stringify(data), {
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    }
+                ).then((response) => {
+
+                }).catch((error) => {
+                    console.log(error);
+                    alert(error.response.data.result["message"]);
+                });
+
             }).catch((error) => {
                 console.log(error);
                 alert(error.response.data.result["message"]);

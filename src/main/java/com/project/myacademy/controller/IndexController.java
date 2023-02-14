@@ -79,6 +79,12 @@ public class IndexController {
 
         return "pages/main";
     }
+
+    @GetMapping("/about")
+    public String about(){
+        return "about/about";
+    }
+
     private FindAcademyResponse setSessionAcademyInfo(HttpServletRequest request, Model model, Long academyId) {
         FindAcademyResponse academy = academyService.findAcademyById(academyId);
         SessionUtil.setSessionAcademyName(request,academy);
