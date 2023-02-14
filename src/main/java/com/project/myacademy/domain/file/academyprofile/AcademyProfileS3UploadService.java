@@ -32,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -129,8 +130,10 @@ public class AcademyProfileS3UploadService {
      */
     public String getStoredUrl(Long academyId) {
 
-        if (academyProfileRepository.existsAcademyProfileByAcademy_Id(academyId)) {
-            return academyProfileRepository.findByAcademy_Id(academyId).get().getStoredFileUrl();
+        Optional<AcademyProfile> profile = academyProfileRepository.findByAcademy_Id(academyId);
+        
+        if (profile.isPresent()) {
+            return profile.get().getStoredFileUrl();
         } else {
             return "null";
         }
