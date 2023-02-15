@@ -193,7 +193,7 @@
 
                                             <th class="align-middle text-center">
                                                 <span class=" text font-weight-bold" style="font-size: small"
-                                                      th:text="${lecture.lectureDay} +' // ' + ${lecture.lectureTime}"></span>
+                                                      th:text="${lecture.lectureDay} +' | ' + ${lecture.lectureTime}"></span>
                                             </th>
                                             <th class="align-middle text-center">
                                                 <span class=" text font-weight-bold" style="font-size: small"
@@ -304,19 +304,37 @@
                                                         </tr>
                                                         </thead>
                                                         <tbody>
-                                                        <tr th:each="student : ${lecture.registeredStudent}">
+                                                        <tr th:each="registerStu : ${lecture.registeredStudent}">
                                                             <th class="align-middle text-center">
                                                 <span class=" text-xs font-weight-bold"
-                                                      th:text="${student.studentName}"></span>
+                                                      th:text="${registerStu.studentName}"></span>
                                                             </th>
                                                             <td class="align-middle text-center">
                                                 <span class=" text-xs font-weight-bold"
-                                                      th:text="${student.studentPhoneNum}"></span>
+                                                      th:text="${registerStu.studentPhoneNum}"></span>
                                                             </td>
                                                             <td class="align-middle text-center">
                                                 <span class=" text-xs font-weight-bold"
-                                                      th:text="${student.paymentYn}"></span>
+                                                      th:text="${registerStu.paymentYn}"></span>
                                                             </td>
+                                                            <th:block
+                                                                    th:if="${registerStu.paymentYn == false}">
+                                                            <td>
+                                                            <a type="button" th:data-parameter1="${registerStu.studentId}"
+                                                                    th:data-parameter2="${registerStu.enrollmentId}"
+                                                                    th:data-parameter3="${academy.academyId}"
+                                                                    th:data-parameter4="${lecture.lectureId}"
+                                                                    th:data-parameter5="${registerStu.studentEmail}"
+                                                                    th:data-parameter6="${registerStu.studentName}"
+                                                                    th:data-parameter7="${lecture.lectureName}"
+                                                                    th:onclick="|register.deleteEnrollment(this.getAttribute('data-parameter1'),this.getAttribute('data-parameter2')
+                                                ,this.getAttribute('data-parameter3'),this.getAttribute('data-parameter4')
+                                                ,this.getAttribute('data-parameter5'),this.getAttribute('data-parameter6')
+                                                ,this.getAttribute('data-parameter7'))|"
+                                                               class="text-danger font-weight-bold text-xs">delete
+                                                            </a>
+                                                            </td>
+                                                            </th:block>
                                                         </tr>
                                                         </tbody>
                                                     </table>
@@ -518,6 +536,51 @@
                 alert(error.response.data.result["message"]);
             });
 
+        },
+
+        deleteEnrollment: function (studentId,enrollmentId,academyId,lectureId,email,studentName,lectureName) {
+
+            const con_check = confirm("삭제하시겠습니까?");
+
+            let data = {
+                memo: "수강 신청이 취소되었습니다.",
+            };
+
+            if (con_check === true) {
+                axios.post("/api/v1/academies/"+academyId+"/students/"+studentId+"/lectures/"+lectureId+"/enrollments/"+enrollmentId,
+                    JSON.stringify(data), {
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    }
+                ).then((response) => {
+                    alert("수강신청이 취소되었습니다.");
+                    window.location.reload();
+
+                    let data = {
+                        email: email,
+                        title: studentName+'님의 수강 등록 취소 안내 메일입니다.',
+                        body: studentName+'님의 '+lectureName+' 강좌 수강 등록 취소가 정상적으로 완료되었습니다. \n \n감사합니다.'
+                    };
+
+                    axios.post("/api/v1/academies/" + academyId + "/send/email",
+                        JSON.stringify(data), {
+                            headers: {
+                                'Content-Type': 'application/json',
+                            }
+                        }
+                    ).then((response) => {
+
+                    }).catch((error) => {
+                        console.log(error);
+                        alert(error.response.data.result["message"]);
+                    });
+
+                }).catch((error) => {
+                    console.log(error);
+                    alert(error.response.data.result["message"]);
+                });
+            }
         },
 
         deleteWaiting: function (academyId, studentId, lectureId, waitinglistId, email, studentName, lectureName) {

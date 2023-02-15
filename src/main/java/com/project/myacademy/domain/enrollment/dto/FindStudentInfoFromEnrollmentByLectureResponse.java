@@ -19,6 +19,7 @@ public class FindStudentInfoFromEnrollmentByLectureResponse {
     private Long waitingNum;
     private Long waitingId;
     private Long lectureId;
+    private Long enrollmentId;
 
     public FindStudentInfoFromEnrollmentByLectureResponse(Student student,Long waitingId,Long lectureId) {
         this.studentName = student.getName();
@@ -34,5 +35,6 @@ public class FindStudentInfoFromEnrollmentByLectureResponse {
         this.studentId = enrollment.getStudent().getId();
         this.paymentYn = enrollment.getPaymentYN();
         this.studentEmail = enrollment.getStudent().getEmail();
+        this.enrollmentId = enrollment.getId();
     }
 }
