@@ -191,17 +191,6 @@ public class EmployeeService {
 
         Employee changedEmployee = employeeRepository.save(foundEmployee);
 
-//        String title = String.format("%s님의 임시 비밀번호 안내 메일입니다.", name);
-//        String body = String.format("안녕하세요.%n%nMyAcademy 임시 비밀번호 안내 관련 메일입니다.%n%n%s님의 임시 비밀번호는 %s입니다.%n%n발급된 임시 비밀번호로 로그인해서 새 비밀번호로 변경 후 이용바랍니다.%n%n감사합니다.", name, tempPassword);
-//
-//        try {
-//            emailService.sendEmail(email, title, body);
-//        } catch (MailException e2){
-//            log.info("이메일 전송 에러 발생 [{}]", e2.getMessage());
-//        } catch (MessagingException e) {
-//            log.info("이메일 전송 에러 발생 [{}]", e.getMessage());
-//        }
-
         return FindPasswordEmployeeResponse.of(changedEmployee);
     }
 
@@ -459,6 +448,17 @@ public class EmployeeService {
         Academy academy = validateAcademyById(academyId);
         return employeeRepository.countByAcademy(academy);
     }
+
+    /**
+     * 해당 이메일로 가입한 사용자의 존재 여부
+     *
+     */
+    public boolean checkExistByEmployeeEmail(String email) {
+
+        // 해당이름의 학원이 존재하면 true 없으면 false 반환
+        return employeeRepository.existsByEmail(email);
+    }
+
 
     // 학원 Id로 학원을 조회 - 없을시 ACADEMY_NOT_FOUND 에러발생
     private Academy validateAcademyById(Long academyId) {
