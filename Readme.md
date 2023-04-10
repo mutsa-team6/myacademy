@@ -20,8 +20,8 @@
 
 ## 결과물
 
-- [배포 서버 주소](http://ec2-13-209-97-187.ap-northeast-2.compute.amazonaws.com/)
-- [Swagger 주소](http://ec2-13-209-97-187.ap-northeast-2.compute.amazonaws.com/swagger-ui/index.html)
+- [배포 서버 주소](http://ec2-52-78-184-7.ap-northeast-2.compute.amazonaws.com/)
+- [Swagger 주소](http://ec2-52-78-184-7.ap-northeast-2.compute.amazonaws.com/swagger-ui/index.html)
 - [요구사항 정의서](https://www.notion.so/5bb77489934c4912b755290672791299)
 - [테스트 코드](https://myacademy-test-report.netlify.app/)
 - [UI 개발 사항 및 설명](https://www.notion.so/UI-d9f0d36c370d481c8dde19ed3f7ed141)
