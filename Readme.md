@@ -117,15 +117,4 @@
 
 <br>
 
-## 프로젝트 구성원
-
-
-| 이름   | 소감                             | 
-------| ------ | 
-| [권오석](https://github.com/percyfrank) |       |           
-| [박태근](https://github.com/taegeun-park0525)  | |        
-| [윤인규](https://github.com/inkyu-yoon)  |        | 
-| [이가현](https://github.com/kahyeonlee)  |       |                  
-| [최승호](https://github.com/gemdoq)  |           |       
-
 
